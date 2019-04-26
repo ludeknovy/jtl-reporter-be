@@ -8,7 +8,7 @@
     "start": "node ./dist/app.js",
     "migrate": "node-pg-migrate",
     "unit-tests": "jest --config=jest-unit.config.js -w=5 --coverage",
-    "lint": "tslint -e 'node_modules/**/*.ts' -c tslint.json src/**/**/*.ts",
+    "lint": "tslint -e 'node_modules/**' -c tslint.json src/**/**/*.ts",
     "ts-check": "tsc --noEmit"
   },
   "keywords": [],
