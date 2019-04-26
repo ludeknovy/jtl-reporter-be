@@ -1,0 +1,93 @@
+// tslint:disable:max-line-length
+
+export const findItemsForScenario = (projectName, scenarioName, limit, offset) => {
+  return {
+    text: `SELECT it.id, environment, upload_time, base, status, start_time, note, overview -> 'maxVu' AS max_vu, overview -> 'duration' as duration FROM jtl.items as it
+    LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
+    LEFT JOIN jtl.item_stat as st ON st.item_id = it.id
+    LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE s.name = $2 AND p.project_name = $1
+    ORDER BY start_time DESC
+    LIMIT $3 OFFSET $4`,
+    values: [projectName, scenarioName, limit, offset]
+  };
+};
+
+export const itemsForScenarioCount = (projectName, scenarioName) => {
+  return {
+    text: `SELECT count(*) as total FROM jtl.items as it
+    LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
+    LEFT JOIN jtl.item_stat as st ON st.item_id = it.id
+    LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE s.name = $2 AND p.project_name = $1;`,
+    values: [projectName, scenarioName]
+  };
+};
+
+
+export const updateScenario = (projectName, scenarioName, name) => {
+  return {
+    text: `
+    UPDATE jtl.scenario as s
+    SET name = $3
+    WHERE s.name = $2
+    AND s.project_id = (SELECT id FROM jtl.projects WHERE project_name = $1)`,
+    values: [projectName, scenarioName, name]
+  };
+};
+
+export const scenarioTrends = (projectName, scenarioName) => {
+  return {
+    text: `SELECT overview, it.id FROM jtl.item_stat as st
+    LEFT JOIN jtl.items as it ON it.id = st.item_id
+    LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
+    LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE s.name = $2
+    AND p.project_name = $1
+    ORDER BY start_time DESC
+    LIMIT 15;`,
+    values: [projectName, scenarioName]
+  };
+};
+
+export const deleteScenario = (projectName, scenarioName) => {
+  return {
+    text: `DELETE FROM jtl.scenario
+    WHERE name = $2 AND project_id = (SELECT id FROM jtl.projects WHERE project_name = $1);`,
+    values: [projectName, scenarioName]
+  };
+};
+
+export const createNewScenario = (projectName, scenarioName) => {
+  return {
+    text: `INSERT INTO jtl.scenario(name, project_id) VALUES($2, (
+      SELECT id FROM jtl.projects WHERE project_name = $1
+    ))`,
+    values: [projectName, scenarioName]
+  };
+};
+
+export const findScenarios = projectName => {
+  return {
+    text: `SELECT s.id, s.name FROM jtl.scenario as s
+    LEFT JOIN jtl.projects p ON p.id = s.project_id
+    WHERE p.project_name = $1;`,
+    values: [projectName]
+  };
+};
+
+export const findScenariosData = (projectName) => {
+  return {
+    text: `SELECT s.id as scenario_id, name, st.overview FROM jtl.item_stat st
+    LEFT JOIN jtl.items as it ON it.id = st.item_id
+    LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
+    WHERE st.item_id IN (
+    SELECT id FROM (
+      SELECT scenario_id, id, start_time, row_number() over (PARTITION BY scenario_id ORDER BY start_time DESC) as rownum FROM jtl.items WHERE scenario_id IN (SELECT s.id FROM jtl.scenario as s LEFT JOIN jtl.projects as p ON p.id = s.project_id WHERE p.project_name = $1)
+      ) tmp
+      WHERE rownum <= 15
+    )
+    ORDER BY it.start_time DESC;`,
+    values: [projectName]
+  };
+};
