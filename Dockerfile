@@ -5,7 +5,7 @@ RUN apk --update add python \
 
 WORKDIR /src/be
 
-COPY package.json ./
+COPY package.json package-lock.json  ./
 
 RUN npm install
 
