@@ -110,7 +110,10 @@ export class ItemsRoutes {
                 const jsonErrors = parser.toJson(fileContent);
                 await db.none(saveErrorsData(item.id, jsonErrors));
               }
-              res.status(200).send({ message: `ok` });
+              res.status(200).send({
+                id: item.id,
+                overview
+              });
             } catch (error) {
               await db.query('ROLLBACK');
               return next(error);
