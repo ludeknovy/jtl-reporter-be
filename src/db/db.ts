@@ -9,5 +9,5 @@ export const db: any = pg({ })({
   database: process.env.DB_NAME || 'jtl_report',
   user: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASS,
-  poolSize: 60
+  max: 60
 });
