@@ -112,7 +112,8 @@ export class ItemsRoutes {
               }
               res.status(200).send({
                 id: item.id,
-                overview
+                overview,
+                status: Object.values(ItemStatus).find(_ => _ === status),
               });
             } catch (error) {
               await db.query('ROLLBACK');
