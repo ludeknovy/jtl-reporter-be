@@ -24,13 +24,14 @@ export const findProjectId = projectName => {
 
 export const findProjects = () => {
   return {
-    text: `SELECT project_name, id FROM jtl.projects;`
+    text: `SELECT project_name as "projectName", id FROM jtl.projects;`
   };
 };
 
 export const latestItems = () => {
   return {
-    text: `SELECT i.id, s.name, environment, project_name, start_time, status FROM jtl.items as i
+    // tslint:disable-next-line:max-line-length
+    text: `SELECT i.id, s.name, environment, project_name as "projectName", start_time as "startTime", status FROM jtl.items as i
     LEFT JOIN jtl.scenario as s ON s.id = i.scenario_id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
     ORDER BY start_time DESC LIMIT 10;`

@@ -34,13 +34,15 @@
     "pg-hstore": "^2.3.2",
     "pg-promise": "^8.5.1",
     "rxjs": "^6.3.3",
-    "sequelize": "^4.39.0",
+    "sequelize": "^4.44.3",
+    "swagger-ui-express": "^4.0.7",
     "tslint": "^5.16.0",
     "uuid": "^3.3.2",
     "winston": "^3.2.1",
     "xml2json": "^0.11.2"
   },
   "devDependencies": {
+    "@types/swagger-ui-express": "^3.0.1",
     "jest": "^24.7.1",
     "ts-jest": "^24.0.2",
     "typescript": "~3.1.6"

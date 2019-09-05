@@ -6,6 +6,8 @@ import * as winston from 'winston';
 import * as expressWinston from 'express-winston';
 import { logger } from './logger';
 import { Router } from './server/router';
+import * as swaggerUi from 'swagger-ui-express';
+const swaggerDocument = require('../openapi.json');
 
 const PORT = 5000;
 
@@ -32,12 +34,15 @@ class App {
       expressFormat: true,
       colorize: false
     }));
+    this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
     this.app.use((req, res, next) => {
       res.header('Access-Control-Allow-Origin', '*');
       res.header('Access-Control-Allow-Methods', '*');
       res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
       next();
     });
+
   }
 
   private errorHandler() {
