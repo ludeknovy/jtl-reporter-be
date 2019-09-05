@@ -1,0 +1,229 @@
+{
+  "openapi" : "3.0.0",
+  "info" : {
+    "title" : "Jtl Reporter Api",
+    "description" : "Jtl Reporter Api",
+    "version" : "1.0.0"
+  },
+  "servers" : [  ],
+  "tags" : [ {
+    "name" : "projects"
+  }, {
+    "name" : "scenarios"
+  }, {
+    "name" : "items"
+  } ],
+  "paths" : {
+    "/projects" : {
+      "get" : {
+        "tags" : [ "projects" ],
+        "summary" : "returns list of projects",
+        "responses" : {
+          "200" : {
+            "description" : "Ok",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ProjectItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "projects" ],
+        "summary" : "create new project",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/NewProject"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "item created"
+          },
+          "400" : {
+            "description" : "invalid input, object invalid"
+          },
+          "409" : {
+            "description" : "an existing item already exists"
+          }
+        }
+      }
+    },
+    "/projects/latest-items" : {
+      "get" : {
+        "tags" : [ "projects" ],
+        "summary" : "get latest project items",
+        "responses" : {
+          "200" : {
+            "description" : "Ok",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ProjectLatestItems"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "bad request"
+          }
+        }
+      }
+    },
+    "/projects/overall-stats" : {
+      "get" : {
+        "tags" : [ "projects" ],
+        "summary" : "returns overall projects summary",
+        "responses" : {
+          "200" : {
+            "description" : "Ok",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProjectOverallStats"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/projects/{projectName}" : {
+      "put" : {
+        "tags" : [ "projects" ],
+        "summary" : "updates project name",
+        "parameters" : [ {
+          "name" : "projectName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/NewProject"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "204" : {
+            "description" : "Ok"
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "projects" ],
+        "summary" : "deletes project",
+        "parameters" : [ {
+          "name" : "projectName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Ok"
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "ProjectItem" : {
+        "required" : [ "id", "projectName" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid",
+            "example" : "d290f1ee-6c54-4b01-90e6-d701748f0851"
+          },
+          "projectName" : {
+            "type" : "string",
+            "example" : "My Project"
+          }
+        }
+      },
+      "NewProject" : {
+        "required" : [ "projectName" ],
+        "type" : "object",
+        "properties" : {
+          "projectName" : {
+            "maxLength" : 50,
+            "minLength" : 3,
+            "type" : "string",
+            "example" : "My Project"
+          }
+        }
+      },
+      "ProjectLatestItems" : {
+        "required" : [ "id", "projectName" ],
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid",
+            "example" : "d290f1ee-6c54-4b01-90e6-d701748f0851"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "environment" : {
+            "type" : "string"
+          },
+          "projectName" : {
+            "type" : "string"
+          },
+          "startTime" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "status" : {
+            "type" : "string",
+            "example" : "passed"
+          }
+        }
+      },
+      "ProjectOverallStats" : {
+        "required" : [ "avgDuration", "avgVu", "totalDuration", "totalRunCount" ],
+        "properties" : {
+          "avgVu" : {
+            "type" : "number"
+          },
+          "avgDuration" : {
+            "type" : "number"
+          },
+          "totalDuration" : {
+            "type" : "number"
+          },
+          "totalRunCount" : {
+            "type" : "number"
+          }
+        }
+      }
+    }
+  }
+}
