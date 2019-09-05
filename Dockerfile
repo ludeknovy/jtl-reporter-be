@@ -9,11 +9,12 @@ COPY package.json package-lock.json  ./
 
 RUN npm install
 
-COPY tsconfig.json ./
+COPY tsconfig.json openapi.json ./
 
 COPY /migrations ./migrations
 
 COPY /src ./src/
+ 
 
 RUN npm run build
 
