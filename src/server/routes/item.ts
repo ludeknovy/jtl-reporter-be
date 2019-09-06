@@ -16,7 +16,8 @@ import {
   findErrors,
   findAttachements,
   removeCurrentBaseFlag,
-  setBaseFlag
+  setBaseFlag,
+  savePlotData
 } from '../queries/items';
 import { db } from '../../db/db';
 import { createNewItem, saveItemStats, saveKpiData, saveErrorsData } from '../queries/items';
@@ -102,6 +103,7 @@ export class ItemsRoutes {
                 status));
               await db.none(saveItemStats(item.id, JSON.stringify(itemStats), overview));
               await db.none(saveKpiData(item.id, JSON.stringify(sortedData)));
+              await db.none(savePlotData(item.id, JSON.stringify(chunkData(sortedData))));
               await db.query('COMMIT');
               if (errors) {
                 const filename = errors[0].path;
@@ -128,7 +130,7 @@ export class ItemsRoutes {
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
           const { projectName, scenarioName, itemId } = req.params;
           const {
-            item_data: data,
+            plot_data: plot,
             note,
             environment,
             base_id,
@@ -136,7 +138,6 @@ export class ItemsRoutes {
           const { stats: statistics, overview } = await db.one(findItemStats(itemId));
           const files = await db.any(findAttachements(itemId));
           const attachements = files.map(_ => _.type);
-          const plot = chunkData(data);
           res.status(200).send({
             overview, statistics, status,
             plot, note, environment,
