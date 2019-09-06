@@ -149,6 +149,181 @@
           }
         }
       }
+    },
+    "/projects/{projectName}/scenarios" : {
+      "get" : {
+        "tags" : [ "scenarios" ],
+        "summary" : "returns list of scenarios",
+        "parameters" : [ {
+          "name" : "projectName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Ok",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ScenarioItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "scenarios" ],
+        "summary" : "creates new scenario",
+        "parameters" : [ {
+          "name" : "projectName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/NewScenario"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "204" : {
+            "description" : "Ok"
+          },
+          "400" : {
+            "description" : "Bad request"
+          }
+        }
+      }
+    },
+    "/projects/{projectName}/scenarios/{scenarioName}" : {
+      "put" : {
+        "tags" : [ "scenarios" ],
+        "summary" : "updates scenario name",
+        "parameters" : [ {
+          "name" : "projectName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "scenarioName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/NewScenario"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "204" : {
+            "description" : "Ok"
+          },
+          "400" : {
+            "description" : "Ok"
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "scenarios" ],
+        "summary" : "deletes scenario",
+        "parameters" : [ {
+          "name" : "projectName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "scenarioName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Ok"
+          }
+        }
+      }
+    },
+    "/projects/{projectName}/scenarios/{scenarioName}/trends" : {
+      "get" : {
+        "tags" : [ "scenarios" ],
+        "summary" : "returns scenario detail",
+        "parameters" : [ {
+          "name" : "projectName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "scenarioName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Ok",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ScenarioDetail"
+                  }
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not found"
+          }
+        }
+      }
     }
   },
   "components" : {
@@ -221,6 +396,95 @@
           },
           "totalRunCount" : {
             "type" : "number"
+          }
+        }
+      },
+      "NewScenario" : {
+        "required" : [ "scenarioName" ],
+        "type" : "object",
+        "properties" : {
+          "scenarioName" : {
+            "maxLength" : 50,
+            "minLength" : 1,
+            "type" : "string",
+            "example" : "new scenario"
+          }
+        }
+      },
+      "ScenarioItem" : {
+        "required" : [ "data", "id", "name" ],
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "example" : "my scenario"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "data" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ScenarioData"
+            }
+          }
+        }
+      },
+      "ScenarioData" : {
+        "required" : [ "avgLatency", "avgResponseTime", "duration", "endDate", "errorRate", "maxVu", "percentil", "startDate", "throughput" ],
+        "type" : "object",
+        "properties" : {
+          "avgLatency" : {
+            "type" : "number",
+            "example" : 32
+          },
+          "avgResponseTime" : {
+            "type" : "number",
+            "example" : 86
+          },
+          "duration" : {
+            "type" : "number",
+            "format" : "float",
+            "example" : 1.4
+          },
+          "errorRate" : {
+            "type" : "number",
+            "example" : 1
+          },
+          "maxVu" : {
+            "type" : "number",
+            "example" : 50
+          },
+          "percentil" : {
+            "type" : "number",
+            "example" : 39
+          },
+          "throughput" : {
+            "type" : "number",
+            "format" : "float",
+            "example" : 1.6
+          },
+          "startDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "endDate" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        }
+      },
+      "ScenarioDetail" : {
+        "required" : [ "id", "overview" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "overview" : {
+            "$ref" : "#/components/schemas/ScenarioData"
           }
         }
       }
