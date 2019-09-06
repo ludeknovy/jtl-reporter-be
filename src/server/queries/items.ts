@@ -15,25 +15,30 @@ export const saveKpiData = (itemId, data) => {
   };
 };
 
+export const savePlotData = (itemId, data) => {
+  return {
+    text: 'INSERT INTO jtl.charts(item_id, plot_data) VALUES($1, $2)',
+    values: [itemId, data]
+  };
+};
+
 export const findItem = (itemId, projectName, scenarioName) => {
   return {
-    text: `SELECT data.item_data, note, environment, status, (SELECT items.id FROM jtl.items as items
-      LEFT JOIN jtl.data as data ON data.item_id = items.id
+    text: `SELECT charts.plot_data, note, environment, status, (SELECT items.id FROM jtl.items as items
+      LEFT JOIN jtl.charts as charts ON charts.item_id = items.id
       LEFT JOIN jtl.scenario as s ON s.id = items.scenario_id
       LEFT JOIN jtl.projects as p ON p.id = s.project_id
       WHERE s.name = $3
       AND p.project_name = $2
-      AND base is not null
-      AND data_type = $4) as base_id
+      AND base is not null) as base_id
     FROM jtl.items as items
-    LEFT JOIN jtl.data as data ON data.item_id = items.id
+    LEFT JOIN jtl.charts as charts ON charts.item_id = items.id
     LEFT JOIN jtl.scenario as s ON s.id = items.scenario_id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
     WHERE items.id = $1
     AND p.project_name = $2
-    AND s.name = $3
-    AND data_type = $4;`,
-    values: [itemId, projectName, scenarioName, ItemDataType.Kpi]
+    AND s.name = $3;`,
+    values: [itemId, projectName, scenarioName]
   };
 };
 
