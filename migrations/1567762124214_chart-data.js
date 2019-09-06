@@ -17,17 +17,21 @@ exports.up = (pgm) => {
   });
   pgm.db.select({
     text: `
-      SELECT item_data, item_id
+      SELECT id, item_id
       FROM jtl.data
       WHERE data_type = $1;
     `,
     values: ['kpi']
   }).then((result) => {
-    return Promise.all(result.map(_ => {
+    return Promise.all(result.map(async({ id, item_id }) => {
+      const [data] = await pgm.db.select({
+        text: `SELECT item_data FROM jtl.data WHERE id = $1`,
+        values: [id]
+      })
       return pgm.db.query({
         text: `
           INSERT INTO jtl.charts(plot_data, item_id) VALUES($1, $2);`,
-        values: [chunkData(_.item_data), _.item_id]
+        values: [chunkData(data.item_data), item_id]
       }).then(res => res)
         .catch(e => console.log(e))
     })).catch(e => console.log(e))
