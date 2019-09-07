@@ -46,12 +46,12 @@ export class ProjectRoutes {
 
     app.route('/api/projects/overall-stats')
       .get(wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
-        const { avg_vu, avg_duration, total_duration, total_count } = await db.one(dashboardStats());
+        const { avgVu, avgDuration, totalDuration, totalCount } = await db.one(dashboardStats());
         res.status(200).send({
-          avgVu: parseInt(avg_vu, 10),
-          avgDuration: parseInt(avg_duration, 10),
-          totalDuration: parseInt(total_duration, 10),
-          totalRunCount: parseInt(total_count, 10)
+          avgVu: parseInt(avgVu, 10),
+          avgDuration: parseInt(avgDuration, 10),
+          totalDuration: parseInt(totalDuration, 10),
+          totalRunCount: parseInt(totalCount, 10)
         });
       }));
 

@@ -137,9 +137,9 @@ export const setBaseFlag = (itemId, scenarioName) => {
 export const dashboardStats = () => {
   return {
     text: `
-    SELECT round(AVG((overview -> 'maxVu')::int)) as avg_vu,
-    round(AVG((overview -> 'duration')::int)) as avg_duration,
-    round(SUM((overview -> 'duration')::int)) as total_duration,
-    count(*) as total_count from jtl.item_stat;`
+    SELECT round(AVG((overview -> 'maxVu')::int)) as "avgVu",
+    round(AVG((overview -> 'duration')::int)) as "avgDuration",
+    round(SUM((overview -> 'duration')::int)) as "totalDuration",
+    count(*) as "totalCount" from jtl.item_stat;`
   };
 };

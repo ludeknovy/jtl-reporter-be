@@ -58,7 +58,7 @@ export class ItemsRoutes {
             _.base = !_.base ? false : true;
             return _;
           });
-          res.status(200).send({ name: scenarioName, data: idsBaseUpdate, total });
+          res.status(200).send({ name: scenarioName, data: idsBaseUpdate, total: parseInt(total, 10) });
         }))
 
       .post(
