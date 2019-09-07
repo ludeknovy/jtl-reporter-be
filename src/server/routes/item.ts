@@ -160,7 +160,7 @@ export class ItemsRoutes {
               await db.none(setBaseFlag(itemId, scenarioName));
             }
             await db.query('COMMIT');
-            res.status(200).send({});
+            res.status(204).send();
           } catch (error) {
             await db.query('ROLLBACK');
             return next(error);
@@ -174,22 +174,6 @@ export class ItemsRoutes {
           await db.any(deleteItem(projectName, scenarioName, itemId));
           res.status(204).send();
         }));
-
-    app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/errors')
-      .get(
-        paramsSchemaValidator(paramsSchema),
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
-          const { projectName, itemId } = req.params;
-          const { errors } = await db.one(findErrors(itemId, projectName));
-          let fileContents = new Buffer(JSON.stringify(errors), null);
-          let readStream = new stream.PassThrough();
-          readStream.end(fileContents);
-          res.writeHead(200, {
-            'Content-Type': 'application/text'
-          });
-          readStream.pipe(res);
-        }));
-
   }
 }
 

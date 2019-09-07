@@ -30,7 +30,7 @@ export class ProjectRoutes {
           } else {
             return next(boom.conflict('Project already exists'));
           }
-          res.status(200).send({ message: `ok` });
+          res.status(201).send();
         }))
 
       .get(wrapAsync(async (req: Request, res: Response) => {

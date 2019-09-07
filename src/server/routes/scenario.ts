@@ -43,7 +43,7 @@ export class ScenarioRoutes {
           const { projectName } = req.params;
           const { scenarioName } = req.body;
           await db.none(createNewScenario(projectName, scenarioName));
-          res.status(200).send();
+          res.status(201).send();
         }));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName')
@@ -54,7 +54,7 @@ export class ScenarioRoutes {
           const { projectName, scenarioName } = req.params;
           const { scenarioName: newScenarioSchema } = req.body;
           await db.any(updateScenario(projectName, scenarioName, newScenarioSchema));
-          res.status(204).send({});
+          res.status(204).send();
         }))
 
       .delete(
@@ -62,7 +62,7 @@ export class ScenarioRoutes {
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
           const { projectName, scenarioName } = req.params;
           await db.none(deleteScenario(projectName, scenarioName));
-          res.status(204).send({});
+          res.status(204).send();
         }));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/trends')

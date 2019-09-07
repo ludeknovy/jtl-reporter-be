@@ -5,7 +5,9 @@
     "description" : "Jtl Reporter Api",
     "version" : "1.0.0"
   },
-  "servers" : [  ],
+  "servers" : [ {
+    "url" : "/"
+  } ],
   "tags" : [ {
     "name" : "projects"
   }, {
@@ -126,7 +128,7 @@
         },
         "responses" : {
           "204" : {
-            "description" : "Ok"
+            "description" : "No content"
           }
         }
       },
@@ -145,7 +147,7 @@
         } ],
         "responses" : {
           "204" : {
-            "description" : "Ok"
+            "description" : "No content"
           }
         }
       }
@@ -204,7 +206,7 @@
         },
         "responses" : {
           "204" : {
-            "description" : "Ok"
+            "description" : "No content"
           },
           "400" : {
             "description" : "Bad request"
@@ -246,7 +248,7 @@
         },
         "responses" : {
           "204" : {
-            "description" : "Ok"
+            "description" : "No content"
           },
           "400" : {
             "description" : "Ok"
@@ -277,7 +279,7 @@
         } ],
         "responses" : {
           "204" : {
-            "description" : "Ok"
+            "description" : "No content"
           }
         }
       }
@@ -285,7 +287,7 @@
     "/projects/{projectName}/scenarios/{scenarioName}/trends" : {
       "get" : {
         "tags" : [ "scenarios" ],
-        "summary" : "returns scenario detail",
+        "summary" : "returns scenario trends",
         "parameters" : [ {
           "name" : "projectName",
           "in" : "path",
@@ -324,12 +326,254 @@
           }
         }
       }
+    },
+    "/projects/{projectName}/scenarios/{scenarioName}/items" : {
+      "get" : {
+        "tags" : [ "items" ],
+        "summary" : "returns list of items",
+        "parameters" : [ {
+          "name" : "projectName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "scenarioName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "offset",
+          "in" : "query",
+          "description" : "The number of items to skip before starting to collect the result set",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "number"
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "The numbers of items to return",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "number"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Ok",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Items"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not found"
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "items" ],
+        "summary" : "create new item",
+        "parameters" : [ {
+          "name" : "projectName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "scenarioName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/NewItem"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Ok",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ItemSave"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad request"
+          }
+        }
+      }
+    },
+    "/projects/{projectName}/scenarios/{scenarioName}/items/{itemId}" : {
+      "get" : {
+        "tags" : [ "items" ],
+        "summary" : "returns item detail",
+        "parameters" : [ {
+          "name" : "projectName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "scenarioName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "itemId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Ok",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Item"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "items" ],
+        "summary" : "updates item",
+        "parameters" : [ {
+          "name" : "projectName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "scenarioName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "itemId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ItemUpdate"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No content"
+          },
+          "400" : {
+            "description" : "Bad request"
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "items" ],
+        "summary" : "deletes item",
+        "parameters" : [ {
+          "name" : "projectName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "scenarioName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "itemId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No content"
+          },
+          "404" : {
+            "description" : "Not found"
+          }
+        }
+      }
     }
   },
   "components" : {
     "schemas" : {
       "ProjectItem" : {
-        "required" : [ "id", "projectName" ],
+        "required" : [ "id", "itemCount", "projectName", "scenarioCount" ],
         "type" : "object",
         "properties" : {
           "id" : {
@@ -340,6 +584,18 @@
           "projectName" : {
             "type" : "string",
             "example" : "My Project"
+          },
+          "itemCount" : {
+            "type" : "number",
+            "example" : 10
+          },
+          "scenariocount" : {
+            "type" : "number",
+            "example" : 3
+          },
+          "latestRun" : {
+            "type" : "string",
+            "format" : "date-time"
           }
         }
       },
@@ -485,6 +741,266 @@
           },
           "overview" : {
             "$ref" : "#/components/schemas/ScenarioData"
+          }
+        }
+      },
+      "Items" : {
+        "required" : [ "data", "name", "total" ],
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "example" : "scenario name"
+          },
+          "total" : {
+            "type" : "number",
+            "example" : 20
+          },
+          "data" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ItemsData"
+            }
+          }
+        }
+      },
+      "ItemsData" : {
+        "required" : [ "base", "duration", "id", "maxVu", "startTime", "status", "uploadTime" ],
+        "type" : "object",
+        "properties" : {
+          "base" : {
+            "type" : "boolean"
+          },
+          "duration" : {
+            "type" : "number",
+            "format" : "float",
+            "example" : 10.1
+          },
+          "environment" : {
+            "type" : "string",
+            "example" : "prod"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "maxVu" : {
+            "type" : "number",
+            "example" : 30
+          },
+          "note" : {
+            "type" : "string",
+            "example" : "test note"
+          },
+          "startTime" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "status" : {
+            "type" : "string",
+            "example" : "1"
+          },
+          "uploadTime" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }
+      },
+      "NewItem" : {
+        "type" : "object",
+        "properties" : {
+          "environment" : {
+            "type" : "string",
+            "example" : "test"
+          },
+          "note" : {
+            "type" : "string",
+            "example" : "test note"
+          },
+          "status" : {
+            "type" : "string",
+            "example" : "1",
+            "enum" : [ "10", "0", "1", "2", "3" ]
+          },
+          "kpi" : {
+            "format" : "binary"
+          },
+          "errors" : {
+            "format" : "binary"
+          }
+        }
+      },
+      "ItemSave" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "overview" : {
+            "$ref" : "#/components/schemas/ScenarioData"
+          },
+          "status" : {
+            "type" : "string",
+            "example" : "1",
+            "enum" : [ "10", "0", "1", "2", "3" ]
+          }
+        }
+      },
+      "Item" : {
+        "type" : "object",
+        "properties" : {
+          "isBase" : {
+            "type" : "boolean"
+          },
+          "baseId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "environment" : {
+            "type" : "string",
+            "example" : "test"
+          },
+          "note" : {
+            "type" : "string",
+            "example" : "test note"
+          },
+          "overview" : {
+            "$ref" : "#/components/schemas/ScenarioData"
+          },
+          "status" : {
+            "type" : "string",
+            "example" : "1",
+            "enum" : [ "10", "0", "1", "2", "3" ]
+          },
+          "statistics" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Statistics"
+            }
+          },
+          "plot" : {
+            "$ref" : "#/components/schemas/Item_plot"
+          }
+        }
+      },
+      "Statistics" : {
+        "type" : "object",
+        "properties" : {
+          "avgResponseTime" : {
+            "type" : "number",
+            "example" : 30
+          },
+          "errorRate" : {
+            "type" : "number",
+            "format" : "float",
+            "example" : 4.3
+          },
+          "label" : {
+            "type" : "string",
+            "example" : "label name"
+          },
+          "maxResponseTime" : {
+            "type" : "number",
+            "example" : 432
+          },
+          "minResponseTime" : {
+            "type" : "number",
+            "example" : 32
+          },
+          "n0" : {
+            "type" : "number",
+            "example" : 12
+          },
+          "n5" : {
+            "type" : "number",
+            "example" : 21
+          },
+          "n9" : {
+            "type" : "number",
+            "example" : 23
+          },
+          "samples" : {
+            "type" : "number",
+            "example" : 642
+          },
+          "throughput" : {
+            "type" : "number",
+            "format" : "float",
+            "example" : 4.2
+          }
+        }
+      },
+      "PlotItem" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "example" : "name"
+          },
+          "data" : {
+            "type" : "array",
+            "items" : {
+              "type" : "array",
+              "items" : {
+                "type" : "number"
+              }
+            }
+          }
+        }
+      },
+      "ItemUpdate" : {
+        "required" : [ "base", "environment" ],
+        "type" : "object",
+        "properties" : {
+          "environment" : {
+            "maxLength" : 50,
+            "minLength" : 1,
+            "type" : "string",
+            "example" : "test"
+          },
+          "note" : {
+            "maxLength" : 250,
+            "type" : "string",
+            "example" : "test note"
+          },
+          "base" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "Item_plot" : {
+        "type" : "object",
+        "properties" : {
+          "overallFailRate" : {
+            "$ref" : "#/components/schemas/PlotItem"
+          },
+          "overallThroughput" : {
+            "$ref" : "#/components/schemas/PlotItem"
+          },
+          "overallTimeResponse" : {
+            "$ref" : "#/components/schemas/PlotItem"
+          },
+          "responseTime" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PlotItem"
+            }
+          },
+          "threads" : {
+            "type" : "array",
+            "items" : {
+              "type" : "array",
+              "items" : {
+                "type" : "number"
+              }
+            }
+          },
+          "throughput" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PlotItem"
+            }
           }
         }
       }
