@@ -5,7 +5,6 @@ import * as express from 'express';
 import * as multer from 'multer';
 import * as boom from 'boom';
 import * as fs from 'fs';
-import * as stream from 'stream';
 import { wrapAsync } from '../errors/error-handler';
 import { chunkData } from '../data-stats/chunk-data';
 import {
@@ -13,11 +12,11 @@ import {
   findItemStats,
   updateTestItemInfo,
   deleteItem,
-  findErrors,
   findAttachements,
   removeCurrentBaseFlag,
   setBaseFlag,
-  savePlotData
+  savePlotData,
+  getEndpointHistory
 } from '../queries/items';
 import { db } from '../../db/db';
 import { createNewItem, saveItemStats, saveKpiData, saveErrorsData } from '../queries/items';
@@ -25,11 +24,15 @@ import {
   bodySchemaValidator, paramsSchemaValidator,
   queryParamsValidator
 } from '../schema-validator/schema-validator-middleware';
-import { paramsSchema, updateItemBodySchema, newItemParamSchema } from '../schema-validator/item-schema';
+import {
+  paramsSchema, updateItemBodySchema,
+  newItemParamSchema, endpointQuerySchema
+} from '../schema-validator/item-schema';
 import { paramsSchema as scenarioParamsSchema, querySchema } from '../schema-validator/scenario-schema';
 import { findItemsForScenario, itemsForScenarioCount } from '../queries/scenario';
 import { prepareDataForSavingToDb, ItemDbData } from '../data-stats/prepare-data';
 import { ItemStatus } from '../queries/items.model';
+import * as moment from 'moment';
 const upload = multer(
   {
     dest: `./uploads`,
@@ -174,6 +177,42 @@ export class ItemsRoutes {
           await db.any(deleteItem(projectName, scenarioName, itemId));
           res.status(204).send();
         }));
+
+    app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label-trend')
+      .get(
+        paramsSchemaValidator(paramsSchema),
+        queryParamsValidator(endpointQuerySchema),
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
+          const { projectName, scenarioName } = req.params;
+          const { name } = req.query;
+          const queryResult = await db.query(getEndpointHistory(scenarioName, projectName, name));
+          const timePoints = [];
+          const n0 = [];
+          const n5 = [];
+          const n9 = [];
+          const errorRate = [];
+          const throughput = [];
+          const threads = [];
+          console.log(queryResult.length);
+          try {
+            queryResult.forEach((_) => {
+              let { start_time } = _;
+              timePoints.push(moment(start_time).format(`DD.MM.YYYY HH:mm:SS`));
+              n0.push( _.labels.n0);
+              n5.push(_.labels.n5);
+              n9.push(_.labels.n9);
+              errorRate.push(_.labels.errorRate);
+              throughput.push(_.labels.throughput);
+              threads.push(_.max_vu);
+            });
+          } catch (error) {
+            console.log(error);
+          }
+          res.status(200).send({
+            timePoints,
+            n0, n5, n9, errorRate, throughput, threads
+          });
+        }));
+
   }
 }
-

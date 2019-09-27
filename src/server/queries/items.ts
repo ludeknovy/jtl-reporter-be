@@ -143,3 +143,20 @@ export const dashboardStats = () => {
     count(*) as "totalCount" from jtl.item_stat;`
   };
 };
+
+export const getEndpointHistory = (scenarioName, projectName, endpointName) => {
+  return {
+    text: `
+    SELECT * FROM (SELECT jsonb_array_elements(stats) as labels, item_id, 
+    its.start_time, overview->'maxVu' as max_vu FROM jtl.item_stat as st
+    LEFT JOIN jtl.items as its ON its.id = st.item_id
+    LEFT JOIN jtl.scenario as sc ON sc.id = its.scenario_id
+    LEFT JOIN jtl.projects as pr ON pr.id = sc.project_id
+    WHERE sc.name = $1
+    AND pr.project_name = $2
+    ORDER BY its.start_time DESC) as stats
+    WHERE labels->>'label' = $3
+    LIMIT 30;`,
+    values: [scenarioName, projectName, endpointName]
+  };
+};
