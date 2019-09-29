@@ -183,35 +183,29 @@ export class ItemsRoutes {
         paramsSchemaValidator(paramsSchema),
         queryParamsValidator(endpointQuerySchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
-          const { projectName, scenarioName } = req.params;
+          const { projectName, scenarioName, itemId } = req.params;
           const { name } = req.query;
-          const queryResult = await db.query(getEndpointHistory(scenarioName, projectName, name));
-          const timePoints = [];
-          const n0 = [];
-          const n5 = [];
-          const n9 = [];
-          const errorRate = [];
-          const throughput = [];
-          const threads = [];
-          console.log(queryResult.length);
+          const queryResult = await db.query(getEndpointHistory(scenarioName, projectName, name, itemId));
           try {
-            queryResult.forEach((_) => {
-              let { start_time } = _;
-              timePoints.push(moment(start_time).format(`DD.MM.YYYY HH:mm:SS`));
-              n0.push( _.labels.n0);
-              n5.push(_.labels.n5);
-              n9.push(_.labels.n9);
-              errorRate.push(_.labels.errorRate);
-              throughput.push(_.labels.throughput);
-              threads.push(_.max_vu);
+            const { timePoints, n0, n5, n9,
+              errorRate, throughput, threads } = queryResult.reduce((accumulator, current) => {
+                accumulator.timePoints.push(moment(current.start_time).format(`DD.MM.YYYY HH:mm:SS`));
+                accumulator.n0.push(current.labels.n0);
+                accumulator.n5.push(current.labels.n5);
+                accumulator.n9.push(current.labels.n9);
+                accumulator.errorRate.push(current.labels.errorRate);
+                accumulator.throughput.push(current.labels.throughput);
+                accumulator.threads.push(current.max_vu);
+                return accumulator;
+              }, { timePoints: [], n0: [], n5: [], n9: [], errorRate: [], throughput: [], threads: [] });
+            res.status(200).send({
+              timePoints,
+              n0, n5, n9, errorRate, throughput, threads
             });
           } catch (error) {
             console.log(error);
+            return next(error);
           }
-          res.status(200).send({
-            timePoints,
-            n0, n5, n9, errorRate, throughput, threads
-          });
         }));
 
   }
