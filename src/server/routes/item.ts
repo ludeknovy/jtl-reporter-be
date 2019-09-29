@@ -26,7 +26,7 @@ import {
 } from '../schema-validator/schema-validator-middleware';
 import {
   paramsSchema, updateItemBodySchema,
-  newItemParamSchema, endpointQuerySchema
+  newItemParamSchema, labelQuerySchema
 } from '../schema-validator/item-schema';
 import { paramsSchema as scenarioParamsSchema, querySchema } from '../schema-validator/scenario-schema';
 import { findItemsForScenario, itemsForScenarioCount } from '../queries/scenario';
@@ -181,11 +181,13 @@ export class ItemsRoutes {
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label-trend')
       .get(
         paramsSchemaValidator(paramsSchema),
-        queryParamsValidator(endpointQuerySchema),
+        queryParamsValidator(labelQuerySchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
           const { projectName, scenarioName, itemId } = req.params;
-          const { name } = req.query;
-          const queryResult = await db.query(getEndpointHistory(scenarioName, projectName, name, itemId));
+          const { label, environment } = req.query;
+          const queryResult = await db.query(getEndpointHistory(
+            scenarioName, projectName, label,
+            itemId, environment));
           try {
             const { timePoints, n0, n5, n9,
               errorRate, throughput, threads } = queryResult.reduce((accumulator, current) => {

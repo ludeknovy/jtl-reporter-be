@@ -9,8 +9,9 @@ export const paramsSchema = Joi.object().keys({
   itemId: Joi.string().uuid().required()
 });
 
-export const endpointQuerySchema = {
-  name: Joi.string().min(0).max(100),
+export const labelQuerySchema = {
+  label: Joi.string().min(0).max(100),
+  environment: Joi.string().min(1),
 };
 
 export const updateItemBodySchema = Joi.object().keys({
