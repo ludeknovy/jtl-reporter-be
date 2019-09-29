@@ -50,13 +50,10 @@
         },
         "responses" : {
           "201" : {
-            "description" : "item created"
+            "description" : "Created"
           },
           "400" : {
-            "description" : "invalid input, object invalid"
-          },
-          "409" : {
-            "description" : "an existing item already exists"
+            "description" : "Bad request"
           }
         }
       }
@@ -205,8 +202,8 @@
           }
         },
         "responses" : {
-          "204" : {
-            "description" : "No content"
+          "201" : {
+            "description" : "Created"
           },
           "400" : {
             "description" : "Bad request"
@@ -565,6 +562,70 @@
           },
           "404" : {
             "description" : "Not found"
+          }
+        }
+      }
+    },
+    "/projects/{projectName}/scenarios/{scenarioName}/items/{itemId}/label-trend" : {
+      "get" : {
+        "tags" : [ "items" ],
+        "summary" : "returns label trends",
+        "parameters" : [ {
+          "name" : "projectName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "scenarioName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "itemId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "label",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "environment",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Ok",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LabelTrend"
+                }
+              }
+            }
           }
         }
       }
@@ -966,6 +1027,57 @@
           },
           "base" : {
             "type" : "boolean"
+          }
+        }
+      },
+      "LabelTrend" : {
+        "required" : [ "erroRate", "n0", "n5", "n9", "threads", "throughput", "timePoints" ],
+        "type" : "object",
+        "properties" : {
+          "timePoints" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "example" : "15.09.2019 19:52:69"
+            }
+          },
+          "errorRate" : {
+            "type" : "array",
+            "items" : {
+              "type" : "number",
+              "format" : "float"
+            }
+          },
+          "throughput" : {
+            "type" : "array",
+            "items" : {
+              "type" : "number",
+              "format" : "float"
+            }
+          },
+          "threads" : {
+            "type" : "array",
+            "items" : {
+              "type" : "number"
+            }
+          },
+          "n0" : {
+            "type" : "array",
+            "items" : {
+              "type" : "number"
+            }
+          },
+          "n5" : {
+            "type" : "array",
+            "items" : {
+              "type" : "number"
+            }
+          },
+          "n9" : {
+            "type" : "array",
+            "items" : {
+              "type" : "number"
+            }
           }
         }
       },
