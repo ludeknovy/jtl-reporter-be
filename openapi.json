@@ -566,9 +566,9 @@
         }
       }
     },
-    "/projects/{projectName}/scenarios/{scenarioName}/items/{itemId}/label-trend" : {
+    "/projects/{projectName}/scenarios/{scenarioName}/items/{itemId}/label/{label}/trend" : {
       "get" : {
-        "tags" : [ "items" ],
+        "tags" : [ "label" ],
         "summary" : "returns label trends",
         "parameters" : [ {
           "name" : "projectName",
@@ -599,10 +599,83 @@
           }
         }, {
           "name" : "label",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "environment",
           "in" : "query",
           "required" : true,
           "style" : "form",
           "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "virtualUsers",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Ok",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LabelTrend"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/projects/{projectName}/scenarios/{scenarioName}/items/{itemId}/label/{label}/virtual-users" : {
+      "get" : {
+        "tags" : [ "label" ],
+        "summary" : "returns label trends",
+        "parameters" : [ {
+          "name" : "projectName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "scenarioName",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "itemId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "label",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
           "schema" : {
             "type" : "string"
           }
@@ -622,7 +695,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/LabelTrend"
+                  "$ref" : "#/components/schemas/LabelVirtualUsers"
                 }
               }
             }
@@ -1081,6 +1154,17 @@
           }
         }
       },
+      "LabelVirtualUsers" : {
+        "type" : "object",
+        "properties" : {
+          "result" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/LabelVirtualUsers_result"
+            }
+          }
+        }
+      },
       "Item_plot" : {
         "type" : "object",
         "properties" : {
@@ -1113,6 +1197,19 @@
             "items" : {
               "$ref" : "#/components/schemas/PlotItem"
             }
+          }
+        }
+      },
+      "LabelVirtualUsers_result" : {
+        "type" : "object",
+        "properties" : {
+          "maxVu" : {
+            "type" : "number",
+            "example" : 50
+          },
+          "count" : {
+            "type" : "string",
+            "example" : "10"
           }
         }
       }
