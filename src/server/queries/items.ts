@@ -144,7 +144,7 @@ export const dashboardStats = () => {
   };
 };
 
-export const getEndpointHistory = (scenarioName, projectName, endpointName, itemId, environment) => {
+export const getLabelHistory = (scenarioName, projectName, endpointName, itemId, environment) => {
   return {
     text: `
     SELECT * FROM (SELECT jsonb_array_elements(stats) as labels, item_id,
@@ -159,6 +159,45 @@ export const getEndpointHistory = (scenarioName, projectName, endpointName, item
     WHERE labels->>'label' = $3
     AND start_time <= (SELECT start_time FROM jtl.items WHERE id = $4)
     LIMIT 50;`,
+    values: [scenarioName, projectName, endpointName, itemId, environment]
+  };
+};
+
+export const getLabelHistoryForVu = (scenarioName, projectName, endpointName, itemId, environment, vu) => {
+  return {
+    text: `
+    SELECT * FROM (SELECT jsonb_array_elements(stats) as labels, item_id,
+    its.start_time, overview->'maxVu' as max_vu FROM jtl.item_stat as st
+    LEFT JOIN jtl.items as its ON its.id = st.item_id
+    LEFT JOIN jtl.scenario as sc ON sc.id = its.scenario_id
+    LEFT JOIN jtl.projects as pr ON pr.id = sc.project_id
+    WHERE sc.name = $1
+    AND pr.project_name = $2
+    AND environment = $5
+    ORDER BY its.start_time DESC) as stats
+    WHERE labels->>'label' = $3
+    AND start_time <= (SELECT start_time FROM jtl.items WHERE id = $4)
+    AND max_vu::integer = $6
+    LIMIT 50;`,
+    values: [scenarioName, projectName, endpointName, itemId, environment, vu]
+  };
+};
+
+export const getMaxVuForLabel = (scenarioName, projectName, endpointName, itemId, environment) => {
+  return {
+    text: `
+    SELECT DISTINCT max_vu as "maxVu", count(*) FROM (SELECT jsonb_array_elements(stats) as labels, item_id,
+    its.start_time, overview->'maxVu' as max_vu FROM jtl.item_stat as st
+    LEFT JOIN jtl.items as its ON its.id = st.item_id
+    LEFT JOIN jtl.scenario as sc ON sc.id = its.scenario_id
+    LEFT JOIN jtl.projects as pr ON pr.id = sc.project_id
+    WHERE sc.name = $1
+    AND pr.project_name = $2
+    AND environment = $5
+    ORDER BY its.start_time DESC) as stats
+    WHERE labels->>'label' = $3
+    AND start_time <= (SELECT start_time FROM jtl.items WHERE id = $4)
+    GROUP BY stats.max_vu;`,
     values: [scenarioName, projectName, endpointName, itemId, environment]
   };
 };

@@ -3,6 +3,13 @@ const projectName = Joi.string().required();
 const environment = Joi.string().min(1).max(50).required();
 const scenarioName = Joi.string().required();
 
+export const labelParamSchema = {
+  projectName,
+  scenarioName,
+  itemId: Joi.string().uuid().required(),
+  label: Joi.string().required()
+};
+
 export const paramsSchema = Joi.object().keys({
   projectName,
   scenarioName,
@@ -10,8 +17,8 @@ export const paramsSchema = Joi.object().keys({
 });
 
 export const labelQuerySchema = {
-  label: Joi.string().min(0).max(100),
-  environment: Joi.string().min(1),
+  environment: Joi.string().min(1).required(),
+  virtualUsers: Joi.string()
 };
 
 export const updateItemBodySchema = Joi.object().keys({

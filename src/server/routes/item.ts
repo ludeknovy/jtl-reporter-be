@@ -16,7 +16,6 @@ import {
   removeCurrentBaseFlag,
   setBaseFlag,
   savePlotData,
-  getEndpointHistory
 } from '../queries/items';
 import { db } from '../../db/db';
 import { createNewItem, saveItemStats, saveKpiData, saveErrorsData } from '../queries/items';
@@ -26,13 +25,12 @@ import {
 } from '../schema-validator/schema-validator-middleware';
 import {
   paramsSchema, updateItemBodySchema,
-  newItemParamSchema, labelQuerySchema
+  newItemParamSchema, labelQuerySchema, labelParamSchema
 } from '../schema-validator/item-schema';
 import { paramsSchema as scenarioParamsSchema, querySchema } from '../schema-validator/scenario-schema';
 import { findItemsForScenario, itemsForScenarioCount } from '../queries/scenario';
 import { prepareDataForSavingToDb, ItemDbData } from '../data-stats/prepare-data';
 import { ItemStatus } from '../queries/items.model';
-import * as moment from 'moment';
 const upload = multer(
   {
     dest: `./uploads`,
@@ -154,7 +152,6 @@ export class ItemsRoutes {
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
           const { projectName, scenarioName, itemId } = req.params;
           const { note, environment, base } = req.body;
-          console.log(base);
           try {
             await db.query('BEGIN');
             await db.none(updateTestItemInfo(itemId, scenarioName, projectName, note, environment));
@@ -177,38 +174,5 @@ export class ItemsRoutes {
           await db.any(deleteItem(projectName, scenarioName, itemId));
           res.status(204).send();
         }));
-
-    app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label-trend')
-      .get(
-        paramsSchemaValidator(paramsSchema),
-        queryParamsValidator(labelQuerySchema),
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
-          const { projectName, scenarioName, itemId } = req.params;
-          const { label, environment } = req.query;
-          const queryResult = await db.query(getEndpointHistory(
-            scenarioName, projectName, label,
-            itemId, environment));
-          try {
-            const { timePoints, n0, n5, n9,
-              errorRate, throughput, threads } = queryResult.reduce((accumulator, current) => {
-                accumulator.timePoints.push(moment(current.start_time).format(`DD.MM.YYYY HH:mm:SS`));
-                accumulator.n0.push(current.labels.n0);
-                accumulator.n5.push(current.labels.n5);
-                accumulator.n9.push(current.labels.n9);
-                accumulator.errorRate.push(current.labels.errorRate);
-                accumulator.throughput.push(current.labels.throughput);
-                accumulator.threads.push(current.max_vu);
-                return accumulator;
-              }, { timePoints: [], n0: [], n5: [], n9: [], errorRate: [], throughput: [], threads: [] });
-            res.status(200).send({
-              timePoints,
-              n0, n5, n9, errorRate, throughput, threads
-            });
-          } catch (error) {
-            console.log(error);
-            return next(error);
-          }
-        }));
-
   }
 }
