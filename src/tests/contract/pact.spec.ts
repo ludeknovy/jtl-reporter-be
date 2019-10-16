@@ -1,21 +1,25 @@
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 80000;
 import { Verifier } from '@pact-foundation/pact';
-import * as Server from '../../app';
+import { App } from '../../app';
 import * as request from 'request-promise-native';
+import * as http from 'http';
 import { States } from './states.model';
 const PROVIDER_URL = 'http://localhost:5000/api';
 const CONSUMER = 'JTL-REPORTER-UI';
 // Verify that the provider meets all consumer expectations
 describe('Pact Verification', () => {
-  let server;
+  let httpServer;
   beforeAll(async () => {
-    server = Server.default;
+    const app = new App();
+    httpServer = require('http').createServer(app.app);
+    httpServer.listen('5000');
   });
-  afterAll(async () => {
-    await server.close();
+  afterAll(() => {
+    console.log('closing server');
+    httpServer.close();
   });
 
-  it('should validate the expectations of Our Little Consumer', async () => {
+  it(`should validate the expectations of ${CONSUMER}`, async () => {
     let opts = {
       provider: 'jtl-reporter-be',
       providerBaseUrl: PROVIDER_URL,

@@ -5,3 +5,4 @@ be/dist/
 data/*
 pacts
 build/
+dist/

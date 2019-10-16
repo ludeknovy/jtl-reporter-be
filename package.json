@@ -4,8 +4,8 @@
   "description": "",
   "scripts": {
     "build": "tsc",
-    "dev": "ts-node src/app.ts",
-    "start": "node ./dist/app.js",
+    "dev": "ts-node src/server.ts",
+    "start": "node ./dist/server.js",
     "migrate": "node-pg-migrate",
     "unit-tests": "jest --config=jest-unit.config.js -w=5 --coverage",
     "contract-tests": "jest --config=contract.config.js -w=5",
