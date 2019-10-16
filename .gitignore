@@ -3,3 +3,5 @@ uploads
 .env
 be/dist/
 data/*
+pacts
+build/

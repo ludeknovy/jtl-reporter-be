@@ -8,6 +8,7 @@
     "start": "node ./dist/app.js",
     "migrate": "node-pg-migrate",
     "unit-tests": "jest --config=jest-unit.config.js -w=5 --coverage",
+    "contract-tests": "jest --config=contract.config.js -w=5",
     "lint": "tslint -e 'node_modules/**' -c tslint.json src/**/**/*.ts",
     "ts-check": "tsc --noEmit"
   },
@@ -42,8 +43,11 @@
     "xml2json": "^0.11.2"
   },
   "devDependencies": {
+    "@pact-foundation/pact": "^9.2.0",
     "@types/swagger-ui-express": "^3.0.1",
     "jest": "^24.7.1",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.7",
     "ts-jest": "^24.0.2",
     "typescript": "~3.1.6"
   }

@@ -3,7 +3,7 @@ import { ItemDataType } from './items.model';
 export const createNewItem = (scenarioId, startTime, environment, note, status) => {
   return {
     text: `INSERT INTO jtl.items(scenario_id, start_time, environment, note, status) VALUES(
-      (SELECT id FROM jtl.scenario WHERE name = $1), $2, $3, $4, $5) RETURNING id`,
+      $1, $2, $3, $4, $5) RETURNING id`,
     values: [scenarioId, startTime, environment, note, status]
   };
 };
