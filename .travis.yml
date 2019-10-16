@@ -10,7 +10,7 @@ install: npm install
 jobs:
   include:
   - stage: Tests
-    script: npm run unit-testss
+    script: npm run unit-tests
   - stage: Contract tests
     env:
     - ENVIRONMENT=CI
