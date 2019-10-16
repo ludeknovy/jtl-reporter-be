@@ -11,7 +11,7 @@ const swaggerDocument = require('../openapi.json');
 
 const PORT = 5000;
 
-class App {
+export class App {
   public app: express.Application;
   public router: Router = new Router();
 
@@ -68,12 +68,9 @@ class App {
     });
   }
 
-  public listen(): void {
-    this.app.listen(PORT, () => {
+  public listen() {
+    return this.app.listen(PORT, () => {
       logger.info('Express server listening on port ' + PORT);
     });
   }
-
 }
-
-export default new App().listen();

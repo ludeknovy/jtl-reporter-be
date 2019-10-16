@@ -1,6 +1,6 @@
 FROM node:8.13.0-alpine as builder
 
-RUN apk --update add python \
+RUN apk --update add python git \
   build-base
 
 WORKDIR /src/be

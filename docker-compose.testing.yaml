@@ -1,0 +1,28 @@
+version: '2.1'
+services:
+  db:
+    image: novyl/jtl-reporter-db:testing
+    build:
+      context: ./src/db/
+      dockerfile: Dockerfile
+    volumes:
+      - ./data/jtl_report:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+
+  migration:
+    image: novyl/jtl-reporter-be:migration
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    environment:
+        - DATABASE_URL=postgres://postgres@db/jtl_report
+    command: npm run migrate up
+    depends_on:
+      db:
+        condition: service_healthy

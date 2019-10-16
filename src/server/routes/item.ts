@@ -25,7 +25,7 @@ import {
 } from '../schema-validator/schema-validator-middleware';
 import {
   paramsSchema, updateItemBodySchema,
-  newItemParamSchema, labelQuerySchema, labelParamSchema
+  newItemParamSchema,
 } from '../schema-validator/item-schema';
 import { paramsSchema as scenarioParamsSchema, querySchema } from '../schema-validator/scenario-schema';
 import { findItemsForScenario, itemsForScenarioCount } from '../queries/scenario';
