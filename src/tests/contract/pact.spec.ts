@@ -2,7 +2,6 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 80000;
 import { Verifier } from '@pact-foundation/pact';
 import { App } from '../../app';
 import * as request from 'request-promise-native';
-import * as http from 'http';
 import { States } from './states.model';
 const PROVIDER_URL = 'http://localhost:5000/api';
 const CONSUMER = 'JTL-REPORTER-UI';

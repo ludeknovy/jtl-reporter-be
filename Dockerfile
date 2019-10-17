@@ -24,6 +24,6 @@ WORKDIR /src/be
 
 COPY --from=builder /src/be/ ./
 
-CMD [ "node", "./dist/app.js" ]
+CMD [ "npm", "run", "start" ]
 
 
