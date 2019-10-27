@@ -36,6 +36,8 @@ export class TestDataSetup {
               const [item] = await db.any(createNewItem('test-scenario', '2019-09-22 20:20:23.265', 'localhost', 'test note', '1', 'test-project'));
               await db.any(saveItemStats(item.id, JSON.stringify(testStats), JSON.stringify(testOverview)));
               break;
+            case States.EmptyDb:
+              break;
             default:
               res.sendStatus(400);
               break;

@@ -91,3 +91,13 @@ export const findScenariosData = (projectName) => {
     values: [projectName]
   };
 };
+
+export const isExistingScenario = (scenarioName, projectName) => {
+  return {
+    text: `SELECT EXISTS(SELECT * FROM jtl.scenario as s
+      LEFT JOIN jtl.projects as p ON p.id = s.project_id
+      WHERE p.project_name = $2
+      AND s.name = $1)`,
+    values: [scenarioName, projectName]
+  };
+};

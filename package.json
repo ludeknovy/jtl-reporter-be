@@ -9,6 +9,7 @@
     "migrate": "node-pg-migrate",
     "unit-tests": "jest --config=jest-unit.config.js -w=5 --coverage",
     "contract-tests": "jest --config=contract.config.js -w=5",
+    "integration-tests": "jest --config=integration.config.js --runInBand",
     "lint": "tslint -e 'node_modules/**' -c tslint.json src/**/**/*.ts",
     "ts-check": "tsc --noEmit"
   },
@@ -44,11 +45,14 @@
   },
   "devDependencies": {
     "@pact-foundation/pact": "^9.2.0",
+    "@types/supertest": "^2.0.8",
     "@types/swagger-ui-express": "^3.0.1",
     "jest": "^24.7.1",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
+    "supertest": "^4.0.2",
     "ts-jest": "^24.0.2",
+    "ts-node": "8.4.1",
     "typescript": "~3.1.6"
   }
 }
