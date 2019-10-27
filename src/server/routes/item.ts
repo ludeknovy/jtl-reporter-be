@@ -68,7 +68,7 @@ export class ItemsRoutes {
           upload(req, res, async error => {
             const { environment, note, status = ItemStatus.None } = req.body;
             const { kpi, errors } = <any>req.files;
-            const { scenarioName } = req.params;
+            const { scenarioName, projectName } = req.params;
             if (error) {
               return next(boom.badRequest(error.message));
             }
@@ -101,7 +101,8 @@ export class ItemsRoutes {
                 startTime,
                 environment,
                 note,
-                status));
+                status,
+                projectName));
               await db.none(saveItemStats(item.id, JSON.stringify(itemStats), overview));
               await db.none(saveKpiData(item.id, JSON.stringify(sortedData)));
               await db.none(savePlotData(item.id, JSON.stringify(chunkData(sortedData))));

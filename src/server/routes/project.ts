@@ -48,10 +48,10 @@ export class ProjectRoutes {
       .get(wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
         const { avgVu, avgDuration, totalDuration, totalCount } = await db.one(dashboardStats());
         res.status(200).send({
-          avgVu: parseInt(avgVu, 10),
-          avgDuration: parseInt(avgDuration, 10),
-          totalDuration: parseInt(totalDuration, 10),
-          totalRunCount: parseInt(totalCount, 10)
+          avgVu: avgVu ? parseInt(avgVu, 10) : 0,
+          avgDuration: avgDuration ? parseInt(avgDuration, 10) : 0,
+          totalDuration: totalDuration ? parseInt(totalDuration, 10) : 0,
+          totalRunCount: totalCount ? parseInt(totalCount, 10) : 0,
         });
       }));
 
