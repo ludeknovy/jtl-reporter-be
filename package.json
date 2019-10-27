@@ -9,7 +9,7 @@
     "migrate": "node-pg-migrate",
     "unit-tests": "jest --config=jest-unit.config.js -w=5 --coverage",
     "contract-tests": "jest --config=contract.config.js -w=5",
-    "integration-tests": "jest --config=integration.config.js --runInBand",
+    "integration-tests": "jest --forceExit --config=integration.config.js --runInBand",
     "lint": "tslint -e 'node_modules/**' -c tslint.json src/**/**/*.ts",
     "ts-check": "tsc --noEmit"
   },

@@ -1,4 +1,3 @@
-import { App } from '../../app';
 import * as request from 'supertest';
 import { States } from '../contract/states.model';
 import { stateSetup } from './helper/state';
@@ -6,68 +5,48 @@ import { stateSetup } from './helper/state';
 
 describe('Projects', () => {
   describe('POST /projects', () => {
-    it('should be able to create new project', async (done) => {
+    it('should be able to create new project', async () => {
       await stateSetup(States.EmptyDb);
-      request(__server__)
+      await request(__server__)
         .post('/api/projects')
         .send({ projectName: `test-project-000` })
         .set('Accept', 'application/json')
-        .expect(201)
-        .end(function (err, res) {
-          if (err) return done(err);
-          done();
-        });
+        .expect(201);
     });
-    it('should return 400 when no projectName provided', async (done) => {
+    it('should return 400 when no projectName provided', async () => {
       await stateSetup(States.EmptyDb);
-      request(__server__)
+      await request(__server__)
         .post('/api/projects')
-        .send({ })
+        .send({})
         .set('Accept', 'application/json')
-        .expect(400)
-        .end(function (err, res) {
-          if (err) return done(err);
-          done();
-        });
+        .expect(400);
     });
-    it('should not be able to create two project with same name', async (done) => {
+    it('should not be able to create two project with same name', async () => {
       await stateSetup(States.ExistingProject);
-      request(__server__)
+      await request(__server__)
         .post('/api/projects')
         .send({ projectName: `test-project` })
         .set('Accept', 'application/json')
-        .expect(409)
-        .end(function (err, res) {
-          if (err) return done(err);
-          done();
-        });
+        .expect(409);
     });
   });
   describe('PUT /projects/${projectName}', () => {
-    it('should be able to update project', async (done) => {
+    it('should be able to update project', async () => {
       await stateSetup(States.ExistingProject);
-      request(__server__)
+      await request(__server__)
         .put('/api/projects/test-project')
         .send({ projectName: `test-project` })
         .set('Accept', 'application/json')
-        .expect(204)
-        .end(function (err, res) {
-          if (err) return done(err);
-          done();
-        });
+        .expect(204);
     });
   });
   describe('DELETE /projects/${projectName}', () => {
-    it('should be able to delete project', async (done) => {
+    it('should be able to delete project', async () => {
       await stateSetup(States.ExistingProject);
-      request(__server__)
+      await request(__server__)
         .delete('/api/projects/test-project')
         .set('Accept', 'application/json')
-        .expect(204)
-        .end(function (err, res) {
-          if (err) return done(err);
-          done();
-        });
+        .expect(204);
     });
   });
 });
