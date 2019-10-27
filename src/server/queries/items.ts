@@ -1,10 +1,13 @@
 import { ItemDataType } from './items.model';
 
-export const createNewItem = (scenarioId, startTime, environment, note, status) => {
+export const createNewItem = (scenarioName, startTime, environment, note, status, projectName) => {
   return {
     text: `INSERT INTO jtl.items(scenario_id, start_time, environment, note, status) VALUES(
-      $1, $2, $3, $4, $5) RETURNING id`,
-    values: [scenarioId, startTime, environment, note, status]
+      (SELECT sc.id FROM jtl.scenario as sc
+        LEFT JOIN jtl.projects as p ON p.id = sc.project_id
+        WHERE sc.name = $1
+        AND p.project_name = $6), $2, $3, $4, $5) RETURNING id`,
+    values: [scenarioName, startTime, environment, note, status, projectName]
   };
 };
 
