@@ -23,6 +23,7 @@ jobs:
         - docker-compose down
     - stage: Integration tests
       env:
+        - ENVIRONMENT=CI
         - DATABASE_URL=postgres://postgres@localhost:5432/jtl_report
       before_script:
         - docker-compose --file docker-compose.testing.yaml up -d
