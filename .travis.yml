@@ -1,26 +1,36 @@
 language: node_js
-node_js: '10'
+node_js: "10"
 cache: npm
 services:
-- docker
+  - docker
 branches:
   only:
-  - master
+    - master
 install: npm install
 jobs:
   include:
-  - stage: Tests
-    script: npm run unit-tests
-  - stage: Contract tests
-    env:
-    - ENVIRONMENT=CI
-    - DATABASE_URL=postgres://postgres@localhost:5432/jtl_report
-    before_script:
-    - docker-compose --file docker-compose.testing.yaml up -d
-    - npm run migrate up
-    script: npm run contract-tests
-    after_script:
-    - docker-compose down
+    - stage: Tests
+      script: npm run unit-tests
+    - stage: Contract tests
+      env:
+        - ENVIRONMENT=CI
+        - DATABASE_URL=postgres://postgres@localhost:5432/jtl_report
+      before_script:
+        - docker-compose --file docker-compose.testing.yaml up -d
+        - npm run migrate up
+      script: npm run contract-tests
+      after_script:
+        - docker-compose down
+    - stage: Integration tests
+      env:
+        - DATABASE_URL=postgres://postgres@localhost:5432/jtl_report
+      before_script:
+        - docker-compose --file docker-compose.testing.yaml up -d
+        - npm run migrate up
+      script: npm run integration-tests
+      after_script:
+        - docker-compose down
+
 env:
   global:
     secure: f4nlHjzs24hejQdICofAssd2bA5EdMYCsEMyArZSLkKttuqh6MjwIdJ083oPGiD1JjMxc5Plat88FOhPuccJfTdo9eq8zxa8AvS8PK9NXKG+zXr3WuSprI7hsGjaQtnz8PlG0er6l2ndpjR0burNh9t2luronNBK3FnYxwwk5Ez6aDn9k6In7ixQp5O8FEeVVWsRvDe/HiO6gcOgG1miW27M5V9bUqtFJPZr/VJDotnhFVSjqDqQBrjS4QJE/VePJrI3go5A78wMvoCkiuW6HYu6WlBeYwOhvk5EDZMZiWpkkVGYViSXxlVZtXzEnjf9T/U3uDRcol1HT39KZn02NPabyUg1zW+E8opfk2VyHMaN7xK5PtEkUXHu2wMePu/kpBysiaasAR9bm4dJJrEkKbqyd42nz0pvH4tSjLHJ5prMLvF3R4KUXVVdw5+X4W7Y61uz0Q7uJS/F/lcOpSIvs7mZ+kDc0Pu2Xjl405X6PJwHR0SgBVfYXNrNtqsG/4dFX+h1euWvqtNZyYEKHMT6CAp38WkSERAU0TN3kkLVkko2XNe5nV8yXqfWYDA0KQzfibBlg6un9niwA2cWBXeFTKAeGdXaDrb7/3YfZkQfi8jTAwSUPwFNgArzn0P41kxIgwxEmrdlBgEKtUanZ+PnsJHfAVRvnnCFoqUeVw8AUME=
