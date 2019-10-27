@@ -1,12 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 import * as express from 'express';
 import { wrapAsync } from '../errors/error-handler';
-import { updateScenario, scenarioTrends, deleteScenario, findScenarios } from '../queries/scenario';
+import {
+  updateScenario, scenarioTrends, deleteScenario,
+  findScenarios, isExistingScenario
+} from '../queries/scenario';
 import { db } from '../../db/db';
 import { findScenariosData, createNewScenario } from '../queries/scenario';
 import { paramsSchemaValidator, bodySchemaValidator } from '../schema-validator/schema-validator-middleware';
 import { paramsSchema, scenarioUpdateSchema } from '../schema-validator/scenario-schema';
 import { projectNameParam, newScenarioSchema } from '../schema-validator/project-schema';
+import * as boom from 'boom';
 
 export class ScenarioRoutes {
 
@@ -42,7 +46,12 @@ export class ScenarioRoutes {
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
           const { projectName } = req.params;
           const { scenarioName } = req.body;
-          await db.none(createNewScenario(projectName, scenarioName));
+          const { exists } = await db.one(isExistingScenario(scenarioName, projectName));
+          if (!exists) {
+            await db.none(createNewScenario(projectName, scenarioName));
+          } else {
+            return next(boom.conflict('Scenario already exists'));
+          }
           res.status(201).send();
         }));
 

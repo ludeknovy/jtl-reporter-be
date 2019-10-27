@@ -8,7 +8,7 @@ import { db } from '../../db/db';
 import { createNewProject } from '../queries/projects';
 import { createNewScenario, findScenarios } from '../queries/scenario';
 import { createNewItem, saveItemStats } from '../queries/items';
-import { testStats, testOverview } from '../../test-data/test-stats';
+import { testStats, testOverview } from '../../test-data/test-stats';
 
 
 export class TestDataSetup {
@@ -35,6 +35,10 @@ export class TestDataSetup {
               // tslint:disable-next-line:max-line-length
               const [item] = await db.any(createNewItem('test-scenario', '2019-09-22 20:20:23.265', 'localhost', 'test note', '1', 'test-project'));
               await db.any(saveItemStats(item.id, JSON.stringify(testStats), JSON.stringify(testOverview)));
+
+              res.status(200).send({ itemId: item.id });
+              break;
+            case States.EmptyDb:
               break;
             default:
               res.sendStatus(400);
