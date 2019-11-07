@@ -16,7 +16,7 @@ jobs:
         - ENVIRONMENT=CI
         - DATABASE_URL=postgres://postgres@localhost:5432/jtl_report
       before_script:
-        - docker-compose rm -f
+        - docker-compose rm -f --file docker-compose.testing.yaml
         - docker-compose --file docker-compose.testing.yaml up --build -d
         - npm run migrate up
       script: npm run contract-tests
@@ -27,6 +27,7 @@ jobs:
         - ENVIRONMENT=CI
         - DATABASE_URL=postgres://postgres@localhost:5432/jtl_report
       before_script:
+        - docker-compose rm -f --file docker-compose.testing.yaml
         - docker-compose --file docker-compose.testing.yaml up -d
         - npm run migrate up
       script: npm run integration-tests
