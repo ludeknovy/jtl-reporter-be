@@ -6,7 +6,6 @@
     "version" : "1.0.0"
   },
   "servers" : [ {
-    "url" : "/"
   } ],
   "tags" : [ {
     "name" : "projects"
@@ -947,6 +946,10 @@
             "type" : "string",
             "example" : "test"
           },
+          "hostname" : {
+            "type" : "string",
+            "example" : "localhost"
+          },
           "note" : {
             "type" : "string",
             "example" : "test note"
@@ -994,6 +997,10 @@
           "environment" : {
             "type" : "string",
             "example" : "test"
+          },
+          "hostname" : {
+            "type" : "string",
+            "example" : "localhost"
           },
           "note" : {
             "type" : "string",
