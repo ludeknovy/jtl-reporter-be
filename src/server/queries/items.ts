@@ -1,13 +1,13 @@
 import { ItemDataType } from './items.model';
 
-export const createNewItem = (scenarioName, startTime, environment, note, status, projectName) => {
+export const createNewItem = (scenarioName, startTime, environment, note, status, projectName, hostname) => {
   return {
-    text: `INSERT INTO jtl.items(scenario_id, start_time, environment, note, status) VALUES(
+    text: `INSERT INTO jtl.items(scenario_id, start_time, environment, note, status, hostname) VALUES(
       (SELECT sc.id FROM jtl.scenario as sc
         LEFT JOIN jtl.projects as p ON p.id = sc.project_id
         WHERE sc.name = $1
-        AND p.project_name = $6), $2, $3, $4, $5) RETURNING id`,
-    values: [scenarioName, startTime, environment, note, status, projectName]
+        AND p.project_name = $6), $2, $3, $4, $5, $7) RETURNING id`,
+    values: [scenarioName, startTime, environment, note, status, projectName, hostname]
   };
 };
 
@@ -27,7 +27,8 @@ export const savePlotData = (itemId, data) => {
 
 export const findItem = (itemId, projectName, scenarioName) => {
   return {
-    text: `SELECT charts.plot_data, note, environment, status, (SELECT items.id FROM jtl.items as items
+    // tslint:disable-next-line:max-line-length
+    text: `SELECT charts.plot_data, note, environment, status, hostname, (SELECT items.id FROM jtl.items as items
       LEFT JOIN jtl.charts as charts ON charts.item_id = items.id
       LEFT JOIN jtl.scenario as s ON s.id = items.scenario_id
       LEFT JOIN jtl.projects as p ON p.id = s.project_id
