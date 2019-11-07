@@ -15,6 +15,7 @@ describe('Items', () => {
         .field('environment', 'test-environment')
         .field('note', 'test-note')
         .field('status', ItemStatus.Passed)
+        .field('hostname', 'localhost')
         .expect(200);
     });
   });

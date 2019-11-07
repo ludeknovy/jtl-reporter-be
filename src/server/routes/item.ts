@@ -66,7 +66,7 @@ export class ItemsRoutes {
         paramsSchemaValidator(newItemParamSchema),
         (req: Request, res: Response, next: NextFunction) => {
           upload(req, res, async error => {
-            const { environment, note, status = ItemStatus.None } = req.body;
+            const { environment, note, status = ItemStatus.None, hostname } = req.body;
             const { kpi, errors } = <any>req.files;
             const { scenarioName, projectName } = req.params;
             if (error) {
@@ -80,6 +80,9 @@ export class ItemsRoutes {
             }
             if (!Object.values(ItemStatus).some(_ => _ === status)) {
               return next(boom.badRequest('invalid status type'));
+            }
+            if (hostname && hostname.lenght > 200) {
+              return next(boom.badRequest('too long hostname. max length is 200.'));
             }
             try {
               const filename = kpi[0].path;
@@ -102,7 +105,8 @@ export class ItemsRoutes {
                 environment,
                 note,
                 status,
-                projectName));
+                projectName,
+                hostname));
               await db.none(saveItemStats(item.id, JSON.stringify(itemStats), overview));
               await db.none(saveKpiData(item.id, JSON.stringify(sortedData)));
               await db.none(savePlotData(item.id, JSON.stringify(chunkData(sortedData))));
@@ -136,13 +140,13 @@ export class ItemsRoutes {
             note,
             environment,
             base_id,
-            status } = await db.one(findItem(itemId, projectName, scenarioName));
+            status, hostname } = await db.one(findItem(itemId, projectName, scenarioName));
           const { stats: statistics, overview } = await db.one(findItemStats(itemId));
           const files = await db.any(findAttachements(itemId));
           const attachements = files.map(_ => _.type);
           res.status(200).send({
             overview, statistics, status,
-            plot, note, environment,
+            plot, note, environment, hostname,
             attachements, baseId: base_id, isBase: base_id === itemId
           });
         }))
