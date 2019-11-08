@@ -156,10 +156,10 @@ export class ItemsRoutes {
         bodySchemaValidator(updateItemBodySchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
           const { projectName, scenarioName, itemId } = req.params;
-          const { note, environment, base } = req.body;
+          const { note, environment, hostname, base } = req.body;
           try {
             await db.query('BEGIN');
-            await db.none(updateTestItemInfo(itemId, scenarioName, projectName, note, environment));
+            await db.none(updateTestItemInfo(itemId, scenarioName, projectName, note, environment, hostname));
             if (base) {
               await db.none(removeCurrentBaseFlag(scenarioName));
               await db.none(setBaseFlag(itemId, scenarioName));
