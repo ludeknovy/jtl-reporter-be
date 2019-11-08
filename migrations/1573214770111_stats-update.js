@@ -1,11 +1,32 @@
-import {
-  findMinMax, calculateAverage,
-  calculateNthPercentil, calculateAverageTime,
-  calculateErrorRate, calculateThroughput,
-  roundNumberTwoDecimals
-} from './helper/stats-fc';
+exports.up = async (pgm) => {
+  try {
+    const ids = await pgm.db.select({
+      text: `
+      SELECT item_id
+      FROM jtl.data
+      WHERE data_type = $1;
+      `,
+      values: ['kpi']
+    });
+    ids.map(async ({ item_id }) => {
+      const data = await pgm.db.select({
+        text: `
+      SELECT item_data
+      FROM jtl.data
+      WHERE data_type = $1 AND item_id = $2`,
+        values: ['kpi', item_id]
+      })
+      await pgm.db.query({
+        text: `UPDATE jtl.item_stat SET overview = $3, stats = $2 WHERE item_id = $1`,
+        values: [item_id, JSON.stringify(stats(data[0].item_data)), JSON.stringify(itemOverview(data[0].item_data))]
+      })
+    });
+  } catch (error) {
+    console.log(error)
+  }
+}
 
-export const itemOverview = data => {
+const itemOverview = data => {
   const orderedElapsedTime = data.slice().sort((a, b) => a.elapsed - b.elapsed).map(_ => _.elapsed);
   const ninetyPercentilResponseTime = calculateNthPercentil(orderedElapsedTime, 90);
   const maxVu = findMinMax(data.map(_ => _.allThreads)).max;
@@ -43,19 +64,7 @@ export const itemOverview = data => {
   };
 };
 
-export const errorStatsPerLabel = inputData => {
-  const dataPerLabel = inputData
-    .filter((_) => _.success === 'false')
-    .reduce((accumulator, { responseCode, label }) => {
-      accumulator[label] = accumulator[label] || {};
-      accumulator[label][responseCode] = accumulator[label][responseCode] || 0;
-      accumulator[label][responseCode] += 1;
-      return accumulator;
-    }, {});
-  return dataPerLabel;
-};
-
-export const stats = data => {
+const stats = data => {
   const dataPerLabel = data.reduce((accumulator,
     { label, elapsed, success, timeStamp, responseCode, bytes, Connect }) => {
     accumulator[label] = accumulator[label] || {
@@ -100,4 +109,49 @@ export const stats = data => {
       n0: calculateNthPercentil(orderedElapsedTime, 90),
     };
   });
+};
+
+
+const calculateNthPercentil = (data, percentil) => {
+  if (data.length < 2) {
+    return roundNumberTwoDecimals(data[0])
+  }
+  const percIndex = Math.ceil((percentil / 100) * data.length);
+  const perc = data[percIndex - 1];
+  return roundNumberTwoDecimals(perc);
+};
+
+const calculateAverageTime = (data) => {
+  return calculateAverage(data);
+}
+
+const calculateAverage = (data) => {
+  return data.reduce((a, b) => a + b, 0) / data.length
+}
+
+const calculateErrorRate = (data) => {
+  const numberNonOkCodes = data.filter(_ => _.success === "false");
+  const rate = (numberNonOkCodes.length / data.length) * 100
+  return roundNumberTwoDecimals(rate);
+}
+
+const calculateThroughput = data => {
+  const startTime = data[0].timeStamp
+  const endTime = data[data.length - 1].timeStamp
+  const totalTimeInSeconds = (endTime - startTime) / 1000;
+  const throughput = data.length / totalTimeInSeconds
+  return roundNumberTwoDecimals(throughput)
+}
+
+const roundNumberTwoDecimals = number => {
+  return Math.round(number * 100) / 100;
+}
+
+const findMinMax = data => {
+  return data.reduce((previousValue, currentValue) => {
+    previousValue.max = previousValue.max > currentValue ? previousValue.max : currentValue
+    previousValue.min = previousValue.min < currentValue ?
+      previousValue.min : currentValue
+    return previousValue;
+  }, { min: undefined, max: undefined });
 };
