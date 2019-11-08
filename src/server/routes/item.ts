@@ -94,6 +94,7 @@ export class ItemsRoutes {
             try {
               this.computedData = prepareDataForSavingToDb(this.fileContent);
             } catch (e) {
+              console.log(e);
               return next(boom.badRequest('Csv data are not in correct format'));
             }
             try {
