@@ -18,7 +18,7 @@ import {
   savePlotData,
 } from '../queries/items';
 import { db } from '../../db/db';
-import { createNewItem, saveItemStats, saveKpiData, saveErrorsData } from '../queries/items';
+import { createNewItem, saveItemStats, saveKpiData, saveData } from '../queries/items';
 import {
   bodySchemaValidator, paramsSchemaValidator,
   queryParamsValidator
@@ -30,14 +30,16 @@ import {
 import { paramsSchema as scenarioParamsSchema, querySchema } from '../schema-validator/scenario-schema';
 import { findItemsForScenario, itemsForScenarioCount } from '../queries/scenario';
 import { prepareDataForSavingToDb, ItemDbData } from '../data-stats/prepare-data';
-import { ItemStatus } from '../queries/items.model';
+import { ItemStatus, ItemDataType } from '../queries/items.model';
 const upload = multer(
   {
     dest: `./uploads`,
     limits: { fieldSize: 25 * 1024 * 1024 }
   }).fields([
     { name: 'kpi', maxCount: 1 },
-    { name: 'errors', maxCount: 1 }]);
+    { name: 'errors', maxCount: 1 },
+    { name: 'monitoring', maxCount: 1}
+  ]);
 
 
 export class ItemsRoutes {
@@ -67,7 +69,7 @@ export class ItemsRoutes {
         (req: Request, res: Response, next: NextFunction) => {
           upload(req, res, async error => {
             const { environment, note, status = ItemStatus.None, hostname } = req.body;
-            const { kpi, errors } = <any>req.files;
+            const { kpi, errors, monitoring } = <any>req.files;
             const { scenarioName, projectName } = req.params;
             if (error) {
               return next(boom.badRequest(error.message));
@@ -85,9 +87,9 @@ export class ItemsRoutes {
               return next(boom.badRequest('too long hostname. max length is 200.'));
             }
             try {
-              const filename = kpi[0].path;
-              this.fileContent = await csv().fromFile(filename);
-              fs.unlinkSync(filename);
+              const kpiFilename = kpi[0].path;
+              this.fileContent = await csv().fromFile(kpiFilename);
+              fs.unlinkSync(kpiFilename);
             } catch (e) {
               return next(boom.badRequest('Error while reading provided file'));
             }
@@ -117,7 +119,13 @@ export class ItemsRoutes {
                 const fileContent = fs.readFileSync(filename);
                 fs.unwatchFile(filename);
                 const jsonErrors = parser.toJson(fileContent);
-                await db.none(saveErrorsData(item.id, jsonErrors));
+                await db.none(saveData(item.id, jsonErrors, ItemDataType.Error));
+              }
+              if (monitoring) {
+                const filename = monitoring[0].path;
+                const jsonMonitoring = await csv().fromFile(filename);
+                fs.unwatchFile(filename);
+                await db.none(saveData(item.id, jsonMonitoring, ItemDataType.MonitoringLogs))
               }
               res.status(200).send({
                 id: item.id,

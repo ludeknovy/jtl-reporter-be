@@ -90,10 +90,10 @@ export const deleteItem = (projectName, scenarioName, itemId) => {
   };
 };
 
-export const saveErrorsData = (itemId, data) => {
+export const saveData = (itemId, data, dataType) => {
   return {
     text: 'INSERT INTO jtl.data(item_id, item_data, data_type) VALUES($1, $2, $3)',
-    values: [itemId, data, ItemDataType.Error]
+    values: [itemId, data, dataType]
   };
 };
 

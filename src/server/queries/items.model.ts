@@ -1,6 +1,7 @@
 export enum ItemDataType {
   Kpi = 'kpi',
-  Error = 'error'
+  Error = 'error',
+  MonitoringLogs = 'monitoring_logs'
 }
 
 export enum ItemStatus {
