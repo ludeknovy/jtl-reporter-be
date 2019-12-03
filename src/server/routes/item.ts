@@ -134,6 +134,7 @@ export class ItemsRoutes {
                 status: Object.values(ItemStatus).find(_ => _ === status),
               });
             } catch (error) {
+              console.log(error)
               await db.query('ROLLBACK');
               return next(error);
             }
@@ -152,12 +153,14 @@ export class ItemsRoutes {
             base_id,
             status, hostname } = await db.one(findItem(itemId, projectName, scenarioName));
           const { stats: statistics, overview } = await db.one(findItemStats(itemId));
+
           const files = await db.any(findAttachements(itemId));
           const attachements = files.map(_ => _.type);
+
           res.status(200).send({
             overview, statistics, status,
             plot, note, environment, hostname,
-            attachements, baseId: base_id, isBase: base_id === itemId
+            attachements, baseId: base_id, isBase: base_id === itemId,
           });
         }))
 
