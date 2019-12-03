@@ -1,9 +1,9 @@
 import { roundNumberTwoDecimals } from './helper/stats-fc';
 
 export const chunkData = inputData => {
-  const numberOfIntervals = 15;
   const timestampSortedData = inputData.sort((a, b) => a.timeStamp - b.timeStamp);
   const labelSet = [...new Set(inputData.map(_ => _.label))];
+  const numberOfIntervals = (inputData.length / labelSet.length) > 500 ? 200 : 75;
   const totalDuration =
     (timestampSortedData[timestampSortedData.length - 1].timeStamp - timestampSortedData[0].timeStamp);
   const startTime = timestampSortedData[0].timeStamp;
