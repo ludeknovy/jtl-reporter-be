@@ -38,7 +38,7 @@ const upload = multer(
   }).fields([
     { name: 'kpi', maxCount: 1 },
     { name: 'errors', maxCount: 1 },
-    { name: 'monitoring', maxCount: 1}
+    { name: 'monitoring', maxCount: 1 }
   ]);
 
 
@@ -123,9 +123,10 @@ export class ItemsRoutes {
               }
               if (monitoring) {
                 const filename = monitoring[0].path;
-                const jsonMonitoring = await csv().fromFile(filename);
+                const monitoringData = await csv().fromFile(filename);
+                const monitoringDataString = JSON.stringify(monitoringData)
                 fs.unwatchFile(filename);
-                await db.none(saveData(item.id, jsonMonitoring, ItemDataType.MonitoringLogs))
+                await db.none(saveData(item.id, monitoringDataString, ItemDataType.MonitoringLogs))
               }
               res.status(200).send({
                 id: item.id,
