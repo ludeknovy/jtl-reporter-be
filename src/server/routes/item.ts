@@ -16,6 +16,7 @@ import {
   removeCurrentBaseFlag,
   setBaseFlag,
   savePlotData,
+  findData,
 } from '../queries/items';
 import { db } from '../../db/db';
 import { createNewItem, saveItemStats, saveKpiData, saveData } from '../queries/items';
@@ -31,6 +32,7 @@ import { paramsSchema as scenarioParamsSchema, querySchema } from '../schema-val
 import { findItemsForScenario, itemsForScenarioCount } from '../queries/scenario';
 import { prepareDataForSavingToDb, ItemDbData } from '../data-stats/prepare-data';
 import { ItemStatus, ItemDataType } from '../queries/items.model';
+import { findMinMax } from '../data-stats/helper/stats-fc';
 const upload = multer(
   {
     dest: `./uploads`,
@@ -157,10 +159,20 @@ export class ItemsRoutes {
           const files = await db.any(findAttachements(itemId));
           const attachements = files.map(_ => _.type);
 
+          const [monitoringLogs = { item_data: [] }] = await db.any(findData(itemId, ItemDataType.MonitoringLogs));
+          monitoringLogs.item_data = monitoringLogs.item_data.map((_) => {
+            _.ts =  parseInt(_.ts) * 1000;
+            return _;
+          })
+          const cpu = monitoringLogs.item_data.map((_) => [_.ts, parseInt(_.cpu)])
+          const mem = monitoringLogs.item_data.map((_) => [_.ts, parseInt(_.mem)])
+          const maxCpu = findMinMax(cpu.map(_ => _[1])).max;
+          const maxMem = findMinMax(mem.map(_ => _[1])).max;
+
           res.status(200).send({
             overview, statistics, status,
             plot, note, environment, hostname,
-            attachements, baseId: base_id, isBase: base_id === itemId,
+            attachements, baseId: base_id, isBase: base_id === itemId, monitoringData: { cpu, mem, maxCpu, maxMem }
           });
         }))
 

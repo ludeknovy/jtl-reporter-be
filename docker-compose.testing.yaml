@@ -5,8 +5,6 @@ services:
     build:
       context: ./src/db/
       dockerfile: Dockerfile
-    volumes:
-      - ./data/jtl_report:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
