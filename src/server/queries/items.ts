@@ -97,6 +97,13 @@ export const saveData = (itemId, data, dataType) => {
   };
 };
 
+export const findData = (itemId, dataType) => {
+  return {
+    text: 'SELECT item_data FROM jtl.data WHERE item_id = $1 AND data_type = $2',
+    values: [itemId, dataType]
+  }
+}
+
 
 export const findErrors = (itemId, projectName) => {
   return {
