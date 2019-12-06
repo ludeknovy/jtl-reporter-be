@@ -4,9 +4,8 @@ import { paramsSchemaValidator, queryParamsValidator } from '../schema-validator
 import { wrapAsync } from '../errors/error-handler';
 import { labelParamSchema, labelQuerySchema } from '../schema-validator/item-schema';
 import { db } from '../../db/db';
-import { getLabelHistoryForVu, getLabelHistory, getMaxVuForLabel } from '../queries/items';
+import { getLabelHistoryForVu, getLabelHistory, getMaxVuForLabel, getErrorsForLabel } from '../queries/items';
 import * as moment from 'moment';
-
 
 export class LabelRoutes {
 
@@ -59,6 +58,21 @@ export class LabelRoutes {
           } catch (error) {
             return next(error);
           }
+        }));
+
+    app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label/:label/errors')
+      .get(
+        paramsSchemaValidator(labelParamSchema),
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
+          const { itemId, label } = req.params;
+          const queryResult = await db.query(getErrorsForLabel(itemId, label));
+          const stat = queryResult.reduce((acc, { error: { rc  } }) => {
+            acc[rc]
+              ? acc[rc]++
+              : acc[rc] = 1;
+            return acc
+          }, {});
+          res.status(200).send({ stat });
         }));
   }
 }

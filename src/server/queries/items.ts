@@ -212,3 +212,10 @@ export const getMaxVuForLabel = (scenarioName, projectName, endpointName, itemId
     values: [scenarioName, projectName, endpointName, itemId, environment]
   };
 };
+
+export const getErrorsForLabel = (itemId, labelName) => {
+  return {
+    text: `SELECT * FROM (SELECT  jsonb_array_elements(item_data->'testResults'->'httpSample') as error FROM jtl.data d WHERE d.data_type = 'error' AND d.item_id = $1) as errors WHERE error->>'lb' = $2;`,
+    values: [itemId, labelName]
+  }
+}
