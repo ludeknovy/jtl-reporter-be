@@ -18,14 +18,7 @@ export const itemOverview = data => {
   const startDate = new Date(data[0].timeStamp);
   const endDate = new Date(data[data.length - 1].timeStamp);
   const duration = roundNumberTwoDecimals((endDate.getTime() - startDate.getTime()) / 1000 / 60);
-  const errors = data.filter(_ => _.success === 'false')
-    .reduce((accumulator, { responseCode }) => {
-      if (!accumulator[responseCode]) {
-        accumulator[responseCode] = 0;
-      }
-      accumulator[responseCode] += 1;
-      return accumulator;
-    }, {});
+
 
   return {
     percentil: ninetyPercentilResponseTime,
@@ -39,20 +32,7 @@ export const itemOverview = data => {
     startDate,
     endDate,
     duration,
-    errors
   };
-};
-
-export const errorStatsPerLabel = inputData => {
-  const dataPerLabel = inputData
-    .filter((_) => _.success === 'false')
-    .reduce((accumulator, { responseCode, label }) => {
-      accumulator[label] = accumulator[label] || {};
-      accumulator[label][responseCode] = accumulator[label][responseCode] || 0;
-      accumulator[label][responseCode] += 1;
-      return accumulator;
-    }, {});
-  return dataPerLabel;
 };
 
 export const stats = data => {
@@ -64,12 +44,9 @@ export const stats = data => {
       timeStamps: [],
       bytes: [],
       connect: [],
-      errors: {}
     };
     if (success === 'false') {
       accumulator[label].nonOkcodes += 1;
-      accumulator[label].errors[responseCode] = accumulator[label].errors[responseCode] || 0;
-      accumulator[label].errors[responseCode] += 1;
     }
     accumulator[label].responseTimes.push(elapsed);
     accumulator[label].timeStamps.push(timeStamp);
@@ -79,7 +56,7 @@ export const stats = data => {
   }, []);
 
   return Object.keys(dataPerLabel).map(_ => {
-    const { responseTimes, nonOkcodes, timeStamps, errors, bytes, connect } = dataPerLabel[_];
+    const { responseTimes, nonOkcodes, timeStamps, bytes, connect } = dataPerLabel[_];
     const total = responseTimes.length;
     const orderedElapsedTime = responseTimes.slice().sort((a, b) => a - b);
     const minMax = findMinMax(responseTimes);
@@ -90,7 +67,6 @@ export const stats = data => {
       minResponseTime: minMax.min,
       maxResponseTime: minMax.max,
       errorRate: roundNumberTwoDecimals(nonOkcodes / total * 100),
-      errors,
       connect: parseInt(calculateAverage(connect).toFixed(0), 10),
       bytes: parseInt(calculateAverage(bytes).toFixed(2), 10),
       throughput: roundNumberTwoDecimals(

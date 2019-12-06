@@ -163,9 +163,9 @@ export class ItemsRoutes {
           monitoringLogs.item_data = monitoringLogs.item_data.map((_) => {
             _.ts =  parseInt(_.ts) * 1000;
             return _;
-          })
-          const cpu = monitoringLogs.item_data.map((_) => [_.ts, parseInt(_.cpu)])
-          const mem = monitoringLogs.item_data.map((_) => [_.ts, parseInt(_.mem)])
+          });
+          const cpu = monitoringLogs.item_data.map((_) => [_.ts, parseInt(_.cpu)]);
+          const mem = monitoringLogs.item_data.map((_) => [_.ts, parseInt(_.mem)]);
           const maxCpu = findMinMax(cpu.map(_ => _[1])).max;
           const maxMem = findMinMax(mem.map(_ => _[1])).max;
 

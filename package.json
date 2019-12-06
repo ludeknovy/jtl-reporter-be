@@ -11,6 +11,7 @@
     "contract-tests": "jest --config=contract.config.js -w=5",
     "integration-tests": "jest --forceExit --config=integration.config.js --runInBand",
     "lint": "tslint -e 'node_modules/**' -c tslint.json src/**/**/*.ts",
+    "lint:fix": "tslint -e 'node_modules/**' -c tslint.json src/**/**/*.ts --fix",
     "ts-check": "tsc --noEmit"
   },
   "keywords": [],

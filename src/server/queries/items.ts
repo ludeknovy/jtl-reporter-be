@@ -101,8 +101,8 @@ export const findData = (itemId, dataType) => {
   return {
     text: 'SELECT item_data FROM jtl.data WHERE item_id = $1 AND data_type = $2',
     values: [itemId, dataType]
-  }
-}
+  };
+};
 
 
 export const findErrors = (itemId, projectName) => {
@@ -210,5 +210,12 @@ export const getMaxVuForLabel = (scenarioName, projectName, endpointName, itemId
     AND start_time <= (SELECT start_time FROM jtl.items WHERE id = $4)
     GROUP BY stats.max_vu;`,
     values: [scenarioName, projectName, endpointName, itemId, environment]
+  };
+};
+
+export const getErrorsForLabel = (itemId, labelName) => {
+  return {
+    text: `SELECT * FROM (SELECT  jsonb_array_elements(item_data->'testResults'->'httpSample') as error FROM jtl.data d WHERE d.data_type = 'error' AND d.item_id = $1) as errors WHERE error->>'lb' = $2;`,
+    values: [itemId, labelName]
   };
 };
