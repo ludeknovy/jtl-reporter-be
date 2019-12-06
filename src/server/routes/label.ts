@@ -70,7 +70,7 @@ export class LabelRoutes {
             acc[rc]
               ? acc[rc]++
               : acc[rc] = 1;
-            return acc
+            return acc;
           }, {});
           res.status(200).send({ stat });
         }));
