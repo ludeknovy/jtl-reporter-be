@@ -1,78 +1,39 @@
 import { Request, Response, NextFunction } from 'express';
 import * as express from 'express';
-import * as boom from 'boom';
 import { wrapAsync } from '../errors/error-handler';
-import {
-  isExistingProject,
-  createNewProject,
-  findProjects,
-  latestItems,
-  deleteProject,
-  updateProjectName
-} from '../queries/projects';
-import { db } from '../../db/db';
 import { bodySchemaValidator, paramsSchemaValidator } from '../schema-validator/schema-validator-middleware';
 import { createNewProjectSchema, projectNameParam } from '../schema-validator/project-schema';
-import { dashboardStats } from '../queries/items';
+import { createProjectController } from '../controllers/project/create-project-controller';
+import { getProjectsController } from '../controllers/project/get-projects-controller';
+import { getLatestItemsControllers } from '../controllers/project/get-latest-items-controllers';
+import { deleteProjectController } from '../controllers/project/delete-project-controller';
+import { updateProjectController } from '../controllers/project/update-project-controller';
 
 export class ProjectRoutes {
-  private projects;
   public routes(app: express.Application): void {
 
     app.route('/api/projects')
       .post(
         bodySchemaValidator(createNewProjectSchema),
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
-          const { body: { projectName } } = req;
-          const { exists } = await db.one(isExistingProject(projectName));
-          if (!exists) {
-            await db.none(createNewProject(projectName));
-          } else {
-            return next(boom.conflict('Project already exists'));
-          }
-          res.status(201).send();
-        }))
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await createProjectController(req, res, next)))
 
-      .get(wrapAsync(async (req: Request, res: Response) => {
-        this.projects = await db.any(findProjects());
-        res.status(200).send(this.projects);
-      }));
+      .get(wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getProjectsController(req, res, next)));
 
     app.route('/api/projects/latest-items')
-      .get(wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
-        const items = await db.many(latestItems());
-        res.status(200).send(items);
-      }));
+      .get(wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getLatestItemsControllers(req, res, next)));
 
     app.route('/api/projects/overall-stats')
-      .get(wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
-        const { avgVu, avgDuration, totalDuration, totalCount } = await db.one(dashboardStats());
-        res.status(200).send({
-          avgVu: avgVu ? parseInt(avgVu, 10) : 0,
-          avgDuration: avgDuration ? parseInt(avgDuration, 10) : 0,
-          totalDuration: totalDuration ? parseInt(totalDuration, 10) : 0,
-          totalRunCount: totalCount ? parseInt(totalCount, 10) : 0,
-        });
-      }));
+      .get(wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getProjectsController(req, res, next)));
 
     app.route('/api/projects/:projectName')
       .delete(
         paramsSchemaValidator(projectNameParam),
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
-          const { projectName } = req.params;
-          await db.none(deleteProject(projectName));
-          res.status(204).send();
-        }))
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteProjectController(req, res, next)))
 
       .put(
         paramsSchemaValidator(projectNameParam),
         bodySchemaValidator(createNewProjectSchema),
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
-          const { projectName } = req.params;
-          const { projectName: newProjectName } = req.body;
-          await db.none(updateProjectName(projectName, newProjectName));
-          res.status(204).send();
-        }));
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await updateProjectController(req, res, next)));
   }
 
 }

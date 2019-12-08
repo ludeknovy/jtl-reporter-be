@@ -3,8 +3,6 @@ import * as express from 'express';
 import { paramsSchemaValidator, queryParamsValidator } from '../schema-validator/schema-validator-middleware';
 import { wrapAsync } from '../errors/error-handler';
 import { labelParamSchema, labelQuerySchema } from '../schema-validator/item-schema';
-import { db } from '../../db/db';
-import { getErrorsForLabel } from '../queries/items';
 import { getLabelTrendController } from '../controllers/label/get-label-trend-controller';
 import { getLabelVirtualUsersController } from '../controllers/label/get-label-vu-controllers';
 import { getLabelErrorsController } from '../controllers/label/get-label-errors-controller';
