@@ -1,4 +1,4 @@
-FROM 12.13.1-alpine3.9 as builder
+FROM node:12.13.1-alpine3.9 as builder
 
 RUN apk --update add python git \
   build-base
@@ -18,7 +18,7 @@ COPY /src ./src/
 
 RUN npm run build
 
-FROM 12.13.1-alpine3.9
+FROM node:12.13.1-alpine3.9
 
 WORKDIR /src/be
 
