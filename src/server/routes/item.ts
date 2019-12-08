@@ -8,15 +8,8 @@ import * as fs from 'fs';
 import { wrapAsync } from '../errors/error-handler';
 import { chunkData } from '../data-stats/chunk-data';
 import {
-  findItem,
-  findItemStats,
-  updateTestItemInfo,
   deleteItem,
-  findAttachements,
-  removeCurrentBaseFlag,
-  setBaseFlag,
   savePlotData,
-  findData,
 } from '../queries/items';
 import { db } from '../../db/db';
 import { createNewItem, saveItemStats, saveKpiData, saveData } from '../queries/items';
@@ -29,10 +22,12 @@ import {
   newItemParamSchema,
 } from '../schema-validator/item-schema';
 import { paramsSchema as scenarioParamsSchema, querySchema } from '../schema-validator/scenario-schema';
-import { findItemsForScenario, itemsForScenarioCount } from '../queries/scenario';
 import { prepareDataForSavingToDb, ItemDbData } from '../data-stats/prepare-data';
 import { ItemStatus, ItemDataType } from '../queries/items.model';
-import { findMinMax } from '../data-stats/helper/stats-fc';
+import { getItemsController } from '../controllers/item/get-items-controller';
+import { getItemController } from '../controllers/item/get-item-controller';
+import { updateItemController } from '../controllers/item/update-item-controller';
+import { deleteItemController } from '../controllers/item/delete-item-controller';
 const upload = multer(
   {
     dest: `./uploads`,
@@ -54,17 +49,7 @@ export class ItemsRoutes {
       .get(
         paramsSchemaValidator(scenarioParamsSchema),
         queryParamsValidator(querySchema),
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
-          const { projectName, scenarioName } = req.params;
-          const { limit = 15, offset = 0 } = req.query;
-          const { total } = await db.one(itemsForScenarioCount(projectName, scenarioName));
-          const ids = await db.any(findItemsForScenario(projectName, scenarioName, limit, offset));
-          const idsBaseUpdate = ids.map(_ => {
-            _.base = !_.base ? false : true;
-            return _;
-          });
-          res.status(200).send({ name: scenarioName, data: idsBaseUpdate, total: parseInt(total, 10) });
-        }))
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemsController(req, res, next)))
 
       .post(
         paramsSchemaValidator(newItemParamSchema),
@@ -146,63 +131,15 @@ export class ItemsRoutes {
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId')
       .get(
         paramsSchemaValidator(paramsSchema),
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
-          const { projectName, scenarioName, itemId } = req.params;
-          const {
-            plot_data: plot,
-            note,
-            environment,
-            base_id,
-            status, hostname } = await db.one(findItem(itemId, projectName, scenarioName));
-          const { stats: statistics, overview } = await db.one(findItemStats(itemId));
-
-          const files = await db.any(findAttachements(itemId));
-          const attachements = files.map(_ => _.type);
-
-          const [monitoringLogs = { item_data: [] }] = await db.any(findData(itemId, ItemDataType.MonitoringLogs));
-          monitoringLogs.item_data = monitoringLogs.item_data.map((_) => {
-            _.ts =  parseInt(_.ts) * 1000;
-            return _;
-          });
-          const cpu = monitoringLogs.item_data.map((_) => [_.ts, parseInt(_.cpu)]);
-          const mem = monitoringLogs.item_data.map((_) => [_.ts, parseInt(_.mem)]);
-          const maxCpu = findMinMax(cpu.map(_ => _[1])).max;
-          const maxMem = findMinMax(mem.map(_ => _[1])).max;
-
-          res.status(200).send({
-            overview, statistics, status,
-            plot, note, environment, hostname,
-            attachements, baseId: base_id, isBase: base_id === itemId, monitoringData: { cpu, mem, maxCpu, maxMem }
-          });
-        }))
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemController(req, res, next)))
 
       .put(
         paramsSchemaValidator(paramsSchema),
         bodySchemaValidator(updateItemBodySchema),
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
-          const { projectName, scenarioName, itemId } = req.params;
-          const { note, environment, hostname, base } = req.body;
-          try {
-            await db.query('BEGIN');
-            await db.none(updateTestItemInfo(itemId, scenarioName, projectName, note, environment, hostname));
-            if (base) {
-              await db.none(removeCurrentBaseFlag(scenarioName));
-              await db.none(setBaseFlag(itemId, scenarioName));
-            }
-            await db.query('COMMIT');
-            res.status(204).send();
-          } catch (error) {
-            await db.query('ROLLBACK');
-            return next(error);
-          }
-        }))
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await updateItemController(req, res, next)))
 
       .delete(
         paramsSchemaValidator(paramsSchema),
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => {
-          const { projectName, scenarioName, itemId } = req.params;
-          await db.any(deleteItem(projectName, scenarioName, itemId));
-          res.status(204).send();
-        }));
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteItemController(req, res, next)));
   }
 }
