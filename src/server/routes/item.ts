@@ -15,7 +15,7 @@ import { getItemController } from '../controllers/item/get-item-controller';
 import { updateItemController } from '../controllers/item/update-item-controller';
 import { deleteItemController } from '../controllers/item/delete-item-controller';
 import { createItemController } from '../controllers/item/create-item-controller';
-import { verifyToken } from '../middleware/jwt-auth-middleware';
+import { verifyToken } from '../middleware/auth-middleware';
 
 
 

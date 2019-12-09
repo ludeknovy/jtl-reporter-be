@@ -3,10 +3,10 @@ import { Request, Response, NextFunction } from 'express';
 import { bodySchemaValidator } from '../schema-validator/schema-validator-middleware';
 import { wrapAsync } from '../errors/error-handler';
 import { loginController } from '../controllers/auth/login-controller';
-import { authQuerySchema, changePasswordSchema, newTokenSchema, deleteTokenSchema } from '../schema-validator/auth-schema';
+import { authQuerySchema, changePasswordSchema, } from '../schema-validator/auth-schema';
 import { signupController } from '../controllers/auth/signup-controller';
 import { changePasswordController } from '../controllers/auth/change-password-controller';
-import { verifyToken } from '../middleware/jwt-auth-middleware';
+import { verifyToken } from '../middleware/auth-middleware';
 
 export class AuthRoutes {
   public routes(app: express.Application): void {

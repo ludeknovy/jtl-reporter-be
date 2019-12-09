@@ -1,17 +1,17 @@
 import * as express from 'express';
 import { Request, Response, NextFunction } from 'express';
 import { bodySchemaValidator } from '../schema-validator/schema-validator-middleware';
-import { verifyToken } from '../middleware/jwt-auth-middleware';
-import { newTokenSchema, deleteTokenSchema } from '../schema-validator/auth-schema';
+import { verifyToken } from '../middleware/auth-middleware';
 import { wrapAsync } from '../errors/error-handler';
 import { getTokensController } from '../controllers/api-tokens/get-tokens-controller';
 import { createTokenController } from '../controllers/api-tokens/create-token-controller';
 import { deleteTokenController } from '../controllers/api-tokens/delete-token-controlle';
+import { newTokenSchema, deleteTokenSchema } from '../schema-validator/token-schema';
 
-export class ItemsRoutes {
+export class ApiTokensRoutes {
 
   public routes(app: express.Application): void {
-    app.route('/api/auth/api-tokens')
+    app.route('/api/api-tokens')
     .get(
       verifyToken,
       wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getTokensController(req, res, next)))

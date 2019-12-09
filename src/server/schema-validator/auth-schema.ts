@@ -11,12 +11,3 @@ export const changePasswordSchema = {
   currentPassword: Joi.string().required(),
   newPassword: password
 }
-
-
-export const newTokenSchema = {
-  description: Joi.string().required()
-}
-
-export const deleteTokenSchema = {
-  id: Joi.string().uuid().required()
-}
