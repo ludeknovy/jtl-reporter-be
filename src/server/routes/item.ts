@@ -1,17 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import * as csv from 'csvtojson';
-import * as parser from 'xml2json';
 import * as express from 'express';
-import * as multer from 'multer';
-import * as boom from 'boom';
-import * as fs from 'fs';
 import { wrapAsync } from '../errors/error-handler';
-import { chunkData } from '../data-stats/chunk-data';
-import {
-  savePlotData,
-} from '../queries/items';
-import { db } from '../../db/db';
-import { createNewItem, saveItemStats, saveKpiData, saveData } from '../queries/items';
 import {
   bodySchemaValidator, paramsSchemaValidator,
   queryParamsValidator
@@ -26,6 +15,7 @@ import { getItemController } from '../controllers/item/get-item-controller';
 import { updateItemController } from '../controllers/item/update-item-controller';
 import { deleteItemController } from '../controllers/item/delete-item-controller';
 import { createItemController } from '../controllers/item/create-item-controller';
+import { verifyToken } from '../middleware/jwt-auth-middleware';
 
 
 
@@ -37,6 +27,7 @@ export class ItemsRoutes {
       .get(
         paramsSchemaValidator(scenarioParamsSchema),
         queryParamsValidator(querySchema),
+        verifyToken,
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemsController(req, res, next)))
 
       .post(
