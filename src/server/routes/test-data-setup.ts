@@ -23,7 +23,7 @@ export class TestDataSetup {
         wrapAsync(async (req: Request, res: Response) => {
           const { state } = req.body;
           // tslint:disable-next-line:max-line-length
-          await db.any({ text: 'TRUNCATE jtl.charts, jtl.projects, jtl.data, jtl.item_stat, jtl.items, jtl.scenario CASCADE' });
+          await db.any({ text: 'TRUNCATE jtl.charts, jtl.projects, jtl.data, jtl.item_stat, jtl.items, jtl.scenario, jtl.users, jtl.api_tokens CASCADE' });
           switch (state) {
             case States.ExistingProject:
               await db.any(createNewProject('test-project'));
