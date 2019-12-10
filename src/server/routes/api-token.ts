@@ -7,6 +7,7 @@ import { getTokensController } from '../controllers/api-tokens/get-tokens-contro
 import { createTokenController } from '../controllers/api-tokens/create-token-controller';
 import { deleteTokenController } from '../controllers/api-tokens/delete-token-controlle';
 import { newTokenSchema, deleteTokenSchema } from '../schema-validator/token-schema';
+import { IGetUserAuthInfoRequest } from '../middleware/request.model';
 
 export class ApiTokensRoutes {
 
@@ -18,7 +19,7 @@ export class ApiTokensRoutes {
     .post(
       verifyToken,
       bodySchemaValidator(newTokenSchema),
-      wrapAsync(async (req: Request, res: Response, next: NextFunction) => await createTokenController(req, res, next)))
+      wrapAsync(async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => await createTokenController(req, res, next)))
     .delete(
       verifyToken,
       bodySchemaValidator(deleteTokenSchema),

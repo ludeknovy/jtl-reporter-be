@@ -6,6 +6,15 @@ import * as path from 'path';
 
 
 describe('Items', () => {
+  beforeAll(async () => {
+    const response = await request(__server__)
+      .post('api/auth/login')
+      .send({
+        username: 'admin',
+        password: '2Txnf5prDknTFYTVEXjj'
+      });
+    console.log(response);
+  });
   describe('POST /projects/{projectName}/scenarios/{scenarioName}/items', () => {
     it('should be able to create test item', async () => {
       await stateSetup(States.ExistingScenario);

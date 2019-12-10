@@ -3,10 +3,11 @@ import { db } from '../../../db/db';
 import { getUserById, updatePassword } from '../../queries/auth';
 import { passwordMatch, hashPassword } from './helper/passwords';
 import * as boom from 'boom';
+import { IGetUserAuthInfoRequest } from '../../middleware/request.model';
 
-export const changePasswordController = async (req: Request, res: Response, next: NextFunction) => {
+export const changePasswordController = async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
   const { currentPassword, newPassword } = req.body;
-  const { userId } = <any>req.user;
+  const { userId } = req.user;
   try {
     const result = await db.query(getUserById(userId));
     if (!await passwordMatch(currentPassword, result[0].password)) {
