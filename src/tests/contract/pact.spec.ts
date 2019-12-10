@@ -27,6 +27,11 @@ describe('Pact Verification', () => {
       pactBrokerToken: process.env.PACT_BROKER_TOKEN,
       publishVerificationResult: process.env.ENVIRONMENT === 'CI',
       providerVersion: '0.0.0',
+      requestFilter: async (req, res, next) => {
+        const newHeaders = await generateAuthHeaders();
+        req.headers = newHeaders;
+        next();
+      },
       stateHandlers: {
         'there is existing project': async () => {
           await request(options(CONSUMER, States.ExistingProject));
@@ -59,3 +64,9 @@ const options = (consumer, state) => {
     }
   };
 };
+
+
+const generateAuthHeaders = async () => {
+  const { token } = await request(options(CONSUMER, States.ExistingLogin))
+  return { 'x-access-token': token }
+}

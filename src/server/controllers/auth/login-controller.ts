@@ -27,7 +27,7 @@ export const loginController = async (req: Request, res: Response, next: NextFun
 
 
 
-const generateToken = (id) => {
+export const generateToken = (id) => {
   const token = jwt.sign({
     userId: id
   },

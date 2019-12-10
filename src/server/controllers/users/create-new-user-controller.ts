@@ -9,8 +9,7 @@ export const createNewUserController = async (req: Request, res: Response, next:
   const { username, password } = req.body;
 
   try {
-    const passwordHash = await hashPassword(password);
-    await db.query(createUser(username, passwordHash));
+    await createUserInDB(username, password);
     res.status(201).send();
   } catch (error) {
     if (error.routine === '_bt_check_unique') {
@@ -18,4 +17,9 @@ export const createNewUserController = async (req: Request, res: Response, next:
     }
     return next(error);
   }
+}
+
+export const createUserInDB = async (username, password) => {
+  const passwordHash = await hashPassword(password);
+  await db.query(createUser(username, passwordHash));
 }

@@ -14,10 +14,10 @@ export class UsersRoutes {
         verifyToken,
         bodySchemaValidator(authQuerySchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await createNewUserController(req, res, next)))
-    
+
       .get(
         verifyToken,
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getUsersController(req, res, next))
-      )
+      );
   }
 }
