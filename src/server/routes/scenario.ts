@@ -9,6 +9,7 @@ import { createScenarioController } from '../controllers/scenario/create-scenari
 import { getScenarioController } from '../controllers/scenario/get-scenario-controller';
 import { deleteScenarioController } from '../controllers/scenario/delete-scenario-controller';
 import { getScenarioTrendsController } from '../controllers/scenario/get-scenario-trends-controller';
+import { verifyToken } from '../middleware/auth-middleware';
 
 export class ScenarioRoutes {
 
@@ -16,25 +17,30 @@ export class ScenarioRoutes {
 
     app.route('/api/projects/:projectName/scenarios')
       .get(
+        verifyToken,
         paramsSchemaValidator(projectNameParam),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getScenariosController(req, res, next)))
       .post(
+        verifyToken,
         paramsSchemaValidator(projectNameParam),
         bodySchemaValidator(newScenarioSchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await createScenarioController(req, res, next)));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName')
       .put(
+        verifyToken,
         paramsSchemaValidator(paramsSchema),
         bodySchemaValidator(scenarioUpdateSchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getScenarioController(req, res, next)))
 
       .delete(
+        verifyToken,
         paramsSchemaValidator(paramsSchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteScenarioController(req, res, next)));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/trends')
       .get(
+        verifyToken,
         paramsSchemaValidator(paramsSchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getScenarioTrendsController(req, res, next)));
   }

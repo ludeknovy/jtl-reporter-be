@@ -9,29 +9,39 @@ import { getLatestItemsControllers } from '../controllers/project/get-latest-ite
 import { deleteProjectController } from '../controllers/project/delete-project-controller';
 import { updateProjectController } from '../controllers/project/update-project-controller';
 import { getProjectStatsController } from '../controllers/project/get-projects-stats-controller';
+import { verifyToken } from '../middleware/auth-middleware';
 
 export class ProjectRoutes {
   public routes(app: express.Application): void {
 
     app.route('/api/projects')
       .post(
+        verifyToken,
         bodySchemaValidator(createNewProjectSchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await createProjectController(req, res, next)))
 
-      .get(wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getProjectsController(req, res, next)));
+      .get(
+        verifyToken,
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getProjectsController(req, res, next)));
 
     app.route('/api/projects/latest-items')
-      .get(wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getLatestItemsControllers(req, res, next)));
+      .get(
+        verifyToken,
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getLatestItemsControllers(req, res, next)));
 
     app.route('/api/projects/overall-stats')
-      .get(wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getProjectStatsController(req, res, next)));
+      .get(
+        verifyToken,
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getProjectStatsController(req, res, next)));
 
     app.route('/api/projects/:projectName')
       .delete(
+        verifyToken,
         paramsSchemaValidator(projectNameParam),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteProjectController(req, res, next)))
 
       .put(
+        verifyToken,
         paramsSchemaValidator(projectNameParam),
         bodySchemaValidator(createNewProjectSchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await updateProjectController(req, res, next)));

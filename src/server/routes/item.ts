@@ -25,26 +25,30 @@ export class ItemsRoutes {
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items')
       .get(
+        verifyToken,
         paramsSchemaValidator(scenarioParamsSchema),
         queryParamsValidator(querySchema),
-        verifyToken,
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemsController(req, res, next)))
 
       .post(
+        verifyToken,
         paramsSchemaValidator(newItemParamSchema),
         createItemController);
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId')
       .get(
+        verifyToken,
         paramsSchemaValidator(paramsSchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemController(req, res, next)))
 
       .put(
+        verifyToken,
         paramsSchemaValidator(paramsSchema),
         bodySchemaValidator(updateItemBodySchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await updateItemController(req, res, next)))
 
       .delete(
+        verifyToken,
         paramsSchemaValidator(paramsSchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteItemController(req, res, next)));
   }

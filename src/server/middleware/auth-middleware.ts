@@ -11,7 +11,7 @@ const UNAUTHORIZED_MSG = 'The token you provided is invalid';
 export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers['x-access-token'];
   if (!token) {
-    return next(boom.badRequest(`Please provide x-access-token`))
+    return next(boom.unauthorized(`Please provide x-access-token`))
   }
   if(isApiToken(token)) {
     try {
