@@ -4,7 +4,6 @@ import * as pgp from 'pg-promise';
 import * as boom from 'boom';
 import * as winston from 'winston';
 import * as expressWinston from 'express-winston';
-import * as passport from 'passport'
 import { logger } from './logger';
 import { Router } from './server/router';
 import * as swaggerUi from 'swagger-ui-express';
@@ -35,7 +34,6 @@ export class App {
       expressFormat: true,
       colorize: false
     }));
-    this.app.use(passport.initialize())
     this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
     this.app.use((req, res, next) => {
