@@ -12,6 +12,6 @@ exports.up = (pgm) => {
     },
     password: {
       type: "varchar(100)",
-    }
+    },
   });
 };

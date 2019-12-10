@@ -2,10 +2,10 @@ import { Request, Response, NextFunction } from 'express';
 import { createUser } from '../../queries/auth';
 import { db } from '../../../db/db';
 import * as boom from 'boom';
-import { hashPassword } from './helper/passwords';
+import { hashPassword } from '../auth/helper/passwords';
 
 
-export const signupController = async (req: Request, res: Response, next: NextFunction) => {
+export const createNewUserController = async (req: Request, res: Response, next: NextFunction) => {
   const { username, password } = req.body;
 
   try {
@@ -19,4 +19,3 @@ export const signupController = async (req: Request, res: Response, next: NextFu
     return next(error);
   }
 }
-

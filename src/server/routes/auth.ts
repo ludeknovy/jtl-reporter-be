@@ -4,7 +4,6 @@ import { bodySchemaValidator } from '../schema-validator/schema-validator-middle
 import { wrapAsync } from '../errors/error-handler';
 import { loginController } from '../controllers/auth/login-controller';
 import { authQuerySchema, changePasswordSchema, } from '../schema-validator/auth-schema';
-import { signupController } from '../controllers/auth/signup-controller';
 import { changePasswordController } from '../controllers/auth/change-password-controller';
 import { verifyToken } from '../middleware/auth-middleware';
 
@@ -14,12 +13,6 @@ export class AuthRoutes {
     app.route('/api/auth/login')
       .post(bodySchemaValidator(authQuerySchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await loginController(req, res, next)));
-
-    app.route('/api/auth/signup')
-      .post(
-        verifyToken,
-        bodySchemaValidator(authQuerySchema),
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await signupController(req, res, next)));
 
     app.route('/api/auth/change-password')
       .post(
