@@ -1,6 +1,32 @@
-import { roundNumberTwoDecimals } from './helper/stats-fc';
+exports.up = async (pgm) => {
+  try {
+    const ids = await pgm.db.select({
+      text: `
+        SELECT item_id
+        FROM jtl.data
+        WHERE data_type = $1;
+        `,
+      values: ['kpi']
+    });
+    ids.map(async ({ item_id }) => {
+      const [data] = await pgm.db.select({
+        text: `
+        SELECT item_data
+        FROM jtl.data
+        WHERE data_type = $1 AND item_id = $2`,
+        values: ['kpi', item_id]
+      })
+      await pgm.db.query({
+        text: `UPDATE jtl.charts SET plot_data = $2 WHERE item_id = $1`,
+        values: [item_id, chunkData(data.item_data)]
+      })
+    });
+  } catch (error) {
+    console.log(error)
+  }
+}
 
-export const chunkData = inputData => {
+const chunkData = inputData => {
   const timestampSortedData = inputData.sort((a, b) => a.timeStamp - b.timeStamp);
   const labelSet = [...new Set(inputData.map(_ => _.label))];
   const numberOfIntervals = (inputData.length / labelSet.length) > 500 ? 200 : 75;
@@ -29,7 +55,6 @@ export const chunkData = inputData => {
     return accumulator;
   }, []);
 
-
   let averages = groupedData
     .map(_ => {
       const startTime = _[0].timeStamp;
@@ -48,7 +73,6 @@ export const chunkData = inputData => {
       return Object.keys(avgResults).map(k => avgResults[k]);
     });
 
-  // if interval does not contain label it creates it with either null or 0 values
   averages = averages.map((a, index) => {
     const fixedData = []
     labelSet.forEach((label) => {
@@ -70,7 +94,6 @@ export const chunkData = inputData => {
     return fixedData
   });
 
-
   const overallAverage = averages.map(_ => {
     const sum = _.reduce((accumulator, currentValue) => {
       accumulator.responseTimeSum = currentValue.average + accumulator.responseTimeSum;
@@ -88,8 +111,9 @@ export const chunkData = inputData => {
     return { ..._, time: intervals[index] };
   });
 
+
   // flattening arrays
-  const flatData: any[] = labelSet.map((label) => {
+  const flatData = labelSet.map((label) => {
     return [].concat(...averages.map((_) =>
       [].concat(..._.filter(__ => __.label === label))));
   });
@@ -106,23 +130,23 @@ export const chunkData = inputData => {
     });
   }));
 
-  const overallThroughput: any = {
+  const overallThroughput = {
     name: 'throughput',
     data: [...overallAverage.map(_ => [_.time, _.throughput])]
   };
 
 
-  const overallTimeResponse: any = {
+  const overallTimeResponse = {
     name: 'response time',
     data: [...overallAverage.map(_ => [_.time, _.averageResponseTime])]
   };
 
-  const overAllFailRate: any = {
+  const overAllFailRate = {
     name: 'errors',
     data: [...overallAverage.map(_ => [_.time, _.errorRate])]
   };
 
-  const responseTimeData: any[] = labelSet.map(_ => {
+  const responseTimeData = labelSet.map(_ => {
     const labelData = series.filter(__ => __.name === _);
     return {
       name: _,
@@ -130,7 +154,7 @@ export const chunkData = inputData => {
     };
   });
 
-  const throughputData: any[] = labelSet.map(_ => {
+  const throughputData = labelSet.map(_ => {
     const labelData = series.filter(__ => __.name === _);
     return {
       name: _,
@@ -159,4 +183,8 @@ export const chunkData = inputData => {
   };
 
   return chart;
+};
+
+const roundNumberTwoDecimals = number => {
+  return Math.round(number * 100) / 100;
 };
