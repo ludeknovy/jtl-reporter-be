@@ -1,25 +1,21 @@
 import * as request from 'supertest';
-import { stateSetup } from './helper/state';
+import { stateSetup, userSetup } from './helper/state';
 import { States } from '../contract/states.model';
 import { ItemStatus } from '../../server/queries/items.model';
 import * as path from 'path';
 
 
 describe('Items', () => {
+  let credentials;
   beforeAll(async () => {
-    const response = await request(__server__)
-      .post('api/auth/login')
-      .send({
-        username: 'admin',
-        password: '2Txnf5prDknTFYTVEXjj'
-      });
-    console.log(response);
+    credentials = await userSetup();
   });
   describe('POST /projects/{projectName}/scenarios/{scenarioName}/items', () => {
     it('should be able to create test item', async () => {
       await stateSetup(States.ExistingScenario);
       await request(__server__)
         .post('/api/projects/test-project/scenarios/test-scenario/items')
+        .set(__tokenHeaderKey__, credentials.token)
         .attach('kpi', path.join(__dirname, './test-data/kpi.jtl'), 'kpi.jtl')
         .field('environment', 'test-environment')
         .field('note', 'test-note')
