@@ -57,6 +57,8 @@ const options = (consumer, state) => {
   return {
     url: PROVIDER_URL + '/contract/states',
     method: 'POST',
+    simple: false,
+    resolveWithFullResponse: true,
     json: true,
     body: {
       consumer,
@@ -67,6 +69,6 @@ const options = (consumer, state) => {
 
 
 const generateAuthHeaders = async () => {
-  const { token } = await request(options(CONSUMER, States.ExistingLogin))
-  return { 'x-access-token': token }
+  const { body } = await request(options(CONSUMER, States.ExistingLogin))
+  return { 'x-access-token': body.token }
 }

@@ -13,5 +13,10 @@ exports.up = (pgm) => {
     password: {
       type: "varchar(100)",
     },
+    create_date: {
+      type: 'timestamp',
+      notNull: true,
+      default: pgm.func('current_timestamp'),
+    }
   });
 };

@@ -49,6 +49,7 @@ export class TestDataSetup {
               const { id } = db.one(getUser(username));
               const token = generateToken(id);
               res.status(200).send({ token })
+              break;
             default:
               res.sendStatus(400);
               break;
