@@ -23,14 +23,17 @@ export class TestDataSetup {
         wrapAsync(async (req: Request, res: Response) => {
           const { state } = req.body;
           // tslint:disable-next-line:max-line-length
-          await db.any({ text: 'TRUNCATE jtl.charts, jtl.projects, jtl.data, jtl.item_stat, jtl.items, jtl.scenario, jtl.users, jtl.api_tokens CASCADE' });
+          await db.any({ text: 'TRUNCATE jtl.charts, jtl.projects, jtl.data, jtl.item_stat, jtl.items, jtl.scenario CASCADE' });
+
           switch (state) {
             case States.ExistingProject:
-              await db.any(createNewProject('test-project'));
+                await db.any(createNewProject('test-project'));
+                res.sendStatus(201);
               break;
             case States.ExistingScenario:
               await db.any(createNewProject('test-project'));
               await db.any(createNewScenario('test-project', 'test-scenario'));
+              res.sendStatus(201);
               break;
             case States.ExistingTestItem:
               await db.any(createNewProject('test-project'));
@@ -41,20 +44,25 @@ export class TestDataSetup {
               res.status(200).send({ itemId: item.id });
               break;
             case States.EmptyDb:
-              break;
-            case States.ExistingLogin:
-              const username = 'contract';
-              const password = 'YK8K95TKHVPprcLv';
-              await createUserInDB(username, password);
-              const { id } = db.one(getUser(username));
-              const token = generateToken(id);
-              res.status(200).send({ token })
+              res.sendStatus(201);
               break;
             default:
               res.sendStatus(400);
               break;
           }
-          res.sendStatus(201);
         }));
+    app.route('/api/contract/test-user')
+      .post(
+        wrapAsync(async (req: Request, res: Response) => {
+          await db.any({ text: 'TRUNCATE jtl.users CASCADE' });
+
+          const username = 'contract';
+          const password = 'YK8K95TKHVPprcLv';
+          await createUserInDB(username, password);
+          const { id } = await db.one(getUser(username));
+          const token = generateToken(id);
+          res.status(200).send({ token })
+        })
+      )
   }
 }

@@ -28,8 +28,8 @@ describe('Pact Verification', () => {
       publishVerificationResult: process.env.ENVIRONMENT === 'CI',
       providerVersion: '0.0.0',
       requestFilter: async (req, res, next) => {
-        const newHeaders = await generateAuthHeaders();
-        req.headers = newHeaders;
+        const token = await generateAuthHeaders();
+        req.headers['x-access-token'] = token;
         next();
       },
       stateHandlers: {
@@ -69,6 +69,12 @@ const options = (consumer, state) => {
 
 
 const generateAuthHeaders = async () => {
-  const { body } = await request(options(CONSUMER, States.ExistingLogin))
-  return { 'x-access-token': body.token }
+  const { body } = await request({
+    url: PROVIDER_URL + '/contract/test-user',
+    method: 'POST',
+    simple: false,
+    json: true,
+    resolveWithFullResponse: true,
+  })
+  return body.token;
 }
