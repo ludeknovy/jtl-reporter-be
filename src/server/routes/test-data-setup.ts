@@ -61,7 +61,7 @@ export class TestDataSetup {
           await createUserInDB(username, password);
           const { id } = await db.one(getUser(username));
           const token = generateToken(id);
-          res.status(200).send({ token })
+          res.status(200).send({ token, username, password })
         })
       )
   }
