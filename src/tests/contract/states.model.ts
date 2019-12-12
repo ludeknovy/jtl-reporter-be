@@ -3,5 +3,6 @@ export enum States {
   ExistingScenario = 'EXISTING_SCENARIO',
   ExistingTestItem = 'EXISTING_TEST_ITEM',
   EmptyDb = 'EMPTY_DB',
-  ExistingLogin = 'EXISTING_LOGIN'
+  ExistingLogin = 'EXISTING_LOGIN',
+  ExistingApiKey = 'EXISTING_API_KEY'
 }

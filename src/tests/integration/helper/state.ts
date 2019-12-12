@@ -25,3 +25,11 @@ export const userSetup = async () => {
     json: true,
   })
 }
+
+export const apiTokenSetup = async () => {
+  return await request({
+    url: PROVIDER_URL + '/contract/api-token',
+    method: 'POST',
+    json: true,
+  })
+}

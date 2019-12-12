@@ -1,6 +1,6 @@
 import * as request from 'supertest';
 import { States } from '../contract/states.model';
-import { stateSetup, userSetup } from './helper/state';
+import { stateSetup, apiTokenSetup, userSetup } from './helper/state';
 
 
 describe('Projects', () => {

@@ -12,6 +12,8 @@ import { testStats, testOverview } from '../../test-data/test-stats';
 import { createUserInDB } from '../controllers/users/create-new-user-controller';
 import { getUser } from '../queries/auth';
 import { generateToken } from '../controllers/auth/login-controller';
+import { createNewApiToken } from '../queries/api-tokens';
+import * as uuid from 'uuid';
 
 
 export class TestDataSetup {
@@ -27,8 +29,8 @@ export class TestDataSetup {
 
           switch (state) {
             case States.ExistingProject:
-                await db.any(createNewProject('test-project'));
-                res.sendStatus(201);
+              await db.any(createNewProject('test-project'));
+              res.sendStatus(201);
               break;
             case States.ExistingScenario:
               await db.any(createNewProject('test-project'));
@@ -46,6 +48,13 @@ export class TestDataSetup {
             case States.EmptyDb:
               res.sendStatus(201);
               break;
+            case States.ExistingApiKey:
+              const TOKEN = 'at-testToken'
+              await createUserInDB('test-user', 'test00010');
+              const { id } = await db.one(getUser('test-user'));
+              await db.any(createNewApiToken(TOKEN, 'test-token', id));
+              res.status(200).send({ token: TOKEN });
+              break;
             default:
               res.sendStatus(400);
               break;
@@ -62,6 +71,17 @@ export class TestDataSetup {
           const { id } = await db.one(getUser(username));
           const token = generateToken(id);
           res.status(200).send({ token, username, password })
+        })
+      )
+    app.route('/api/contract/api-token')
+      .post(
+        wrapAsync(async (req: Request, res: Response) => {
+          await db.any({ text: 'TRUNCATE jtl.api_tokens CASCADE' });
+          const TOKEN = `at-${uuid()}`;
+          await createUserInDB('test-user', 'test0000');
+          const { id } = await db.one(getUser('test-user'));
+          await db.any(createNewApiToken(TOKEN, 'test-token', id));
+          res.status(200).send({ token: TOKEN })
         })
       )
   }

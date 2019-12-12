@@ -3,5 +3,6 @@ export const routes = {
     login: '/api/auth/login',
     changePassword: '/api/auth/change-password'
   },
-  apiTokens: '/api/api-tokens'
+  apiTokens: '/api/api-tokens',
+  users: '/api/users'
 }
