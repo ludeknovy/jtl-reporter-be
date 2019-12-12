@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
 export const newUserSchema = {
-    username: Joi.string().min(3).regex(/[^a-zA-Z0-9]/).required(),
-    password: Joi.string().required(),
-  };
+  username: Joi.string().min(3).regex(/^[0-9a-zA-Z.]+$/).required(),
+  password: Joi.string().min(8).required(),
+};

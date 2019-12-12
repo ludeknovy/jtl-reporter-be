@@ -12,13 +12,13 @@ describe('Users', () => {
       await request(__server__)
         .post(routes.users)
         .send({
-          username: `new-user`,
+          username: `new.user`,
           password: 'test12345'
         })
         .expect(401);
     });
     it('should be able to create new user', async () => {
-      const USERNAME = 'new-test-user'
+      const USERNAME = 'new.test.user'
       await request(__server__)
         .post(routes.users)
         .set(__tokenHeaderKey__, credentials.token)
@@ -38,11 +38,11 @@ describe('Users', () => {
         })
     });
     it.each([
-      ['too short password', { password: 'test', usertname: 'test' }],
-      ['too short username', { password: 'test12345', usertname: 'te' }],
-      ['unallowed character é in username', { password: 'test12345', usertname: 'éééééé' }],
-      ['unallowed character ? username', { password: 'test12345', usertname: 'test?' }],
-      ['unallowed character @ in username', { password: 'test12345', usertname: 'test@' }],
+      ['too short password', { password: 'test', username: 'test' }],
+      ['too short username', { password: 'test12345', username: 'te' }],
+      ['unallowed character é in username', { password: 'test12345', username: 'éééééé' }],
+      ['unallowed character ? username', { password: 'test12345', username: 'test?' }],
+      ['unallowed character @ in username', { password: 'test12345', username: 'test@' }],
     ])('should not be able to create new when %s provided', async (desc, body) => {
       await request(__server__)
         .post(routes.users)
