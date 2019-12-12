@@ -29,6 +29,7 @@ describe('Items', () => {
       const { itemId } = await stateSetup(States.ExistingTestItem);
       await request(__server__)
         .put(`/api/projects/test-project/scenarios/test-scenario/items/${itemId}`)
+        .set(__tokenHeaderKey__, credentials.token)
         .set('Accept', 'application/json')
         .send({
           environment: 'new-test-environment',
@@ -43,6 +44,7 @@ describe('Items', () => {
       const { itemId } = await stateSetup(States.ExistingTestItem);
       await request(__server__)
         .delete(`/api/projects/test-project/scenarios/test-scenario/items/${itemId}`)
+        .set(__tokenHeaderKey__, credentials.token)
         .set('Accept', 'application/json')
         .send({
           environment: 'new-test-environment',
