@@ -17,3 +17,19 @@ export const stateSetup = async (state, consumer = 'integration-tests') => {
   return await request(options(state, consumer));
 };
 
+
+export const userSetup = async () => {
+  return await request({
+    url: PROVIDER_URL + '/contract/test-user',
+    method: 'POST',
+    json: true,
+  })
+}
+
+export const apiTokenSetup = async () => {
+  return await request({
+    url: PROVIDER_URL + '/contract/api-token',
+    method: 'POST',
+    json: true,
+  })
+}

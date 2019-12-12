@@ -1,17 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import * as csv from 'csvtojson';
-import * as parser from 'xml2json';
 import * as express from 'express';
-import * as multer from 'multer';
-import * as boom from 'boom';
-import * as fs from 'fs';
 import { wrapAsync } from '../errors/error-handler';
-import { chunkData } from '../data-stats/chunk-data';
-import {
-  savePlotData,
-} from '../queries/items';
-import { db } from '../../db/db';
-import { createNewItem, saveItemStats, saveKpiData, saveData } from '../queries/items';
 import {
   bodySchemaValidator, paramsSchemaValidator,
   queryParamsValidator
@@ -26,6 +15,7 @@ import { getItemController } from '../controllers/item/get-item-controller';
 import { updateItemController } from '../controllers/item/update-item-controller';
 import { deleteItemController } from '../controllers/item/delete-item-controller';
 import { createItemController } from '../controllers/item/create-item-controller';
+import { verifyToken } from '../middleware/auth-middleware';
 
 
 
@@ -35,25 +25,30 @@ export class ItemsRoutes {
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items')
       .get(
+        verifyToken,
         paramsSchemaValidator(scenarioParamsSchema),
         queryParamsValidator(querySchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemsController(req, res, next)))
 
       .post(
+        verifyToken,
         paramsSchemaValidator(newItemParamSchema),
         createItemController);
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId')
       .get(
+        verifyToken,
         paramsSchemaValidator(paramsSchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemController(req, res, next)))
 
       .put(
+        verifyToken,
         paramsSchemaValidator(paramsSchema),
         bodySchemaValidator(updateItemBodySchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await updateItemController(req, res, next)))
 
       .delete(
+        verifyToken,
         paramsSchemaValidator(paramsSchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteItemController(req, res, next)));
   }

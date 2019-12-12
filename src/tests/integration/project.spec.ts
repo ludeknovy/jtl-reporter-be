@@ -1,14 +1,19 @@
 import * as request from 'supertest';
 import { States } from '../contract/states.model';
-import { stateSetup } from './helper/state';
+import { stateSetup, apiTokenSetup, userSetup } from './helper/state';
 
 
 describe('Projects', () => {
+  let credentials;
+  beforeAll(async () => {
+    credentials = await userSetup();
+  });
   describe('POST /projects', () => {
     it('should be able to create new project', async () => {
       await stateSetup(States.EmptyDb);
       await request(__server__)
         .post('/api/projects')
+        .set(__tokenHeaderKey__, credentials.token)
         .send({ projectName: `test-project-000` })
         .set('Accept', 'application/json')
         .expect(201);
@@ -17,6 +22,7 @@ describe('Projects', () => {
       await stateSetup(States.EmptyDb);
       await request(__server__)
         .post('/api/projects')
+        .set(__tokenHeaderKey__, credentials.token)
         .send({})
         .set('Accept', 'application/json')
         .expect(400);
@@ -25,6 +31,7 @@ describe('Projects', () => {
       await stateSetup(States.ExistingProject);
       await request(__server__)
         .post('/api/projects')
+        .set(__tokenHeaderKey__, credentials.token)
         .send({ projectName: `test-project` })
         .set('Accept', 'application/json')
         .expect(409);
@@ -35,6 +42,7 @@ describe('Projects', () => {
       await stateSetup(States.ExistingProject);
       await request(__server__)
         .put('/api/projects/test-project')
+        .set(__tokenHeaderKey__, credentials.token)
         .send({ projectName: `test-project` })
         .set('Accept', 'application/json')
         .expect(204);
@@ -45,6 +53,7 @@ describe('Projects', () => {
       await stateSetup(States.ExistingProject);
       await request(__server__)
         .delete('/api/projects/test-project')
+        .set(__tokenHeaderKey__, credentials.token)
         .set('Accept', 'application/json')
         .expect(204);
     });

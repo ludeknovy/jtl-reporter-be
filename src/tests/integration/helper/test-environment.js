@@ -14,6 +14,7 @@ class TestEnvironment extends NodeEnvironment {
     await super.setup();
     const app = new App();
 
+    this.global.__tokenHeaderKey__ = 'x-access-token';
     this.global.__server__ = require('http')
       .createServer(app.app)
       .listen('5000');

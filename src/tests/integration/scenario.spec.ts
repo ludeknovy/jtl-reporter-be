@@ -1,13 +1,18 @@
 import * as request from 'supertest';
 import { States } from '../contract/states.model';
-import { stateSetup } from './helper/state';
+import { stateSetup, userSetup } from './helper/state';
 
 describe('Scenario', () => {
+  let credentials;
+  beforeAll(async () => {
+    credentials = await userSetup();
+  });
   describe('POST /projects/{projectName}/scenarios', () => {
     it('should be able to create new scenario', async () => {
       await stateSetup(States.ExistingProject);
       await request(__server__)
         .post('/api/projects/test-project/scenarios')
+        .set(__tokenHeaderKey__, credentials.token)
         .send({ scenarioName: `test-scenario` })
         .set('Accept', 'application/json')
         .expect(201);
@@ -16,6 +21,7 @@ describe('Scenario', () => {
       await stateSetup(States.ExistingScenario);
       await request(__server__)
         .post('/api/projects/test-project/scenarios')
+        .set(__tokenHeaderKey__, credentials.token)
         .send({ scenarioName: `test-scenario` })
         .set('Accept', 'application/json')
         .expect(409);
@@ -24,6 +30,7 @@ describe('Scenario', () => {
       await stateSetup(States.ExistingScenario);
       await request(__server__)
         .post('/api/projects/test-project/scenarios')
+        .set(__tokenHeaderKey__, credentials.token)
         .send({})
         .set('Accept', 'application/json')
         .expect(400);
@@ -34,6 +41,7 @@ describe('Scenario', () => {
       await stateSetup(States.ExistingScenario);
       await request(__server__)
         .put('/api/projects/test-project/scenarios/test-scenario')
+        .set(__tokenHeaderKey__, credentials.token)
         .send({ scenarioName: `test-scenario` })
         .set('Accept', 'application/json')
         .expect(204);
@@ -44,6 +52,7 @@ describe('Scenario', () => {
       await stateSetup(States.ExistingScenario);
       await request(__server__)
         .delete('/api/projects/test-project/scenarios/test-scenario')
+        .set(__tokenHeaderKey__, credentials.token)
         .set('Accept', 'application/json')
         .expect(204);
      });
