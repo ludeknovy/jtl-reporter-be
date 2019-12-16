@@ -16,6 +16,7 @@ import { updateItemController } from '../controllers/item/update-item-controller
 import { deleteItemController } from '../controllers/item/delete-item-controller';
 import { createItemController } from '../controllers/item/create-item-controller';
 import { verifyToken } from '../middleware/auth-middleware';
+import { getItemErrorsController } from '../controllers/item/get-item-errors-controller';
 
 
 
@@ -51,5 +52,8 @@ export class ItemsRoutes {
         verifyToken,
         paramsSchemaValidator(paramsSchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteItemController(req, res, next)));
+    
+    app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/errors')
+      .get(wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemErrorsController(req, res, next)))
   }
 }
