@@ -1,5 +1,5 @@
 export const getUsers = () => {
   return {
-    text: 'SELECT username, id FROM jtl.users',
+    text: 'SELECT username, id, create_date as "createDate" FROM jtl.users',
   };
 };
