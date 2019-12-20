@@ -6,7 +6,8 @@ export const createNewApiToken = (token, description, createdBy) => {
 };
 
 export const getApiTokens = {
-  text: `SELECT id, description, token, create_date as "createDate" FROM jtl.api_tokens;`
+  text: `SELECT tokens.id, description, token, tokens.create_date as "createDate", users.username as "createdBy" FROM jtl.api_tokens tokens
+  LEFT JOIN jtl.users users on users.id = tokens.created_by;`
 };
 
 export const deleteToken = (id) => {
