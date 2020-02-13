@@ -5,3 +5,19 @@ export const getUsers = () => {
     GROUP BY username, users.id;`,
   };
 };
+
+
+export const deleteUser = (userId) => {
+  return {
+    text: `DELETE FROM jtl.users users
+    WHERE users.id = $1;`,
+    values: [userId]
+  };
+};
+
+export const isExistingUser = (userId) => {
+  return {
+    text: `SELECT EXISTS(SELECT * FROM jtl.users users WHERE users.id = $1)`,
+    values: [userId],
+  };
+};

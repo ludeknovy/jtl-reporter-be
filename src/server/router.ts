@@ -22,7 +22,7 @@ export class Router {
     this.scenarioRoutes = new ScenarioRoutes();
     this.itemRoutes = new ItemsRoutes();
     this.labelRoutes = new LabelRoutes();
-    this.authRoutes = new AuthRoutes()
+    this.authRoutes = new AuthRoutes();
     this.apiTokenRoutes = new ApiTokensRoutes();
     this.userRoutes = new UsersRoutes();
     this.testDataSetup = new TestDataSetup();

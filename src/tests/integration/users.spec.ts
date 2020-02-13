@@ -1,6 +1,7 @@
 import * as request from 'supertest';
 import { userSetup } from './helper/state';
 import { routes } from './helper/routes';
+import { uuid } from '@pact-foundation/pact/dsl/matchers';
 
 describe('Users', () => {
   let credentials;
@@ -49,22 +50,55 @@ describe('Users', () => {
         .set(__tokenHeaderKey__, credentials.token)
         .send(body)
         .expect(400);
-  });
+    });
 
-});
-describe('GET /users', () => {
-  it('should not be able to get users as unathorized user', async () => {
-    await request(__server__)
-      .get(routes.users)
+  });
+  describe('GET /users', () => {
+    it('should not be able to get users as unathorized user', async () => {
+      await request(__server__)
+        .get(routes.users)
+        .send()
+        .expect(401);
+    });
+    it('should be able to get users', async () => {
+      await request(__server__)
+        .get(routes.users)
+        .set(__tokenHeaderKey__, credentials.token)
+        .send()
+        .expect(200);
+    });
+  });
+  describe('DELETE /user/:userId', () => {
+    let id, token;
+    beforeAll(async () => {
+      ({ id, token } = await userSetup());
+    });
+    it('should return 401 when deleting user as unathorized', async () => {
+      await request(__server__)
+      .delete(routes.user + `/${uuid()}`)
       .send()
       .expect(401);
-  });
-  it('should be able to get users', async () => {
-    await request(__server__)
-      .get(routes.users)
-      .set(__tokenHeaderKey__, credentials.token)
+    });
+    it('should return 404 when deleting unexisting user', async () => {
+      await request(__server__)
+        .delete(routes.user + `/${uuid()}`)
+        .set(__tokenHeaderKey__, token)
+        .send()
+        .expect(404);
+    });
+    it('should be able to delete user', async () => {
+      await request(__server__)
+        .delete(routes.user + `/${id}`)
+        .set(__tokenHeaderKey__, token)
+        .send()
+        .expect(200);
+    });
+    it('should return 400 when no valid userId provided', async () => {
+      await request(__server__)
+      .delete(routes.user + `/abcd`)
+      .set(__tokenHeaderKey__, token)
       .send()
-      .expect(200);
+      .expect(400);
+    });
   });
-});
 });

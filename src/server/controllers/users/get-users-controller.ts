@@ -4,6 +4,6 @@ import { getUsers } from '../../queries/users';
 
 
 export const getUsersController = async (req: Request, res: Response, next: NextFunction) => {
-  const result = await db.query(getUsers)
-  res.status(200).send(result)
-}
+  const result = await db.query(getUsers);
+  res.status(200).send(result);
+};
