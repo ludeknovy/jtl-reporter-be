@@ -23,7 +23,7 @@ export class UsersRoutes {
       );
 
     app.route('/api/users/:userId')
-      .get(
+      .delete(
         verifyToken,
         paramsSchemaValidator(userSchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteUserController(req, res, next))

@@ -5,5 +5,4 @@ export const routes = {
   },
   apiTokens: '/api/api-tokens',
   users: '/api/users',
-  user: '/api/user'
 };
