@@ -13,10 +13,12 @@ export class UsersRoutes {
       .post(
         verifyToken,
         bodySchemaValidator(newUserSchema),
+        // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await createNewUserController(req, res, next)))
 
       .get(
         verifyToken,
+        // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getUsersController(req, res, next))
       );
   }

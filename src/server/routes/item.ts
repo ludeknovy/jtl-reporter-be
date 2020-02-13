@@ -29,6 +29,7 @@ export class ItemsRoutes {
         verifyToken,
         paramsSchemaValidator(scenarioParamsSchema),
         queryParamsValidator(querySchema),
+        // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemsController(req, res, next)))
 
       .post(
@@ -40,20 +41,24 @@ export class ItemsRoutes {
       .get(
         verifyToken,
         paramsSchemaValidator(paramsSchema),
+        // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemController(req, res, next)))
 
       .put(
         verifyToken,
         paramsSchemaValidator(paramsSchema),
         bodySchemaValidator(updateItemBodySchema),
+        // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await updateItemController(req, res, next)))
 
       .delete(
         verifyToken,
         paramsSchemaValidator(paramsSchema),
+        // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteItemController(req, res, next)));
-    
+
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/errors')
-      .get(wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemErrorsController(req, res, next)))
+      // tslint:disable-next-line: max-line-length
+      .get(wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemErrorsController(req, res, next)));
   }
 }

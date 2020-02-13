@@ -15,14 +15,17 @@ export class ApiTokensRoutes {
     app.route('/api/api-tokens')
     .get(
       verifyToken,
+      // tslint:disable-next-line: max-line-length
       wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getTokensController(req, res, next)))
     .post(
       verifyToken,
       bodySchemaValidator(newTokenSchema),
+      // tslint:disable-next-line: max-line-length
       wrapAsync(async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => await createTokenController(req, res, next)))
     .delete(
       verifyToken,
       bodySchemaValidator(deleteTokenSchema),
+      // tslint:disable-next-line: max-line-length
       wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteTokenController(req, res, next)));
    }
 }
