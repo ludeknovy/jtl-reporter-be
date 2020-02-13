@@ -50,7 +50,7 @@ export const chunkData = inputData => {
 
   // if interval does not contain label it creates it with either null or 0 values
   averages = averages.map((a, index) => {
-    const fixedData = []
+    const fixedData = [];
     labelSet.forEach((label) => {
       const found = a.find((_) => _.label === label);
       if (!found) {
@@ -61,13 +61,13 @@ export const chunkData = inputData => {
           label,
           average: index === 0 ? 0 : null,
           throughput: index === 0 ? 0 : null
-        })
+        });
       } else {
         fixedData.push(found);
 
       }
     });
-    return fixedData
+    return fixedData;
   });
 
 

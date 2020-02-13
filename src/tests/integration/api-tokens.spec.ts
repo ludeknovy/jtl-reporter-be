@@ -68,9 +68,9 @@ describe('Api tokens', () => {
       .expect(200)
       .then(({ body }) => {
         tokenId = body[0].id;
-      })
+      });
     });
-    it('should not be able to delete api token as uanthorized user', async () => { 
+    it('should not be able to delete api token as uanthorized user', async () => {
       await request(__server__)
       .delete(routes.apiTokens)
       .send()
@@ -89,6 +89,6 @@ describe('Api tokens', () => {
       .set(__tokenHeaderKey__, credentials.token)
       .send({ id: null })
       .expect(400);
-     })
+     });
   });
 });

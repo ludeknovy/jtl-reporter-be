@@ -18,7 +18,7 @@ describe('Users', () => {
         .expect(401);
     });
     it('should be able to create new user', async () => {
-      const USERNAME = 'new.test.user'
+      const USERNAME = 'new.test.user';
       await request(__server__)
         .post(routes.users)
         .set(__tokenHeaderKey__, credentials.token)
@@ -34,8 +34,8 @@ describe('Users', () => {
         .send()
         .expect(200)
         .then(({ body }) => {
-          expect(body.find((_) => _.username === USERNAME)).toBeDefined()
-        })
+          expect(body.find((_) => _.username === USERNAME)).toBeDefined();
+        });
     });
     it.each([
       ['too short password', { password: 'test', username: 'test' }],
@@ -48,7 +48,7 @@ describe('Users', () => {
         .post(routes.users)
         .set(__tokenHeaderKey__, credentials.token)
         .send(body)
-        .expect(400)
+        .expect(400);
   });
 
 });
@@ -64,7 +64,7 @@ describe('GET /users', () => {
       .get(routes.users)
       .set(__tokenHeaderKey__, credentials.token)
       .send()
-      .expect(200)
+      .expect(200);
   });
 });
 });
