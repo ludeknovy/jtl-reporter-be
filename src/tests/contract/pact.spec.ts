@@ -75,6 +75,6 @@ const generateAuthHeaders = async () => {
     simple: false,
     json: true,
     resolveWithFullResponse: true,
-  })
+  });
   return body.token;
-}
+};

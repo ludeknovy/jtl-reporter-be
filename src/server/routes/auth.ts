@@ -13,12 +13,14 @@ export class AuthRoutes {
 
     app.route('/api/auth/login')
       .post(bodySchemaValidator(authQuerySchema),
+        // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await loginController(req, res, next)));
 
     app.route('/api/auth/change-password')
       .post(
         verifyToken,
         bodySchemaValidator(changePasswordSchema),
+        // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => await changePasswordController(req, res, next)));
 
   }

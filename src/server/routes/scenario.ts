@@ -19,11 +19,13 @@ export class ScenarioRoutes {
       .get(
         verifyToken,
         paramsSchemaValidator(projectNameParam),
+        // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getScenariosController(req, res, next)))
       .post(
         verifyToken,
         paramsSchemaValidator(projectNameParam),
         bodySchemaValidator(newScenarioSchema),
+        // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await createScenarioController(req, res, next)));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName')
@@ -31,17 +33,20 @@ export class ScenarioRoutes {
         verifyToken,
         paramsSchemaValidator(paramsSchema),
         bodySchemaValidator(scenarioUpdateSchema),
+        // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getScenarioController(req, res, next)))
 
       .delete(
         verifyToken,
         paramsSchemaValidator(paramsSchema),
+        // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteScenarioController(req, res, next)));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/trends')
       .get(
         verifyToken,
         paramsSchemaValidator(paramsSchema),
+        // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getScenarioTrendsController(req, res, next)));
   }
 }

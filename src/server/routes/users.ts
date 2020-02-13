@@ -18,6 +18,7 @@ export class UsersRoutes {
 
       .get(
         verifyToken,
+        // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getUsersController(req, res, next))
       );
     

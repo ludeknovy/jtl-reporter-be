@@ -54,7 +54,7 @@ describe('Auth', () => {
       .expect(400);
     });
     describe('Change password flow', () => {
-      const newPassword = 'test12345'
+      const newPassword = 'test12345';
       it('should be able to change password', async () => {
         await request(__server__)
         .post(routes.auth.changePassword)
@@ -82,7 +82,7 @@ describe('Auth', () => {
           password: newPassword,
         })
         .expect(200);
-      })
+      });
     });
   });
-})
+});

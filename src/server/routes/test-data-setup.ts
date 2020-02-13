@@ -49,7 +49,7 @@ export class TestDataSetup {
               res.sendStatus(201);
               break;
             case States.ExistingApiKey:
-              const TOKEN = 'at-testToken'
+              const TOKEN = 'at-testToken';
               await createUserInDB('test-user', 'test00010');
               const { id } = await db.one(getUser('test-user'));
               await db.any(createNewApiToken(TOKEN, 'test-token', id));
@@ -70,9 +70,9 @@ export class TestDataSetup {
           await createUserInDB(username, password);
           const { id } = await db.one(getUser(username));
           const token = generateToken(id);
-          res.status(200).send({ token, username, password })
+          res.status(200).send({ token, username, password });
         })
-      )
+      );
     app.route('/api/contract/api-token')
       .post(
         wrapAsync(async (req: Request, res: Response) => {
@@ -81,8 +81,8 @@ export class TestDataSetup {
           await createUserInDB('test-user', 'test0000');
           const { id } = await db.one(getUser('test-user'));
           await db.any(createNewApiToken(TOKEN, 'test-token', id));
-          res.status(200).send({ token: TOKEN })
+          res.status(200).send({ token: TOKEN });
         })
-      )
+      );
   }
 }
