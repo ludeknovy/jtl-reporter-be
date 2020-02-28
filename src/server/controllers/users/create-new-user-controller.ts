@@ -6,10 +6,10 @@ import { hashPassword } from '../auth/helper/passwords';
 
 
 export const createNewUserController = async (req: Request, res: Response, next: NextFunction) => {
-  const { username, password } = req.body;
+  const { username, password, role } = req.body;
 
   try {
-    await createUserInDB(username, password);
+    await createUserInDB(username, password, role);
     res.status(201).send();
   } catch (error) {
     if (error.routine === '_bt_check_unique') {
@@ -19,7 +19,7 @@ export const createNewUserController = async (req: Request, res: Response, next:
   }
 }
 
-export const createUserInDB = async (username, password) => {
+export const createUserInDB = async (username, password, role) => {
   const passwordHash = await hashPassword(password);
-  await db.query(createUser(username, passwordHash));
+  await db.query(createUser(username, passwordHash, role));
 }

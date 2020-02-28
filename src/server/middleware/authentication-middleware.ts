@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import * as boom from 'boom';
 import * as jwt from 'jsonwebtoken';
 import { db } from '../../db/db';
@@ -9,7 +9,7 @@ import { IGetUserAuthInfoRequest } from './request.model';
 
 const UNAUTHORIZED_MSG = 'The token you provided is invalid';
 
-export const verifyToken = async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
+export const authentication = async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
   const token = req.headers['x-access-token'];
   if (!token) {
     return next(boom.unauthorized(`Please provide x-access-token`));
@@ -18,7 +18,7 @@ export const verifyToken = async (req: IGetUserAuthInfoRequest, res: Response, n
     try {
       const [tokenData] = await db.query(getApiToken(token));
       if (tokenData) {
-        req.user = { userId: tokenData.created_by };
+        req.user = { userId: tokenData.created_by, role: tokenData.role };
         return next();
       } else {
         return next(boom.unauthorized(UNAUTHORIZED_MSG));
@@ -34,7 +34,7 @@ export const verifyToken = async (req: IGetUserAuthInfoRequest, res: Response, n
     if (!userData) {
       return next(boom.unauthorized(UNAUTHORIZED_MSG));
     }
-    req.user = { userId };
+    req.user = { userId, role: userData.role };
     next();
   } catch (error) {
     return next(boom.unauthorized(UNAUTHORIZED_MSG));

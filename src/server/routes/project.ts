@@ -9,44 +9,51 @@ import { getLatestItemsControllers } from '../controllers/project/get-latest-ite
 import { deleteProjectController } from '../controllers/project/delete-project-controller';
 import { updateProjectController } from '../controllers/project/update-project-controller';
 import { getProjectStatsController } from '../controllers/project/get-projects-stats-controller';
-import { verifyToken } from '../middleware/auth-middleware';
+import { authentication } from '../middleware/authentication-middleware';
+import { authorization, AllowedRoles } from '../middleware/authorization-middleware';
 
 export class ProjectRoutes {
   public routes(app: express.Application): void {
 
     app.route('/api/projects')
       .post(
-        verifyToken,
+        authentication,
+        authorization([AllowedRoles.Regular, AllowedRoles.Admin]),
         bodySchemaValidator(createNewProjectSchema),
         // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await createProjectController(req, res, next)))
 
       .get(
-        verifyToken,
+        authentication,
+        authorization([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
         // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getProjectsController(req, res, next)));
 
     app.route('/api/projects/latest-items')
       .get(
-        verifyToken,
+        authentication,
+        authorization([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
         // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getLatestItemsControllers(req, res, next)));
 
     app.route('/api/projects/overall-stats')
       .get(
-        verifyToken,
+        authentication,
+        authorization([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
         // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getProjectStatsController(req, res, next)));
 
     app.route('/api/projects/:projectName')
       .delete(
-        verifyToken,
+        authentication,
+        authorization([AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(projectNameParam),
         // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteProjectController(req, res, next)))
 
       .put(
-        verifyToken,
+        authentication,
+        authorization([AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(projectNameParam),
         bodySchemaValidator(createNewProjectSchema),
         // tslint:disable-next-line: max-line-length

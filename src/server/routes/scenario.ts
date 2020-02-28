@@ -9,7 +9,8 @@ import { createScenarioController } from '../controllers/scenario/create-scenari
 import { getScenarioController } from '../controllers/scenario/get-scenario-controller';
 import { deleteScenarioController } from '../controllers/scenario/delete-scenario-controller';
 import { getScenarioTrendsController } from '../controllers/scenario/get-scenario-trends-controller';
-import { verifyToken } from '../middleware/auth-middleware';
+import { authentication } from '../middleware/authentication-middleware';
+import { authorization, AllowedRoles } from '../middleware/authorization-middleware';
 
 export class ScenarioRoutes {
 
@@ -17,12 +18,14 @@ export class ScenarioRoutes {
 
     app.route('/api/projects/:projectName/scenarios')
       .get(
-        verifyToken,
+        authentication,
+        authorization([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(projectNameParam),
         // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getScenariosController(req, res, next)))
       .post(
-        verifyToken,
+        authentication,
+        authorization([AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(projectNameParam),
         bodySchemaValidator(newScenarioSchema),
         // tslint:disable-next-line: max-line-length
@@ -30,21 +33,24 @@ export class ScenarioRoutes {
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName')
       .put(
-        verifyToken,
+        authentication,
+        authorization([AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
         bodySchemaValidator(scenarioUpdateSchema),
         // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getScenarioController(req, res, next)))
 
       .delete(
-        verifyToken,
+        authentication,
+        authorization([AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
         // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteScenarioController(req, res, next)));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/trends')
       .get(
-        verifyToken,
+        authentication,
+        authorization([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
         // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getScenarioTrendsController(req, res, next)));

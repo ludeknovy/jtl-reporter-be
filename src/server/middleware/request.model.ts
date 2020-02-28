@@ -1,4 +1,9 @@
 import { Request } from 'express';
+import { AllowedRoles } from './authorization-middleware';
+
 export interface IGetUserAuthInfoRequest extends Request {
-  user: any;
+  user: {
+    userId: string;
+    role: AllowedRoles
+  };
 }

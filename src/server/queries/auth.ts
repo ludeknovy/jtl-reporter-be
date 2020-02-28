@@ -13,10 +13,10 @@ export const getUserById = (id) => {
   };
 };
 
-export const createUser = (username, password) => {
+export const createUser = (username, password, role) => {
   return {
-    text: 'INSERT INTO jtl.users(username, password) VALUES($1, $2)',
-    values: [username, password]
+    text: 'INSERT INTO jtl.users(username, password, role) VALUES($1, $2, $3)',
+    values: [username, password, role]
   };
 };
 

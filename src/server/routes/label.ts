@@ -6,7 +6,8 @@ import { labelParamSchema, labelQuerySchema } from '../schema-validator/item-sch
 import { getLabelTrendController } from '../controllers/label/get-label-trend-controller';
 import { getLabelVirtualUsersController } from '../controllers/label/get-label-vu-controllers';
 import { getLabelErrorsController } from '../controllers/label/get-label-errors-controller';
-import { verifyToken } from '../middleware/auth-middleware';
+import { authentication } from '../middleware/authentication-middleware';
+import { authorization, AllowedRoles } from '../middleware/authorization-middleware';
 
 export class LabelRoutes {
 
@@ -14,7 +15,8 @@ export class LabelRoutes {
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label/:label/trend')
       .get(
-        verifyToken,
+        authentication,
+        authorization([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(labelParamSchema),
         queryParamsValidator(labelQuerySchema),
         // tslint:disable-next-line: max-line-length
@@ -22,7 +24,8 @@ export class LabelRoutes {
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label/:label/virtual-users')
       .get(
-        verifyToken,
+        authentication,
+        authorization([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(labelParamSchema),
         queryParamsValidator(labelQuerySchema),
         // tslint:disable-next-line: max-line-length
@@ -30,7 +33,8 @@ export class LabelRoutes {
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label/:label/errors')
       .get(
-        verifyToken,
+        authentication,
+        authorization([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(labelParamSchema),
         // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getLabelErrorsController(req, res, next)));
