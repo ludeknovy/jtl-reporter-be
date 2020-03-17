@@ -18,9 +18,9 @@ export const loginController = async (req: Request, res: Response, next: NextFun
       return next(boom.unauthorized('The credentials you provided is incorrect'));
     }
     const token = generateToken(result[0].id);
-    return res.status(200).send({ token });    
+    return res.status(200).send({ token, username });
   } catch (error) {
-    return next(error)
+    return next(error);
   }
 
 };
@@ -34,4 +34,4 @@ export const generateToken = (id) => {
     config.jwtToken, { expiresIn: '7d' }
   );
   return token;
-}
+};
