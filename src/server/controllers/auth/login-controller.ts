@@ -18,7 +18,7 @@ export const loginController = async (req: Request, res: Response, next: NextFun
       return next(boom.unauthorized('The credentials you provided is incorrect'));
     }
     const token = generateToken(result[0].id);
-    return res.status(200).send({ token, username });
+    return res.status(200).send({ token, username, role: result[0].role });
   } catch (error) {
     return next(error);
   }
