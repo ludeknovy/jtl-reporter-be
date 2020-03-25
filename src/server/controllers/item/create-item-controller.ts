@@ -1,16 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
 import { ItemStatus, ItemDataType } from '../../queries/items.model';
-import { prepareDataForSavingToDb, InputData, OutputData, normalizeData } from '../../data-stats/prepare-data';
+import { prepareDataForSavingToDb, InputData, OutputData, normalizeData, dataForFb, prepareDataForSavingToDbFromMongo } from '../../data-stats/prepare-data';
 import { db } from '../../../db/db';
-import { createNewItem, saveItemStats, saveKpiData, savePlotData, saveData } from '../../queries/items';
+import { createNewItem, saveItemStats, saveKpiData, savePlotData, saveData, calculateOverview, getLabelsStats } from '../../queries/items';
 import { chunkData } from '../../data-stats/chunk-data';
 import * as multer from 'multer';
 import * as boom from 'boom';
 import * as fs from 'fs';
+import * as pgp from 'pg-promise';
 // import * as csv from 'csvtojson';
 import * as parser from 'xml2json';
 import * as csv from 'fast-csv';
-import pg = require('pg-promise/typescript/pg-subset');
+import * as uuid from 'uuid';
+import { MongoClient } from 'mongodb';
+import { overviewAggPipeline, labelAggPipeline } from '../../queries/mongo-db-agg';
+const uri = 'mongodb://127.0.0.1:27017';
+const client: MongoClient = new MongoClient(uri);
 
 
 const upload = multer(
@@ -45,30 +50,99 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
       return next(boom.badRequest('too long hostname. max length is 200.'));
     }
     try {
+      await client.connect();
+      const jtlDb = client.db('jtl-data');
+      const collection = jtlDb.collection('data-chunks');
+
+      await db.query('BEGIN');
       const kpiFilename = kpi[0].path;
       let tempBuffer = [];
+      const item = await db.one(createNewItem(
+        scenarioName,
+        null,
+        environment,
+        note,
+        status,
+        projectName,
+        hostname));
+
+
       const csvStream = fs.createReadStream(kpiFilename)
         .pipe(csv.parse({ headers: true }))
         .on('data', async row => {
-          if (tempBuffer.length === (5000 - 1)) {
+          if (tempBuffer.length === (500)) {
             csvStream.pause();
-            await db.query('INSERT INTO jtl.data_chunks(item_data) VALUES($1)', [JSON.stringify(tempBuffer)]);
+            await collection.insertOne({ itemId: item.id, samples: tempBuffer });
             tempBuffer = [];
             csvStream.resume();
           }
-          tempBuffer.push(normalizeData(row));
+          tempBuffer.push(dataForFb(row, item.id));
           return;
         })
-        .on('end', (rowCount: number) => {
-          console.log(tempBuffer.length);
-          console.log(`Parsed ${rowCount} rows`);
-          fs.unlinkSync(kpiFilename);
-          return res.status(200).send();
+        .on('end', async (rowCount: number) => {
+          try {
+            await collection.insertOne({ itemId: item.id, samples: tempBuffer });
+
+            const before = Date.now();
+            console.log(tempBuffer[0]);
+            console.log(item.id)
+            const aggOverview = await collection.aggregate(overviewAggPipeline(item.id)).toArray();
+            const after = Date.now();
+            console.log(aggOverview);
+  
+            const beforeL = Date.now();
+            const aggLabel = await collection.aggregate(labelAggPipeline(item.id), { allowDiskUse: true }).toArray();
+            const afterL = Date.now();
+            console.log(aggLabel);
+  
+            console.log(`duration Overview: ${(after - before) / 1000} sec.`)
+            console.log(`duration Label: ${(afterL - beforeL) / 1000} sec.`)
+            console.log(tempBuffer.length);
+            console.log(`Parsed ${rowCount} rows`);
+
+            const { overview, labelStats } = prepareDataForSavingToDbFromMongo(aggOverview[0], aggLabel);
+            console.log("--------------")
+            console.log(overview);
+            console.log("--------------")
+            console.log(labelStats);
+
+            await db.none(saveItemStats(item.id, JSON.stringify(labelStats), overview));
+
+            fs.unlinkSync(kpiFilename);
+            await db.query('COMMIT');
+            return res.status(200).send();
+  
+          } catch (error) {
+            console.log(error);
+            return res.status(500).send();
+          }
+
+ 
+
+          // await db.none(saveItemStats(item.id, JSON.stringify(itemStats), {
+          //   percentil: overview.ninety,
+          //   maxVu: overview.max,
+          //   avgResponseTime: overview.avg_elapsed,
+          //   errorRate,
+          //   throughput,
+          //   avgLatency: overview.avg_latency,
+          //   avgBytes,
+          //   avgConnect: overview.avg_connect,
+          //   startDate,
+          //   endDate,
+          //   duration
+          // }))
+
+   
         });
 
     } catch (e) {
+      await db.query('ROLLBACK');
+      console.log(e);
       return next(boom.badRequest('Error while reading provided file'));
     }
+
+    // OLD ------------
     // try {
     //   console.log(`${Date.now()} data received....`)
     //   computedData = prepareDataForSavingToDb(fileContent);
@@ -121,5 +195,6 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
     //     await db.query('ROLLBACK');
     //     return next(error);
     //   }
+    //
   });
-}
+};
