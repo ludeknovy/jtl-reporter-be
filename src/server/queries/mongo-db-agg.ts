@@ -5,7 +5,25 @@ export const overviewAggPipeline = (itemId) => {
         'itemId': itemId
       }
     }, {
-      '$addFields': {
+      '$unwind': {
+        'path': '$samples'
+      }
+    }, {
+      '$sort': {
+        'samples.elapsed': 1
+      }
+    }, {
+      '$group': {
+        '_id': null,
+        'maxVu': {
+          '$max': '$samples.allThreads'
+        },
+        'start': {
+          '$min': '$samples.timeStamp'
+        },
+        'end': {
+          '$max': '$samples.timeStamp'
+        },
         'avgConnect': {
           '$avg': '$samples.Connect'
         },
@@ -13,51 +31,7 @@ export const overviewAggPipeline = (itemId) => {
           '$avg': '$samples.Latency'
         },
         'total': {
-          '$size': '$samples'
-        },
-        'failed': {
-          '$size': {
-            '$filter': {
-              'input': '$samples',
-              'as': 'sample',
-              'cond': {
-                '$eq': [
-                  '$$sample.success', false
-                ]
-              }
-            }
-          }
-        }
-      }
-    }, {
-      '$group': {
-        '_id': null,
-        'maxVu': {
-          '$max': {
-            '$max': '$samples.allThreads'
-          }
-        },
-        'start': {
-          '$min': {
-            '$min': '$samples.timeStamp'
-          }
-        },
-        'end': {
-          '$max': {
-            '$max': '$samples.timeStamp'
-          }
-        },
-        'avgConnect': {
-          '$max': '$avgConnect'
-        },
-        'avgLatency': {
-          '$avg': '$avgLatency'
-        },
-        'failed': {
-          '$sum': '$failed'
-        },
-        'total': {
-          '$sum': '$total'
+          '$sum': 1
         },
         'elapsed': {
           '$push': '$samples.elapsed'
@@ -65,35 +39,19 @@ export const overviewAggPipeline = (itemId) => {
       }
     }, {
       '$addFields': {
-        'data': {
-          '$reduce': {
-            'input': '$elapsed',
-            'initialValue': [],
-            'in': {
-              '$setUnion': [
-                '$$value', '$$this'
-              ]
-            }
-          }
-        }
-      }
-    }, {
-      '$addFields': {
         'percentil': {
           '$arrayElemAt': [
-            '$data', {
+            '$elapsed', {
               '$floor': {
                 '$multiply': [
-                  0.90, {
-                    '$size': '$data'
-                  }
+                  0.90, '$total'
                 ]
               }
             }
           ]
         },
         'avgResponse': {
-          '$avg': '$data'
+          '$avg': '$elapsed'
         }
       }
     }, {
@@ -110,15 +68,15 @@ export const labelAggPipeline = (itemId) => {
   return [
     {
       '$match': {
-        'itemId': itemId
+        'itemId': '02b863cb-edb7-4846-b55d-cff89f3b428e'
       }
     }, {
       '$unwind': {
         'path': '$samples'
       }
     }, {
-      '$unwind': {
-        'path': '$samples.label'
+      '$sort': {
+        'samples.elapsed': 1
       }
     }, {
       '$group': {

@@ -1,5 +1,6 @@
 import { stats, itemOverview } from './statistics';
 import { roundNumberTwoDecimals } from './helper/stats-fc';
+import * as moment from 'moment';
 
 export const prepareDataForSavingToDb = (inputData): ItemDbData => {
   const sortedData = normalizeAndSortData(inputData);
@@ -41,6 +42,36 @@ export const prepareDataForSavingToDbFromMongo = (overviewData, labelData) => {
     }))
   };
 };
+
+export const prepareChartDataForSavingFromMongo = (overviewData: ChartOverviewData[], labelData: ChartLabelData[]) => {
+  const labels = [...new Set(labelData.map((_) => _._id.label))];
+  return {
+    threads: overviewData.map((_) => [moment(_._id).valueOf(), _.threads]),
+    overAllFailRate: {
+      data: overviewData.map((_) => [moment(_._id).valueOf(), _.errorRate]),
+      name: `errors`,
+    },
+    overallTimeResponse: {
+      data: overviewData.map((_) => [moment(_._id).valueOf(), _.avgResponseTime]),
+      name: `response time`,
+    },
+    overallThroughput: {
+      data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.count / _.interval)]),
+      name: `throughput`
+    },
+    throughput: labels.map((label) => ({
+      // tslint:disable-next-line: max-line-length
+      data: labelData.filter((_) => _._id.label === label).map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.count / _.interval)]),
+      name: label
+    })),
+    responseTime: labels.map((label) => ({
+      // tslint:disable-next-line: max-line-length
+      data: labelData.filter((_) => _._id.label === label).map((_) => [moment(_._id.interval).valueOf(), _.avgResponseTime]),
+      name: label
+    }))
+  };
+
+}
 
 export const normalizeAndSortData = (inputData) => {
   return inputData.map(_ => {
@@ -113,4 +144,28 @@ export interface OutputData {
   Latency: number;
   Hostname: string;
   Connect: number;
+}
+
+interface ChartOverviewData {
+  _id: Date;
+  min: Date;
+  max: Date;
+  count: number;
+  threads: number;
+  avgResponseTime: number;
+  interval: number;
+  errorRate: number;
+}
+
+interface ChartLabelData {
+  _id: {
+    interval: Date,
+    label: string,
+  };
+  min: Date;
+  max: Date;
+  count: number;
+  threads: number;
+  avgResponseTime: number;
+  interval: number;
 }
