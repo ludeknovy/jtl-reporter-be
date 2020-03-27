@@ -63,8 +63,8 @@ export const normalizeData = (_): OutputData => {
   return _;
 };
 
-export const dataForFb = (_, id) => {
-  _.timeStamp = parseInt(_.timeStamp, 10);
+export const dataForFb = (_) => {
+  _.timeStamp = new Date(parseInt(_.timeStamp, 10));
   _.elapsed = parseInt(_.elapsed, 10);
   _.responseCode = parseInt(_.responseCode, 10);
   _.bytes = parseInt(_.bytes, 10);
@@ -97,7 +97,7 @@ export interface InputData {
   Latency: string;
   Hostname: string;
   Connect: string;
-};
+}
 
 export interface OutputData {
   timeStamp: number;

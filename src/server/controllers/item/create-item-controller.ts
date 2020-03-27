@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ItemStatus, ItemDataType } from '../../queries/items.model';
-import { prepareDataForSavingToDb, InputData, OutputData, normalizeData, dataForFb, prepareDataForSavingToDbFromMongo } from '../../data-stats/prepare-data';
+import { prepareDataForSavingToDb, InputData, OutputData, 
+  normalizeData, dataForFb, prepareDataForSavingToDbFromMongo,  } from '../../data-stats/prepare-data';
 import { db } from '../../../db/db';
 import { createNewItem, saveItemStats, saveKpiData, savePlotData, saveData, calculateOverview, getLabelsStats } from '../../queries/items';
 import { chunkData } from '../../data-stats/chunk-data';
@@ -13,7 +14,8 @@ import * as parser from 'xml2json';
 import * as csv from 'fast-csv';
 import * as uuid from 'uuid';
 import { MongoClient } from 'mongodb';
-import { overviewAggPipeline, labelAggPipeline } from '../../queries/mongo-db-agg';
+import { overviewAggPipeline, labelAggPipeline, overviewChartAgg, labelChartAgg } from '../../queries/mongo-db-agg';
+import { chartQueryOptionInterval } from '../../queries/mongoChartOptionHelper';
 const uri = 'mongodb://127.0.0.1:27017';
 const client: MongoClient = new MongoClient(uri);
 
@@ -76,15 +78,14 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
             tempBuffer = [];
             csvStream.resume();
           }
-          tempBuffer.push(dataForFb(row, item.id));
-          return;
+          tempBuffer.push(dataForFb(row));
         })
         .on('end', async (rowCount: number) => {
           try {
+            console.log(tempBuffer[0])
             await collection.insertOne({ itemId: item.id, samples: tempBuffer });
 
             const before = Date.now();
-            console.log(tempBuffer[0]);
             console.log(item.id)
             const aggOverview = await collection.aggregate(overviewAggPipeline(item.id)).toArray();
             const after = Date.now();
@@ -106,6 +107,22 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
             console.log("--------------")
             console.log(labelStats);
 
+
+            const { duration } = overview;
+            console.log(duration);
+            const interval = chartQueryOptionInterval(duration);
+            const bOchD = Date.now();
+            const overviewChartData = await collection.aggregate(overviewChartAgg(item.id, interval)).toArray();
+            const aOchD = Date.now();
+            const labelChartData = await collection.aggregate(labelChartAgg(item.id, interval)).toArray();
+            const aLChD = Date.now();
+
+
+            console.log(`Duration overview chart: ${(aOchD - bOchD) / 1000} sec.`);
+            console.log(`Duration label chart: ${(aLChD - aOchD) / 1000} sec.`);
+
+            console.log(overviewChartData.length);
+            console.log(labelChartData.length);
             await db.none(saveItemStats(item.id, JSON.stringify(labelStats), overview));
 
             fs.unlinkSync(kpiFilename);
