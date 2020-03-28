@@ -35,6 +35,9 @@ export const overviewAggPipeline = (itemId) => {
         },
         'elapsed': {
           '$push': '$samples.elapsed'
+        },
+        'success': {
+          '$push': '$samples.success'
         }
       }
     }, {
@@ -52,6 +55,19 @@ export const overviewAggPipeline = (itemId) => {
         },
         'avgResponse': {
           '$avg': '$elapsed'
+        },
+        'failed': {
+          '$size': {
+            '$filter': {
+              'input': '$success',
+              'as': 'success',
+              'cond': {
+                '$eq': [
+                  '$$success', false
+                ]
+              }
+            }
+          }
         }
       }
     }, {
@@ -60,7 +76,7 @@ export const overviewAggPipeline = (itemId) => {
         'data': 0
       }
     }
-  ];
+  ]
 };
 
 
