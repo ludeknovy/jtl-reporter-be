@@ -15,13 +15,13 @@ export const prepareDataForSavingToDbFromMongo = (overviewData, labelData) => {
   const endDate = new Date(overviewData.end);
   return {
     overview: {
-      percentil: overviewData.percentil,
+      percentil: roundNumberTwoDecimals(overviewData.percentil),
       maxVu: overviewData.maxVu,
       avgResponseTime: overviewData.avgResponse.toFixed(0),
       errorRate: (overviewData.failed / overviewData.total) * 100,
       throughput: roundNumberTwoDecimals(overviewData.total / ((overviewData.end - overviewData.start) / 1000)),
-      avgLatency: overviewData.avgLatency,
-      avgConnect: overviewData.avgConnect,
+      avgLatency: roundNumberTwoDecimals(overviewData.avgLatency),
+      avgConnect: roundNumberTwoDecimals(overviewData.avgConnect),
       startDate,
       endDate,
       duration: roundNumberTwoDecimals((endDate.getTime() - startDate.getTime()) / 1000 / 60),

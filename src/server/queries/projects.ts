@@ -39,6 +39,7 @@ export const latestItems = () => {
     text: `SELECT i.id, s.name, environment, project_name as "projectName", start_time as "startTime", status FROM jtl.items as i
     LEFT JOIN jtl.scenario as s ON s.id = i.scenario_id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE i.report_status = 'ready'
     ORDER BY start_time DESC LIMIT 10;`
   };
 };

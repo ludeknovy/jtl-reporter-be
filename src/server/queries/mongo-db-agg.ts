@@ -84,7 +84,7 @@ export const labelAggPipeline = (itemId) => {
   return [
     {
       '$match': {
-        'itemId': '02b863cb-edb7-4846-b55d-cff89f3b428e'
+        'itemId': itemId
       }
     }, {
       '$unwind': {

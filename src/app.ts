@@ -7,6 +7,7 @@ import * as expressWinston from 'express-winston';
 import { logger } from './logger';
 import { Router } from './server/router';
 import * as swaggerUi from 'swagger-ui-express';
+import { MongoUtils } from './db/mongoUtil';
 const swaggerDocument = require('../openapi.json');
 
 const PORT = 5000;
@@ -68,7 +69,8 @@ export class App {
     });
   }
 
-  public listen() {
+  public async listen() {
+    await MongoUtils.connect();
     return this.app.listen(PORT, () => {
       logger.info('Express server listening on port ' + PORT);
     });

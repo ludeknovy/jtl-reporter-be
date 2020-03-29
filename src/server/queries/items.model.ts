@@ -11,3 +11,9 @@ export enum ItemStatus {
   Terminated = '2',
   Failed = '3'
 }
+
+export enum ReportStatus {
+  Ready = 'ready',
+  Error = 'error',
+  InProgress = 'in_progress'
+}

@@ -219,3 +219,10 @@ export const getErrorsForLabel = (itemId, labelName) => {
     values: [itemId, labelName]
   };
 };
+
+export const updateItemStatus = (itemId, reportStatus) => {
+  return {
+    text: `UPDATE jtl.items SET report_status = $2 WHERE id = $1;`,
+    values: [itemId, reportStatus]
+  };
+} 
