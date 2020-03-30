@@ -1,8 +1,8 @@
-export const overviewAggPipeline = (itemId) => {
+export const overviewAggPipeline = (dataId) => {
   return [
     {
       '$match': {
-        'itemId': itemId
+        'dataId': dataId
       }
     }, {
       '$unwind': {
@@ -80,11 +80,11 @@ export const overviewAggPipeline = (itemId) => {
 };
 
 
-export const labelAggPipeline = (itemId) => {
+export const labelAggPipeline = (dataId) => {
   return [
     {
       '$match': {
-        'itemId': itemId
+        'dataId': dataId
       }
     }, {
       '$unwind': {
@@ -183,11 +183,11 @@ export const labelAggPipeline = (itemId) => {
   ];
 };
 
-export const overviewChartAgg = (itemId: string, interval: number) => {
+export const overviewChartAgg = (dataId: string, interval: number) => {
   return [
     {
       '$match': {
-        'itemId': itemId
+        'dataId': dataId
       }
     }, {
       '$unwind': {
@@ -283,11 +283,11 @@ export const overviewChartAgg = (itemId: string, interval: number) => {
 };
 
 
-export const labelChartAgg = (itemId: string, interval: number) => {
+export const labelChartAgg = (dataId: string, interval: number) => {
   return [
     {
       '$match': {
-        'itemId': itemId
+        'dataId': dataId
       }
     }, {
       '$unwind': {

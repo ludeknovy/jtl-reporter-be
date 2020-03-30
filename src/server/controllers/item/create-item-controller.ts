@@ -1,28 +1,24 @@
 import { Request, Response, NextFunction } from 'express';
 import { ItemStatus, ItemDataType } from '../../queries/items.model';
 import {
-  prepareDataForSavingToDb, InputData, OutputData,
-  normalizeData, dataForFb, prepareDataForSavingToDbFromMongo, prepareChartDataForSavingFromMongo,
+  dataForFb, prepareDataForSavingToDbFromMongo, prepareChartDataForSavingFromMongo,
 } from '../../data-stats/prepare-data';
 import { db } from '../../../db/db';
 import {
-  createNewItem, saveItemStats,
-  saveKpiData, savePlotData, saveData, calculateOverview, getLabelsStats, updateItemStatus
+  createNewItem, saveItemStats, savePlotData, saveData, updateItemStatus
 } from '../../queries/items';
-import { chunkData } from '../../data-stats/chunk-data';
 import * as multer from 'multer';
 import * as boom from 'boom';
 import * as fs from 'fs';
-import * as pgp from 'pg-promise';
-// import * as csv from 'csvtojson';
+import * as csvtojson from 'csvtojson';
 import * as parser from 'xml2json';
 import * as csv from 'fast-csv';
-import * as uuid from 'uuid';
 import { ReportStatus } from '../../queries/items.model';
 import { overviewAggPipeline, labelAggPipeline, overviewChartAgg, labelChartAgg } from '../../queries/mongo-db-agg';
 import { chartQueryOptionInterval } from '../../queries/mongoChartOptionHelper';
 import { MongoUtils } from '../../../db/mongoUtil';
 import { logger } from '../../../logger';
+import * as uuid from 'uuid';
 
 
 const upload = multer(
@@ -37,7 +33,7 @@ const upload = multer(
 
 export const createItemController = (req: Request, res: Response, next: NextFunction) => {
   upload(req, res, async error => {
-    let fileContent, computedData;
+    let itemId = null;
     const { environment, note, status = ItemStatus.None, hostname } = req.body;
     const { kpi, errors, monitoring } = <any>req.files;
     const { scenarioName, projectName } = req.params;
@@ -58,25 +54,15 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
     }
     logger.info(`Starting new item processing for scenario: ${scenarioName}`);
     try {
+      const dataId = uuid();
+      let itemId;
       const jtlDb = MongoUtils.getClient().db('jtl-data');
       const collection = jtlDb.collection('data-chunks');
 
       const kpiFilename = kpi[0].path;
       let tempBuffer = [];
-      const item = await db.one(createNewItem(
-        scenarioName,
-        null,
-        environment,
-        note,
-        status,
-        projectName,
-        hostname,
-        ReportStatus.InProgress
-      ));
 
-      logger.info(`Created new test item with id: ${item.id}`);
       logger.info(`Starting KPI file streaming and saving to Mongo`);
-
       res.status(200).send();
 
       const parsingStart = Date.now();
@@ -85,7 +71,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
         .on('data', async row => {
           if (tempBuffer.length === (500)) {
             csvStream.pause();
-            await collection.insertOne({ itemId: item.id, samples: tempBuffer });
+            await collection.insertOne({ dataId, samples: tempBuffer });
             tempBuffer = [];
             csvStream.resume();
           }
@@ -93,16 +79,16 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
         })
         .on('end', async (rowCount: number) => {
           try {
-            await collection.insertOne({ itemId: item.id, samples: tempBuffer });
+            await collection.insertOne({ dataId, samples: tempBuffer });
 
             fs.unlinkSync(kpiFilename);
 
             logger.info(`Parsed ${rowCount} records in ${(Date.now() - parsingStart) / 1000} seconds`);
 
             const aggOverview = await collection.aggregate(
-              overviewAggPipeline(item.id), { allowDiskUse: true }).toArray();
+              overviewAggPipeline(dataId), { allowDiskUse: true }).toArray();
             const aggLabel = await collection.aggregate(
-              labelAggPipeline(item.id), { allowDiskUse: true }).toArray();
+              labelAggPipeline(dataId), { allowDiskUse: true }).toArray();
 
             const {
               overview,
@@ -110,101 +96,58 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
               labelStats } = prepareDataForSavingToDbFromMongo(aggOverview[0], aggLabel);
             const interval = chartQueryOptionInterval(duration);
             const overviewChartData = await collection.aggregate(
-              overviewChartAgg(item.id, interval), { allowDiskUse: true }).toArray();
+              overviewChartAgg(dataId, interval), { allowDiskUse: true }).toArray();
             const labelChartData = await collection.aggregate(
-              labelChartAgg(item.id, interval), { allowDiskUse: true }).toArray();
+              labelChartAgg(dataId, interval), { allowDiskUse: true }).toArray();
 
             const chartData = prepareChartDataForSavingFromMongo(overviewChartData, labelChartData);
 
-            await db.query('BEGIN');
-            await db.none(saveItemStats(item.id, JSON.stringify(labelStats), overview));
-            await db.none(savePlotData(item.id, JSON.stringify(chartData)));
-            await db.none(updateItemStatus(item.id, ReportStatus.Ready));
 
-            await db.query('COMMIT');
+            await db.tx(async t => {
+
+              const item = await t.one(createNewItem(
+                scenarioName,
+                null,
+                environment,
+                note,
+                status,
+                projectName,
+                hostname,
+                ReportStatus.InProgress,
+                dataId
+              ));
+
+              itemId = item.id;
+              await t.none(saveItemStats(item.id, JSON.stringify(labelStats), overview));
+              await t.none(savePlotData(item.id, JSON.stringify(chartData)));
+              await t.none(updateItemStatus(item.id, ReportStatus.Ready));
+            });
+
+
+            if (errors) {
+              const filename = errors[0].path;
+              const fileContent = fs.readFileSync(filename);
+              fs.unwatchFile(filename);
+              const jsonErrors = parser.toJson(fileContent);
+              await db.none(saveData(itemId, jsonErrors, ItemDataType.Error));
+            }
+
+
+            if (monitoring) {
+              const filename = monitoring[0].path;
+              const monitoringData = await csvtojson().fromFile(filename);
+              const monitoringDataString = JSON.stringify(monitoringData);
+              fs.unwatchFile(filename);
+              await db.none(saveData(itemId, monitoringDataString, ItemDataType.MonitoringLogs));
+            }
+            logger.info(`Item: ${itemId} processing finished`);
           } catch (error) {
-            logger.error(error);
-            await db.none(updateItemStatus(item.id, ReportStatus.Error));
+            logger.error(`Error while processing item: ${itemId}: ${error}`);
           }
-
-
-
-          // await db.none(saveItemStats(item.id, JSON.stringify(itemStats), {
-          //   percentil: overview.ninety,
-          //   maxVu: overview.max,
-          //   avgResponseTime: overview.avg_elapsed,
-          //   errorRate,
-          //   throughput,
-          //   avgLatency: overview.avg_latency,
-          //   avgBytes,
-          //   avgConnect: overview.avg_connect,
-          //   startDate,
-          //   endDate,
-          //   duration
-          // }))
-
-
         });
-
     } catch (e) {
-      await db.query('ROLLBACK');
-      console.log(e);
+      logger.error(e);
       return next(boom.serverUnavailable('Error while reading provided file'));
     }
-
-    // OLD ------------
-    // try {
-    //   console.log(`${Date.now()} data received....`)
-    //   computedData = prepareDataForSavingToDb(fileContent);
-    //   console.log(`${Date.now()} data prepared for db`);
-    // } catch (e) {
-    //   console.log(e);
-    //   return next(boom.badRequest('Csv data are not in correct format'));
-    // }
-    // try {
-    //   const { startTime, itemStats, overview, sortedData } = computedData;
-    //   const chunckedData = chunkData(sortedData);
-    //   console.log(`${Date.now()} data chunked`);
-    //   await db.query('BEGIN');
-    //   const item = await db.one(createNewItem(
-    //     scenarioName,
-    //     startTime,
-    //     environment,
-    //     note,
-    //     status,
-    //     projectName,
-    //     hostname));
-    //   console.log(`${Date.now()} stringifying...`);
-    //   await db.none(saveItemStats(item.id, JSON.stringify(itemStats), overview));
-    //   await db.none(saveKpiData(item.id, JSON.stringify(sortedData)));
-    //   await db.none(savePlotData(item.id, JSON.stringify(chunckedData)));
-    //   await db.query('COMMIT');
-    //   if (errors) {
-    //     const filename = errors[0].path;
-    //     const fileContent = fs.readFileSync(filename);
-    //     fs.unwatchFile(filename);
-    //     const jsonErrors = parser.toJson(fileContent);
-    //     await db.none(saveData(item.id, jsonErrors, ItemDataType.Error));
-    //   }
-
-
-    // if (monitoring) {
-    //   const filename = monitoring[0].path;
-    //   const monitoringData = await csv().fromFile(filename);
-    //   const monitoringDataString = JSON.stringify(monitoringData);
-    //   fs.unwatchFile(filename);
-    //   await db.none(saveData(item.id, monitoringDataString, ItemDataType.MonitoringLogs));
-    // }
-    //     res.status(200).send({
-    //       id: item.id,
-    //       overview,
-    //       status: Object.values(ItemStatus).find(_ => _ === status),
-    //     });
-    //   } catch (error) {
-    //     console.log(error);
-    //     await db.query('ROLLBACK');
-    //     return next(error);
-    //   }
-    //
   });
 };

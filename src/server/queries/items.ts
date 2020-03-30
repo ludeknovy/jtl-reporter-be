@@ -1,20 +1,14 @@
 import { ItemDataType } from './items.model';
 
-export const createNewItem = (scenarioName, startTime, environment, note, status, projectName, hostname) => {
+// tslint:disable-next-line: max-line-length
+export const createNewItem = (scenarioName, startTime, environment, note, status, projectName, hostname, reportStatus, dataId) => {
   return {
-    text: `INSERT INTO jtl.items(scenario_id, start_time, environment, note, status, hostname) VALUES(
+    text: `INSERT INTO jtl.items(scenario_id, start_time, environment, note, status, hostname, report_status, data_id) VALUES(
       (SELECT sc.id FROM jtl.scenario as sc
         LEFT JOIN jtl.projects as p ON p.id = sc.project_id
         WHERE sc.name = $1
-        AND p.project_name = $6), $2, $3, $4, $5, $7) RETURNING id`,
-    values: [scenarioName, startTime, environment, note, status, projectName, hostname]
-  };
-};
-
-export const saveKpiData = (itemId, data) => {
-  return {
-    text: 'INSERT INTO jtl.data(item_id, item_data, data_type) VALUES($1, $2, $3)',
-    values: [itemId, data, ItemDataType.Kpi]
+        AND p.project_name = $6), $2, $3, $4, $5, $7, $8, $9) RETURNING id`,
+    values: [scenarioName, startTime, environment, note, status, projectName, hostname, reportStatus, dataId]
   };
 };
 
