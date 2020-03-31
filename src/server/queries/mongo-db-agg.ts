@@ -2,7 +2,7 @@ export const overviewAggPipeline = (dataId) => {
   return [
     {
       '$match': {
-        'dataId': dataId
+        'dataId': dataId,
       }
     }, {
       '$unwind': {
@@ -30,6 +30,9 @@ export const overviewAggPipeline = (dataId) => {
         'avgLatency': {
           '$avg': '$samples.Latency'
         },
+        'avgResponse': {
+          '$avg': '$samples.elapsed'
+        },
         'total': {
           '$sum': 1
         },
@@ -53,9 +56,6 @@ export const overviewAggPipeline = (dataId) => {
             }
           ]
         },
-        'avgResponse': {
-          '$avg': '$elapsed'
-        },
         'failed': {
           '$size': {
             '$filter': {
@@ -73,10 +73,10 @@ export const overviewAggPipeline = (dataId) => {
     }, {
       '$project': {
         'elapsed': 0,
-        'data': 0
+        'success': 0
       }
     }
-  ]
+  ];
 };
 
 
