@@ -33,7 +33,6 @@ const upload = multer(
 
 export const createItemController = (req: Request, res: Response, next: NextFunction) => {
   upload(req, res, async error => {
-    let itemId = null;
     const { environment, note, status = ItemStatus.None, hostname } = req.body;
     const { kpi, errors, monitoring } = <any>req.files;
     const { scenarioName, projectName } = req.params;
@@ -54,17 +53,30 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
     }
     logger.info(`Starting new item processing for scenario: ${scenarioName}`);
     try {
-      const dataId = uuid();
       let itemId;
+      const dataId = uuid();
       const jtlDb = MongoUtils.getClient().db('jtl-data');
       const collection = jtlDb.collection('data-chunks');
 
       const kpiFilename = kpi[0].path;
       let tempBuffer = [];
 
-      logger.info(`Starting KPI file streaming and saving to Mongo`);
-      res.status(200).send();
+      const item = await db.one(createNewItem(
+        scenarioName,
+        null,
+        environment,
+        note,
+        status,
+        projectName,
+        hostname,
+        ReportStatus.InProgress,
+        dataId
+      ));
+      itemId = item.id;
 
+      res.status(200).send({ itemId });
+
+      logger.info(`Starting KPI file streaming and saving to Mongo`);
       const parsingStart = Date.now();
       const csvStream = fs.createReadStream(kpiFilename)
         .pipe(csv.parse({ headers: true }))
@@ -107,23 +119,9 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
             const chartData = prepareChartDataForSavingFromMongo(overviewChartData, labelChartData);
 
             await db.tx(async t => {
-
-              const item = await t.one(createNewItem(
-                scenarioName,
-                null,
-                environment,
-                note,
-                status,
-                projectName,
-                hostname,
-                ReportStatus.InProgress,
-                dataId
-              ));
-
-              itemId = item.id;
-              await t.none(saveItemStats(item.id, JSON.stringify(labelStats), overview));
-              await t.none(savePlotData(item.id, JSON.stringify(chartData)));
-              await t.none(updateItemStatus(item.id, ReportStatus.Ready));
+              await t.none(saveItemStats(itemId, JSON.stringify(labelStats), overview));
+              await t.none(savePlotData(itemId, JSON.stringify(chartData)));
+              await t.none(updateItemStatus(itemId, ReportStatus.Ready));
             });
 
 
@@ -145,6 +143,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
             }
             logger.info(`Item: ${itemId} processing finished`);
           } catch (error) {
+            await db.none(updateItemStatus(itemId, ReportStatus.Error));
             logger.error(`Error while processing item: ${itemId}: ${error}`);
           }
         });
