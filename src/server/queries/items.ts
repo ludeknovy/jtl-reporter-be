@@ -219,4 +219,54 @@ export const updateItemStatus = (itemId, reportStatus) => {
     text: `UPDATE jtl.items SET report_status = $2 WHERE id = $1;`,
     values: [itemId, reportStatus]
   };
-} 
+};
+
+// tslint:disable-next-line: max-line-length
+export const saveChunks = (timestamp, elapsed, connect, statusCode, allThreads, grpThreads, success, latency, bytes, hostname, threadName, responseMessage, label) => {
+  return {
+    text: `INSERT INTO data_chunks (timestamp, elapsed, connect, status_code, all_threads, grp_threads, success, latency, bytes, hostname, thread_name, response_message, label)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+    // tslint:disable-next-line: max-line-length
+    values: [timestamp, elapsed, connect, statusCode, allThreads, grpThreads, allThreads, success, latency, bytes, hostname, threadName, responseMessage, label],
+  };
+};
+
+export const calculateOverview = (itemId) => {
+  return {
+    text: `
+    SELECT
+      MAX(chunks.all_threads),
+      percentile_cont(0.90) within group (order by (chunks.elapsed)::int) as ninety,
+      AVG(chunks.latency::int) as avg_latency,
+      AVG(chunks.connect) as avg_connect,
+      AVG(chunks.elapsed) as avg_elapsed,
+      COUNT(*) as sample_count,
+      MIN(chunks.timestamp) as start,
+      MAX(chunks.timestamp) as end
+    FROM jtl.data_chunks as chunks
+    WHERE chunks.item_id = $1;`,
+    values: [itemId],
+  };
+};
+
+export const getLabelsStats = (itemId) => {
+  return {
+    text: `
+    SELECT
+      chunks.label,
+      count(*) as samples,
+      AVG(chunks.elapsed),
+      MIN(chunks.elapsed),
+      MAX(chunks.elapsed),
+      AVG(chunks.bytes),
+      percentile_cont(0.99) within group (order by (chunks.elapsed)) as ninety_nine,
+      percentile_cont(0.95) within group (order by (chunks.elapsed)) as ninety_five,
+      percentile_cont(0.90) within group (order by (chunks.elapsed)) as ninety,
+      MAX(chunks.timestamp) as end,
+      MIN(chunks.timestamp) as start
+    FROM jtl.data_chunks as chunks
+    WHERE item_id = $1
+    GROUP BY chunks.label`,
+    values: [itemId]
+  };
+};

@@ -90,21 +90,36 @@ export const normalizeData = (_): OutputData => {
   _.allThreads = parseInt(_.allThreads, 10);
   _.Latency = parseInt(_.Latency, 10);
   _.Connect = parseInt(_.Connect, 10);
-  _.success = (_.success = 'true');
+  _.success = _.success === 'true';
   return _;
 };
 
-export const dataForFb = (_) => {
-  _.timeStamp = new Date(parseInt(_.timeStamp, 10));
-  _.elapsed = parseInt(_.elapsed, 10);
-  _.responseCode = parseInt(_.responseCode, 10);
-  _.bytes = parseInt(_.bytes, 10);
-  _.grpThreads = parseInt(_.grpThreads, 10);
-  _.allThreads = parseInt(_.allThreads, 10);
-  _.Latency = parseInt(_.Latency, 10);
-  _.Connect = parseInt(_.Connect, 10);
-  _.success = _.success === 'true';
-  return _;
+export const dataForFb = (_, id) => {
+  try {
+    _.dataId = id;
+    _.timeStamp = moment(parseInt(_.timeStamp, 10));
+    _.elapsed = parseNumber(_.elapsed, 10);
+    _.responseCode = parseNumber(_.responseCode, 10);
+    _.bytes = parseNumber(_.bytes, 10);
+    _.grpThreads = parseNumber(_.grpThreads, 10);
+    _.allThreads = parseNumber(_.allThreads, 10);
+    _.Latency = parseNumber(_.Latency, 10);
+    _.Connect = parseNumber(_.Connect, 10);
+    _.success = _.success === 'true';
+    return _;
+  } catch (error) {
+    console.log(error);
+    return;
+  }
+};
+
+const parseNumber = (input: string, radix) => {
+  const result = parseInt(input, radix);
+  if (isNaN(result)) {
+    console.log(input)
+    throw (`Not a number`);
+  }
+  return result;
 };
 
 export interface ItemDbData {
