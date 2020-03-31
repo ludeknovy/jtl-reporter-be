@@ -219,4 +219,18 @@ export const updateItemStatus = (itemId, reportStatus) => {
     text: `UPDATE jtl.items SET report_status = $2 WHERE id = $1;`,
     values: [itemId, reportStatus]
   };
-} 
+};
+
+export const selectDataId = (itemId, projectName, scenarioName) => {
+  return {
+    text: `SELECT data_id
+    FROM jtl.items as items
+    LEFT JOIN jtl.charts as charts ON charts.item_id = items.id
+    LEFT JOIN jtl.scenario as s ON s.id = items.scenario_id
+    LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE items.id = $1
+    AND p.project_name = $2
+    AND s.name = $3;`,
+    values: [itemId, projectName, scenarioName]
+  }
+}

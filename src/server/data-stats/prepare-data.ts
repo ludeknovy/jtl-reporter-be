@@ -81,6 +81,14 @@ export const normalizeAndSortData = (inputData) => {
   });
 };
 
+const stringToNumber = (input: string, radix: number) => {
+  const result = parseInt(input, radix);
+  if (isNaN(result)) {
+    throw (`not a number`);
+  }
+  return result;
+}
+
 export const normalizeData = (_): OutputData => {
   _.timeStamp = parseInt(_.timeStamp, 10);
   _.elapsed = parseInt(_.elapsed, 10);
@@ -95,16 +103,20 @@ export const normalizeData = (_): OutputData => {
 };
 
 export const dataForFb = (_) => {
-  _.timeStamp = new Date(parseInt(_.timeStamp, 10));
-  _.elapsed = parseInt(_.elapsed, 10);
-  _.responseCode = parseInt(_.responseCode, 10);
-  _.bytes = parseInt(_.bytes, 10);
-  _.grpThreads = parseInt(_.grpThreads, 10);
-  _.allThreads = parseInt(_.allThreads, 10);
-  _.Latency = parseInt(_.Latency, 10);
-  _.Connect = parseInt(_.Connect, 10);
-  _.success = _.success === 'true';
-  return _;
+  try {
+    _.timeStamp = new Date(stringToNumber(_.timeStamp, 10));
+    _.elapsed = stringToNumber(_.elapsed, 10);
+    _.responseCode = stringToNumber(_.responseCode, 10);
+    _.bytes = stringToNumber(_.bytes, 10);
+    _.grpThreads = stringToNumber(_.grpThreads, 10);
+    _.allThreads = stringToNumber(_.allThreads, 10);
+    _.Latency = stringToNumber(_.Latency, 10);
+    _.Connect = stringToNumber(_.Connect, 10);
+    _.success = _.success === 'true';
+    return _;
+  } catch (error) {
+    return;
+  }
 };
 
 export interface ItemDbData {

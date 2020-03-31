@@ -75,7 +75,11 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
             tempBuffer = [];
             csvStream.resume();
           }
-          tempBuffer.push(dataForFb(row));
+          const data = dataForFb(row);
+          if (data) {
+            return tempBuffer.push(data);
+          }
+          return;
         })
         .on('end', async (rowCount: number) => {
           try {
@@ -101,7 +105,6 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
               labelChartAgg(dataId, interval), { allowDiskUse: true }).toArray();
 
             const chartData = prepareChartDataForSavingFromMongo(overviewChartData, labelChartData);
-
 
             await db.tx(async t => {
 
