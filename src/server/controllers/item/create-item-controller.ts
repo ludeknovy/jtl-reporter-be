@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ItemStatus, ItemDataType } from '../../queries/items.model';
 import {
-  dataForFb, prepareDataForSavingToDbFromMongo, prepareChartDataForSavingFromMongo,
+  transformDataForFb, prepareDataForSavingToDbFromMongo, prepareChartDataForSavingFromMongo,
 } from '../../data-stats/prepare-data';
 import { db } from '../../../db/db';
 import {
@@ -87,7 +87,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
             tempBuffer = [];
             csvStream.resume();
           }
-          const data = dataForFb(row);
+          const data = transformDataForFb(row);
           if (data) {
             return tempBuffer.push(data);
           }

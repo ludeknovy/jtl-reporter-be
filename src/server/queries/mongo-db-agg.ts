@@ -279,7 +279,7 @@ export const overviewChartAgg = (dataId: string, interval: number) => {
         '_id': 1
       }
     }
-  ]
+  ];
 };
 
 
@@ -347,4 +347,4 @@ export const labelChartAgg = (dataId: string, interval: number) => {
       }
     }
   ];
-}
+};

@@ -1,14 +1,5 @@
-import { stats, itemOverview } from './statistics';
 import { roundNumberTwoDecimals } from './helper/stats-fc';
 import * as moment from 'moment';
-
-export const prepareDataForSavingToDb = (inputData): ItemDbData => {
-  const sortedData = normalizeAndSortData(inputData);
-  const itemStats = stats(sortedData);
-  const overview = itemOverview(sortedData);
-  const startTime = new Date(sortedData.find(_ => _.timeStamp).timeStamp);
-  return { itemStats, overview, startTime, sortedData };
-};
 
 export const prepareDataForSavingToDbFromMongo = (overviewData, labelData) => {
   const startDate = new Date(overviewData.start);
@@ -18,7 +9,7 @@ export const prepareDataForSavingToDbFromMongo = (overviewData, labelData) => {
       percentil: roundNumberTwoDecimals(overviewData.percentil),
       maxVu: overviewData.maxVu,
       avgResponseTime: overviewData.avgResponse.toFixed(0),
-      errorRate: (overviewData.failed / overviewData.total) * 100,
+      errorRate: roundNumberTwoDecimals((overviewData.failed / overviewData.total) * 100),
       throughput: roundNumberTwoDecimals(overviewData.total / ((overviewData.end - overviewData.start) / 1000)),
       avgLatency: roundNumberTwoDecimals(overviewData.avgLatency),
       avgConnect: roundNumberTwoDecimals(overviewData.avgConnect),
@@ -71,14 +62,6 @@ export const prepareChartDataForSavingFromMongo = (overviewData: ChartOverviewDa
     }))
   };
 
-}
-
-export const normalizeAndSortData = (inputData) => {
-  return inputData.map(_ => {
-    return normalizeData(_);
-  }).sort((curr, next) => {
-    return curr.timeStamp - next.timeStamp;
-  });
 };
 
 const stringToNumber = (input: string, radix: number) => {
@@ -87,22 +70,9 @@ const stringToNumber = (input: string, radix: number) => {
     throw (`not a number`);
   }
   return result;
-}
-
-export const normalizeData = (_): OutputData => {
-  _.timeStamp = parseInt(_.timeStamp, 10);
-  _.elapsed = parseInt(_.elapsed, 10);
-  _.responseCode = parseInt(_.responseCode, 10);
-  _.bytes = parseInt(_.bytes, 10);
-  _.grpThreads = parseInt(_.grpThreads, 10);
-  _.allThreads = parseInt(_.allThreads, 10);
-  _.Latency = parseInt(_.Latency, 10);
-  _.Connect = parseInt(_.Connect, 10);
-  _.success = (_.success = 'true');
-  return _;
 };
 
-export const dataForFb = (_) => {
+export const transformDataForFb = (_) => {
   try {
     _.timeStamp = new Date(stringToNumber(_.timeStamp, 10));
     _.elapsed = stringToNumber(_.elapsed, 10);

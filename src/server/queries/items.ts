@@ -232,5 +232,5 @@ export const selectDataId = (itemId, projectName, scenarioName) => {
     AND p.project_name = $2
     AND s.name = $3;`,
     values: [itemId, projectName, scenarioName]
-  }
-}
+  };
+};
