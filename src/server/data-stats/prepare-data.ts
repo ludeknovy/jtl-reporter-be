@@ -39,11 +39,11 @@ export const prepareChartDataForSavingFromMongo = (overviewData: ChartOverviewDa
   return {
     threads: overviewData.map((_) => [moment(_._id).valueOf(), _.threads]),
     overAllFailRate: {
-      data: overviewData.map((_) => [moment(_._id).valueOf(), _.errorRate]),
+      data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.errorRate)]),
       name: `errors`,
     },
     overallTimeResponse: {
-      data: overviewData.map((_) => [moment(_._id).valueOf(), _.avgResponseTime]),
+      data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.avgResponseTime)]),
       name: `response time`,
     },
     overallThroughput: {
@@ -57,7 +57,7 @@ export const prepareChartDataForSavingFromMongo = (overviewData: ChartOverviewDa
     })),
     responseTime: labels.map((label) => ({
       // tslint:disable-next-line: max-line-length
-      data: labelData.filter((_) => _._id.label === label).map((_) => [moment(_._id.interval).valueOf(), _.avgResponseTime]),
+      data: labelData.filter((_) => _._id.label === label).map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.avgResponseTime)]),
       name: label
     }))
   };

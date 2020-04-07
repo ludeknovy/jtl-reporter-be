@@ -76,7 +76,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
 
       res.status(200).send({ itemId });
 
-      logger.info(`Starting KPI file streaming and saving to Mongo`);
+      logger.info(`Starting KPI file streaming and saving to Mongo with dataId: ${dataId}`);
       const parsingStart = Date.now();
       const csvStream = fs.createReadStream(kpiFilename)
         .pipe(csv.parse({ headers: true }))
