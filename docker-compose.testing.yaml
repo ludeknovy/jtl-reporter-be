@@ -1,7 +1,7 @@
 version: '2.1'
 services:
   db:
-    image: novyl/jtl-reporter-db:testing
+    container_name: jtl-reporter-db
     build:
       context: ./src/db/
       dockerfile: Dockerfile
@@ -14,7 +14,7 @@ services:
       - "5432:5432"
 
   migration:
-    image: novyl/jtl-reporter-be:migration
+    container_name: jtl-reporter-migration
     build:
       context: ./
       dockerfile: Dockerfile
