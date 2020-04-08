@@ -27,7 +27,7 @@ jobs:
         - ENVIRONMENT=CI
       before_script:
         - docker-compose --file docker-compose.testing.yaml rm -f
-        - docker-compose --file docker-compose.testing.yaml up -d
+        - docker-compose --file docker-compose.testing.yaml up --build -d
       script: npm run integration-tests
       after_script:
         - docker-compose --file docker-compose.testing.yaml down
