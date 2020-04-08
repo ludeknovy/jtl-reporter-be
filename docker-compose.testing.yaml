@@ -13,14 +13,14 @@ services:
     ports:
       - "5432:5432"
 
-  # migration:
-  #   container_name: jtl-reporter-migration
-  #   build:
-  #     context: ./
-  #     dockerfile: Dockerfile
-  #   environment:
-  #       - DATABASE_URL=postgres://postgres@db/jtl_report
-  #   command: npm run migrate up
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
+  migration:
+    container_name: jtl-reporter-migration
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    environment:
+        - DATABASE_URL=postgres://postgres@db/jtl_report
+    command: npm run migrate up
+    depends_on:
+      db:
+        condition: service_healthy
