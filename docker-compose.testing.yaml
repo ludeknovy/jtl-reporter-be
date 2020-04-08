@@ -1,7 +1,7 @@
-version: '2.1'
+version: '3.6'
 services:
   db:
-    image: novyl/jtl-reporter-db:testing
+    container_name: jtl-reporter-db
     build:
       context: ./src/db/
       dockerfile: Dockerfile
@@ -14,13 +14,12 @@ services:
       - "5432:5432"
 
   migration:
-    image: novyl/jtl-reporter-be:migration
+    container_name: jtl-reporter-migration
     build:
       context: ./
       dockerfile: Dockerfile
     environment:
         - DATABASE_URL=postgres://postgres@db/jtl_report
-    command: npm run migrate up
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; npm run migrate up'
     depends_on:
-      db:
-        condition: service_healthy
+      - db
