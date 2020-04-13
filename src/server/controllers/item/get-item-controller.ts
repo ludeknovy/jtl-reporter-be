@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { db } from "../../../db/db";
-import { findItem, findItemStats, findAttachements, findData } from "../../queries/items";
-import { ItemDataType } from "../../queries/items.model";
-import { findMinMax } from "../../data-stats/helper/stats-fc";
+import { db } from '../../../db/db';
+import { findItem, findItemStats, findAttachements, findData } from '../../queries/items';
+import { ItemDataType } from '../../queries/items.model';
+import { findMinMax } from '../../data-stats/helper/stats-fc';
 
 export const getItemController = async (req: Request, res: Response, next: NextFunction) => {
   const { projectName, scenarioName, itemId } = req.params;
@@ -19,11 +19,11 @@ export const getItemController = async (req: Request, res: Response, next: NextF
 
   const [monitoringLogs = { item_data: [] }] = await db.any(findData(itemId, ItemDataType.MonitoringLogs));
   monitoringLogs.item_data = monitoringLogs.item_data.map((_) => {
-    _.ts = parseInt(_.ts) * 1000;
+    _.ts = parseInt(_.ts, 10) * 1000;
     return _;
   });
-  const cpu = monitoringLogs.item_data.map((_) => [_.ts, parseInt(_.cpu)]);
-  const mem = monitoringLogs.item_data.map((_) => [_.ts, parseInt(_.mem)]);
+  const cpu = monitoringLogs.item_data.map((_) => [_.ts, parseInt(_.cpu, 10)]);
+  const mem = monitoringLogs.item_data.map((_) => [_.ts, parseInt(_.mem, 10)]);
   const maxCpu = findMinMax(cpu.map(_ => _[1])).max;
   const maxMem = findMinMax(mem.map(_ => _[1])).max;
 
@@ -32,4 +32,4 @@ export const getItemController = async (req: Request, res: Response, next: NextF
     plot, note, environment, hostname,
     attachements, baseId: base_id, isBase: base_id === itemId, monitoringData: { cpu, mem, maxCpu, maxMem }
   });
-}
+};

@@ -36,9 +36,11 @@ export const findProjects = () => {
 export const latestItems = () => {
   return {
     // tslint:disable-next-line:max-line-length
-    text: `SELECT i.id, s.name, environment, project_name as "projectName", start_time as "startTime", status FROM jtl.items as i
+    text: `SELECT i.id, s.name, environment, project_name as "projectName", stat.overview->'startDate' as "startTime", status FROM jtl.items as i
     LEFT JOIN jtl.scenario as s ON s.id = i.scenario_id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    LEFT JOIN jtl.item_stat as stat ON stat.item_id = i.id
+    WHERE i.report_status = 'ready'
     ORDER BY start_time DESC LIMIT 10;`
   };
 };

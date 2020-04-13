@@ -4,7 +4,6 @@ import { States } from '../contract/states.model';
 import { ItemStatus } from '../../server/queries/items.model';
 import * as path from 'path';
 
-
 describe('Items', () => {
   let credentials;
   let token;

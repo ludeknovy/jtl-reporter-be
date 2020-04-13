@@ -1,20 +1,14 @@
 import { ItemDataType } from './items.model';
 
-export const createNewItem = (scenarioName, startTime, environment, note, status, projectName, hostname) => {
+// tslint:disable-next-line: max-line-length
+export const createNewItem = (scenarioName, startTime, environment, note, status, projectName, hostname, reportStatus, dataId) => {
   return {
-    text: `INSERT INTO jtl.items(scenario_id, start_time, environment, note, status, hostname) VALUES(
+    text: `INSERT INTO jtl.items(scenario_id, start_time, environment, note, status, hostname, report_status, data_id) VALUES(
       (SELECT sc.id FROM jtl.scenario as sc
         LEFT JOIN jtl.projects as p ON p.id = sc.project_id
         WHERE sc.name = $1
-        AND p.project_name = $6), $2, $3, $4, $5, $7) RETURNING id`,
-    values: [scenarioName, startTime, environment, note, status, projectName, hostname]
-  };
-};
-
-export const saveKpiData = (itemId, data) => {
-  return {
-    text: 'INSERT INTO jtl.data(item_id, item_data, data_type) VALUES($1, $2, $3)',
-    values: [itemId, data, ItemDataType.Kpi]
+        AND p.project_name = $6), $2, $3, $4, $5, $7, $8, $9) RETURNING id`,
+    values: [scenarioName, startTime, environment, note, status, projectName, hostname, reportStatus, dataId]
   };
 };
 
@@ -217,5 +211,26 @@ export const getErrorsForLabel = (itemId, labelName) => {
   return {
     text: `SELECT * FROM (SELECT  jsonb_array_elements(item_data->'testResults'->'httpSample') as error FROM jtl.data d WHERE d.data_type = 'error' AND d.item_id = $1) as errors WHERE error->>'lb' = $2;`,
     values: [itemId, labelName]
+  };
+};
+
+export const updateItemStatus = (itemId, reportStatus) => {
+  return {
+    text: `UPDATE jtl.items SET report_status = $2 WHERE id = $1;`,
+    values: [itemId, reportStatus]
+  };
+};
+
+export const selectDataId = (itemId, projectName, scenarioName) => {
+  return {
+    text: `SELECT data_id
+    FROM jtl.items as items
+    LEFT JOIN jtl.charts as charts ON charts.item_id = items.id
+    LEFT JOIN jtl.scenario as s ON s.id = items.scenario_id
+    LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE items.id = $1
+    AND p.project_name = $2
+    AND s.name = $3;`,
+    values: [itemId, projectName, scenarioName]
   };
 };

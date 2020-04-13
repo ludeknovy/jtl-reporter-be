@@ -30,7 +30,7 @@ jobs:
         - docker-compose --file docker-compose.testing.yaml up --build -d
       script: npm run integration-tests
       after_script:
-        - docker-compose down
+        - docker-compose --file docker-compose.testing.yaml down
 
 env:
   global:

@@ -7,6 +7,8 @@ import * as expressWinston from 'express-winston';
 import { logger } from './logger';
 import { Router } from './server/router';
 import * as swaggerUi from 'swagger-ui-express';
+import { MongoUtils } from './db/mongoUtil';
+import * as http from 'http';
 const swaggerDocument = require('../openapi.json');
 
 const PORT = 5000;
@@ -14,6 +16,7 @@ const PORT = 5000;
 export class App {
   public app: express.Application;
   public router: Router = new Router();
+  private server: http.Server;
 
   constructor() {
     this.app = express();
@@ -68,9 +71,17 @@ export class App {
     });
   }
 
-  public listen() {
-    return this.app.listen(PORT, () => {
+  public async listen() {
+    await MongoUtils.connect();
+    return this.server = this.app.listen(PORT, () => {
       logger.info('Express server listening on port ' + PORT);
+    });
+  }
+
+  public async close() {
+    // @ts-ignore
+    return this.server.close(() => {
+      logger.info("Server closed");
     });
   }
 }
