@@ -8,7 +8,7 @@ import { db } from '../../db/db';
 import { createNewProject } from '../queries/projects';
 import { createNewScenario } from '../queries/scenario';
 import { createNewItem, saveItemStats } from '../queries/items';
-import { mongoDataChunks } from '../../test-data/mongo-data-chunks'
+import { mongoDataChunks } from '../../test-data/mongo-data-chunks';
 import { testStats, testOverview } from '../../test-data/test-stats';
 import { createUserInDB } from '../controllers/users/create-new-user-controller';
 import { getUser } from '../queries/auth';
