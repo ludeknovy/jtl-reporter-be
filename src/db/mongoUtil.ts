@@ -15,7 +15,7 @@ export class MongoUtils {
       await mongoClient.connect();
       logger.info('Successfully connected to MongoDB');
     } catch (error) {
-      logger.error('Error while connecting to MongoDB');
+      logger.error(`Error while connecting to MongoDB: ${error}`);
     }
   }
 

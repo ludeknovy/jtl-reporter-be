@@ -149,7 +149,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
         });
     } catch (e) {
       logger.error(e);
-      return next(boom.serverUnavailable('Error while reading provided file'));
+      return next(boom.internal('Error while reading provided file'));
     }
   });
 };
