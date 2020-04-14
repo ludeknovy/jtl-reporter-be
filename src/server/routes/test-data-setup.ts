@@ -12,7 +12,7 @@ import { mongoDataChunks } from '../../test-data/mongo-data-chunks';
 import { testStats, testOverview } from '../../test-data/test-stats';
 import { createUserInDB } from '../controllers/users/create-new-user-controller';
 import { getUser } from '../queries/auth';
-import { generateToken } from '../controllers/auth/login-controller';
+import { generateToken } from '../controllers/auth/helper/token-generator';
 import { createNewApiToken } from '../queries/api-tokens';
 import * as uuid from 'uuid';
 import { ReportStatus } from '../queries/items.model';

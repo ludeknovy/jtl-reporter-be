@@ -64,7 +64,7 @@ export const prepareChartDataForSavingFromMongo = (overviewData: ChartOverviewDa
 
 };
 
-const stringToNumber = (input: string, radix: number) => {
+export const stringToNumber = (input: string, radix: number) => {
   const result = parseInt(input, radix);
   if (isNaN(result)) {
     throw (`not a number`);

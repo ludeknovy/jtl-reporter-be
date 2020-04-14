@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import * as boom from 'boom';
 import * as jwt from 'jsonwebtoken';
 import { db } from '../../db/db';
