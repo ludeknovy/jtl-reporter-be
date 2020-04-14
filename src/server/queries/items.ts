@@ -214,10 +214,10 @@ export const getErrorsForLabel = (itemId, labelName) => {
   };
 };
 
-export const updateItemStatus = (itemId, reportStatus) => {
+export const updateItem = (itemId, reportStatus, startTime) => {
   return {
-    text: `UPDATE jtl.items SET report_status = $2 WHERE id = $1;`,
-    values: [itemId, reportStatus]
+    text: `UPDATE jtl.items SET report_status = $2, start_time= $3 WHERE id = $1;`,
+    values: [itemId, reportStatus, startTime]
   };
 };
 

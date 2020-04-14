@@ -5,7 +5,7 @@ import {
 } from '../../data-stats/prepare-data';
 import { db } from '../../../db/db';
 import {
-  createNewItem, saveItemStats, savePlotData, saveData, updateItemStatus
+  createNewItem, saveItemStats, savePlotData, saveData, updateItem
 } from '../../queries/items';
 import * as multer from 'multer';
 import * as boom from 'boom';
@@ -121,7 +121,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
             await db.tx(async t => {
               await t.none(saveItemStats(itemId, JSON.stringify(labelStats), overview));
               await t.none(savePlotData(itemId, JSON.stringify(chartData)));
-              await t.none(updateItemStatus(itemId, ReportStatus.Ready));
+              await t.none(updateItem(itemId, ReportStatus.Ready, overview.startDate));
             });
 
 
@@ -143,7 +143,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
             }
             logger.info(`Item: ${itemId} processing finished`);
           } catch (error) {
-            await db.none(updateItemStatus(itemId, ReportStatus.Error));
+            await db.none(updateItem(itemId, ReportStatus.Error, null));
             logger.error(`Error while processing item: ${itemId}: ${error}`);
           }
         });
