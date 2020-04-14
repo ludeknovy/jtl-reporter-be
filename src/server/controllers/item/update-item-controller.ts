@@ -19,4 +19,4 @@ export const updateItemController = async (req: Request, res: Response, next: Ne
     await db.query('ROLLBACK');
     return next(error);
   }
-}
+};

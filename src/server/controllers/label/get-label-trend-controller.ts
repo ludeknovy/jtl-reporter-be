@@ -5,7 +5,7 @@ import { db } from '../../../db/db';
 
 export const getLabelTrendController = async (req: Request, res: Response, next: NextFunction) => {
   const { projectName, scenarioName, itemId, label } = req.params;
-  const { environment, virtualUsers } = req.query;
+  const { environment, virtualUsers } = req.query as any;
   const queryResult = (virtualUsers && parseInt(virtualUsers, 10) > 0)
     ? await db.query(getLabelHistoryForVu(
       scenarioName, projectName, label,
@@ -31,4 +31,4 @@ export const getLabelTrendController = async (req: Request, res: Response, next:
     throughput,
     threads
   });
-}
+};

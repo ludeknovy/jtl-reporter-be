@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { itemsForScenarioCount, findItemsForScenario } from "../../queries/scenario";
+import { itemsForScenarioCount, findItemsForScenario } from '../../queries/scenario';
 import { db } from '../../../db/db';
 
 export const getItemsController = async (req: Request, res: Response, next: NextFunction) => {
@@ -13,4 +13,4 @@ export const getItemsController = async (req: Request, res: Response, next: Next
     return _;
   });
   res.status(200).send({ name: scenarioName, data: idsBaseUpdate, total: parseInt(total, 10) });
-}
+};

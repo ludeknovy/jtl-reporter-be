@@ -81,7 +81,7 @@ export class App {
   public async close() {
     // @ts-ignore
     return this.server.close(() => {
-      logger.info("Server closed");
+      logger.info('Server closed');
     });
   }
 }
