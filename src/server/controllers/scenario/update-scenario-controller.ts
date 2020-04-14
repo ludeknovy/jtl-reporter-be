@@ -7,4 +7,4 @@ export const updateScenarioController = async (req: Request, res: Response, next
   const { scenarioName: newScenarioSchema } = req.body;
   await db.any(updateScenario(projectName, scenarioName, newScenarioSchema));
   res.status(204).send();
-}
+};

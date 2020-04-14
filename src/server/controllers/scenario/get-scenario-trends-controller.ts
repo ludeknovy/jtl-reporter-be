@@ -6,4 +6,4 @@ export const getScenarioTrendsController = async (req: Request, res: Response, n
   const { projectName, scenarioName } = req.params;
   const ids = await db.any(scenarioTrends(projectName, scenarioName));
   res.status(200).send(ids);
-}
+};

@@ -10,4 +10,4 @@ export const getProjectStatsController = async (req: Request, res: Response, nex
     totalDuration: totalDuration ? parseInt(totalDuration, 10) : 0,
     totalRunCount: totalCount ? parseInt(totalCount, 10) : 0,
   });
-}
+};

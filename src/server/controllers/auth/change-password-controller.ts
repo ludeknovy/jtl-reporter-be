@@ -14,11 +14,11 @@ export const changePasswordController = async (req: IGetUserAuthInfoRequest, res
       return next(boom.unauthorized('Current password is invalid'));
     }
     const passwordHash = await hashPassword(newPassword);
-    console.log(passwordHash)
+    console.log(passwordHash);
     await db.query(updatePassword(userId, passwordHash));
     return res.status(204).send();
   } catch (error) {
-    console.log(error)
-    next(error)
+    console.log(error);
+    next(error);
   }
 };
