@@ -17,6 +17,6 @@ export const changePasswordController = async (req: IGetUserAuthInfoRequest, res
     await db.query(updatePassword(userId, passwordHash));
     return res.status(204).send();
   } catch (error) {
-    next(error)
+    next(error);
   }
 };

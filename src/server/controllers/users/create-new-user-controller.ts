@@ -17,9 +17,9 @@ export const createNewUserController = async (req: Request, res: Response, next:
     }
     return next(error);
   }
-}
+};
 
 export const createUserInDB = async (username, password) => {
   const passwordHash = await hashPassword(password);
   await db.query(createUser(username, passwordHash));
-}
+};

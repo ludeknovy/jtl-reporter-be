@@ -12,4 +12,4 @@ export const getLabelErrorsController = async (req: Request, res: Response, next
     return acc;
   }, {});
   res.status(200).send({ stat });
-}
+};

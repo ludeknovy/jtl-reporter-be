@@ -13,4 +13,4 @@ export const getLabelVirtualUsersController = async (req: Request, res: Response
   } catch (error) {
     return next(error);
   }
-}
+};

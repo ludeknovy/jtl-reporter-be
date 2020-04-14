@@ -7,4 +7,4 @@ export const updateProjectController = async (req: Request, res: Response, next:
   const { projectName: newProjectName } = req.body;
   await db.none(updateProjectName(projectName, newProjectName));
   res.status(204).send();
-}
+};

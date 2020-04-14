@@ -6,4 +6,4 @@ export const deleteProjectController = async (req: Request, res: Response, next:
   const { projectName } = req.params;
   await db.none(deleteProject(projectName));
   res.status(204).send();
-}
+};
