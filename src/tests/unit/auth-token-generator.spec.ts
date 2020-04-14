@@ -1,4 +1,4 @@
-import { generateToken } from "../../server/controllers/auth/helper/token-generator";
+import { generateToken } from '../../server/controllers/auth/helper/token-generator';
 
 describe('token generator', () => {
   it('should return valid token', () => {
