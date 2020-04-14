@@ -29,6 +29,7 @@ export const findProjects = () => {
     FROM jtl.projects as p
     LEFT JOIN jtl.scenario as s ON s.project_id = p.id
     LEFT JOIN jtl.items as i ON i.scenario_id = s.id
+    WHERE i.report_status = 'ready'
     GROUP BY project_name, p.id;`
   };
 };

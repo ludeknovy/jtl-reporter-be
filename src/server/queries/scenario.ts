@@ -19,7 +19,7 @@ export const itemsForScenarioCount = (projectName, scenarioName) => {
     LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
     LEFT JOIN jtl.item_stat as st ON st.item_id = it.id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
-    WHERE s.name = $2 AND p.project_name = $1;`,
+    WHERE s.name = $2 AND p.project_name = $1 AND report_status = 'ready';`,
     values: [projectName, scenarioName]
   };
 };
@@ -44,6 +44,7 @@ export const scenarioTrends = (projectName, scenarioName) => {
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
     WHERE s.name = $2
     AND p.project_name = $1
+    AND report_status = 'ready'
     ORDER BY start_time DESC
     LIMIT 15;`,
     values: [projectName, scenarioName]
@@ -83,7 +84,7 @@ export const findScenariosData = (projectName) => {
     LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
     WHERE st.item_id IN (
     SELECT id FROM (
-      SELECT scenario_id, id, start_time, row_number() over (PARTITION BY scenario_id ORDER BY start_time DESC) as rownum FROM jtl.items WHERE scenario_id IN (SELECT s.id FROM jtl.scenario as s LEFT JOIN jtl.projects as p ON p.id = s.project_id WHERE p.project_name = $1)
+      SELECT scenario_id, id, start_time, row_number() over (PARTITION BY scenario_id ORDER BY start_time DESC) as rownum FROM jtl.items WHERE scenario_id IN (SELECT s.id FROM jtl.scenario as s LEFT JOIN jtl.projects as p ON p.id = s.project_id WHERE p.project_name = $1 AND report_status = 'ready')
       ) tmp
       WHERE rownum <= 15
     )
