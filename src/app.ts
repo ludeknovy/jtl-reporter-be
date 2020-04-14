@@ -50,11 +50,11 @@ export class App {
 
   private errorHandler() {
     this.app.use(function (error, req, res, next) {
-      logger.error(error);
       if (boom.isBoom(error)) {
         const { payload: { message } } = error.output;
         return res.status(error.output.statusCode).json({ message });
       } else {
+        logger.error(`Unexpected error: ${error}`);
         return res.status(500).json({ message: `Something went wrong` });
       }
     });
