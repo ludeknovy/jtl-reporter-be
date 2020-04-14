@@ -16,5 +16,11 @@ describe('auth password helper', () => {
       expect(result).toBe(false);
     });
   });
-  describe('hashPassword', () => { });
+  describe('hashPassword', () => {
+    it('should be able to hash password', async () => {
+      const hashedPassword = await hashPassword('test123');
+      expect(typeof hashedPassword).toBe('string');
+      expect(hashedPassword.length).toBeGreaterThan(0);
+    });
+  });
 });

@@ -2,7 +2,6 @@ import {
   roundNumberTwoDecimals, findMinMax,
 } from '../../server/data-stats/helper/stats-fc';
 
-
 describe('Stats Helper', () => {
   describe('roundNumberTwoDecimals', () => {
     it.each([
