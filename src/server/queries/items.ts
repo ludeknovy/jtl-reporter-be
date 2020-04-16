@@ -22,7 +22,7 @@ export const savePlotData = (itemId, data) => {
 export const findItem = (itemId, projectName, scenarioName) => {
   return {
     // tslint:disable-next-line:max-line-length
-    text: `SELECT charts.plot_data, note, environment, status, hostname, (SELECT items.id FROM jtl.items as items
+    text: `SELECT charts.plot_data, note, environment, status, hostname, report_status, (SELECT items.id FROM jtl.items as items
       LEFT JOIN jtl.charts as charts ON charts.item_id = items.id
       LEFT JOIN jtl.scenario as s ON s.id = items.scenario_id
       LEFT JOIN jtl.projects as p ON p.id = s.project_id
