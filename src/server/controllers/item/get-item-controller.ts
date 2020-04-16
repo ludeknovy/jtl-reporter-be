@@ -11,7 +11,7 @@ export const getItemController = async (req: Request, res: Response, next: NextF
     note,
     environment,
     base_id,
-    status, hostname, report_status: reportStatus } = await db.one(findItem(itemId, projectName, scenarioName));
+    status, hostname, reportStatus } = await db.one(findItem(itemId, projectName, scenarioName));
   const { stats: statistics, overview } = await db.one(findItemStats(itemId));
 
   const files = await db.any(findAttachements(itemId));
