@@ -17,6 +17,7 @@ import { deleteItemController } from '../controllers/item/delete-item-controller
 import { createItemController } from '../controllers/item/create-item-controller';
 import { verifyToken } from '../middleware/auth-middleware';
 import { getItemErrorsController } from '../controllers/item/get-item-errors-controller';
+import { getProcessingItemsController } from '../controllers/item/get-processing-items-controller';
 
 
 
@@ -60,5 +61,12 @@ export class ItemsRoutes {
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/errors')
       // tslint:disable-next-line: max-line-length
       .get(wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemErrorsController(req, res, next)));
+
+    app.route('/api/projects/:projectName/scenarios/:scenarioName/processing-items')
+      .get(
+        verifyToken,
+        paramsSchemaValidator(scenarioParamsSchema),
+        // tslint:disable-next-line: max-line-length
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getProcessingItemsController(req, res, next)));
   }
 }

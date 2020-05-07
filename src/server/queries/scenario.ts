@@ -103,7 +103,7 @@ export const isExistingScenario = (scenarioName, projectName) => {
   };
 };
 
-export const getProcessingItems = (scenarioName, projectName) => {
+export const getProcessingItems = (projectName, scenarioName) => {
   return {
     text: `SELECT it.id, it.report_status as "reportStatus", it.upload_time as "uploadTime" FROM jtl.items as it
     LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
