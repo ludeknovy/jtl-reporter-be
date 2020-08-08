@@ -211,7 +211,7 @@ export const overviewChartAgg = (dataId: string, interval: number) => {
           }
         },
         'min': {
-          '$min': '$samples.timeStamp'
+          '$min': { '$subtract': ['$samples.timeStamp', '$samples.elapsed'] }
         },
         'max': {
           '$max': '$samples.timeStamp'
@@ -314,7 +314,7 @@ export const labelChartAgg = (dataId: string, interval: number) => {
           'label': '$samples.label'
         },
         'min': {
-          '$min': '$samples.timeStamp'
+          '$min': { '$subtract': ['$samples.timeStamp', '$samples.elapsed'] }
         },
         'max': {
           '$max': '$samples.timeStamp'
