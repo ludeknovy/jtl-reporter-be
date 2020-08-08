@@ -1,5 +1,6 @@
 import { roundNumberTwoDecimals } from './helper/stats-fc';
 import * as moment from 'moment';
+import { logger } from '../../logger';
 
 export const prepareDataForSavingToDbFromMongo = (overviewData, labelData) => {
   const startDate = new Date(overviewData.start);
@@ -85,6 +86,7 @@ export const transformDataForFb = (_) => {
     _.success = _.success === 'true';
     return _;
   } catch (error) {
+    logger.error(error);
     return;
   }
 };
