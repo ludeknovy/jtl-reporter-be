@@ -6,11 +6,11 @@ import { paramsSchema, scenarioUpdateSchema } from '../schema-validator/scenario
 import { projectNameParam, newScenarioSchema } from '../schema-validator/project-schema';
 import { getScenariosController } from '../controllers/scenario/get-scenarios-controller';
 import { createScenarioController } from '../controllers/scenario/create-scenario-controller';
-import { getScenarioController } from '../controllers/scenario/get-scenario-controller';
 import { deleteScenarioController } from '../controllers/scenario/delete-scenario-controller';
 import { getScenarioTrendsController } from '../controllers/scenario/get-scenario-trends-controller';
 import { authentication } from '../middleware/authentication-middleware';
 import { authorization, AllowedRoles } from '../middleware/authorization-middleware';
+import { updateScenarioController } from '../controllers/scenario/update-scenario-controller';
 
 export class ScenarioRoutes {
 
@@ -38,7 +38,7 @@ export class ScenarioRoutes {
         paramsSchemaValidator(paramsSchema),
         bodySchemaValidator(scenarioUpdateSchema),
         // tslint:disable-next-line: max-line-length
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getScenarioController(req, res, next)))
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await updateScenarioController(req, res, next)))
 
       .delete(
         authentication,

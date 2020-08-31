@@ -6,4 +6,4 @@ export const deleteScenarioController = async (req: Request, res: Response, next
   const { projectName, scenarioName } = req.params;
   await db.none(deleteScenario(projectName, scenarioName));
   res.status(204).send();
-}
+};

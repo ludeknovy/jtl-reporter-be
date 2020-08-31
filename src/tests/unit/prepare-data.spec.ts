@@ -1,55 +1,54 @@
-import { normalizeAndSortData, prepareDataForSavingToDb } from '../../server/data-stats/prepare-data';
-import * as statistics from '../../server/data-stats/statistics';
-const dataToBeSaved = require('./stubs/data-to-be-saved.json');
-jest.mock('../../server/data-stats/statistics');
+import { stringToNumber, transformDataForFb } from '../../server/data-stats/prepare-data';
 
-
-describe('Prepare data', () => {
-  describe('prepareDataForSavingToDb', () => {
-    let preparedData;
-    let normalizeAndSortDataSpy;
-    beforeEach(() => {
-      jest.restoreAllMocks();
-      normalizeAndSortDataSpy = jest.spyOn(
-        require('../../server/data-stats/prepare-data'),
-        'normalizeAndSortData');
-      preparedData = prepareDataForSavingToDb(dataToBeSaved);
+describe('prepare data', () => {
+  describe('transformDataForFb', () => {
+    it('should return undefined when unable to process data', () => {
+      const result = transformDataForFb({});
+      expect(result).toBeUndefined();
     });
-    it('should prepare stats and itemOverview', async () => {
-      expect(statistics.stats).toHaveBeenCalledTimes(1);
-      expect(statistics.itemOverview).toHaveBeenCalledTimes(1);
-    });
-    it('should substract start time', async () => {
-      const startTime = new Date(dataToBeSaved.sort((a, b) => a.timeStamp - b.timeStamp)[0].timeStamp);
-      expect(preparedData.startTime).toEqual(startTime);
-    });
-    it('should prepare sorted data', async () => {
-      expect(normalizeAndSortDataSpy).toHaveBeenCalledTimes(1);
-    });
-    it('should return object containing all keys', async () => {
-      expect(preparedData).toHaveProperty('itemStats');
-      expect(preparedData).toHaveProperty('overview');
-      expect(preparedData).toHaveProperty('startTime');
-      expect(preparedData).toHaveProperty('sortedData');
+    it('should correctly proccess data', () => {
+      const inputData = {
+        bytes: '792',
+        label: 'endpoint3',
+        Connect: '155',
+        Latency: '190',
+        elapsed: '191',
+        success: 'true',
+        Hostname: 'localhost',
+        timeStamp: '1555399218911',
+        allThreads: '1',
+        grpThreads: '1',
+        threadName: 'Thread 1-1',
+        responseCode: '200',
+        responseMessage: ''
+      };
+      const result = transformDataForFb(inputData);
+      expect(result).toEqual({
+        bytes: 792,
+        label: 'endpoint3',
+        Connect: 155,
+        Latency: 190,
+        elapsed: 191,
+        success: true,
+        Hostname: 'localhost',
+        timeStamp: new Date(1555399218911),
+        allThreads: 1,
+        grpThreads: 1,
+        threadName: 'Thread 1-1',
+        responseCode: 200,
+        responseMessage: ''
+      });
     });
   });
-  describe('normalizeAndSortData', () => {
-    it('should transfer strings to numbers and sort data chronologically', async () => {
-      const data = normalizeAndSortData(dataToBeSaved);
-      data.forEach((value, index, array) => {
-        expect(typeof value.timeStamp).toBe('number');
-        expect(typeof value.elapsed).toBe('number');
-        expect(typeof value.responseCode).toBe('number');
-        expect(typeof value.bytes).toBe('number');
-        expect(typeof value.grpThreads).toBe('number');
-        expect(typeof value.allThreads).toBe('number');
-        expect(typeof value.Latency).toBe('number');
-        expect(typeof value.Connect).toBe('number');
-
-        if (index !== (array.length - 1)) {
-          expect(value.timeStamp).toBeLessThanOrEqual(array[index + 1].timeStamp);
-        }
-      });
+  describe('stringToNumber', () => {
+    it('should convert string to number', () => {
+      const result = stringToNumber('1', 10);
+      expect(result).toBe(1);
+    });
+    it('should throw an error when unablqe to convert ', () => {
+      expect(() => {
+        stringToNumber(undefined, 10);
+      }).toThrow();
     });
   });
 });

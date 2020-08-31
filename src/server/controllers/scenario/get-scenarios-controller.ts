@@ -22,4 +22,4 @@ export const getScenariosController = async (req: Request, res: Response, next: 
     }
   });
   res.status(200).send(groupedData);
-}
+};

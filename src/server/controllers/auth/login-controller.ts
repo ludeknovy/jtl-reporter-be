@@ -2,9 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { db } from '../../../db/db';
 import { getUser } from '../../queries/auth';
 import * as boom from 'boom';
-import * as jwt from 'jsonwebtoken';
 import { passwordMatch } from './helper/passwords';
-import { config } from '../../config';
+import { generateToken } from './helper/token-generator';
 
 
 export const loginController = async (req: Request, res: Response, next: NextFunction) => {
@@ -23,15 +22,4 @@ export const loginController = async (req: Request, res: Response, next: NextFun
     return next(error);
   }
 
-};
-
-
-
-export const generateToken = (id) => {
-  const token = jwt.sign({
-    userId: id
-  },
-    config.jwtToken, { expiresIn: '7d' }
-  );
-  return token;
 };

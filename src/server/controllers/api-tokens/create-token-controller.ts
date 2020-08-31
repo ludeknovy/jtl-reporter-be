@@ -14,4 +14,4 @@ export const createTokenController = async (req: IGetUserAuthInfoRequest, res: R
   } catch (error) {
     return next(error);
   }
-}
+};

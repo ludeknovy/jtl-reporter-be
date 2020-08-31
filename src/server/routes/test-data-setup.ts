@@ -11,11 +11,11 @@ import { createNewItem, saveItemStats } from '../queries/items';
 import { testStats, testOverview } from '../../test-data/test-stats';
 import { createUserInDB } from '../controllers/users/create-new-user-controller';
 import { getUser } from '../queries/auth';
-import { generateToken } from '../controllers/auth/login-controller';
+import { generateToken } from '../controllers/auth/helper/token-generator';
 import { createNewApiToken } from '../queries/api-tokens';
 import * as uuid from 'uuid';
 import { AllowedRoles } from '../middleware/authorization-middleware';
-
+import { ReportStatus } from '../queries/items.model';
 
 export class TestDataSetup {
 
@@ -27,7 +27,6 @@ export class TestDataSetup {
           const { state } = req.body;
           // tslint:disable-next-line:max-line-length
           await db.any({ text: 'TRUNCATE jtl.charts, jtl.projects, jtl.data, jtl.item_stat, jtl.items, jtl.scenario CASCADE' });
-
           switch (state) {
             case States.ExistingProject:
               await db.any(createNewProject('test-project'));
@@ -42,7 +41,8 @@ export class TestDataSetup {
               await db.any(createNewProject('test-project'));
               await db.any(createNewScenario('test-project', 'test-scenario'));
               // tslint:disable-next-line:max-line-length
-              const [item] = await db.any(createNewItem('test-scenario', '2019-09-22 20:20:23.265', 'localhost', 'test note', '1', 'test-project', 'localhost'));
+              const dataId = uuid();
+              const [item] = await db.any(createNewItem('test-scenario', '2019-09-22 20:20:23.265', 'localhost', 'test note', '1', 'test-project', 'localhost', ReportStatus.Ready, dataId));
               await db.any(saveItemStats(item.id, JSON.stringify(testStats), JSON.stringify(testOverview)));
               res.status(200).send({ itemId: item.id });
               break;
