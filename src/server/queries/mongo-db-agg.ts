@@ -2,7 +2,7 @@ export const overviewAggPipeline = (dataId) => {
   return [
     {
       '$match': {
-        'dataId': dataId,
+        'dataId': dataId
       }
     }, {
       '$unwind': {

@@ -13,7 +13,7 @@ describe('Users', () => {
       await request(__server__)
         .post(routes.users)
         .send({
-          username: `new.user`,
+          username: 'new.user',
           password: 'test12345'
         })
         .expect(401);
@@ -43,7 +43,7 @@ describe('Users', () => {
       ['too short username', { password: 'test12345', username: 'te' }],
       ['unallowed character é in username', { password: 'test12345', username: 'éééééé' }],
       ['unallowed character ? username', { password: 'test12345', username: 'test?' }],
-      ['unallowed character @ in username', { password: 'test12345', username: 'test@' }],
+      ['unallowed character @ in username', { password: 'test12345', username: 'test@' }]
     ])('should not be able to create new when %s provided', async (desc, body) => {
       await request(__server__)
         .post(routes.users)
@@ -71,9 +71,9 @@ describe('Users', () => {
   describe('DELETE /users/:userId', () => {
     it('should return 401 when deleting user as unathorized', async () => {
       await request(__server__)
-      .delete(routes.users + `/${credentials.id}`)
-      .send()
-      .expect(401);
+        .delete(routes.users + `/${credentials.id}`)
+        .send()
+        .expect(401);
     });
     it('should return 404 when deleting unexisting user', async () => {
       await request(__server__)
@@ -84,10 +84,10 @@ describe('Users', () => {
     });
     it('should return 400 when no valid userId provided', async () => {
       await request(__server__)
-      .delete(routes.users + `/abcd`)
-      .set(__tokenHeaderKey__, credentials.token)
-      .send()
-      .expect(400);
+        .delete(routes.users + '/abcd')
+        .set(__tokenHeaderKey__, credentials.token)
+        .send()
+        .expect(400);
     });
     it('should be able to delete user', async () => {
       await request(__server__)

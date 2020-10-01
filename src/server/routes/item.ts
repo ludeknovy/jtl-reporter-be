@@ -7,7 +7,7 @@ import {
 } from '../schema-validator/schema-validator-middleware';
 import {
   paramsSchema, updateItemBodySchema,
-  newItemParamSchema,
+  newItemParamSchema
 } from '../schema-validator/item-schema';
 import { paramsSchema as scenarioParamsSchema, querySchema } from '../schema-validator/scenario-schema';
 import { getItemsController } from '../controllers/item/get-items-controller';
@@ -30,7 +30,6 @@ export class ItemsRoutes {
         verifyToken,
         paramsSchemaValidator(scenarioParamsSchema),
         queryParamsValidator(querySchema),
-        // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemsController(req, res, next)))
 
       .post(
@@ -42,31 +41,30 @@ export class ItemsRoutes {
       .get(
         verifyToken,
         paramsSchemaValidator(paramsSchema),
-        // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemController(req, res, next)))
 
       .put(
         verifyToken,
         paramsSchemaValidator(paramsSchema),
         bodySchemaValidator(updateItemBodySchema),
-        // tslint:disable-next-line: max-line-length
+        // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await updateItemController(req, res, next)))
 
       .delete(
         verifyToken,
         paramsSchemaValidator(paramsSchema),
-        // tslint:disable-next-line: max-line-length
+        // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteItemController(req, res, next)));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/errors')
-      // tslint:disable-next-line: max-line-length
+      // eslint-disable-next-line max-len
       .get(wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemErrorsController(req, res, next)));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/processing-items')
       .get(
         verifyToken,
         paramsSchemaValidator(scenarioParamsSchema),
-        // tslint:disable-next-line: max-line-length
+        // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getProcessingItemsController(req, res, next)));
   }
 }

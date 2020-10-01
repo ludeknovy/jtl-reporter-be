@@ -1,8 +1,9 @@
 import { ItemDataType } from './items.model';
 
-// tslint:disable-next-line: max-line-length
+// eslint-disable-next-line max-len
 export const createNewItem = (scenarioName, startTime, environment, note, status, projectName, hostname, reportStatus, dataId) => {
   return {
+    // eslint-disable-next-line max-len
     text: `INSERT INTO jtl.items(scenario_id, start_time, environment, note, status, hostname, report_status, data_id) VALUES(
       (SELECT sc.id FROM jtl.scenario as sc
         LEFT JOIN jtl.projects as p ON p.id = sc.project_id
@@ -21,7 +22,7 @@ export const savePlotData = (itemId, data) => {
 
 export const findItem = (itemId, projectName, scenarioName) => {
   return {
-    // tslint:disable-next-line:max-line-length
+    // eslint-disable-next-line max-len
     text: `SELECT charts.plot_data, note, environment, status, hostname, report_status as "reportStatus", (SELECT items.id FROM jtl.items as items
       LEFT JOIN jtl.charts as charts ON charts.item_id = items.id
       LEFT JOIN jtl.scenario as s ON s.id = items.scenario_id
@@ -211,14 +212,15 @@ export const getMaxVuForLabel = (scenarioName, projectName, endpointName, itemId
 
 export const getErrorsForLabel = (itemId, labelName) => {
   return {
-    text: `SELECT * FROM (SELECT  jsonb_array_elements(item_data->'testResults'->'httpSample') as error FROM jtl.data d WHERE d.data_type = 'error' AND d.item_id = $1) as errors WHERE error->>'lb' = $2;`,
+    // eslint-disable-next-line max-len
+    text: 'SELECT * FROM (SELECT  jsonb_array_elements(item_data->\'testResults\'->\'httpSample\') as error FROM jtl.data d WHERE d.data_type = \'error\' AND d.item_id = $1) as errors WHERE error->>\'lb\' = $2;',
     values: [itemId, labelName]
   };
 };
 
 export const updateItem = (itemId, reportStatus, startTime) => {
   return {
-    text: `UPDATE jtl.items SET report_status = $2, start_time= $3 WHERE id = $1;`,
+    text: 'UPDATE jtl.items SET report_status = $2, start_time= $3 WHERE id = $1;',
     values: [itemId, reportStatus, startTime]
   };
 };

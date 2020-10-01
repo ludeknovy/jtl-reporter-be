@@ -10,10 +10,13 @@ describe('prepare data', () => {
       const inputData = {
         bytes: '792',
         label: 'endpoint3',
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         Connect: '155',
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         Latency: '190',
         elapsed: '191',
         success: 'true',
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         Hostname: 'localhost',
         timeStamp: '1555399218911',
         allThreads: '1',
@@ -26,10 +29,13 @@ describe('prepare data', () => {
       expect(result).toEqual({
         bytes: 792,
         label: 'endpoint3',
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         Connect: 155,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         Latency: 190,
         elapsed: 191,
         success: true,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         Hostname: 'localhost',
         timeStamp: new Date(1555399218911),
         allThreads: 1,

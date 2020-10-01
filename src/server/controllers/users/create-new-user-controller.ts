@@ -13,7 +13,7 @@ export const createNewUserController = async (req: Request, res: Response, next:
     res.status(201).send();
   } catch (error) {
     if (error.routine === '_bt_check_unique') {
-      return next(boom.conflict(`Username already exists`));
+      return next(boom.conflict('Username already exists'));
     }
     return next(error);
   }

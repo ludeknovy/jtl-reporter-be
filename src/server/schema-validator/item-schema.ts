@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const Joi = require('joi');
 const projectName = Joi.string().required();
 const environment = Joi.string().min(1).max(50).required();

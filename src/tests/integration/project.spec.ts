@@ -14,7 +14,7 @@ describe('Projects', () => {
       await request(__server__)
         .post('/api/projects')
         .set(__tokenHeaderKey__, credentials.token)
-        .send({ projectName: `test-project-000` })
+        .send({ projectName: 'test-project-000' })
         .set('Accept', 'application/json')
         .expect(201);
     });
@@ -32,7 +32,7 @@ describe('Projects', () => {
       await request(__server__)
         .post('/api/projects')
         .set(__tokenHeaderKey__, credentials.token)
-        .send({ projectName: `test-project` })
+        .send({ projectName: 'test-project' })
         .set('Accept', 'application/json')
         .expect(409);
     });
@@ -43,7 +43,7 @@ describe('Projects', () => {
       await request(__server__)
         .put('/api/projects/test-project')
         .set(__tokenHeaderKey__, credentials.token)
-        .send({ projectName: `test-project` })
+        .send({ projectName: 'test-project' })
         .set('Accept', 'application/json')
         .expect(204);
     });

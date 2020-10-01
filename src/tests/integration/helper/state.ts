@@ -22,7 +22,7 @@ export const userSetup = async () => {
   return await request({
     url: PROVIDER_URL + '/contract/test-user',
     method: 'POST',
-    json: true,
+    json: true
   });
 };
 
@@ -30,6 +30,6 @@ export const apiTokenSetup = async () => {
   return await request({
     url: PROVIDER_URL + '/contract/api-token',
     method: 'POST',
-    json: true,
+    json: true
   });
 };

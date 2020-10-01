@@ -5,7 +5,7 @@ export const generateToken = (id: string): string => {
   const token = jwt.sign({
     userId: id
   },
-    config.jwtToken, { expiresIn: '7d' }
+  config.jwtToken, { expiresIn: '7d' }
   );
   return token;
 };

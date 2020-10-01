@@ -1,5 +1,4 @@
-// tslint:disable:max-line-length
-
+/* eslint-disable max-len */
 export const findItemsForScenario = (projectName, scenarioName, limit, offset) => {
   return {
     text: `SELECT it.id, environment, upload_time as "uploadTime", base, status, st.overview->>'startDate' as "startTime", note, hostname, overview -> 'maxVu' AS "maxVu", overview -> 'duration' as duration FROM jtl.items as it

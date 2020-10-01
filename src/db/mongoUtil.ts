@@ -4,7 +4,7 @@ import { logger } from '../logger';
 const MONGO_CONNECTION_STRING =  process.env.MONGO_CONNECTION_STRING || 'mongodb://127.0.0.1:27017';
 const MONGO_CONNECTION_CONFIG = {
   useNewUrlParser: true,
-  useUnifiedTopology: true,
+  useUnifiedTopology: true
 };
 let mongoClient: MongoClient;
 

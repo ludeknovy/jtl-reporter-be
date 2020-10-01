@@ -41,8 +41,8 @@ describe('Pact Verification', () => {
         },
         'there is at least one existing test item': async () => {
           await request(options(CONSUMER, States.ExistingTestItem));
-        },
-      },
+        }
+      }
     };
 
     return new Verifier().verifyProvider(opts).then(output => {
@@ -74,7 +74,7 @@ const generateAuthHeaders = async () => {
     method: 'POST',
     simple: false,
     json: true,
-    resolveWithFullResponse: true,
+    resolveWithFullResponse: true
   });
   return body.token;
 };
