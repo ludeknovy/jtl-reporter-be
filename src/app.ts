@@ -55,7 +55,7 @@ export class App {
         return res.status(error.output.statusCode).json({ message });
       } else {
         logger.error(`Unexpected error: ${error}`);
-        return res.status(500).json({ message: `Something went wrong` });
+        return res.status(500).json({ message: 'Something went wrong' });
       }
     });
   }

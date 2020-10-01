@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ItemStatus, ItemDataType } from '../../queries/items.model';
 import {
-  transformDataForFb, prepareDataForSavingToDbFromMongo, prepareChartDataForSavingFromMongo,
+  transformDataForFb, prepareDataForSavingToDbFromMongo, prepareChartDataForSavingFromMongo
 } from '../../data-stats/prepare-data';
 import { db } from '../../../db/db';
 import {
@@ -23,13 +23,13 @@ import * as uuid from 'uuid';
 
 const upload = multer(
   {
-    dest: `./uploads`,
+    dest: './uploads',
     limits: { fieldSize: 2048 * 1024 * 1024 }
   }).fields([
-    { name: 'kpi', maxCount: 1 },
-    { name: 'errors', maxCount: 1 },
-    { name: 'monitoring', maxCount: 1 }
-  ]);
+  { name: 'kpi', maxCount: 1 },
+  { name: 'errors', maxCount: 1 },
+  { name: 'monitoring', maxCount: 1 }
+]);
 
 export const createItemController = (req: Request, res: Response, next: NextFunction) => {
   upload(req, res, async error => {

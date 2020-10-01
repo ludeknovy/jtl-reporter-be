@@ -1,10 +1,11 @@
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const Joi = require('joi');
 
 const password = Joi.string().min(8).required();
 
 export const authQuerySchema = {
   username: Joi.string().min(3).required(),
-  password: Joi.string().required(),
+  password: Joi.string().required()
 };
 
 export const changePasswordSchema = {

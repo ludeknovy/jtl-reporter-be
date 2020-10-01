@@ -13,19 +13,18 @@ export class ApiTokensRoutes {
 
   public routes(app: express.Application): void {
     app.route('/api/api-tokens')
-    .get(
-      verifyToken,
-      // tslint:disable-next-line: max-line-length
-      wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getTokensController(req, res, next)))
-    .post(
-      verifyToken,
-      bodySchemaValidator(newTokenSchema),
-      // tslint:disable-next-line: max-line-length
-      wrapAsync(async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => await createTokenController(req, res, next)))
-    .delete(
-      verifyToken,
-      bodySchemaValidator(deleteTokenSchema),
-      // tslint:disable-next-line: max-line-length
-      wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteTokenController(req, res, next)));
-   }
+      .get(
+        verifyToken,
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getTokensController(req, res, next)))
+      .post(
+        verifyToken,
+        bodySchemaValidator(newTokenSchema),
+        // eslint-disable-next-line max-len
+        wrapAsync(async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => await createTokenController(req, res, next)))
+      .delete(
+        verifyToken,
+        bodySchemaValidator(deleteTokenSchema),
+        // eslint-disable-next-line max-len
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteTokenController(req, res, next)));
+  }
 }

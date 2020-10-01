@@ -1,5 +1,5 @@
 import {
-  roundNumberTwoDecimals, findMinMax,
+  roundNumberTwoDecimals, findMinMax
 } from '../../server/data-stats/helper/stats-fc';
 
 describe('Stats Helper', () => {
@@ -9,9 +9,9 @@ describe('Stats Helper', () => {
       [100, 100],
       [0.12, 0.12],
       [3.123, 3.12]])('should correctly round %s', (input, expectedNumber) => {
-        const roundedNumber = roundNumberTwoDecimals(input);
-        expect(roundedNumber).toBe(expectedNumber);
-      });
+      const roundedNumber = roundNumberTwoDecimals(input);
+      expect(roundedNumber).toBe(expectedNumber);
+    });
   });
   describe('findMinMax', () => {
     it('should correctly return min and max', () => {

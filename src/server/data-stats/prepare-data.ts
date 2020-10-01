@@ -16,7 +16,7 @@ export const prepareDataForSavingToDbFromMongo = (overviewData, labelData) => {
       avgConnect: roundNumberTwoDecimals(overviewData.avgConnect),
       startDate,
       endDate,
-      duration: roundNumberTwoDecimals((endDate.getTime() - startDate.getTime()) / 1000 / 60),
+      duration: roundNumberTwoDecimals((endDate.getTime() - startDate.getTime()) / 1000 / 60)
     },
     labelStats: labelData.map((_) => ({
       label: _._id,
@@ -30,7 +30,7 @@ export const prepareDataForSavingToDbFromMongo = (overviewData, labelData) => {
         _.samplesCount / ((_.end - _.start) / 1000)),
       n9: _.percentil99,
       n5: _.percentil95,
-      n0: _.percentil90,
+      n0: _.percentil90
     }))
   };
 };
@@ -41,24 +41,24 @@ export const prepareChartDataForSavingFromMongo = (overviewData: ChartOverviewDa
     threads: overviewData.map((_) => [moment(_._id).valueOf(), _.threads]),
     overAllFailRate: {
       data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.errorRate)]),
-      name: `errors`,
+      name: 'errors'
     },
     overallTimeResponse: {
       data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.avgResponseTime)]),
-      name: `response time`,
+      name: 'response time'
     },
     overallThroughput: {
       data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.count / _.interval)]),
-      name: `throughput`
+      name: 'throughput'
     },
     throughput: labels.map((label) => ({
-      // tslint:disable-next-line: max-line-length
-      data: labelData.filter((_) => _._id.label === label).map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.count / _.interval)]),
+      data: labelData.filter((_) => _._id.label === label)
+        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.count / _.interval)]),
       name: label
     })),
     responseTime: labels.map((label) => ({
-      // tslint:disable-next-line: max-line-length
-      data: labelData.filter((_) => _._id.label === label).map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.avgResponseTime)]),
+      data: labelData.filter((_) => _._id.label === label)
+        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.avgResponseTime)]),
       name: label
     }))
   };
@@ -68,7 +68,7 @@ export const prepareChartDataForSavingFromMongo = (overviewData: ChartOverviewDa
 export const stringToNumber = (input: string, radix: number) => {
   const result = parseInt(input, radix);
   if (isNaN(result)) {
-    throw (`not a number`);
+    throw ('not a number');
   }
   return result;
 };
@@ -109,8 +109,11 @@ export interface InputData {
   bytes: string;
   grpThreads: string;
   allThreads: string;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   Latency: string;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   Hostname: string;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   Connect: string;
 }
 
@@ -125,8 +128,11 @@ export interface OutputData {
   bytes: number;
   grpThreads: number;
   allThreads: number;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   Latency: number;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   Hostname: string;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   Connect: number;
 }
 
@@ -143,8 +149,8 @@ interface ChartOverviewData {
 
 interface ChartLabelData {
   _id: {
-    interval: Date,
-    label: string,
+    interval: Date;
+    label: string;
   };
   min: Date;
   max: Date;

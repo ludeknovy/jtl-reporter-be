@@ -10,6 +10,7 @@ export const getItemController = async (req: Request, res: Response, next: NextF
     plot_data: plot,
     note,
     environment,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     base_id,
     status, hostname, reportStatus } = await db.one(findItem(itemId, projectName, scenarioName));
   const { stats: statistics, overview } = await db.one(findItemStats(itemId));
@@ -17,6 +18,7 @@ export const getItemController = async (req: Request, res: Response, next: NextF
   const files = await db.any(findAttachements(itemId));
   const attachements = files.map(_ => _.type);
 
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const [monitoringLogs = { item_data: [] }] = await db.any(findData(itemId, ItemDataType.MonitoringLogs));
   monitoringLogs.item_data = monitoringLogs.item_data.map((_) => {
     _.ts = parseInt(_.ts, 10) * 1000;

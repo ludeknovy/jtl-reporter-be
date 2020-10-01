@@ -13,7 +13,7 @@ describe('Scenario', () => {
       await request(__server__)
         .post('/api/projects/test-project/scenarios')
         .set(__tokenHeaderKey__, credentials.token)
-        .send({ scenarioName: `test-scenario` })
+        .send({ scenarioName: 'test-scenario' })
         .set('Accept', 'application/json')
         .expect(201);
     });
@@ -22,7 +22,7 @@ describe('Scenario', () => {
       await request(__server__)
         .post('/api/projects/test-project/scenarios')
         .set(__tokenHeaderKey__, credentials.token)
-        .send({ scenarioName: `test-scenario` })
+        .send({ scenarioName: 'test-scenario' })
         .set('Accept', 'application/json')
         .expect(409);
     });
@@ -42,7 +42,7 @@ describe('Scenario', () => {
       await request(__server__)
         .put('/api/projects/test-project/scenarios/test-scenario')
         .set(__tokenHeaderKey__, credentials.token)
-        .send({ scenarioName: `test-scenario` })
+        .send({ scenarioName: 'test-scenario' })
         .set('Accept', 'application/json')
         .expect(204);
     });
@@ -55,6 +55,6 @@ describe('Scenario', () => {
         .set(__tokenHeaderKey__, credentials.token)
         .set('Accept', 'application/json')
         .expect(204);
-     });
+    });
   });
 });

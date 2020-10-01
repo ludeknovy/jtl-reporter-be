@@ -4,5 +4,5 @@ export const routes = {
     changePassword: '/api/auth/change-password'
   },
   apiTokens: '/api/api-tokens',
-  users: '/api/users',
+  users: '/api/users'
 };

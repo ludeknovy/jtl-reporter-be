@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { bodySchemaValidator } from '../schema-validator/schema-validator-middleware';
 import { wrapAsync } from '../errors/error-handler';
 import { loginController } from '../controllers/auth/login-controller';
-import { authQuerySchema, changePasswordSchema, } from '../schema-validator/auth-schema';
+import { authQuerySchema, changePasswordSchema } from '../schema-validator/auth-schema';
 import { changePasswordController } from '../controllers/auth/change-password-controller';
 import { verifyToken } from '../middleware/auth-middleware';
 import { IGetUserAuthInfoRequest } from '../middleware/request.model';
@@ -13,14 +13,13 @@ export class AuthRoutes {
 
     app.route('/api/auth/login')
       .post(bodySchemaValidator(authQuerySchema),
-        // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await loginController(req, res, next)));
 
     app.route('/api/auth/change-password')
       .post(
         verifyToken,
         bodySchemaValidator(changePasswordSchema),
-        // tslint:disable-next-line: max-line-length
+        // eslint-disable-next-line max-len
         wrapAsync(async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => await changePasswordController(req, res, next)));
 
   }
