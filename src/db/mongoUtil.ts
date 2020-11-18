@@ -16,6 +16,7 @@ export class MongoUtils {
       logger.info('Successfully connected to MongoDB');
     } catch (error) {
       logger.error(`Error while connecting to MongoDB: ${error}`);
+      process.exit(1);
     }
   }
 
