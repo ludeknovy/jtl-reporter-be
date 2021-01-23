@@ -7,7 +7,8 @@ import {
 } from '../schema-validator/schema-validator-middleware';
 import {
   paramsSchema, updateItemBodySchema,
-  newItemParamSchema
+  newItemParamSchema,
+  newAsyncItemStartBodySchema
 } from '../schema-validator/item-schema';
 import { paramsSchema as scenarioParamsSchema, querySchema } from '../schema-validator/scenario-schema';
 import { getItemsController } from '../controllers/item/get-items-controller';
@@ -18,8 +19,7 @@ import { createItemController } from '../controllers/item/create-item-controller
 import { verifyToken } from '../middleware/auth-middleware';
 import { getItemErrorsController } from '../controllers/item/get-item-errors-controller';
 import { getProcessingItemsController } from '../controllers/item/get-processing-items-controller';
-
-
+import { createItemAsyncController } from '../controllers/item/create-item-async-controller';
 
 export class ItemsRoutes {
 
@@ -36,6 +36,13 @@ export class ItemsRoutes {
         verifyToken,
         paramsSchemaValidator(newItemParamSchema),
         createItemController);
+
+    app.route('/api/projects/:projectName/scenarios/:scenarioName/items/start-async')
+      .post(
+        // verifyToken,
+        bodySchemaValidator(newAsyncItemStartBodySchema),
+        paramsSchemaValidator(newItemParamSchema),
+        createItemAsyncController);
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId')
       .get(
