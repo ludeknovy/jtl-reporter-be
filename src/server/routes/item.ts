@@ -39,7 +39,7 @@ export class ItemsRoutes {
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/start-async')
       .post(
-        // verifyToken,
+        verifyToken,
         bodySchemaValidator(newAsyncItemStartBodySchema),
         paramsSchemaValidator(newItemParamSchema),
         createItemAsyncController);
