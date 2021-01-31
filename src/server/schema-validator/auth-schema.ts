@@ -8,6 +8,10 @@ export const authQuerySchema = {
   password: Joi.string().required()
 };
 
+export const authWithTokenSchema = {
+  token: Joi.string().required()
+};
+
 export const changePasswordSchema = {
   currentPassword: Joi.string().required(),
   newPassword: password
