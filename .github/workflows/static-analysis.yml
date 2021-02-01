@@ -1,5 +1,5 @@
-name: CI
-on: push
+name: Static Analysis
+on: pull_request
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -9,3 +9,5 @@ jobs:
         run: npm install
       - name: Run ESLint
         run: npm run lint
+      - name: Run TS check
+        run: npm run ts-check
