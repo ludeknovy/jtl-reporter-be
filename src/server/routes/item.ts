@@ -8,7 +8,7 @@ import {
 import {
   paramsSchema, updateItemBodySchema,
   newItemParamSchema,
-  newAsyncItemStartBodySchema
+  newAsyncItemStartBodySchema, stopAsyncItemBody
 } from '../schema-validator/item-schema';
 import { paramsSchema as scenarioParamsSchema, querySchema } from '../schema-validator/scenario-schema';
 import { getItemsController } from '../controllers/item/get-items-controller';
@@ -20,6 +20,7 @@ import { verifyToken } from '../middleware/auth-middleware';
 import { getItemErrorsController } from '../controllers/item/get-item-errors-controller';
 import { getProcessingItemsController } from '../controllers/item/get-processing-items-controller';
 import { createItemAsyncController } from '../controllers/item/create-item-async-controller';
+import {stopItemAsyncController} from '../controllers/item/stop-item-async-controller';
 
 export class ItemsRoutes {
 
@@ -62,6 +63,12 @@ export class ItemsRoutes {
         paramsSchemaValidator(paramsSchema),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteItemController(req, res, next)));
+
+    app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/stop-async')
+      .post(
+        verifyToken,
+        paramsSchemaValidator(paramsSchema),
+        stopItemAsyncController);
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/errors')
       // eslint-disable-next-line max-len

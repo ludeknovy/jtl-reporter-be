@@ -37,6 +37,17 @@ describe('Items', () => {
         .expect(200);
     });
   });
+  describe('POST /api/projects/:projectName/scenarios/:scenarioName/items/start-async', () => {
+    it('should be able to start async item', async () => {
+      await stateSetup(States.ExistingScenario);
+      await request(__server__)
+        .post('/api/projects/test-project/scenarios/test-scenario/items/start-async')
+        .set(__tokenHeaderKey__, credentials.token)
+        .set('Accept', 'application/json')
+        .send()
+        .expect(201);
+    });
+  });
   describe('PUT /projects/{projectName}/scenarios/{scenarioName}/items/{itemId}', () => {
     it('should be able to update test item', async () => {
       const { itemId } = await stateSetup(States.ExistingTestItem);
