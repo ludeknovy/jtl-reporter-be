@@ -9,10 +9,6 @@ branches:
 install: npm install
 jobs:
   include:
-    - stage: Static analysis
-      script: npm run lint
-    - stage: Tests
-      script: npm run unit-tests
     - stage: Contract tests
       env:
         - ENVIRONMENT=CI
