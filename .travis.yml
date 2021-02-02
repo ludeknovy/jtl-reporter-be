@@ -13,6 +13,7 @@ jobs:
       env:
         - ENVIRONMENT=CI
       before_script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - docker-compose --file docker-compose.testing.yaml rm -f
         - docker-compose --file docker-compose.testing.yaml up --build -d
       script: npm run test:contract
@@ -22,6 +23,7 @@ jobs:
       env:
         - ENVIRONMENT=CI
       before_script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - docker-compose --file docker-compose.testing.yaml rm -f
         - docker-compose --file docker-compose.testing.yaml up --build -d
       script: npm run test:integration
