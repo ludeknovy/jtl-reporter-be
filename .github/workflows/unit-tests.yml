@@ -8,4 +8,4 @@ jobs:
       - name: Install modules
         run: npm install
       - name: Run unit tests
-        run: npm run unit-tests
+        run: npm run test:unit

@@ -9,3 +9,10 @@ export const generateToken = (id: string): string => {
   );
   return token;
 };
+
+export const generateTokenFromToken = (userId: string): string => {
+  const token = jwt.sign({
+    userId
+  }, config.jwtTokenLogin, { expiresIn: '2d' });
+  return token;
+};

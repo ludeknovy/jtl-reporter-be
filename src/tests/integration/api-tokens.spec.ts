@@ -5,7 +5,7 @@ import { routes } from './helper/routes';
 describe('Api tokens', () => {
   let credentials;
   beforeAll(async () => {
-    credentials = await userSetup();
+    ({ data: credentials } = await userSetup());
   });
   describe('POST /api-tokens', () => {
     it('should not be able to create new api token as unathorized user', async () => {

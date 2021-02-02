@@ -16,7 +16,7 @@ jobs:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - docker-compose --file docker-compose.testing.yaml rm -f
         - docker-compose --file docker-compose.testing.yaml up --build -d
-      script: npm run contract-tests
+      script: npm run test:contract
       after_script:
         - docker-compose --file docker-compose.testing.yaml down
     - stage: Integration tests
@@ -26,7 +26,7 @@ jobs:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - docker-compose --file docker-compose.testing.yaml rm -f
         - docker-compose --file docker-compose.testing.yaml up --build -d
-      script: npm run integration-tests
+      script: npm run test:integration
       after_script:
         - docker-compose --file docker-compose.testing.yaml down
 

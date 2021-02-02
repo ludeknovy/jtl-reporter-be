@@ -1,11 +1,14 @@
 import * as request from 'supertest';
-import { userSetup } from './helper/state';
+import { apiTokenSetup, userSetup } from './helper/state';
 import { routes } from './helper/routes';
+import * as assert from 'assert';
 
 describe('Auth', () => {
   let credentials;
+  let token;
   beforeAll(async () => {
-    credentials = await userSetup();
+    ({ data: credentials } = await userSetup());
+    ({  data: { token } } = await apiTokenSetup());
   });
   describe('Login', () => {
     it('should be able to login with valid credentials', async () => {
@@ -83,6 +86,23 @@ describe('Auth', () => {
           })
           .expect(200);
       });
+    });
+  });
+  describe.only('Login with token', () => {
+    it('should be able to login with valid token', async () => {
+      await request(__server__)
+        .post(routes.auth.loginWithToken)
+        .send({ token })
+        .expect(200)
+        .then((r) => {
+          assert.ok(r.body.jwtToken.length > 0);
+        });
+    });
+    it('should not be able to login with invalid token', async () => {
+      await request(__server__)
+        .post(routes.auth.loginWithToken)
+        .send({ token: 'at-test' })
+        .expect(401);
     });
   });
 });
