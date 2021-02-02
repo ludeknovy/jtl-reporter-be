@@ -5,7 +5,7 @@ import { routes } from './helper/routes';
 describe('Auth', () => {
   let credentials;
   beforeAll(async () => {
-    credentials = await userSetup();
+    ({ data: credentials } = await userSetup());
   });
   describe('Login', () => {
     it('should be able to login with valid credentials', async () => {

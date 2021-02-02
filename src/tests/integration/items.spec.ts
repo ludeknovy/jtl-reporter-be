@@ -8,8 +8,13 @@ describe('Items', () => {
   let credentials;
   let token;
   beforeAll(async () => {
-    credentials = await userSetup();
-    ({ token } = await apiTokenSetup());
+    try {
+      ({ data: credentials } = await userSetup());
+      ({  data: { token } } = await apiTokenSetup());
+    } catch (error) {
+      console.log(error);
+    }
+
   });
   describe('POST /projects/{projectName}/scenarios/{scenarioName}/items', () => {
     it('should be able to create test item', async () => {
@@ -44,13 +49,13 @@ describe('Items', () => {
         .post('/api/projects/test-project/scenarios/test-scenario/items/start-async')
         .set(__tokenHeaderKey__, credentials.token)
         .set('Accept', 'application/json')
-        .send()
+        .send({ environment: 'test' })
         .expect(201);
     });
   });
   describe('PUT /projects/{projectName}/scenarios/{scenarioName}/items/{itemId}', () => {
     it('should be able to update test item', async () => {
-      const { itemId } = await stateSetup(States.ExistingTestItem);
+      const { data: { itemId } } = await stateSetup(States.ExistingTestItem);
       await request(__server__)
         .put(`/api/projects/test-project/scenarios/test-scenario/items/${itemId}`)
         .set(__tokenHeaderKey__, credentials.token)
@@ -65,7 +70,7 @@ describe('Items', () => {
   });
   describe('DELETE /projects/{projectName}/scenarios/{scenarioName}/items/{itemId}', () => {
     it('should be able to delete test item', async () => {
-      const { itemId } = await stateSetup(States.ExistingTestItem);
+      const { data: { itemId } } = await stateSetup(States.ExistingTestItem);
       await request(__server__)
         .delete(`/api/projects/test-project/scenarios/test-scenario/items/${itemId}`)
         .set(__tokenHeaderKey__, credentials.token)

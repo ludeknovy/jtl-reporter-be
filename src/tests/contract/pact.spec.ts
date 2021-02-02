@@ -1,9 +1,9 @@
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 80000;
 import { Verifier } from '@pact-foundation/pact';
 import { App } from '../../app';
-import * as request from 'request-promise-native';
 import { States } from './states.model';
 const PROVIDER_URL = 'http://localhost:5000/api';
+import axios, { AxiosRequestConfig } from 'axios';
 const CONSUMER = 'JTL-REPORTER-UI';
 // Verify that the provider meets all consumer expectations
 describe('Pact Verification', () => {
@@ -34,13 +34,13 @@ describe('Pact Verification', () => {
       },
       stateHandlers: {
         'there is existing project': async () => {
-          await request(options(CONSUMER, States.ExistingProject));
+          await axios(options(CONSUMER, States.ExistingProject));
         },
         'there is existing project with at least one scenario': async () => {
-          await request(options(CONSUMER, States.ExistingScenario));
+          await axios(options(CONSUMER, States.ExistingScenario));
         },
         'there is at least one existing test item': async () => {
-          await request(options(CONSUMER, States.ExistingTestItem));
+          await axios(options(CONSUMER, States.ExistingTestItem));
         }
       }
     };
@@ -53,14 +53,12 @@ describe('Pact Verification', () => {
 });
 
 
-const options = (consumer, state) => {
+const options = (consumer, state): AxiosRequestConfig => {
   return {
-    url: PROVIDER_URL + '/contract/states',
+    url: '/contract/states',
+    baseURL: PROVIDER_URL,
     method: 'POST',
-    simple: false,
-    resolveWithFullResponse: true,
-    json: true,
-    body: {
+    data: {
       consumer,
       state
     }
@@ -69,12 +67,10 @@ const options = (consumer, state) => {
 
 
 const generateAuthHeaders = async () => {
-  const { body } = await request({
-    url: PROVIDER_URL + '/contract/test-user',
-    method: 'POST',
-    simple: false,
-    json: true,
-    resolveWithFullResponse: true
+  const { data } = await axios({
+    url: '/contract/test-user',
+    baseURL: PROVIDER_URL,
+    method: 'POST'
   });
-  return body.token;
+  return data.token;
 };

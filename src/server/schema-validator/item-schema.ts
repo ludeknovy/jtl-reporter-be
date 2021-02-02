@@ -26,6 +26,7 @@ export const labelQuerySchema = {
 };
 
 export const updateItemBodySchema = Joi.object().keys({
+  note,
   base: Joi.boolean().required(),
   hostname,
   environment

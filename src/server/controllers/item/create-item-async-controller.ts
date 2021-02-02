@@ -28,7 +28,7 @@ export const createItemAsyncController = async (req: Request, res: Response, nex
     ));
     itemId = item.id;
     logger.info(`New item for scenario: ${scenarioName} created with id: ${itemId} and dataId: ${dataId}`);
-    res.status(200).send({ itemId, dataId });
+    res.status(201).send({ itemId, dataId });
   } catch (e) {
     logger.error(`Creating new async item failed ${e}`);
     res.status(500).send();

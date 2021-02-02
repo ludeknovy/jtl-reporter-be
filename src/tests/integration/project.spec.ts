@@ -6,7 +6,7 @@ import { stateSetup, apiTokenSetup, userSetup } from './helper/state';
 describe('Projects', () => {
   let credentials;
   beforeAll(async () => {
-    credentials = await userSetup();
+    ({ data: credentials } = await userSetup());
   });
   describe('POST /projects', () => {
     it('should be able to create new project', async () => {

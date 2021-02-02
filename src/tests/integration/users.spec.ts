@@ -6,7 +6,7 @@ import * as uuid from 'uuid';
 describe('Users', () => {
   let credentials;
   beforeAll(async () => {
-    credentials = await userSetup();
+    ({ data: credentials } = await userSetup());
   });
   describe('POST /users', () => {
     it('should not be able to create new user as unathorized user', async () => {

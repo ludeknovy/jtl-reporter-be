@@ -5,7 +5,7 @@ import { stateSetup, userSetup } from './helper/state';
 describe('Scenario', () => {
   let credentials;
   beforeAll(async () => {
-    credentials = await userSetup();
+    ({ data: credentials } = await userSetup());
   });
   describe('POST /projects/{projectName}/scenarios', () => {
     it('should be able to create new scenario', async () => {
