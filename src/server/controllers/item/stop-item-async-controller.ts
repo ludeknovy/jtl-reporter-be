@@ -1,4 +1,3 @@
-import boom = require('boom');
 import { Request, Response, NextFunction } from 'express';
 import { db } from '../../../db/db';
 import { logger } from '../../../logger';
@@ -9,19 +8,20 @@ import {prepareChartDataForSavingFromMongo, prepareDataForSavingToDbFromMongo} f
 import {chartQueryOptionInterval} from '../../queries/mongoChartOptionHelper';
 import {MongoUtils} from '../../../db/mongoUtil';
 
-const jtlDb = MongoUtils.getClient().db('jtl-data');
-const collection = jtlDb.collection('data-chunks');
-
 export const stopItemAsyncController = async (req: Request, res: Response, next: NextFunction) => {
-  const { scenarioName, projectName, itemId } = req.params;
+  const { scenarioName, itemId } = req.params;
 
   logger.info(`Stopping async item: ${itemId}`);
   try {
-    const { dataId, reportStatus } = await db
-      .one('SELECT data_id as dataId, report_status as reportStatus FROM jtl.items WHERE id = $1', [itemId]);
+    const { reportStatus, dataId } = await db
+      .one('SELECT data_id as "dataId", report_status as "reportStatus" FROM jtl.items WHERE id = $1', [itemId]);
+
     if (reportStatus !== ReportStatus.InProgress) {
       return res.status(400).send('Already processed');
     }
+
+    const jtlDb = MongoUtils.getClient().db('jtl-data');
+    const collection = jtlDb.collection('data-chunks');
 
     const aggOverview = await collection.aggregate(
       overviewAggPipeline(dataId), { allowDiskUse: true }).toArray();
@@ -46,10 +46,10 @@ export const stopItemAsyncController = async (req: Request, res: Response, next:
       await t.none(updateItem(itemId, ReportStatus.Ready, overview.startDate));
     });
 
-    logger.info(`New item for scenario: ${scenarioName} created with id: ${itemId} and dataId: ${dataId}`);
+    logger.info(`Data were processed for scenario: ${scenarioName}, id: ${itemId} and dataId: ${dataId}`);
     res.status(200).send({ itemId, dataId });
   } catch (e) {
-    logger.error(`Processing of item samples failed ${e}`);
+    logger.error(`Processing of item ${itemId} failed ${e}`);
     res.status(500).send();
   }
 };
