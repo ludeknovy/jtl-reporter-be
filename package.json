@@ -7,9 +7,9 @@
     "dev": "ts-node src/server.ts",
     "start": "node ./dist/server.js",
     "migrate": "node-pg-migrate",
-    "unit-tests": "jest --config=jest-unit.config.js -w=5 --coverage",
-    "contract-tests": "jest --config=contract.config.js -w=5",
-    "integration-tests": "jest --forceExit --config=integration.config.js --runInBand",
+    "test:unit": "jest --config=jest-unit.config.js -w=5 --coverage",
+    "test:contract": "jest --config=contract.config.js -w=5",
+    "test:integration": "jest --forceExit --config=integration.config.js --runInBand",
     "lint": "eslint -c .eslintrc --ext .ts .",
     "lint:fix": "eslint -c .eslintrc --ext .ts . --fix",
     "ts-check": "tsc --noEmit"
