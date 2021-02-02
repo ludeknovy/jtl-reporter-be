@@ -1,7 +1,7 @@
 import { AxiosRequestConfig } from 'axios';
 const axios = require('axios');
 
-const PROVIDER_URL = 'http://localhost:5040';
+const PROVIDER_URL = 'http://localhost:5000';
 
 const options = (state, consumer): AxiosRequestConfig => {
   return {
