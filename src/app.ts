@@ -74,7 +74,7 @@ export class App {
 
   public async listen() {
     if (!config.jwtToken || !config.jwtTokenLogin) {
-      logger.error('Please provide JWT_TOKEN and JWT_TOKEN_LOGIN env vars')
+      logger.error('Please provide JWT_TOKEN and JWT_TOKEN_LOGIN env vars');
       process.exit(1);
     }
     await MongoUtils.connect();
