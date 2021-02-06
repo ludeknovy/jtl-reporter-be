@@ -1,6 +1,12 @@
+import { config } from '../../server/config';
 import { generateToken } from '../../server/controllers/auth/helper/token-generator';
 
+
+
 describe('token generator', () => {
+  config.jwtToken = '123';
+  config.jwtTokenLogin = '456';
+
   it('should return valid token', () => {
     const ID = 'test-id';
     const token = generateToken(ID);
