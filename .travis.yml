@@ -12,6 +12,8 @@ jobs:
     - stage: Contract tests
       env:
         - ENVIRONMENT=CI
+        - JWT_TOKEN=123
+        - JWT_TOKEN_LOGIN=456
       before_script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - docker-compose --file docker-compose.testing.yaml rm -f
@@ -22,6 +24,8 @@ jobs:
     - stage: Integration tests
       env:
         - ENVIRONMENT=CI
+        - JWT_TOKEN=123
+        - JWT_TOKEN_LOGIN=456
       before_script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - docker-compose --file docker-compose.testing.yaml rm -f
