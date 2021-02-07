@@ -14,3 +14,9 @@ export const querySchema = {
 export const scenarioUpdateSchema = {
   scenarioName: Joi.string().min(1).max(50).required()
 };
+
+export const scenarioNotificationBodySchema = {
+  url: Joi.string().required(),
+  type: Joi.string().valid('ms-teams').required(),
+  name: Joi.string().min(1).max(100).required()
+};
