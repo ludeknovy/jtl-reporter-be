@@ -2,7 +2,10 @@ import { Request, Response, NextFunction } from 'express';
 import * as express from 'express';
 import { wrapAsync } from '../errors/error-handler';
 import { paramsSchemaValidator, bodySchemaValidator } from '../schema-validator/schema-validator-middleware';
-import { paramsSchema, scenarioNotificationBodySchema, scenarioUpdateSchema } from '../schema-validator/scenario-schema';
+import {
+  paramSchemaNotification, paramsSchema,
+  scenarioNotificationBodySchema, scenarioUpdateSchema
+} from '../schema-validator/scenario-schema';
 import { projectNameParam, newScenarioSchema } from '../schema-validator/project-schema';
 import { getScenariosController } from '../controllers/scenario/get-scenarios-controller';
 import { createScenarioController } from '../controllers/scenario/create-scenario-controller';
@@ -12,6 +15,7 @@ import { verifyToken } from '../middleware/auth-middleware';
 import { updateScenarioController } from '../controllers/scenario/update-scenario-controller';
 import { getScenarioNotificationsController } from '../controllers/scenario/get-notifications-controllers';
 import { createScenarioNotificationController } from '../controllers/scenario/create-notification-controller';
+import { deleteScenarioNotificationController } from '../controllers/scenario/delete-scenario-notification-controller';
 
 export class ScenarioRoutes {
 
@@ -59,7 +63,12 @@ export class ScenarioRoutes {
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await createScenarioNotificationController(req, res, next)));
 
 
-
+    app.route('/api/projects/:projectName/scenarios/:scenarioName/notifications/:notificationId')
+      .delete(
+        verifyToken,
+        paramsSchemaValidator(paramSchemaNotification),
+        // eslint-disable-next-line max-len
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteScenarioNotificationController(req, res, next)));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/trends')
       .get(

@@ -115,7 +115,7 @@ export const getProcessingItems = (projectName, scenarioName) => {
 
 export const scenarioNotifications = (projectName, scenarioName) => {
   return {
-    text: `SELECT notif.id, url, type FROM jtl.notifications as notif
+    text: `SELECT notif.id, url, type, notif.name FROM jtl.notifications as notif
     LEFT JOIN jtl.scenario as s ON s.id = notif.scenario_id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
     WHERE s.name = $2 AND p.project_name = $1`,
@@ -131,5 +131,16 @@ export const createScenarioNotification = (projectName, scenarioName, type, url,
       WHERE s.name = $2 AND p.project_name = $1 
     ), $3, $4, $5)`,
     values: [projectName, scenarioName, type, url, name]
+  };
+};
+
+export const deleteScenarioNotification = (projectName, scenarioName, id) => {
+  return {
+    text: `DELETE FROM jtl.notifications
+     WHERE id = $3 AND scenario_id = (
+       SELECT s.id FROM jtl.scenario as s
+       LEFT JOIN jtl.projects as p ON p.id = project_id
+       WHERE s.name = $2 AND p.project_name = $1)`,
+    values: [projectName, scenarioName, id]
   };
 };

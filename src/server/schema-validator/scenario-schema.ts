@@ -6,6 +6,11 @@ export const paramsSchema = {
   scenarioName: Joi.string().required()
 };
 
+export const paramSchemaNotification = {
+  ...paramsSchema,
+  notificationId: Joi.string().required()
+};
+
 export const querySchema = {
   limit: Joi.number().integer().min(0).max(100),
   offset: Joi.number().integer()
