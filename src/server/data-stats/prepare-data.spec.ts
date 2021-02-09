@@ -1,4 +1,4 @@
-import { stringToNumber, transformDataForFb } from '../../server/data-stats/prepare-data';
+import { stringToNumber, transformDataForFb } from './prepare-data';
 
 describe('prepare data', () => {
   describe('transformDataForFb', () => {

@@ -6,6 +6,11 @@ export const paramsSchema = {
   scenarioName: Joi.string().required()
 };
 
+export const paramSchemaNotification = {
+  ...paramsSchema,
+  notificationId: Joi.string().required()
+};
+
 export const querySchema = {
   limit: Joi.number().integer().min(0).max(100),
   offset: Joi.number().integer()
@@ -13,4 +18,10 @@ export const querySchema = {
 
 export const scenarioUpdateSchema = {
   scenarioName: Joi.string().min(1).max(50).required()
+};
+
+export const scenarioNotificationBodySchema = {
+  url: Joi.string().max(400).required(),
+  type: Joi.string().valid('ms-teams').required(),
+  name: Joi.string().min(1).max(100).required()
 };

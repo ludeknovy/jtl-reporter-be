@@ -2,7 +2,7 @@ import { roundNumberTwoDecimals } from './helper/stats-fc';
 import * as moment from 'moment';
 import { logger } from '../../logger';
 
-export const prepareDataForSavingToDbFromMongo = (overviewData, labelData) => {
+export const prepareDataForSavingToDbFromMongo = (overviewData, labelData): { overview: Overview; labelStats } => {
   const startDate = new Date(overviewData.start);
   const endDate = new Date(overviewData.end);
   return {
@@ -159,3 +159,16 @@ interface ChartLabelData {
   avgResponseTime: number;
   interval: number;
 }
+
+export interface Overview {
+  percentil: number;
+  errorRate: number;
+  throughput: number;
+  duration: number;
+  maxVu: number;
+  avgResponseTime: number;
+  avgLatency: number;
+  avgConnect: number;
+  startDate: Date;
+  endDate: Date;
+};

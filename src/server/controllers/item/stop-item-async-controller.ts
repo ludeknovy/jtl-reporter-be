@@ -7,9 +7,10 @@ import {labelAggPipeline, labelChartAgg, overviewAggPipeline, overviewChartAgg} 
 import {prepareChartDataForSavingFromMongo, prepareDataForSavingToDbFromMongo} from '../../data-stats/prepare-data';
 import {chartQueryOptionInterval} from '../../queries/mongoChartOptionHelper';
 import {MongoUtils} from '../../../db/mongoUtil';
+import { sendNotifications } from '../../utils/notifications/send-notification';
 
 export const stopItemAsyncController = async (req: Request, res: Response, next: NextFunction) => {
-  const { scenarioName, itemId } = req.params;
+  const { projectName, scenarioName, itemId } = req.params;
 
   logger.info(`Stopping async item: ${itemId}`);
   try {
@@ -48,6 +49,8 @@ export const stopItemAsyncController = async (req: Request, res: Response, next:
 
     logger.info(`Data were processed for scenario: ${scenarioName}, id: ${itemId} and dataId: ${dataId}`);
     res.status(200).send({ itemId, dataId });
+
+    await sendNotifications(projectName, scenarioName, itemId, overview);
   } catch (e) {
     logger.error(`Processing of item ${itemId} failed ${e}`);
     res.status(500).send();

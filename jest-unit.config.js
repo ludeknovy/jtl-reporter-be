@@ -6,7 +6,8 @@ module.exports = {
   ],
   'preset': 'ts-jest',
   'testMatch': [
-    '**/src/tests/unit/**/*.(ts|tsx|js)'
+    '**/src/**/*.spec.ts',
+    '!**/src/tests/**'
   ],
   'testEnvironment': 'node',
   'verbose': true,
