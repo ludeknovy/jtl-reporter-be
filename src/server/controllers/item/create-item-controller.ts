@@ -19,6 +19,7 @@ import { chartQueryOptionInterval } from '../../queries/mongoChartOptionHelper';
 import { MongoUtils } from '../../../db/mongoUtil';
 import { logger } from '../../../logger';
 import * as uuid from 'uuid';
+import { sendNotifications } from '../../utils/notifications/sendNotification';
 
 
 const upload = multer(
@@ -142,6 +143,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
               await db.none(saveData(itemId, monitoringDataString, ItemDataType.MonitoringLogs));
             }
             logger.info(`Item: ${itemId} processing finished`);
+            await sendNotifications(projectName, scenarioName, itemId, overview);
           } catch (error) {
             await db.none(updateItem(itemId, ReportStatus.Error, null));
             logger.error(`Error while processing item: ${itemId}: ${error}`);

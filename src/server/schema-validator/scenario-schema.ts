@@ -21,7 +21,7 @@ export const scenarioUpdateSchema = {
 };
 
 export const scenarioNotificationBodySchema = {
-  url: Joi.string().required(),
+  url: Joi.string().max(400).required(),
   type: Joi.string().valid('ms-teams').required(),
   name: Joi.string().min(1).max(100).required()
 };
