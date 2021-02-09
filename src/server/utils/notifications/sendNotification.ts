@@ -3,7 +3,7 @@ import { scenarioNotifications } from '../../queries/scenario';
 import axios from 'axios';
 import { msTeamsTemplate } from './templates/ms-teams-template';
 import { logger } from '../../../logger';
-import { linkUrl } from './linkUrl';
+import { linkUrl } from './link-url';
 import { Overview } from '../../data-stats/prepare-data';
 
 export const sendNotifications = async (projectName, scenarioName, id, overview: Overview) => {

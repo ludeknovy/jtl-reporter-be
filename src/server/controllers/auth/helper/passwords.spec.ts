@@ -1,4 +1,4 @@
-import { hashPassword, passwordMatch } from '../../server/controllers/auth/helper/passwords';
+import { hashPassword, passwordMatch } from './passwords';
 
 describe('auth password helper', () => {
   describe('passwordMatch', () => {
