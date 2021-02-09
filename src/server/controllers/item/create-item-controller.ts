@@ -19,7 +19,7 @@ import { chartQueryOptionInterval } from '../../queries/mongoChartOptionHelper';
 import { MongoUtils } from '../../../db/mongoUtil';
 import { logger } from '../../../logger';
 import * as uuid from 'uuid';
-import { sendNotifications } from '../../utils/notifications/sendNotification';
+import { sendNotifications } from '../../utils/notifications/send-notification';
 
 
 const upload = multer(
