@@ -9,6 +9,6 @@ describe('Link url', () => {
   it('should retrun correct url when FE_URL provided', () => {
     config.feUrl = 'http://localhost';
     const url = linkUrl('test', 'test', 'id');
-    expect(url).toEqual('http://localhost/project/test/scenario/test/items/id');
+    expect(url).toEqual('http://localhost/project/test/scenario/test/item/id');
   });
 });
