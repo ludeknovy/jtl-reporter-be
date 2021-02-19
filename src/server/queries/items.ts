@@ -279,4 +279,14 @@ export const createShareToken = (projectName, scenarioName, itemId, token, name 
   };
 };
 
-export const updateShareToken = (projectName, scenarioName, itemId) => { };
+export const deleteShareToken = (projectName, scenarioName, itemId, id) => {
+  return {
+    text: `DELETE FROM jtl.share_tokens as st
+    USING jtl.scenario as sc
+    WHERE st.id = $4
+    AND st.item_id = $3
+    AND sc.name = $2
+    AND sc.project_id = (SELECT id FROM jtl.projects WHERE project_name = $1)`,
+    values: [projectName, scenarioName, itemId, id]
+  };
+};

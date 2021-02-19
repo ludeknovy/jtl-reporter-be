@@ -8,7 +8,7 @@ import {
 import {
   paramsSchema, updateItemBodySchema,
   newItemParamSchema,
-  newAsyncItemStartBodySchema, stopAsyncItemBody
+  newAsyncItemStartBodySchema, stopAsyncItemBody, shareTokenSchema
 } from '../schema-validator/item-schema';
 import { paramsSchema as scenarioParamsSchema, querySchema } from '../schema-validator/scenario-schema';
 import { getItemsController } from '../controllers/item/get-items-controller';
@@ -24,7 +24,7 @@ import { stopItemAsyncController } from '../controllers/item/stop-item-async-con
 import { allowQueryTokenAuth } from '../middleware/allow-query-token-auth';
 import { getItemLinksController } from '../controllers/item/links/get-item-links-controller';
 import { createItemLinkController } from '../controllers/item/links/create-item-link-controller';
-import { deleteItemLinkController } from '../controllers/item/links/delete-item-link-cronroller';
+import { deleteItemShareTokenController } from '../controllers/item/links/delete-item-share-token-cronroller';
 
 export class ItemsRoutes {
 
@@ -91,9 +91,9 @@ export class ItemsRoutes {
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/share-tokens/:tokenId')
       .delete(
         authenticationMiddleware,
-        paramsSchemaValidator(paramsSchema),
+        paramsSchemaValidator(shareTokenSchema),
         // eslint-disable-next-line max-len
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteItemLinkController(req, res, next)));
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteItemShareTokenController(req, res, next)));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/errors')
       // eslint-disable-next-line max-len

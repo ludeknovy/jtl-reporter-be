@@ -14,6 +14,13 @@ export const labelParamSchema = {
   label: Joi.string().required()
 };
 
+export const shareTokenSchema = Joi.object().keys({
+  projectName,
+  scenarioName,
+  itemId,
+  tokenId: Joi.string().uuid().required()
+});
+
 export const paramsSchema = Joi.object().keys({
   projectName,
   scenarioName,
