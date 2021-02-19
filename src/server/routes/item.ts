@@ -20,7 +20,11 @@ import { verifyToken } from '../middleware/auth-middleware';
 import { getItemErrorsController } from '../controllers/item/get-item-errors-controller';
 import { getProcessingItemsController } from '../controllers/item/get-processing-items-controller';
 import { createItemAsyncController } from '../controllers/item/create-item-async-controller';
-import {stopItemAsyncController} from '../controllers/item/stop-item-async-controller';
+import { stopItemAsyncController } from '../controllers/item/stop-item-async-controller';
+import { allowQueryTokenAuth } from '../middleware/allow-query-token-auth';
+import { getItemLinksController } from '../controllers/item/links/get-item-links-controller';
+import { createItemLinkController } from '../controllers/item/links/create-item-link-controller';
+import { deleteItemLinkController } from '../controllers/item/links/delete-item-link-cronroller';
 
 export class ItemsRoutes {
 
@@ -47,6 +51,7 @@ export class ItemsRoutes {
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId')
       .get(
+        allowQueryTokenAuth,
         verifyToken,
         paramsSchemaValidator(paramsSchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemController(req, res, next)))
@@ -69,6 +74,26 @@ export class ItemsRoutes {
         verifyToken,
         paramsSchemaValidator(paramsSchema),
         stopItemAsyncController);
+
+    app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/share-tokens')
+      .get(
+        verifyToken,
+        paramsSchemaValidator(paramsSchema),
+        // eslint-disable-next-line max-len
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemLinksController(req, res, next)))
+
+      .post(
+        verifyToken,
+        paramsSchemaValidator(paramsSchema),
+        // eslint-disable-next-line max-len
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await createItemLinkController(req, res, next)));
+
+    app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/share-tokens/:tokenId')
+      .delete(
+        verifyToken,
+        paramsSchemaValidator(paramsSchema),
+        // eslint-disable-next-line max-len
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteItemLinkController(req, res, next)));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/errors')
       // eslint-disable-next-line max-len
