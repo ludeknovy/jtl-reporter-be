@@ -53,6 +53,7 @@ export const stopItemAsyncController = async (req: Request, res: Response, next:
     await sendNotifications(projectName, scenarioName, itemId, overview);
   } catch (e) {
     logger.error(`Processing of item ${itemId} failed ${e}`);
+    await db.none(updateItem(itemId, ReportStatus.Error, null));
     res.status(500).send();
   }
 };
