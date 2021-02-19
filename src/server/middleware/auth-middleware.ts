@@ -11,14 +11,13 @@ import { findShareToken } from '../queries/items';
 
 const UNAUTHORIZED_MSG = 'The token you provided is invalid';
 
-export const verifyToken = async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
+export const authenticationMiddleware = async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
 
   const { token } = req.query;
   if (token && (token !== 'undefined') && req.allowQueryAuth) {
     try {
       const { projectName, scenarioName, itemId } = req.params;
       const shareToken = await db.oneOrNone(findShareToken(projectName, scenarioName, itemId, token));
-      console.log({ shareToken });
       if (shareToken && shareToken.token && shareToken.valid) {
         return next();
       }

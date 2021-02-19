@@ -5,7 +5,7 @@ import { wrapAsync } from '../errors/error-handler';
 import { loginController } from '../controllers/auth/login-controller';
 import { authQuerySchema, authWithTokenSchema, changePasswordSchema } from '../schema-validator/auth-schema';
 import { changePasswordController } from '../controllers/auth/change-password-controller';
-import { verifyToken } from '../middleware/auth-middleware';
+import { authenticationMiddleware } from '../middleware/auth-middleware';
 import { IGetUserAuthInfoRequest } from '../middleware/request.model';
 import { loginWithTokenController } from '../controllers/auth/login-with-token-controller';
 
@@ -23,7 +23,7 @@ export class AuthRoutes {
 
     app.route('/api/auth/change-password')
       .post(
-        verifyToken,
+        authenticationMiddleware,
         bodySchemaValidator(changePasswordSchema),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => await changePasswordController(req, res, next)));

@@ -16,7 +16,7 @@ import { getItemController } from '../controllers/item/get-item-controller';
 import { updateItemController } from '../controllers/item/update-item-controller';
 import { deleteItemController } from '../controllers/item/delete-item-controller';
 import { createItemController } from '../controllers/item/create-item-controller';
-import { verifyToken } from '../middleware/auth-middleware';
+import { authenticationMiddleware } from '../middleware/auth-middleware';
 import { getItemErrorsController } from '../controllers/item/get-item-errors-controller';
 import { getProcessingItemsController } from '../controllers/item/get-processing-items-controller';
 import { createItemAsyncController } from '../controllers/item/create-item-async-controller';
@@ -32,19 +32,19 @@ export class ItemsRoutes {
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items')
       .get(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(scenarioParamsSchema),
         queryParamsValidator(querySchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemsController(req, res, next)))
 
       .post(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(newItemParamSchema),
         createItemController);
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/start-async')
       .post(
-        verifyToken,
+        authenticationMiddleware,
         bodySchemaValidator(newAsyncItemStartBodySchema),
         paramsSchemaValidator(newItemParamSchema),
         createItemAsyncController);
@@ -52,45 +52,45 @@ export class ItemsRoutes {
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId')
       .get(
         allowQueryTokenAuth,
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(paramsSchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemController(req, res, next)))
 
       .put(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(paramsSchema),
         bodySchemaValidator(updateItemBodySchema),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await updateItemController(req, res, next)))
 
       .delete(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(paramsSchema),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteItemController(req, res, next)));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/stop-async')
       .post(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(paramsSchema),
         stopItemAsyncController);
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/share-tokens')
       .get(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(paramsSchema),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemLinksController(req, res, next)))
 
       .post(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(paramsSchema),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await createItemLinkController(req, res, next)));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/share-tokens/:tokenId')
       .delete(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(paramsSchema),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteItemLinkController(req, res, next)));
@@ -101,7 +101,7 @@ export class ItemsRoutes {
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/processing-items')
       .get(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(scenarioParamsSchema),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getProcessingItemsController(req, res, next)));
