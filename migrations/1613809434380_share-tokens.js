@@ -12,7 +12,7 @@ exports.up = (pgm) => {
     },
     name: {
       type: 'varchar(200)',
-      notNull: true
+      notNull: false
     },
     item_id: {
       type: 'uuid',
