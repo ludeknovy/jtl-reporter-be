@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as express from 'express';
-import { verifyToken } from '../middleware/auth-middleware';
+import { authenticationMiddleware } from '../middleware/auth-middleware';
 import { bodySchemaValidator, paramsSchemaValidator } from '../schema-validator/schema-validator-middleware';
 import { wrapAsync } from '../errors/error-handler';
 import { createNewUserController } from '../controllers/users/create-new-user-controller';
@@ -12,19 +12,19 @@ export class UsersRoutes {
   public routes(app: express.Application): void {
     app.route('/api/users')
       .post(
-        verifyToken,
+        authenticationMiddleware,
         bodySchemaValidator(newUserSchema),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await createNewUserController(req, res, next)))
 
       .get(
-        verifyToken,
+        authenticationMiddleware,
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getUsersController(req, res, next))
       );
 
     app.route('/api/users/:userId')
       .delete(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(userSchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteUserController(req, res, next))
       );

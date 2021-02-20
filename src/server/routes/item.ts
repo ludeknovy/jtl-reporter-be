@@ -8,7 +8,7 @@ import {
 import {
   paramsSchema, updateItemBodySchema,
   newItemParamSchema,
-  newAsyncItemStartBodySchema, stopAsyncItemBody
+  newAsyncItemStartBodySchema, stopAsyncItemBody, shareTokenSchema
 } from '../schema-validator/item-schema';
 import { paramsSchema as scenarioParamsSchema, querySchema } from '../schema-validator/scenario-schema';
 import { getItemsController } from '../controllers/item/get-items-controller';
@@ -16,11 +16,15 @@ import { getItemController } from '../controllers/item/get-item-controller';
 import { updateItemController } from '../controllers/item/update-item-controller';
 import { deleteItemController } from '../controllers/item/delete-item-controller';
 import { createItemController } from '../controllers/item/create-item-controller';
-import { verifyToken } from '../middleware/auth-middleware';
+import { authenticationMiddleware } from '../middleware/auth-middleware';
 import { getItemErrorsController } from '../controllers/item/get-item-errors-controller';
 import { getProcessingItemsController } from '../controllers/item/get-processing-items-controller';
 import { createItemAsyncController } from '../controllers/item/create-item-async-controller';
-import {stopItemAsyncController} from '../controllers/item/stop-item-async-controller';
+import { stopItemAsyncController } from '../controllers/item/stop-item-async-controller';
+import { allowQueryTokenAuth } from '../middleware/allow-query-token-auth';
+import { getItemLinksController } from '../controllers/item/share-tokens/get-item-share-tokens-controller';
+import { createItemLinkController } from '../controllers/item/share-tokens/create-item-share-token-controller';
+import { deleteItemShareTokenController } from '../controllers/item/share-tokens/delete-item-share-token-cronroller';
 
 export class ItemsRoutes {
 
@@ -28,47 +32,68 @@ export class ItemsRoutes {
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items')
       .get(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(scenarioParamsSchema),
         queryParamsValidator(querySchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemsController(req, res, next)))
 
       .post(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(newItemParamSchema),
         createItemController);
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/start-async')
       .post(
-        verifyToken,
+        authenticationMiddleware,
         bodySchemaValidator(newAsyncItemStartBodySchema),
         paramsSchemaValidator(newItemParamSchema),
         createItemAsyncController);
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId')
       .get(
-        verifyToken,
+        allowQueryTokenAuth,
+        authenticationMiddleware,
         paramsSchemaValidator(paramsSchema),
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemController(req, res, next)))
 
       .put(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(paramsSchema),
         bodySchemaValidator(updateItemBodySchema),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await updateItemController(req, res, next)))
 
       .delete(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(paramsSchema),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteItemController(req, res, next)));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/stop-async')
       .post(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(paramsSchema),
         stopItemAsyncController);
+
+    app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/share-tokens')
+      .get(
+        authenticationMiddleware,
+        paramsSchemaValidator(paramsSchema),
+        // eslint-disable-next-line max-len
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemLinksController(req, res, next)))
+
+      .post(
+        authenticationMiddleware,
+        paramsSchemaValidator(paramsSchema),
+        // eslint-disable-next-line max-len
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await createItemLinkController(req, res, next)));
+
+    app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/share-tokens/:tokenId')
+      .delete(
+        authenticationMiddleware,
+        paramsSchemaValidator(shareTokenSchema),
+        // eslint-disable-next-line max-len
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteItemShareTokenController(req, res, next)));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/errors')
       // eslint-disable-next-line max-len
@@ -76,7 +101,7 @@ export class ItemsRoutes {
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/processing-items')
       .get(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(scenarioParamsSchema),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getProcessingItemsController(req, res, next)));

@@ -11,7 +11,7 @@ import { getScenariosController } from '../controllers/scenario/get-scenarios-co
 import { createScenarioController } from '../controllers/scenario/create-scenario-controller';
 import { deleteScenarioController } from '../controllers/scenario/delete-scenario-controller';
 import { getScenarioTrendsController } from '../controllers/scenario/get-scenario-trends-controller';
-import { verifyToken } from '../middleware/auth-middleware';
+import { authenticationMiddleware } from '../middleware/auth-middleware';
 import { updateScenarioController } from '../controllers/scenario/update-scenario-controller';
 import { getScenarioNotificationsController } from '../controllers/scenario/get-notifications-controllers';
 import { createScenarioNotificationController } from '../controllers/scenario/create-notification-controller';
@@ -23,12 +23,12 @@ export class ScenarioRoutes {
 
     app.route('/api/projects/:projectName/scenarios')
       .get(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(projectNameParam),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getScenariosController(req, res, next)))
       .post(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(projectNameParam),
         bodySchemaValidator(newScenarioSchema),
         // eslint-disable-next-line max-len
@@ -36,27 +36,27 @@ export class ScenarioRoutes {
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName')
       .put(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(paramsSchema),
         bodySchemaValidator(scenarioUpdateSchema),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await updateScenarioController(req, res, next)))
 
       .delete(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(paramsSchema),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteScenarioController(req, res, next)));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/notifications')
       .get(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(paramsSchema),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getScenarioNotificationsController(req, res, next)))
 
       .post(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(paramsSchema),
         bodySchemaValidator(scenarioNotificationBodySchema),
         // eslint-disable-next-line max-len
@@ -65,14 +65,14 @@ export class ScenarioRoutes {
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/notifications/:notificationId')
       .delete(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(paramSchemaNotification),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteScenarioNotificationController(req, res, next)));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/trends')
       .get(
-        verifyToken,
+        authenticationMiddleware,
         paramsSchemaValidator(paramsSchema),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getScenarioTrendsController(req, res, next)));

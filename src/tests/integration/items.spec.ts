@@ -10,7 +10,7 @@ describe('Items', () => {
   beforeAll(async () => {
     try {
       ({ data: credentials } = await userSetup());
-      ({  data: { token } } = await apiTokenSetup());
+      ({ data: { token } } = await apiTokenSetup());
     } catch (error) {
       console.log(error);
     }
@@ -49,13 +49,13 @@ describe('Items', () => {
         .post('/api/projects/test-project/scenarios/test-scenario/items/start-async')
         .set(__tokenHeaderKey__, credentials.token)
         .set('Accept', 'application/json')
-        .send({ environment: 'test' })
+        .send({ environment: 'test' })
         .expect(201);
     });
   });
   describe('PUT /projects/{projectName}/scenarios/{scenarioName}/items/{itemId}', () => {
     it('should be able to update test item', async () => {
-      const { data: { itemId } } = await stateSetup(States.ExistingTestItem);
+      const { data: { itemId } } = await stateSetup(States.ExistingTestItem);
       await request(__server__)
         .put(`/api/projects/test-project/scenarios/test-scenario/items/${itemId}`)
         .set(__tokenHeaderKey__, credentials.token)
@@ -70,7 +70,7 @@ describe('Items', () => {
   });
   describe('DELETE /projects/{projectName}/scenarios/{scenarioName}/items/{itemId}', () => {
     it('should be able to delete test item', async () => {
-      const { data: { itemId } } = await stateSetup(States.ExistingTestItem);
+      const { data: { itemId } } = await stateSetup(States.ExistingTestItem);
       await request(__server__)
         .delete(`/api/projects/test-project/scenarios/test-scenario/items/${itemId}`)
         .set(__tokenHeaderKey__, credentials.token)
@@ -81,6 +81,19 @@ describe('Items', () => {
           base: true
         })
         .expect(204);
+    });
+  });
+  describe('POST /projects/{projectName}/scenarios/{scenarioName}/items/{itemId}/share-tokens', () => {
+    it('should be able to create new share token', async () => {
+      const { data: { itemId } } = await stateSetup(States.ExistingTestItem);
+      await request(__server__)
+        .post(`/api/projects/test-project/scenarios/test-scenario/items/${itemId}/share-tokens`)
+        .set(__tokenHeaderKey__, credentials.token)
+        .set('Accept', 'application/json')
+        .send({
+          name: 'test-token'
+        })
+        .expect(201);
     });
   });
 });
