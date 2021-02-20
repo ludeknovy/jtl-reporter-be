@@ -241,7 +241,7 @@ export const selectDataId = (itemId, projectName, scenarioName) => {
 
 export const findShareToken = (projectName, scenarioName, itemId, token) => {
   return {
-    text: `SELECT t.token, t.valid FROM jtl.share_tokens as t
+    text: `SELECT t.token FROM jtl.share_tokens as t
     LEFT JOIN jtl.items as it ON it.id = t.item_id
     LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
@@ -255,7 +255,7 @@ export const findShareToken = (projectName, scenarioName, itemId, token) => {
 
 export const selectShareTokens = (projectName, scenarioName, itemId) => {
   return {
-    text: `SELECT t.id, t.token, t.name, t.valid FROM jtl.share_tokens as t
+    text: `SELECT t.id, t.token, t.name FROM jtl.share_tokens as t
     LEFT JOIN jtl.items as it ON it.id = t.item_id
     LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
@@ -268,14 +268,14 @@ export const selectShareTokens = (projectName, scenarioName, itemId) => {
 
 export const createShareToken = (projectName, scenarioName, itemId, token, name = null) => {
   return {
-    text: `INSERT INTO jtl.share_tokens (item_id, token, name, valid) VALUES (
+    text: `INSERT INTO jtl.share_tokens (item_id, token, name) VALUES (
       (SELECT it.id FROM jtl.items as it
       LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
       LEFT JOIN jtl.projects as p ON p.id = s.project_id
       WHERE p.project_name = $1
       AND s.name = $2
-      AND it.id = $3), $4, $5, $6);`,
-    values: [projectName, scenarioName, itemId, token, name, true]
+      AND it.id = $3), $4, $5);`,
+    values: [projectName, scenarioName, itemId, token, name]
   };
 };
 

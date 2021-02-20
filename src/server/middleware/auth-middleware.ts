@@ -18,7 +18,7 @@ export const authenticationMiddleware = async (req: IGetUserAuthInfoRequest, res
     try {
       const { projectName, scenarioName, itemId } = req.params;
       const shareToken = await db.oneOrNone(findShareToken(projectName, scenarioName, itemId, token));
-      if (shareToken && shareToken.token && shareToken.valid) {
+      if (shareToken && shareToken.token) {
         return next();
       }
       return next(boom.unauthorized(UNAUTHORIZED_MSG));

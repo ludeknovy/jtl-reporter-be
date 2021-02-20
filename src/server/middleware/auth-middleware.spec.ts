@@ -35,7 +35,7 @@ describe('AuthenticationMiddleware', () => {
       expect(nextFunction).toHaveBeenCalledWith(Boom.unauthorized('The token you provided is invalid'));
     });
     it('should proceed when valid token provided', async () => {
-      db.oneOrNone = jest.fn().mockResolvedValue({ token: 'test', valid: true });
+      db.oneOrNone = jest.fn().mockResolvedValue({ token: 'test'});
       await authenticationMiddleware({
         headers: {},
         query: { token: '123' },
