@@ -13,8 +13,19 @@ export const scenarioThresholdsCalc = (overviewData: Overview, scenarioMetrics: 
 
   return {
     passed: percentilePass && throughputPass && errorRatePass,
-    diff: {
-      percentileDiff, throughputDiff, errorRateDiff
+    result: {
+      percentile: {
+        passed: percentilePass,
+        diffValue: percentileDiff
+      },
+      throughput: {
+        passed: throughputPass,
+        diffValue: throughputDiff
+      },
+      errorRate: {
+        passed: errorRatePass,
+        diffValue: errorRateDiff
+      }
     },
     scenarioMetrics,
     thresholds
