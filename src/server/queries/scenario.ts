@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 export const findItemsForScenario = (projectName, scenarioName, limit, offset) => {
   return {
-    text: `SELECT it.id, environment, upload_time as "uploadTime", base, status, st.overview->>'startDate' as "startTime", note, hostname, overview -> 'maxVu' AS "maxVu", overview -> 'duration' as duration FROM jtl.items as it
+    text: `SELECT it.id, environment, upload_time as "uploadTime", base, status, st.overview->>'startDate' as "startTime", note, hostname, threshold_result->'passed' as "thresholdPassed", overview -> 'maxVu' AS "maxVu", overview -> 'duration' as duration FROM jtl.items as it
     LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
     LEFT JOIN jtl.item_stat as st ON st.item_id = it.id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
@@ -144,3 +144,28 @@ export const deleteScenarioNotification = (projectName, scenarioName, id) => {
     values: [projectName, scenarioName, id]
   };
 };
+
+
+export const getScenarioThresholds = (projectName, scenarioName) => {
+  return {
+    text: `SELECT s.threshold_error_rate as "errorRate", s.threshold_percentile as "percentile", s.threshold_throughput as "throughput", s.threshold_enabled as "enabled"  FROM jtl.scenario as s
+    LEFT JOIN jtl.projects p ON p.id = s.project_id
+    WHERE p.project_name = $1
+    AND s.name = $2`,
+    values: [projectName, scenarioName]
+  };
+};
+
+export const currentScenarioMetrics = (projectName, scenarioName) => {
+  return {
+    text: `SELECT avg((st.overview->>'percentil')::numeric) as "percentile", avg((st.overview->>'throughput')::numeric) as "throughput", avg((st.overview->>'errorRate')::numeric) as "errorRate" FROM jtl.item_stat as st
+    LEFT JOIN jtl.items as it ON it.id = st.item_id
+    LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
+    LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE s.name = $2
+    AND p.project_name = $1
+    AND report_status = 'ready'`,
+    values: [projectName, scenarioName]
+  };
+};
+

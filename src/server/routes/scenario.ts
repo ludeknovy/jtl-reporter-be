@@ -10,12 +10,13 @@ import { projectNameParam, newScenarioSchema } from '../schema-validator/project
 import { getScenariosController } from '../controllers/scenario/get-scenarios-controller';
 import { createScenarioController } from '../controllers/scenario/create-scenario-controller';
 import { deleteScenarioController } from '../controllers/scenario/delete-scenario-controller';
-import { getScenarioTrendsController } from '../controllers/scenario/get-scenario-trends-controller';
+import { getScenarioTrendsController } from '../controllers/scenario/trends/get-scenario-trends-controller';
 import { authenticationMiddleware } from '../middleware/auth-middleware';
 import { updateScenarioController } from '../controllers/scenario/update-scenario-controller';
-import { getScenarioNotificationsController } from '../controllers/scenario/get-notifications-controllers';
-import { createScenarioNotificationController } from '../controllers/scenario/create-notification-controller';
-import { deleteScenarioNotificationController } from '../controllers/scenario/delete-scenario-notification-controller';
+import { getScenarioNotificationsController } from '../controllers/scenario/notifications/get-notifications-controllers';
+import { createScenarioNotificationController } from '../controllers/scenario/notifications/create-notification-controller';
+import { deleteScenarioNotificationController } from '../controllers/scenario/notifications/delete-scenario-notification-controller';
+import { getScenarioThresholdsController } from '../controllers/scenario/thresholds/get-scenario-thresholds-controller';
 
 export class ScenarioRoutes {
 
@@ -47,6 +48,20 @@ export class ScenarioRoutes {
         paramsSchemaValidator(paramsSchema),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteScenarioController(req, res, next)));
+
+    app.route('/api/projects/:projectName/scenarios/:scenarioName/thresholds')
+      .get(
+        authenticationMiddleware,
+        paramsSchemaValidator(paramsSchema),
+        // eslint-disable-next-line max-len
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getScenarioThresholdsController(req, res, next)))
+
+      // .put(
+      //   authenticationMiddleware,
+      //   paramsSchemaValidator(paramsSchema),
+      //   // eslint-disable-next-line max-len
+      //   wrapAsync(async (req: Request, res: Response, next: NextFunction) =>  ));
+
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/notifications')
       .get(

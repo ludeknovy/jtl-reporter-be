@@ -23,7 +23,7 @@ export const savePlotData = (itemId, data) => {
 export const findItem = (itemId, projectName, scenarioName) => {
   return {
     // eslint-disable-next-line max-len
-    text: `SELECT charts.plot_data, note, environment, status, hostname, report_status as "reportStatus", (SELECT items.id FROM jtl.items as items
+    text: `SELECT charts.plot_data, note, environment, status, hostname, threshold_result as "thresholds", report_status as "reportStatus", (SELECT items.id FROM jtl.items as items
       LEFT JOIN jtl.charts as charts ON charts.item_id = items.id
       LEFT JOIN jtl.scenario as s ON s.id = items.scenario_id
       LEFT JOIN jtl.projects as p ON p.id = s.project_id
@@ -290,3 +290,16 @@ export const deleteShareToken = (projectName, scenarioName, itemId, id) => {
     values: [projectName, scenarioName, itemId, id]
   };
 };
+
+export const saveThresholdsResult = (projectName, scenarioName, itemId, threshold) => {
+  return {
+    text: `UPDATE jtl.items as it
+    SET threshold_result = $4
+    FROM jtl.scenario as s
+    WHERE it.id = $1
+    AND s.project_id = (SELECT id FROM jtl.projects WHERE project_name = $2)
+    AND s.name = $3`,
+    values: [itemId, projectName, scenarioName, threshold]
+  };
+};
+
