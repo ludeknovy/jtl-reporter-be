@@ -125,7 +125,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
             if (scenarioThresholds.enabled) {
               const scenarioMetrics = await db.one(currentScenarioMetrics(projectName, scenarioName));
               const thresholdResult = scenarioThresholdsCalc(overview, scenarioMetrics, scenarioThresholds);
-              await db.none(saveThresholdsResult(projectName, scenarioName, itemId, thresholdResult))
+              await db.none(saveThresholdsResult(projectName, scenarioName, itemId, thresholdResult));
             }
 
 

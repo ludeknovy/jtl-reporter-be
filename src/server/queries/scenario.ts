@@ -156,6 +156,16 @@ export const getScenarioThresholds = (projectName, scenarioName) => {
   };
 };
 
+export const updateScenarioThresholds = (projectName, scenarioName, thresholds) => {
+  return {
+    text: `UPDATE jtl.scenario as s
+    SET threshold_percentile = $3, threshold_throughput = $4, threshold_error_rate = $5, threshold_enabled = $6
+    WHERE s.name = $2
+    AND s.project_id = (SELECT id FROM jtl.projects WHERE project_name = $1)`,
+    values: [projectName, scenarioName, thresholds.percentile, thresholds.throughput, thresholds.errorRate, thresholds.enabled]
+  };
+};
+
 export const currentScenarioMetrics = (projectName, scenarioName) => {
   return {
     text: `SELECT avg((st.overview->>'percentil')::numeric) as "percentile", avg((st.overview->>'throughput')::numeric) as "throughput", avg((st.overview->>'errorRate')::numeric) as "errorRate" FROM jtl.item_stat as st
