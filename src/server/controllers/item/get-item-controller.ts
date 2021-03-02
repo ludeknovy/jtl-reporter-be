@@ -12,7 +12,7 @@ export const getItemController = async (req: Request, res: Response, next: NextF
     environment,
     // eslint-disable-next-line @typescript-eslint/naming-convention
     base_id,
-    status, hostname, reportStatus } = await db.one(findItem(itemId, projectName, scenarioName));
+    status, hostname, reportStatus, thresholds } = await db.one(findItem(itemId, projectName, scenarioName));
   const { stats: statistics, overview } = await db.one(findItemStats(itemId));
 
   const files = await db.any(findAttachements(itemId));
@@ -31,7 +31,7 @@ export const getItemController = async (req: Request, res: Response, next: NextF
 
   res.status(200).send({
     overview, statistics, status,
-    plot, note, environment, hostname, reportStatus,
+    plot, note, environment, hostname, reportStatus, thresholds,
     attachements, baseId: base_id, isBase: base_id === itemId, monitoringData: { cpu, mem, maxCpu, maxMem }
   });
 };

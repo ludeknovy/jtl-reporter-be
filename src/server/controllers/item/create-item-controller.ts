@@ -5,7 +5,7 @@ import {
 } from '../../data-stats/prepare-data';
 import { db } from '../../../db/db';
 import {
-  createNewItem, saveItemStats, savePlotData, saveData, updateItem
+  createNewItem, saveItemStats, savePlotData, saveData, updateItem, saveThresholdsResult
 } from '../../queries/items';
 import * as multer from 'multer';
 import * as boom from 'boom';
@@ -20,6 +20,8 @@ import { MongoUtils } from '../../../db/mongoUtil';
 import { logger } from '../../../logger';
 import * as uuid from 'uuid';
 import { sendNotifications } from '../../utils/notifications/send-notification';
+import { currentScenarioMetrics, getScenarioThresholds } from '../../queries/scenario';
+import { scenarioThresholdsCalc } from './utils/scenario-thresholds-calc';
 
 
 const upload = multer(
@@ -118,6 +120,14 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
               labelChartAgg(dataId, interval), { allowDiskUse: true }).toArray();
 
             const chartData = prepareChartDataForSavingFromMongo(overviewChartData, labelChartData);
+
+            const scenarioThresholds = await db.one(getScenarioThresholds(projectName, scenarioName));
+            if (scenarioThresholds.enabled) {
+              const scenarioMetrics = await db.one(currentScenarioMetrics(projectName, scenarioName));
+              const thresholdResult = scenarioThresholdsCalc(overview, scenarioMetrics, scenarioThresholds);
+              await db.none(saveThresholdsResult(projectName, scenarioName, itemId, thresholdResult));
+            }
+
 
             await db.tx(async t => {
               await t.none(saveItemStats(itemId, JSON.stringify(labelStats), overview));

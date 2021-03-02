@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { db } from '../../../db/db';
-import { createScenarioNotification } from '../../queries/scenario';
+import { db } from '../../../../db/db';
+import { createScenarioNotification } from '../../../queries/scenario';
 
 export const createScenarioNotificationController = async (req: Request, res: Response, next: NextFunction) => {
   const { projectName, scenarioName } = req.params;
