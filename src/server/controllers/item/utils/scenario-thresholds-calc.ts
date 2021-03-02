@@ -6,7 +6,9 @@ import { divide } from 'mathjs';
 export const scenarioThresholdsCalc = (overviewData: Overview, scenarioMetrics: Thresholds<number>, thresholds: Thresholds<string>) => {
   const percentileDiff = (overviewData.percentil / scenarioMetrics.percentile) * 100;
   const throughputDiff = (overviewData.throughput / scenarioMetrics.throughput) * 100;
-  const errorRateDiff = scenarioMetrics.errorRate === 0 ? 0 : divide(overviewData.errorRate, 0.1) * 100;
+  const errorRateDiff = scenarioMetrics.errorRate === 0
+    ? 100 + overviewData.errorRate
+    : divide(overviewData.errorRate, scenarioMetrics.errorRate) * 100;
 
   const percentilePass = percentileDiff < (100 + parseFloat(thresholds.percentile));
   const errorRatePass = errorRateDiff < (100 + parseFloat(thresholds.errorRate));
