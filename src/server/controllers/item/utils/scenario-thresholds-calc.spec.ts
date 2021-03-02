@@ -2,9 +2,9 @@ import { scenarioThresholdsCalc } from './scenario-thresholds-calc';
 
 describe('scenarioThresholdsCalc', () => {
   const SCENARIO_AVERAGE = {
-    percentile: 35.33,
-    throughput: 462.39,
-    errorRate: 0.0
+    percentile: '35.33',
+    throughput: '462.39',
+    errorRate: '0.0'
   };
   it('should return false, when response time threshold exceeded', () => {
     const output = scenarioThresholdsCalc({
@@ -69,9 +69,9 @@ describe('scenarioThresholdsCalc', () => {
       errorRate: 10.0,
       throughput: 462.39
     } as any, {
-      percentile: 35.33,
-      throughput: 462.39,
-      errorRate: 1.0
+      percentile: '35.33',
+      throughput: '462.39',
+      errorRate: '1.0'
     }, {
       errorRate: '5', percentile: '5', throughput: '5'
     });
@@ -95,9 +95,9 @@ describe('scenarioThresholdsCalc', () => {
       errorRate: 0.0,
       throughput: 462.39
     } as any, {
-      percentile: 35.33,
-      throughput: 462.39,
-      errorRate: 1.0
+      percentile: '35.33',
+      throughput: '462.39',
+      errorRate: '1.0'
     }, {
       errorRate: '5', percentile: '5', throughput: '5'
     });
