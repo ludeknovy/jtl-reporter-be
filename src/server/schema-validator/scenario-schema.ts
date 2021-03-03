@@ -25,3 +25,10 @@ export const scenarioNotificationBodySchema = {
   type: Joi.string().valid('ms-teams').required(),
   name: Joi.string().min(1).max(100).required()
 };
+
+export const updateScenarioThresholdsBodySchema = {
+  enabled: Joi.boolean().required(),
+  errorRate: Joi.number().min(0).max(100).strict().required(),
+  throughput: Joi.number().min(0).max(100).strict().required(),
+  percentile: Joi.number().min(0).max(100).strict().required()
+};

@@ -1,13 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
 import { db } from '../../../db/db';
 import { logger } from '../../../logger';
-import { saveItemStats, savePlotData, updateItem} from '../../queries/items';
+import { saveItemStats, savePlotData, saveThresholdsResult, updateItem} from '../../queries/items';
 import { ReportStatus } from '../../queries/items.model';
 import {labelAggPipeline, labelChartAgg, overviewAggPipeline, overviewChartAgg} from '../../queries/mongo-db-agg';
 import {prepareChartDataForSavingFromMongo, prepareDataForSavingToDbFromMongo} from '../../data-stats/prepare-data';
 import {chartQueryOptionInterval} from '../../queries/mongoChartOptionHelper';
 import {MongoUtils} from '../../../db/mongoUtil';
 import { sendNotifications } from '../../utils/notifications/send-notification';
+import { getScenarioThresholds, currentScenarioMetrics } from '../../queries/scenario';
+import { scenarioThresholdsCalc } from './utils/scenario-thresholds-calc';
 
 export const stopItemAsyncController = async (req: Request, res: Response, next: NextFunction) => {
   const { projectName, scenarioName, itemId } = req.params;
