@@ -45,9 +45,11 @@ export const stopItemAsyncController = async (req: Request, res: Response, next:
 
     const scenarioThresholds = await db.one(getScenarioThresholds(projectName, scenarioName));
     if (scenarioThresholds.enabled) {
-      const scenarioMetrics = await db.one(currentScenarioMetrics(projectName, scenarioName));
+      const scenarioMetrics = await db.one(currentScenarioMetrics(projectName, scenarioName, overview.maxVu));
       const thresholdResult = scenarioThresholdsCalc(overview, scenarioMetrics, scenarioThresholds);
-      await db.none(saveThresholdsResult(projectName, scenarioName, itemId, thresholdResult));
+      if (thresholdResult) {
+        await db.none(saveThresholdsResult(projectName, scenarioName, itemId, thresholdResult));
+      }
     }
 
     await db.tx(async t => {

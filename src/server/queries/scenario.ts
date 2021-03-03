@@ -145,7 +145,6 @@ export const deleteScenarioNotification = (projectName, scenarioName, id) => {
   };
 };
 
-
 export const getScenarioThresholds = (projectName, scenarioName) => {
   return {
     text: `SELECT s.threshold_error_rate as "errorRate", s.threshold_percentile as "percentile", s.threshold_throughput as "throughput", s.threshold_enabled as "enabled"  FROM jtl.scenario as s
@@ -166,7 +165,7 @@ export const updateScenarioThresholds = (projectName, scenarioName, thresholds) 
   };
 };
 
-export const currentScenarioMetrics = (projectName, scenarioName) => {
+export const currentScenarioMetrics = (projectName, scenarioName, vu) => {
   return {
     text: `SELECT avg((st.overview->>'percentil')::numeric) as "percentile", avg((st.overview->>'throughput')::numeric) as "throughput", avg((st.overview->>'errorRate')::numeric) as "errorRate" FROM jtl.item_stat as st
     LEFT JOIN jtl.items as it ON it.id = st.item_id
@@ -174,8 +173,9 @@ export const currentScenarioMetrics = (projectName, scenarioName) => {
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
     WHERE s.name = $2
     AND p.project_name = $1
-    AND report_status = 'ready'`,
-    values: [projectName, scenarioName]
+    AND report_status = 'ready'
+    AND (st.overview->>'maxVu')::numeric = $3`,
+    values: [projectName, scenarioName, vu]
   };
 };
 

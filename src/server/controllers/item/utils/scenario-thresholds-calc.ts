@@ -4,6 +4,9 @@ import { divide } from 'mathjs';
 
 // eslint-disable-next-line max-len
 export const scenarioThresholdsCalc = (overviewData: Overview, scenarioMetrics: Thresholds<string>, thresholds: Thresholds<string>) => {
+  if (!scenarioMetrics.errorRate || !scenarioMetrics.percentile || !scenarioMetrics.throughput) {
+    return undefined;
+  }
   const percentileDiff = (overviewData.percentil / parseFloat(scenarioMetrics.percentile)) * 100;
   const throughputDiff = (overviewData.throughput / parseFloat(scenarioMetrics.throughput)) * 100;
   const errorRateDiff = parseFloat(scenarioMetrics.errorRate) === 0
