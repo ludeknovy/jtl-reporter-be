@@ -41,6 +41,15 @@ export const stopItemAsyncController = async (req: Request, res: Response, next:
 
     const chartData = prepareChartDataForSavingFromMongo(overviewChartData, labelChartData);
 
+    const scenarioThresholds = await db.one(getScenarioThresholds(projectName, scenarioName));
+    if (scenarioThresholds.enabled) {
+      const scenarioMetrics = await db.one(currentScenarioMetrics(projectName, scenarioName, overview.maxVu));
+      const thresholdResult = scenarioThresholdsCalc(overview, scenarioMetrics, scenarioThresholds);
+      if (thresholdResult) {
+        await db.none(saveThresholdsResult(projectName, scenarioName, itemId, thresholdResult));
+      }
+    }
+
     await db.tx(async t => {
       await t.none(saveItemStats(itemId, JSON.stringify(labelStats), overview));
       await t.none(savePlotData(itemId, JSON.stringify(chartData)));
