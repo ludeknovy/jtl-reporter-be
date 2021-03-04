@@ -20,7 +20,8 @@ const OVERVIEW = {
   errorRate: 0,
   maxVu: 10,
   startDate: new Date(),
-  throughput: 10
+  throughput: 10,
+  bytesPerSecond: 20123
 };
 
 describe('sendNotification', () => {

@@ -33,6 +33,9 @@ export const overviewAggPipeline = (dataId) => {
         'avgResponse': {
           '$avg': '$samples.elapsed'
         },
+        'bytes': {
+          '$sum': '$samples.bytes'
+        },
         'total': {
           '$sum': 1
         },
