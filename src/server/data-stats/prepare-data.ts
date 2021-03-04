@@ -12,6 +12,7 @@ export const prepareDataForSavingToDbFromMongo = (overviewData, labelData): { ov
       avgResponseTime: overviewData.avgResponse.toFixed(0),
       errorRate: roundNumberTwoDecimals((overviewData.failed / overviewData.total) * 100),
       throughput: roundNumberTwoDecimals(overviewData.total / ((overviewData.end - overviewData.start) / 1000)),
+      bytesPerSecond: roundNumberTwoDecimals(overviewData.bytes / ((overviewData.end - overviewData.start) / 1000)),
       avgLatency: roundNumberTwoDecimals(overviewData.avgLatency),
       avgConnect: roundNumberTwoDecimals(overviewData.avgConnect),
       startDate,
@@ -171,4 +172,5 @@ export interface Overview {
   avgConnect: number;
   startDate: Date;
   endDate: Date;
+  bytesPerSecond: number;
 };
