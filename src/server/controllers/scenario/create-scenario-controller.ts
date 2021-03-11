@@ -5,10 +5,10 @@ import * as boom from 'boom';
 
 export const createScenarioController = async (req: Request, res: Response, next: NextFunction) => {
   const { projectName } = req.params;
-  const { scenarioName } = req.body;
+  const { scenarioName, analysisEnabled } = req.body;
   const { exists } = await db.one(isExistingScenario(scenarioName, projectName));
   if (!exists) {
-    await db.none(createNewScenario(projectName, scenarioName));
+    await db.none(createNewScenario(projectName, scenarioName, analysisEnabled));
   } else {
     return next(boom.conflict('Scenario already exists'));
   }

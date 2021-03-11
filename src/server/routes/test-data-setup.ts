@@ -8,7 +8,6 @@ import { db } from '../../db/db';
 import { createNewProject } from '../queries/projects';
 import { createNewScenario } from '../queries/scenario';
 import { createNewItem, saveItemStats } from '../queries/items';
-import { mongoDataChunks } from '../../test-data/mongo-data-chunks';
 import { testStats, testOverview } from '../../test-data/test-stats';
 import { createUserInDB } from '../controllers/users/create-new-user-controller';
 import { getUser } from '../queries/auth';
@@ -34,12 +33,12 @@ export class TestDataSetup {
               break;
             case States.ExistingScenario:
               await db.any(createNewProject('test-project'));
-              await db.any(createNewScenario('test-project', 'test-scenario'));
+              await db.any(createNewScenario('test-project', 'test-scenario', true));
               res.sendStatus(201);
               break;
             case States.ExistingTestItem:
               await db.any(createNewProject('test-project'));
-              await db.any(createNewScenario('test-project', 'test-scenario'));
+              await db.any(createNewScenario('test-project', 'test-scenario', true));
               const dataId = uuid();
               // eslint-disable-next-line max-len
               const [item] = await db.any(createNewItem('test-scenario', '2019-09-22 20:20:23.265', 'localhost', 'test note', '1', 'test-project', 'localhost', ReportStatus.Ready, dataId));

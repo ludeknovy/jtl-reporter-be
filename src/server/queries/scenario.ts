@@ -23,15 +23,22 @@ export const itemsForScenarioCount = (projectName, scenarioName) => {
   };
 };
 
+export const getScenario = (projectName, scenarioName) => {
+  return {
+    text: `SELECT * FROM jtl.scenario
+    WHERE name = $2 AND project_id = (SELECT id FROM jtl.projects WHERE project_name = $1);`,
+    values: [projectName, scenarioName]
+  };
+};
 
-export const updateScenario = (projectName, scenarioName, name) => {
+export const updateScenario = (projectName, scenarioName, name, analysisEnabled, thresholds) => {
   return {
     text: `
     UPDATE jtl.scenario as s
-    SET name = $3
+    SET name = $3, analysis_enabled=$4, threshold_enabled = $5, threshold_percentile = $6, threshold_throughput = $7, threshold_error_rate = $8
     WHERE s.name = $2
     AND s.project_id = (SELECT id FROM jtl.projects WHERE project_name = $1)`,
-    values: [projectName, scenarioName, name]
+    values: [projectName, scenarioName, name, analysisEnabled, thresholds.enabled, thresholds.percentile, thresholds.throughput, thresholds.errorRate]
   };
 };
 
@@ -58,12 +65,12 @@ export const deleteScenario = (projectName, scenarioName) => {
   };
 };
 
-export const createNewScenario = (projectName, scenarioName) => {
+export const createNewScenario = (projectName, scenarioName, analysisEnabled) => {
   return {
-    text: `INSERT INTO jtl.scenario(name, project_id) VALUES($2, (
+    text: `INSERT INTO jtl.scenario(name, project_id, analysis_enabled) VALUES($2, (
       SELECT id FROM jtl.projects WHERE project_name = $1
-    ))`,
-    values: [projectName, scenarioName]
+    ), $3)`,
+    values: [projectName, scenarioName, analysisEnabled]
   };
 };
 
@@ -78,7 +85,7 @@ export const findScenarios = projectName => {
 
 export const findScenariosData = (projectName) => {
   return {
-    text: `SELECT s.id as scenario_id, name, st.overview FROM jtl.item_stat st
+    text: `SELECT s.id as scenario_id, name, s.analysis_enabled, st.overview FROM jtl.item_stat st
     LEFT JOIN jtl.items as it ON it.id = st.item_id
     LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
     WHERE st.item_id IN (
@@ -155,15 +162,6 @@ export const getScenarioThresholds = (projectName, scenarioName) => {
   };
 };
 
-export const updateScenarioThresholds = (projectName, scenarioName, thresholds) => {
-  return {
-    text: `UPDATE jtl.scenario as s
-    SET threshold_percentile = $3, threshold_throughput = $4, threshold_error_rate = $5, threshold_enabled = $6
-    WHERE s.name = $2
-    AND s.project_id = (SELECT id FROM jtl.projects WHERE project_name = $1)`,
-    values: [projectName, scenarioName, thresholds.percentile, thresholds.throughput, thresholds.errorRate, thresholds.enabled]
-  };
-};
 
 export const currentScenarioMetrics = (projectName, scenarioName, vu) => {
   return {
