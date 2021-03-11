@@ -13,7 +13,7 @@ describe('Scenario', () => {
       await request(__server__)
         .post('/api/projects/test-project/scenarios')
         .set(__tokenHeaderKey__, credentials.token)
-        .send({ scenarioName: 'test-scenario', })
+        .send({ scenarioName: 'test-scenario' })
         .set('Accept', 'application/json')
         .expect(201);
     });
