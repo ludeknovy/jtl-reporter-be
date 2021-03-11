@@ -10,6 +10,5 @@ export const projectNameParam = {
 };
 
 export const scenarioSchema = {
-  scenarioName: Joi.string().min(1).max(50).required(),
-  analysisEnabled: Joi.boolean().required()
+  scenarioName: Joi.string().min(1).max(50).required()
 };

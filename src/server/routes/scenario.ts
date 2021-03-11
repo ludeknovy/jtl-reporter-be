@@ -32,6 +32,7 @@ export class ScenarioRoutes {
         paramsSchemaValidator(projectNameParam),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getScenariosController(req, res, next)))
+
       .post(
         authenticationMiddleware,
         paramsSchemaValidator(projectNameParam),

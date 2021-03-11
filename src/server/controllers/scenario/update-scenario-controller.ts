@@ -7,5 +7,5 @@ export const updateScenarioController = async (req: Request, res: Response, next
   const { projectName, scenarioName } = req.params;
   const { thresholds, analysisEnabled, scenarioName: name } = req.body;
   await db.none(updateScenario(projectName, scenarioName, name, analysisEnabled, thresholds));
-  res.status(200).send();
+  res.status(204).send();
 };
