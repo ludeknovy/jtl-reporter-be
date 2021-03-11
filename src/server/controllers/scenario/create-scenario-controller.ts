@@ -8,7 +8,7 @@ export const createScenarioController = async (req: Request, res: Response, next
   const { scenarioName } = req.body;
   const { exists } = await db.one(isExistingScenario(scenarioName, projectName));
   if (!exists) {
-    await db.none(createNewScenario(projectName, scenarioName, true));
+    await db.none(createNewScenario(projectName, scenarioName));
   } else {
     return next(boom.conflict('Scenario already exists'));
   }
