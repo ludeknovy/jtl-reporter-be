@@ -42,7 +42,16 @@ describe('Scenario', () => {
       await request(__server__)
         .put('/api/projects/test-project/scenarios/test-scenario')
         .set(__tokenHeaderKey__, credentials.token)
-        .send({ scenarioName: 'test-scenario' })
+        .send({
+          scenarioName: 'test-scenario',
+          analysisEnabled: false,
+          thresholds: {
+            enabled: true,
+            percentile: 4.2,
+            errorRate: 4.2,
+            throughput: 8.3
+          }
+        })
         .set('Accept', 'application/json')
         .expect(204);
     });

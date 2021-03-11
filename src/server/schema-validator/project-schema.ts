@@ -9,6 +9,6 @@ export const projectNameParam = {
   projectName: Joi.string().required()
 };
 
-export const newScenarioSchema = {
+export const scenarioSchema = {
   scenarioName: Joi.string().min(1).max(50).required()
 };
