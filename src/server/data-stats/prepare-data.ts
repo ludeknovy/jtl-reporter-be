@@ -66,6 +66,16 @@ export const prepareChartDataForSavingFromMongo = (overviewData: ChartOverviewDa
         .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.avgResponseTime)]),
       name: label
     })),
+    minResponseTime: labels.map((label) => ({
+      data: labelData.filter((_) => _._id.label === label)
+        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.minResponseTime)]),
+      name: label
+    })),
+    maxResponseTime: labels.map((label) => ({
+      data: labelData.filter((_) => _._id.label === label)
+        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.maxResponseTime)]),
+      name: label
+    })),
     network: labels.map((label) => ({
       data: labelData.filter((_) => _._id.label === label)
         .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.bytes / _.interval)]),
@@ -168,6 +178,8 @@ interface ChartLabelData {
   count: number;
   threads: number;
   avgResponseTime: number;
+  minResponseTime: number;
+  maxResponseTime: number;
   interval: number;
   bytes: number;
 }

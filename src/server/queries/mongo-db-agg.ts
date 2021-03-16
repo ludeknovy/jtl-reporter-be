@@ -336,6 +336,12 @@ export const labelChartAgg = (dataId: string, interval: number) => {
         },
         'avgResponseTime': {
           '$avg': '$samples.elapsed'
+        },
+        'minResponseTime': {
+          '$min': '$samples.elapsed'
+        },
+        'maxResponseTime': {
+          '$max': '$samples.elapsed'
         }
       }
     }, {
