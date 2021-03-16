@@ -228,6 +228,9 @@ export const overviewChartAgg = (dataId: string, interval: number) => {
         'avgResponseTime': {
           '$avg': '$samples.elapsed'
         },
+        'bytes': {
+          '$sum': '$samples.bytes'
+        },
         'success': {
           '$push': '$samples.success'
         }
@@ -324,6 +327,9 @@ export const labelChartAgg = (dataId: string, interval: number) => {
         },
         'count': {
           '$sum': 1
+        },
+        'bytes': {
+          '$sum': '$samples.bytes'
         },
         'threads': {
           '$max': '$samples.allThreads'

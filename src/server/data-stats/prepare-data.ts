@@ -52,6 +52,10 @@ export const prepareChartDataForSavingFromMongo = (overviewData: ChartOverviewDa
       data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.count / _.interval)]),
       name: 'throughput'
     },
+    overallNetwork: {
+      data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.bytes / _.interval)]),
+      name: 'network'
+    },
     throughput: labels.map((label) => ({
       data: labelData.filter((_) => _._id.label === label)
         .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.count / _.interval)]),
@@ -60,6 +64,11 @@ export const prepareChartDataForSavingFromMongo = (overviewData: ChartOverviewDa
     responseTime: labels.map((label) => ({
       data: labelData.filter((_) => _._id.label === label)
         .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.avgResponseTime)]),
+      name: label
+    })),
+    network: labels.map((label) => ({
+      data: labelData.filter((_) => _._id.label === label)
+        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.bytes / _.interval)]),
       name: label
     }))
   };
@@ -146,6 +155,7 @@ interface ChartOverviewData {
   avgResponseTime: number;
   interval: number;
   errorRate: number;
+  bytes: number;
 }
 
 interface ChartLabelData {
@@ -159,6 +169,7 @@ interface ChartLabelData {
   threads: number;
   avgResponseTime: number;
   interval: number;
+  bytes: number;
 }
 
 export interface Overview {
