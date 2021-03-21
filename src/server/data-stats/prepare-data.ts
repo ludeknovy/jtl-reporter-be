@@ -80,6 +80,21 @@ export const prepareChartDataForSavingFromMongo = (overviewData: ChartOverviewDa
       data: labelData.filter((_) => _._id.label === label)
         .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.bytes / _.interval)]),
       name: label
+    })),
+    percentile90: labels.map((label) => ({
+      data: labelData.filter((_) => _._id.label === label)
+        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.percentile90)]),
+      name: label
+    })),
+    percentile95: labels.map((label) => ({
+      data: labelData.filter((_) => _._id.label === label)
+        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.percentile95)]),
+      name: label
+    })),
+    percentile99: labels.map((label) => ({
+      data: labelData.filter((_) => _._id.label === label)
+        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.percentile99)]),
+      name: label
     }))
   };
 
@@ -182,6 +197,9 @@ interface ChartLabelData {
   maxResponseTime: number;
   interval: number;
   bytes: number;
+  percentile90: number;
+  percentile95: number;
+  percentile99: number;
 }
 
 export interface Overview {

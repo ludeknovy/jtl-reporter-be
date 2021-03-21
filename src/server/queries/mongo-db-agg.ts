@@ -300,6 +300,11 @@ export const labelChartAgg = (dataId: string, interval: number) => {
         'path': '$samples'
       }
     }, {
+      '$sort': {
+        'samples.elapsed': 1
+      }
+    },
+    {
       '$group': {
         '_id': {
           'interval': {
@@ -342,6 +347,9 @@ export const labelChartAgg = (dataId: string, interval: number) => {
         },
         'maxResponseTime': {
           '$max': '$samples.elapsed'
+        },
+        'elapsed': {
+          '$push': '$samples.elapsed'
         }
       }
     }, {
@@ -354,11 +362,49 @@ export const labelChartAgg = (dataId: string, interval: number) => {
               ]
             }, 1000
           ]
+        },
+        'percentile90': {
+          '$arrayElemAt': [
+            '$elapsed', {
+              '$floor': {
+                '$multiply': [
+                  0.90, '$count'
+                ]
+              }
+            }
+          ]
+        },
+        'percentile95': {
+          '$arrayElemAt': [
+            '$elapsed', {
+              '$floor': {
+                '$multiply': [
+                  0.95, '$count'
+                ]
+              }
+            }
+          ]
+        },
+        'percentile99': {
+          '$arrayElemAt': [
+            '$elapsed', {
+              '$floor': {
+                '$multiply': [
+                  0.99, '$count'
+                ]
+              }
+            }
+          ]
         }
       }
     }, {
       '$sort': {
         '_id': 1
+      }
+    },
+    {
+      '$project': {
+        'elapsed': 0
       }
     }
   ];
