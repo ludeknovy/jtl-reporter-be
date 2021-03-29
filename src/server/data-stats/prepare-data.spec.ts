@@ -1,9 +1,9 @@
-import { stringToNumber, transformDataForFb } from './prepare-data';
+import { stringToNumber, transformDataForDb } from './prepare-data';
 
 describe('prepare data', () => {
   describe('transformDataForFb', () => {
     it('should return undefined when unable to process data', () => {
-      const result = transformDataForFb({});
+      const result = transformDataForDb({});
       expect(result).toBeUndefined();
     });
     it('should correctly proccess data', () => {
@@ -25,7 +25,7 @@ describe('prepare data', () => {
         responseCode: '200',
         responseMessage: ''
       };
-      const result = transformDataForFb(inputData);
+      const result = transformDataForDb(inputData);
       expect(result).toEqual({
         bytes: 792,
         label: 'endpoint3',

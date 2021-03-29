@@ -15,9 +15,6 @@ export const overviewAggPipeline = (dataId) => {
     }, {
       '$group': {
         '_id': null,
-        'maxVu': {
-          '$max': '$samples.allThreads'
-        },
         'start': {
           '$min': '$samples.timeStamp'
         },
@@ -336,9 +333,6 @@ export const labelChartAgg = (dataId: string, interval: number) => {
         'bytes': {
           '$sum': '$samples.bytes'
         },
-        'threads': {
-          '$max': '$samples.allThreads'
-        },
         'avgResponseTime': {
           '$avg': '$samples.elapsed'
         },
@@ -405,6 +399,63 @@ export const labelChartAgg = (dataId: string, interval: number) => {
     {
       '$project': {
         'elapsed': 0
+      }
+    }
+  ];
+};
+
+export const threadChartDistributed = (interval, dataId) => {
+  return [
+    {
+      '$match': {
+        'dataId': dataId
+      }
+    }, {
+      '$unwind': {
+        'path': '$samples'
+      }
+    },
+    {
+      '$match': {
+        'samples.responseMessage': {
+          '$not': {
+            '$regex': '^Number of samples in transaction'
+          }
+        }
+      }
+    }, {
+      '$group': {
+        '_id': {
+          'interval': {
+            '$toDate': {
+              '$subtract': [
+                {
+                  '$toLong': '$samples.timeStamp'
+                }, {
+                  '$mod': [
+                    {
+                      '$toLong': '$samples.timeStamp'
+                    }, interval
+                  ]
+                }
+              ]
+            }
+          },
+          'hostname': '$samples.Hostname'
+        },
+        'threadAvg': {
+          '$avg': '$samples.allThreads'
+        }
+      }
+    }, {
+      '$project': {
+        'threads': {
+          '$round': ['$threadAvg']
+        }
+      }
+    }, {
+      '$sort': {
+        '_id': 1
       }
     }
   ];
