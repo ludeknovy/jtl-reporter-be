@@ -8,7 +8,7 @@ export const prepareDataForSavingToDbFromMongo = (overviewData, labelData): { ov
   return {
     overview: {
       percentil: roundNumberTwoDecimals(overviewData.percentil),
-      maxVu: overviewData.maxVu,
+      maxVu: undefined,
       avgResponseTime: overviewData.avgResponse.toFixed(0),
       errorRate: roundNumberTwoDecimals((overviewData.failed / overviewData.total) * 100),
       throughput: roundNumberTwoDecimals(overviewData.total / ((overviewData.end - overviewData.start) / 1000)),
@@ -36,10 +36,13 @@ export const prepareDataForSavingToDbFromMongo = (overviewData, labelData): { ov
   };
 };
 
-export const prepareChartDataForSavingFromMongo = (overviewData: ChartOverviewData[], labelData: ChartLabelData[]) => {
+export const prepareChartDataForSavingFromMongo = (
+  overviewData: ChartOverviewData[], labelData: ChartLabelData[], distributedThreads?: []) => {
   const labels = [...new Set(labelData.map((_) => _._id.label))];
   return {
-    threads: overviewData.map((_) => [moment(_._id).valueOf(), _.threads]),
+    threads: distributedThreads?.length > 0
+      ? calculateDistributedThreads(distributedThreads)
+      : overviewData.map((_) => [moment(_._id).valueOf(), _.threads]) as [number, number][],
     overAllFailRate: {
       data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.errorRate)]),
       name: 'errors'
@@ -97,7 +100,24 @@ export const prepareChartDataForSavingFromMongo = (overviewData: ChartOverviewDa
       name: label
     }))
   };
+};
 
+export const calculateDistributedThreads = (distributedThreads: DistributedThreadData[]): [number, number][] => {
+  const threadAcc = distributedThreads.reduce((acc, curr) => {
+    const interval = moment(curr._id.interval).valueOf();
+    if (!acc[interval]) {
+      acc[interval] = 0;
+    }
+    acc[interval] += curr.threads;
+    return acc;
+  }, { });
+
+  const threads = [];
+
+  for (const key in threadAcc) {
+    threads.push([parseInt(key, 10), threadAcc[key]]);
+  }
+  return threads;
 };
 
 export const stringToNumber = (input: string, radix: number) => {
@@ -108,7 +128,7 @@ export const stringToNumber = (input: string, radix: number) => {
   return result;
 };
 
-export const transformDataForFb = (_) => {
+export const transformDataForDb = (_) => {
   try {
     _.timeStamp = new Date(stringToNumber(_.timeStamp, 10));
     _.elapsed = stringToNumber(_.elapsed, 10);
@@ -214,4 +234,12 @@ export interface Overview {
   startDate: Date;
   endDate: Date;
   bytesPerSecond: number;
+};
+
+interface DistributedThreadData {
+  _id: {
+    interval: Date;
+    hostname: string;
+  };
+  threads: number;
 };
