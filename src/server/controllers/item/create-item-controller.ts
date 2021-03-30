@@ -107,6 +107,10 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
             await db.none(updateItem(itemId, ReportStatus.Error, null));
             logger.error(`Error while processing item: ${itemId}: ${error}`);
           }
+        }).
+        on('error', async (error) => {
+          await db.none(updateItem(itemId, ReportStatus.Error, null));
+          logger.error(`Not valid csv file provided: ${error}`);
         });
     } catch (e) {
       logger.error(e);
