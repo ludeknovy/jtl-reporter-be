@@ -85,10 +85,8 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId, da
       await t.none(savePlotData(itemId, JSON.stringify(chartData)));
       await t.none(updateItem(itemId, ReportStatus.Ready, overview.startDate));
     });
-
   } catch (error) {
-    logger.error(error);
-    throw new Error(`Error while processing dataId: ${dataId} for item:: ${itemId}`);
+    throw new Error(`Error while processing dataId: ${dataId} for item: ${itemId}, error: ${error}`);
   }
 };
 
