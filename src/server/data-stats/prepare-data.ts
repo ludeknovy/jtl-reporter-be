@@ -2,38 +2,43 @@ import { roundNumberTwoDecimals } from './helper/stats-fc';
 import * as moment from 'moment';
 import { logger } from '../../logger';
 
-export const prepareDataForSavingToDbFromMongo = (overviewData, labelData): { overview: Overview; labelStats } => {
-  const startDate = new Date(overviewData.start);
-  const endDate = new Date(overviewData.end);
-  return {
-    overview: {
-      percentil: roundNumberTwoDecimals(overviewData.percentil),
-      maxVu: undefined,
-      avgResponseTime: overviewData.avgResponse.toFixed(0),
-      errorRate: roundNumberTwoDecimals((overviewData.failed / overviewData.total) * 100),
-      throughput: roundNumberTwoDecimals(overviewData.total / ((overviewData.end - overviewData.start) / 1000)),
-      bytesPerSecond: roundNumberTwoDecimals(overviewData.bytes / ((overviewData.end - overviewData.start) / 1000)),
-      avgLatency: roundNumberTwoDecimals(overviewData.avgLatency),
-      avgConnect: roundNumberTwoDecimals(overviewData.avgConnect),
-      startDate,
-      endDate,
-      duration: roundNumberTwoDecimals((endDate.getTime() - startDate.getTime()) / 1000 / 60)
-    },
-    labelStats: labelData.map((_) => ({
-      label: _._id,
-      samples: _.samplesCount,
-      avgResponseTime: _.avgResponseTime.toFixed(0),
-      minResponseTime: _.minResponseTime,
-      maxResponseTime: _.maxResponseTime,
-      errorRate: roundNumberTwoDecimals(_.failed / _.samplesCount * 100),
-      bytes: _.avgBytes.toFixed(2),
-      throughput: roundNumberTwoDecimals(
-        _.samplesCount / ((_.end - _.start) / 1000)),
-      n9: _.percentil99,
-      n5: _.percentil95,
-      n0: _.percentil90
-    }))
-  };
+// eslint-disable-next-line max-len
+export const prepareDataForSavingToDbFromMongo = (overviewData, labelData, itemId: string): { overview: Overview; labelStats } => {
+  try {
+    const startDate = new Date(overviewData.start);
+    const endDate = new Date(overviewData.end);
+    return {
+      overview: {
+        percentil: roundNumberTwoDecimals(overviewData.percentil),
+        maxVu: undefined,
+        avgResponseTime: overviewData.avgResponse.toFixed(0),
+        errorRate: roundNumberTwoDecimals((overviewData.failed / overviewData.total) * 100),
+        throughput: roundNumberTwoDecimals(overviewData.total / ((overviewData.end - overviewData.start) / 1000)),
+        bytesPerSecond: roundNumberTwoDecimals(overviewData.bytes / ((overviewData.end - overviewData.start) / 1000)),
+        avgLatency: roundNumberTwoDecimals(overviewData.avgLatency),
+        avgConnect: roundNumberTwoDecimals(overviewData.avgConnect),
+        startDate,
+        endDate,
+        duration: roundNumberTwoDecimals((endDate.getTime() - startDate.getTime()) / 1000 / 60)
+      },
+      labelStats: labelData.map((_) => ({
+        label: _._id,
+        samples: _.samplesCount,
+        avgResponseTime: _.avgResponseTime.toFixed(0),
+        minResponseTime: _.minResponseTime,
+        maxResponseTime: _.maxResponseTime,
+        errorRate: roundNumberTwoDecimals(_.failed / _.samplesCount * 100),
+        bytes: _.avgBytes.toFixed(2),
+        throughput: roundNumberTwoDecimals(
+          _.samplesCount / ((_.end - _.start) / 1000)),
+        n9: _.percentil99,
+        n5: _.percentil95,
+        n0: _.percentil90
+      }))
+    };
+  } catch (error) {
+    throw new Error(`Error while processing aggregation pipeline results for item: ${itemId} error: ${error}`);
+  }
 };
 
 export const prepareChartDataForSavingFromMongo = (
@@ -110,7 +115,7 @@ export const calculateDistributedThreads = (distributedThreads: DistributedThrea
     }
     acc[interval] += curr.threads;
     return acc;
-  }, { });
+  }, {});
 
   const threads = [];
 
@@ -141,7 +146,7 @@ export const transformDataForDb = (_) => {
     _.success = _.success === 'true';
     return _;
   } catch (error) {
-    logger.error(error);
+    logger.error(`Error while parsing data: ${error}`);
     return;
   }
 };

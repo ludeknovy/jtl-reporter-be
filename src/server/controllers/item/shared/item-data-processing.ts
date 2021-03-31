@@ -33,7 +33,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId, da
     const {
       overview,
       overview: { duration },
-      labelStats } = prepareDataForSavingToDbFromMongo(aggOverview[0], aggLabel);
+      labelStats } = prepareDataForSavingToDbFromMongo(aggOverview[0], aggLabel, itemId);
     const interval = chartQueryOptionInterval(duration);
     const overviewChartData = await collection.aggregate(
       overviewChartAgg(dataId, interval), { allowDiskUse: true }).toArray();
@@ -85,10 +85,8 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId, da
       await t.none(savePlotData(itemId, JSON.stringify(chartData)));
       await t.none(updateItem(itemId, ReportStatus.Ready, overview.startDate));
     });
-
   } catch (error) {
-    logger.error(error);
-    throw new Error(`Error while processing dataId: ${dataId} for item:: ${itemId}`);
+    throw new Error(`Error while processing dataId: ${dataId} for item: ${itemId}, error: ${error}`);
   }
 };
 
