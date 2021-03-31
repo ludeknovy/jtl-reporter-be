@@ -2,8 +2,7 @@ import { roundNumberTwoDecimals } from './helper/stats-fc';
 import * as moment from 'moment';
 import { logger } from '../../logger';
 
-// eslint-disable-next-line max-len
-export const prepareDataForSavingToDbFromMongo = (overviewData, labelData, itemId: string): { overview: Overview; labelStats } => {
+export const prepareDataForSavingToDbFromMongo = (overviewData, labelData): { overview: Overview; labelStats } => {
   try {
     const startDate = new Date(overviewData.start);
     const endDate = new Date(overviewData.end);
@@ -37,7 +36,7 @@ export const prepareDataForSavingToDbFromMongo = (overviewData, labelData, itemI
       }))
     };
   } catch (error) {
-    throw new Error(`Error while processing aggregation pipeline results for item: ${itemId} error: ${error}`);
+    throw new Error(`Error while processing aggregation pipeline results ${error}`);
   }
 };
 

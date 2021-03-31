@@ -33,7 +33,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId, da
     const {
       overview,
       overview: { duration },
-      labelStats } = prepareDataForSavingToDbFromMongo(aggOverview[0], aggLabel, itemId);
+      labelStats } = prepareDataForSavingToDbFromMongo(aggOverview[0], aggLabel);
     const interval = chartQueryOptionInterval(duration);
     const overviewChartData = await collection.aggregate(
       overviewChartAgg(dataId, interval), { allowDiskUse: true }).toArray();
