@@ -10,7 +10,7 @@ export const prepareDataForSavingToDbFromMongo = (overviewData, labelData): { ov
       overview: {
         percentil: roundNumberTwoDecimals(overviewData.percentil),
         maxVu: undefined,
-        avgResponseTime: overviewData.avgResponse.toFixed(0),
+        avgResponseTime: Math.round(overviewData.avgResponse),
         errorRate: roundNumberTwoDecimals((overviewData.failed / overviewData.total) * 100),
         throughput: roundNumberTwoDecimals(overviewData.total / ((overviewData.end - overviewData.start) / 1000)),
         bytesPerSecond: roundNumberTwoDecimals(overviewData.bytes / ((overviewData.end - overviewData.start) / 1000)),
@@ -23,11 +23,11 @@ export const prepareDataForSavingToDbFromMongo = (overviewData, labelData): { ov
       labelStats: labelData.map((_) => ({
         label: _._id,
         samples: _.samplesCount,
-        avgResponseTime: _.avgResponseTime.toFixed(0),
+        avgResponseTime: Math.round(_.avgResponseTime),
         minResponseTime: _.minResponseTime,
         maxResponseTime: _.maxResponseTime,
         errorRate: roundNumberTwoDecimals(_.failed / _.samplesCount * 100),
-        bytes: _.avgBytes.toFixed(2),
+        bytes: roundNumberTwoDecimals(_.avgBytes),
         throughput: roundNumberTwoDecimals(
           _.samplesCount / ((_.end - _.start) / 1000)),
         n9: _.percentil99,
