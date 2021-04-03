@@ -8,12 +8,10 @@ exports.up = (pgm) => {
     },
     user_id: {
       type: 'uuid',
-      notNull: true,
       references: { schema: 'jtl', name: 'users', column: 'id' }
     },
     item_id: {
       type: 'uuid',
-      notNull: true,
       references: { schema: 'jtl', name: 'items', column: 'id' }
     },
     chart_settings: {
@@ -23,6 +21,13 @@ exports.up = (pgm) => {
   });
   pgm.createIndex(
     { schema: 'jtl', name: 'user_item_chart_settings' },
-    ['item_id', 'user_id'],
+    ['user_id', 'item_id'],
     { name: 'user_item_chart_settings_user_id_item_id_key', unique: true });
+  pgm.addConstraint(
+    { schema: 'jtl', name: 'user_item_chart_settings' },
+    'user_item_chart_settings_user_id_item_id_constraint',
+    {
+      unique: ['user_id', 'item_id']
+    });
+
 };

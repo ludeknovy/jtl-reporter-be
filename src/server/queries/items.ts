@@ -306,7 +306,7 @@ export const saveThresholdsResult = (projectName, scenarioName, itemId, threshol
 export const upsertItemChartSettings = (itemId, userId, chartSetting) => {
   return {
     text: `INSERT INTO jtl.user_item_chart_settings as settings (item_id, user_id, chart_settings) VALUES ($1, $2, $3) 
-    ON CONFLICT ON CONSTRAINT user_item_chart_settings_user_id_item_id_key 
+    ON CONFLICT ON CONSTRAINT user_item_chart_settings_user_id_item_id_constraint 
     DO UPDATE SET chart_settings = $3 WHERE settings.item_id = $1 AND settings.user_id = $2`,
     values: [itemId, userId, chartSetting]
   };
