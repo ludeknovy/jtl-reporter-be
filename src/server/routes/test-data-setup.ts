@@ -7,7 +7,7 @@ import { States } from '../../tests/contract/states.model';
 import { db } from '../../db/db';
 import { createNewProject } from '../queries/projects';
 import { createNewScenario } from '../queries/scenario';
-import { createNewItem, saveItemStats } from '../queries/items';
+import { createNewItem, createShareToken, saveItemStats } from '../queries/items';
 import { testStats, testOverview } from '../../test-data/test-stats';
 import { createUserInDB } from '../controllers/users/create-new-user-controller';
 import { getUser } from '../queries/auth';
@@ -37,17 +37,19 @@ export class TestDataSetup {
               res.sendStatus(201);
               break;
             case States.ExistingTestItem:
+              const itemId = '28b32386-2c69-41fc-ab98-8b16ef4823af';
               await db.any(createNewProject('test-project'));
               await db.any(createNewScenario('test-project', 'test-scenario'));
               const dataId = uuid();
               // eslint-disable-next-line max-len
-              const [item] = await db.any(createNewItem('test-scenario', '2019-09-22 20:20:23.265', 'localhost', 'test note', '1', 'test-project', 'localhost', ReportStatus.Ready, dataId));
-              await db.any(saveItemStats(item.id, JSON.stringify(testStats), JSON.stringify(testOverview)));
-              await db.any({
+              await db.none(createNewItem('test-scenario', '2019-09-22 20:20:23.265', 'localhost', 'test note', '1', 'test-project', 'localhost', ReportStatus.Ready, dataId));
+              await db.none({
                 text: 'UPDATE jtl.items SET id = $2 WHERE data_id = $1',
-                values: [dataId, '28b32386-2c69-41fc-ab98-8b16ef4823af']
+                values: [dataId, itemId]
               });
-              res.status(200).send({ itemId: item.id });
+              await db.any(saveItemStats(itemId, JSON.stringify(testStats), JSON.stringify(testOverview)));
+              await db.none(createShareToken('test-project', 'test-scenario', itemId, 'test', 'my-name'));
+              res.status(200).send({ itemId: itemId });
               break;
             case States.EmptyDb:
               res.sendStatus(201);
