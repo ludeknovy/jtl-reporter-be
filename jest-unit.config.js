@@ -19,5 +19,5 @@ module.exports = {
     '!**/db/**',
     '!**/node_modules/**'
   ],
-  'coverageReporters': ['text']
+  'coverageReporters': ['lcov']
 };
