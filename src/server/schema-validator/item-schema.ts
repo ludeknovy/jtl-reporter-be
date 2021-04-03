@@ -54,3 +54,7 @@ export const newItemParamSchema = Joi.object().keys({
   scenarioName
 });
 
+export const upsertUserItemChartSettings = Joi.array().items(Joi.object().keys({
+  name: Joi.string().required(),
+  metric: Joi.string().required()
+})).required();

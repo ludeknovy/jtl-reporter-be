@@ -8,7 +8,7 @@ import {
 import {
   paramsSchema, updateItemBodySchema,
   newItemParamSchema,
-  newAsyncItemStartBodySchema, stopAsyncItemBody, shareTokenSchema
+  newAsyncItemStartBodySchema, stopAsyncItemBody, shareTokenSchema, upsertUserItemChartSettings
 } from '../schema-validator/item-schema';
 import { paramsSchema as scenarioParamsSchema, querySchema } from '../schema-validator/scenario-schema';
 import { getItemsController } from '../controllers/item/get-items-controller';
@@ -25,6 +25,9 @@ import { allowQueryTokenAuth } from '../middleware/allow-query-token-auth';
 import { getItemLinksController } from '../controllers/item/share-tokens/get-item-share-tokens-controller';
 import { createItemLinkController } from '../controllers/item/share-tokens/create-item-share-token-controller';
 import { deleteItemShareTokenController } from '../controllers/item/share-tokens/delete-item-share-token-cronroller';
+import { IGetUserAuthInfoRequest } from '../middleware/request.model';
+import { upsertItemChartSettingsController } from '../controllers/item/upsert-item-chart-settings-controller';
+import { getItemChartSettingsController } from '../controllers/item/get-item-chart-settings-controller';
 
 export class ItemsRoutes {
 
@@ -105,5 +108,18 @@ export class ItemsRoutes {
         paramsSchemaValidator(scenarioParamsSchema),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getProcessingItemsController(req, res, next)));
+
+    app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/custom-chart-settings')
+      .post(
+        authenticationMiddleware,
+        paramsSchemaValidator(paramsSchema),
+        bodySchemaValidator(upsertUserItemChartSettings),
+        // eslint-disable-next-line max-len
+        wrapAsync(async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => await upsertItemChartSettingsController(req, res, next))
+      )
+      .get(authenticationMiddleware,
+        paramsSchemaValidator(paramsSchema),
+        // eslint-disable-next-line max-len
+        wrapAsync(async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => await getItemChartSettingsController(req, res, next)));
   }
 }

@@ -96,4 +96,25 @@ describe('Items', () => {
         .expect(201);
     });
   });
+  describe('POST /projects/{projectName}/scenarios/{scenarioName}/items/{itemId}/custom-chart-settings', () => {
+    it('should be able to upsert chart settings', async () => {
+      const { data: { itemId } } = await stateSetup(States.ExistingTestItem);
+      await request(__server__)
+        .post(`/api/projects/test-project/scenarios/test-scenario/items/${itemId}/custom-chart-settings`)
+        .set(__tokenHeaderKey__, credentials.token)
+        .set('Accept', 'application/json')
+        .send([{ name: 'test', metric: 'test' }])
+        .expect(200);
+    });
+  });
+  describe('GET /projects/{projectName}/scenarios/{scenarioName}/items/{itemId}/custom-chart-settings', () => {
+    it('should be able to upsert chart settings', async () => {
+      const { data: { itemId } } = await stateSetup(States.ExistingTestItem);
+      await request(__server__)
+        .get(`/api/projects/test-project/scenarios/test-scenario/items/${itemId}/custom-chart-settings`)
+        .set(__tokenHeaderKey__, credentials.token)
+        .set('Accept', 'application/json')
+        .expect(200);
+    });
+  });
 });
