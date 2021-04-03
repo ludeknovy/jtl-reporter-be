@@ -43,6 +43,10 @@ export class TestDataSetup {
               // eslint-disable-next-line max-len
               const [item] = await db.any(createNewItem('test-scenario', '2019-09-22 20:20:23.265', 'localhost', 'test note', '1', 'test-project', 'localhost', ReportStatus.Ready, dataId));
               await db.any(saveItemStats(item.id, JSON.stringify(testStats), JSON.stringify(testOverview)));
+              await db.any({
+                text: 'UPDATE jtl.items SET id = $2 WHERE data_id = $1',
+                values: [dataId, '28b32386-2c69-41fc-ab98-8b16ef4823af']
+              });
               res.status(200).send({ itemId: item.id });
               break;
             case States.EmptyDb:
