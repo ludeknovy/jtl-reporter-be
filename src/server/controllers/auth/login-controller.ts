@@ -5,7 +5,6 @@ import * as boom from 'boom';
 import { passwordMatch } from './helper/passwords';
 import { generateToken } from './helper/token-generator';
 
-
 export const loginController = async (req: Request, res: Response, next: NextFunction) => {
   const { username, password } = req.body;
   try {
@@ -21,5 +20,4 @@ export const loginController = async (req: Request, res: Response, next: NextFun
   } catch (error) {
     return next(error);
   }
-
 };
