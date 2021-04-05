@@ -10,7 +10,7 @@ import { saveThresholdsResult, saveItemStats, savePlotData, updateItem, saveData
 import { ItemDataType, ReportStatus } from '../../../queries/items.model';
 import {
   overviewChartAgg, labelChartAgg, labelAggPipeline,
-  overviewAggPerUrlPipeline, threadChartDistributed
+  overviewAggPerSutPipeline, threadChartDistributed, overviewAggPipeline
 } from '../../../queries/mongo-db-agg';
 import { chartQueryOptionInterval } from '../../../queries/mongoChartOptionHelper';
 import { getScenarioThresholds, currentScenarioMetrics } from '../../../queries/scenario';
@@ -33,7 +33,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId, da
     const aggLabel = await labelAggregationPipeline(collection, dataId);
 
     if (sutHostnames.filter(_ => _).length > 0) {
-      sutMetrics = await overviewAggregationPerUrlPipeline(collection, dataId);
+      sutMetrics = await overviewAggregationPerSutPipeline(collection, dataId);
     }
 
 
@@ -100,12 +100,12 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId, da
 
 const overviewAggregationPipeline = async (collection, dataId) => {
   return await collection.aggregate(
-    overviewAggPerUrlPipeline(dataId), { allowDiskUse: true }).toArray();
+    overviewAggPipeline(dataId), { allowDiskUse: true }).toArray();
 };
 
-const overviewAggregationPerUrlPipeline = async (collection, dataId) => {
+const overviewAggregationPerSutPipeline = async (collection, dataId) => {
   return await collection.aggregate(
-    overviewAggPerUrlPipeline(dataId), { allowDiskUse: true }).toArray();
+    overviewAggPerSutPipeline(dataId), { allowDiskUse: true }).toArray();
 };
 
 const labelAggregationPipeline = async (collection, dataId) => {

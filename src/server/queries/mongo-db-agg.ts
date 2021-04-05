@@ -79,7 +79,7 @@ export const overviewAggPipeline = (dataId) => {
   ];
 };
 
-export const overviewAggPerUrlPipeline = (dataId) => {
+export const overviewAggPerSutPipeline = (dataId) => {
   return [
     {
       '$match': {
