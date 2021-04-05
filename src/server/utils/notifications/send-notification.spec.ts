@@ -21,7 +21,8 @@ const OVERVIEW = {
   maxVu: 10,
   startDate: new Date(),
   throughput: 10,
-  bytesPerSecond: 20123
+  bytesPerSecond: 20123,
+  bytesSentPerSecond: 1233
 };
 
 describe('sendNotification', () => {

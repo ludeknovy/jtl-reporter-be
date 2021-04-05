@@ -12,7 +12,8 @@ describe('MS Teams template', () => {
     maxVu: 10,
     startDate: new Date(),
     throughput: 10,
-    bytesPerSecond: 123234
+    bytesPerSecond: 123234,
+    bytesSentPerSecond: 12334
   };
   it('should return correct card payload when url provided', () => {
     const template = msTeamsTemplate('scenarioName', 'http://localhost', OVERVIEW);
