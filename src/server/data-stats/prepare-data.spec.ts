@@ -199,7 +199,6 @@ describe('prepare data', () => {
       }
     ];
     const { overview, labelStats } = prepareDataForSavingToDbFromMongo(overviewData, labelsData, []);
-    console.log(labelStats)
     expect(overview).toEqual({
       percentil: 271,
       maxVu: undefined,
