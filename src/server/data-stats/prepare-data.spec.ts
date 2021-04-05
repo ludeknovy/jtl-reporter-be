@@ -13,6 +13,7 @@ describe('prepare data', () => {
     it('should correctly proccess data', () => {
       const inputData = {
         bytes: '792',
+        sentBytes: '124',
         label: 'endpoint3',
         // eslint-disable-next-line @typescript-eslint/naming-convention
         Connect: '155',
@@ -32,6 +33,7 @@ describe('prepare data', () => {
       const result = transformDataForDb(inputData);
       expect(result).toEqual({
         bytes: 792,
+        sentBytes: 124,
         label: 'endpoint3',
         // eslint-disable-next-line @typescript-eslint/naming-convention
         Connect: 155,
@@ -46,12 +48,14 @@ describe('prepare data', () => {
         grpThreads: 1,
         threadName: 'Thread 1-1',
         responseCode: 200,
-        responseMessage: ''
+        responseMessage: '',
+        sutHostname: undefined
       });
     });
     it('should return sutHostname when URL provided with valid url', () => {
       const inputData = {
         bytes: '792',
+        sentBytes: '123',
         label: 'endpoint3',
         // eslint-disable-next-line @typescript-eslint/naming-convention
         Connect: '155',
@@ -75,6 +79,7 @@ describe('prepare data', () => {
     it('should return sutHostname undefined when URL contains empty url', () => {
       const inputData = {
         bytes: '792',
+        sentBytes: '123',
         label: 'endpoint3',
         // eslint-disable-next-line @typescript-eslint/naming-convention
         Connect: '155',
@@ -98,6 +103,7 @@ describe('prepare data', () => {
     it('should return sutHostname undefined when URL contains invalid url', () => {
       const inputData = {
         bytes: '792',
+        sentBytes: '123',
         label: 'endpoint3',
         // eslint-disable-next-line @typescript-eslint/naming-convention
         Connect: '155',
@@ -168,6 +174,7 @@ describe('prepare data', () => {
       avgLatency: 105.62091166623745,
       avgResponse: 105.72559876384238,
       bytes: 69848465,
+      bytesSent: 123123,
       total: 46596,
       percentil: 271,
       failed: 3
@@ -179,6 +186,8 @@ describe('prepare data', () => {
         maxResponseTime: 1325,
         avgResponseTime: 286.97317596566523,
         avgBytes: 1921.6502145922748,
+        bytes: 123,
+        bytesSent: 1231,
         samplesCount: 932,
         start: new Date('2021-03-29T10:59:01.561Z'),
         end: new Date('2021-03-29T11:27:07.702Z'),
@@ -194,6 +203,8 @@ describe('prepare data', () => {
         avgResponseTime: 44.93503480278422,
         avgBytes: 572.2737819025522,
         samplesCount: 431,
+        bytes: 123,
+        bytesSent: 1231,
         start: new Date('2021-03-29T11:00:53.221Z'),
         end: new Date('2021-03-29T11:27:01.650Z'),
         percentil90: 50,
@@ -210,6 +221,7 @@ describe('prepare data', () => {
       errorRate: 0.01,
       throughput: 25.9,
       bytesPerSecond: 38820.04,
+      bytesSentPerSecond: 68.43,
       avgLatency: 105.62,
       avgConnect: 5.8,
       startDate: new Date('2021-03-29T10:57:10.882Z'),
@@ -225,6 +237,8 @@ describe('prepare data', () => {
         maxResponseTime: 1325,
         errorRate: 0,
         bytes: 1921.65,
+        bytesPerSecond: 0.07,
+        bytesSentPerSecond: 0.73,
         throughput: 0.55,
         n9: 418,
         n5: 367,
@@ -238,6 +252,8 @@ describe('prepare data', () => {
         maxResponseTime: 118,
         errorRate: 0,
         bytes: 572.27,
+        bytesPerSecond: 0.08,
+        bytesSentPerSecond: 0.78,
         throughput: 0.27,
         n9: 93,
         n5: 56,

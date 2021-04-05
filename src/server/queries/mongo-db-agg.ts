@@ -33,6 +33,9 @@ export const overviewAggPipeline = (dataId) => {
         'bytes': {
           '$sum': '$samples.bytes'
         },
+        'bytesSent': {
+          '$sum': '$samples.sentBytes'
+        },
         'total': {
           '$sum': 1
         },
@@ -116,6 +119,9 @@ export const overviewAggPerSutPipeline = (dataId) => {
         'bytes': {
           '$sum': '$samples.bytes'
         },
+        'bytesSent': {
+          '$sum': '$samples.sentBytes'
+        },
         'total': {
           '$sum': 1
         },
@@ -191,6 +197,12 @@ export const labelAggPipeline = (dataId) => {
         },
         'avgBytes': {
           '$avg': '$samples.bytes'
+        },
+        'bytesSent': {
+          '$sum': '$samples.sentBytes'
+        },
+        'bytes': {
+          '$sum': '$samples.bytes'
         },
         'samplesCount': {
           '$sum': 1
@@ -311,6 +323,9 @@ export const overviewChartAgg = (dataId: string, interval: number) => {
         'bytes': {
           '$sum': '$samples.bytes'
         },
+        'bytesSent': {
+          '$sum': '$samples.sentBytes'
+        },
         'success': {
           '$push': '$samples.success'
         }
@@ -415,6 +430,9 @@ export const labelChartAgg = (dataId: string, interval: number) => {
         },
         'bytes': {
           '$sum': '$samples.bytes'
+        },
+        'bytesSent': {
+          '$sum': '$samples.sentBytes'
         },
         'avgResponseTime': {
           '$avg': '$samples.elapsed'
