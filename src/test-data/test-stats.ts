@@ -4,5 +4,5 @@ export const testStats =
 
 export const testOverview = {
   // eslint-disable-next-line max-len
-  'maxVu': 500, 'errors': { '401': 1453, 'NaN': 30 }, 'endDate': '2019-03-06T10:52:49.602Z', 'duration': 6.02, 'errorRate': 21.95, 'percentil': 39268, 'startDate': '2019-03-06T10:46:48.533Z', 'avgLatency': '16550', 'throughput': 18.71, 'avgResponseTime': 26485
+  'maxVu': 500, 'errors': { '401': 1453, 'NaN': 30 }, 'endDate': '2019-03-06T10:52:49.602Z', 'duration': 6.02, 'errorRate': 21.95, 'percentil': 39268, 'startDate': '2019-03-06T10:46:48.533Z', 'avgLatency': 16550, 'throughput': 18.71, 'avgResponseTime': 26485
 };
