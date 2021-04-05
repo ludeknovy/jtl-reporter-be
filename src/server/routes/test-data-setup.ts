@@ -42,7 +42,10 @@ export class TestDataSetup {
               const dataId = uuid();
               // eslint-disable-next-line max-len
               const [item] = await db.any(createNewItem('test-scenario', '2019-09-22 20:20:23.265', 'localhost', 'test note', '1', 'test-project', 'localhost', ReportStatus.Ready, dataId));
-              await db.any(saveItemStats(item.id, JSON.stringify(testStats), JSON.stringify(testOverview)));
+              await db.any(saveItemStats(
+                item.id, JSON.stringify(testStats),
+                JSON.stringify(testOverview),
+                JSON.stringify([])));
               res.status(200).send({ itemId: item.id });
               break;
             case States.EmptyDb:

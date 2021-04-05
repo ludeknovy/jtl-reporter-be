@@ -79,6 +79,89 @@ export const overviewAggPipeline = (dataId) => {
   ];
 };
 
+export const overviewAggPerUrlPipeline = (dataId) => {
+  return [
+    {
+      '$match': {
+        'dataId': dataId
+      }
+    }, {
+      '$unwind': {
+        'path': '$samples'
+      }
+    }, {
+      '$sort': {
+        'samples.elapsed': 1
+      }
+    }, {
+      '$group': {
+        '_id': {
+          'sut': '$samples.sutHostname'
+        },
+        'start': {
+          '$min': '$samples.timeStamp'
+        },
+        'end': {
+          '$max': '$samples.timeStamp'
+        },
+        'avgConnect': {
+          '$avg': '$samples.Connect'
+        },
+        'avgLatency': {
+          '$avg': '$samples.Latency'
+        },
+        'avgResponse': {
+          '$avg': '$samples.elapsed'
+        },
+        'bytes': {
+          '$sum': '$samples.bytes'
+        },
+        'total': {
+          '$sum': 1
+        },
+        'elapsed': {
+          '$push': '$samples.elapsed'
+        },
+        'success': {
+          '$push': '$samples.success'
+        }
+      }
+    }, {
+      '$addFields': {
+        'percentil': {
+          '$arrayElemAt': [
+            '$elapsed', {
+              '$floor': {
+                '$multiply': [
+                  0.90, '$total'
+                ]
+              }
+            }
+          ]
+        },
+        'failed': {
+          '$size': {
+            '$filter': {
+              'input': '$success',
+              'as': 'success',
+              'cond': {
+                '$eq': [
+                  '$$success', false
+                ]
+              }
+            }
+          }
+        }
+      }
+    }, {
+      '$project': {
+        'elapsed': 0,
+        'success': 0
+      }
+    }
+  ];
+};
+
 
 export const labelAggPipeline = (dataId) => {
   return [
