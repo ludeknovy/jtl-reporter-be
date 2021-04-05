@@ -3,7 +3,7 @@ import * as moment from 'moment';
 import { logger } from '../../logger';
 
 // eslint-disable-next-line max-len
-export const prepareDataForSavingToDbFromMongo = (overviewData, labelData, sutStats): { overview: Overview; labelStats, sutOverview: {}[] } => {
+export const prepareDataForSavingToDbFromMongo = (overviewData, labelData, sutStats): { overview: Overview; labelStats; sutOverview: {}[] } => {
   try {
     const startDate = new Date(overviewData.start);
     const endDate = new Date(overviewData.end);
