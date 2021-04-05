@@ -2,7 +2,8 @@ import { roundNumberTwoDecimals } from './helper/stats-fc';
 import * as moment from 'moment';
 import { logger } from '../../logger';
 
-export const prepareDataForSavingToDbFromMongo = (overviewData, labelData): { overview: Overview; labelStats } => {
+// eslint-disable-next-line max-len
+export const prepareDataForSavingToDbFromMongo = (overviewData, labelData, sutStats): { overview: Overview; labelStats; sutOverview: {}[] } => {
   try {
     const startDate = new Date(overviewData.start);
     const endDate = new Date(overviewData.end);
@@ -33,6 +34,16 @@ export const prepareDataForSavingToDbFromMongo = (overviewData, labelData): { ov
         n9: _.percentil99,
         n5: _.percentil95,
         n0: _.percentil90
+      })),
+      sutOverview: sutStats.map((_) => ({
+        sutHostname: _._id.sut,
+        percentile: roundNumberTwoDecimals(_.percentil),
+        avgResponseTime: Math.round(_.avgResponse),
+        errorRate: roundNumberTwoDecimals((_.failed / _.total) * 100),
+        throughput: roundNumberTwoDecimals(_.total / ((_.end - _.start) / 1000)),
+        bytesPerSecond: roundNumberTwoDecimals(_.bytes / ((_.end - _.start) / 1000)),
+        avgLatency: roundNumberTwoDecimals(_.avgLatency),
+        avgConnect: roundNumberTwoDecimals(_.avgConnect)
       }))
     };
   } catch (error) {
@@ -143,9 +154,24 @@ export const transformDataForDb = (_) => {
     _.Latency = stringToNumber(_.Latency, 10);
     _.Connect = stringToNumber(_.Connect, 10);
     _.success = _.success === 'true';
+    _.sutHostname = getHostnameFromUrl(_.URL);
     return _;
   } catch (error) {
     logger.error(`Error while parsing data: ${error}`);
+    return;
+  }
+};
+
+export const getHostnameFromUrl = (url) => {
+  if (!url) {
+    return;
+  };
+  try {
+    const hostname = new URL(url).hostname;
+    if (hostname && hostname.length > 0) {
+      return hostname;
+    }
+  } catch (error) {
     return;
   }
 };

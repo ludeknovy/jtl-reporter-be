@@ -43,7 +43,7 @@ export const findItem = (itemId, projectName, scenarioName) => {
 
 export const findItemStats = (testItem) => {
   return {
-    text: 'SELECT stats, overview FROM jtl.item_stat WHERE item_id = $1',
+    text: 'SELECT stats, overview, sut as "sutOverview" FROM jtl.item_stat WHERE item_id = $1',
     values: [testItem]
   };
 };
@@ -55,10 +55,10 @@ export const updateNote = (itemId, projectName, note) => {
   };
 };
 
-export const saveItemStats = (itemId, stats, overview) => {
+export const saveItemStats = (itemId, stats, overview, sutOverview) => {
   return {
-    text: 'INSERT INTO jtl.item_stat(item_id, stats, overview) VALUES($1, $2, $3);',
-    values: [itemId, stats, overview]
+    text: 'INSERT INTO jtl.item_stat(item_id, stats, overview, sut) VALUES($1, $2, $3, $4);',
+    values: [itemId, stats, overview, sutOverview]
   };
 };
 

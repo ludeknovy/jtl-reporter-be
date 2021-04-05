@@ -10,7 +10,7 @@ import { saveThresholdsResult, saveItemStats, savePlotData, updateItem, saveData
 import { ItemDataType, ReportStatus } from '../../../queries/items.model';
 import {
   overviewChartAgg, labelChartAgg, labelAggPipeline,
-  overviewAggPipeline, threadChartDistributed
+  overviewAggPerSutPipeline, threadChartDistributed, overviewAggPipeline
 } from '../../../queries/mongo-db-agg';
 import { chartQueryOptionInterval } from '../../../queries/mongoChartOptionHelper';
 import { getScenarioThresholds, currentScenarioMetrics } from '../../../queries/scenario';
@@ -23,17 +23,24 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId, da
   const jtlDb = MongoUtils.getClient().db('jtl-data');
   const collection = jtlDb.collection('data-chunks');
   let distributedThreads = null;
+  let sutMetrics = [];
 
   try {
     const hostnames: [] = await collection.distinct('samples.Hostname', { dataId });
+    const sutHostnames: [] = await collection.distinct('samples.sutHostname', { dataId });
 
     const aggOverview = await overviewAggregationPipeline(collection, dataId);
     const aggLabel = await labelAggregationPipeline(collection, dataId);
 
+    if (sutHostnames.filter(_ => _).length > 0) {
+      sutMetrics = await overviewAggregationPerSutPipeline(collection, dataId);
+    }
+
+
     const {
       overview,
       overview: { duration },
-      labelStats } = prepareDataForSavingToDbFromMongo(aggOverview[0], aggLabel);
+      labelStats, sutOverview } = prepareDataForSavingToDbFromMongo(aggOverview[0], aggLabel, sutMetrics);
     const interval = chartQueryOptionInterval(duration);
     const overviewChartData = await collection.aggregate(
       overviewChartAgg(dataId, interval), { allowDiskUse: true }).toArray();
@@ -81,7 +88,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId, da
 
 
     await db.tx(async t => {
-      await t.none(saveItemStats(itemId, JSON.stringify(labelStats), overview));
+      await t.none(saveItemStats(itemId, JSON.stringify(labelStats), overview, JSON.stringify(sutOverview)));
       await t.none(savePlotData(itemId, JSON.stringify(chartData)));
       await t.none(updateItem(itemId, ReportStatus.Ready, overview.startDate));
     });
@@ -94,6 +101,11 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId, da
 const overviewAggregationPipeline = async (collection, dataId) => {
   return await collection.aggregate(
     overviewAggPipeline(dataId), { allowDiskUse: true }).toArray();
+};
+
+const overviewAggregationPerSutPipeline = async (collection, dataId) => {
+  return await collection.aggregate(
+    overviewAggPerSutPipeline(dataId), { allowDiskUse: true }).toArray();
 };
 
 const labelAggregationPipeline = async (collection, dataId) => {

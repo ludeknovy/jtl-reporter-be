@@ -14,7 +14,7 @@ export const getItemController = async (req: Request, res: Response, next: NextF
     base_id,
     status, hostname, reportStatus, thresholds,
     analysisEnabled } = await db.one(findItem(itemId, projectName, scenarioName));
-  const { stats: statistics, overview } = await db.one(findItemStats(itemId));
+  const { stats: statistics, overview, sutOverview } = await db.one(findItemStats(itemId));
 
   const files = await db.any(findAttachements(itemId));
   const attachements = files.map(_ => _.type);
@@ -31,7 +31,7 @@ export const getItemController = async (req: Request, res: Response, next: NextF
   const maxMem = findMinMax(mem.map(_ => _[1])).max;
 
   res.status(200).send({
-    overview, statistics, status,
+    overview, sutOverview, statistics, status,
     plot, note, environment, hostname, reportStatus, thresholds, analysisEnabled,
     attachements, baseId: base_id, isBase: base_id === itemId, monitoringData: { cpu, mem, maxCpu, maxMem }
   });
