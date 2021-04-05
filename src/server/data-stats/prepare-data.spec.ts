@@ -1,4 +1,8 @@
-import { calculateDistributedThreads, prepareDataForSavingToDbFromMongo, stringToNumber, transformDataForDb } from './prepare-data';
+import {
+  calculateDistributedThreads,
+  prepareDataForSavingToDbFromMongo,
+  stringToNumber, transformDataForDb
+} from './prepare-data';
 
 describe('prepare data', () => {
   describe('transformDataForDb', () => {
