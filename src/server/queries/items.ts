@@ -43,7 +43,7 @@ export const findItem = (itemId, projectName, scenarioName) => {
 
 export const findItemStats = (testItem) => {
   return {
-    text: 'SELECT stats, overview FROM jtl.item_stat WHERE item_id = $1',
+    text: 'SELECT stats, overview, sut as "sutOverview" FROM jtl.item_stat WHERE item_id = $1',
     values: [testItem]
   };
 };
