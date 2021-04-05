@@ -15,6 +15,8 @@ export const prepareDataForSavingToDbFromMongo = (overviewData, labelData, sutSt
         errorRate: roundNumberTwoDecimals((overviewData.failed / overviewData.total) * 100),
         throughput: roundNumberTwoDecimals(overviewData.total / ((overviewData.end - overviewData.start) / 1000)),
         bytesPerSecond: roundNumberTwoDecimals(overviewData.bytes / ((overviewData.end - overviewData.start) / 1000)),
+        // eslint-disable-next-line max-len
+        bytesSentPerSecond: roundNumberTwoDecimals(overviewData.bytesSent / ((overviewData.end - overviewData.start) / 1000)),
         avgLatency: roundNumberTwoDecimals(overviewData.avgLatency),
         avgConnect: roundNumberTwoDecimals(overviewData.avgConnect),
         startDate,
@@ -29,6 +31,8 @@ export const prepareDataForSavingToDbFromMongo = (overviewData, labelData, sutSt
         maxResponseTime: _.maxResponseTime,
         errorRate: roundNumberTwoDecimals(_.failed / _.samplesCount * 100),
         bytes: roundNumberTwoDecimals(_.avgBytes),
+        bytesPerSecond: roundNumberTwoDecimals(_.bytes / ((_.end - _.start) / 1000)),
+        bytesSentPerSecond: roundNumberTwoDecimals(_.bytesSent / ((_.end - _.start) / 1000)),
         throughput: roundNumberTwoDecimals(
           _.samplesCount / ((_.end - _.start) / 1000)),
         n9: _.percentil99,
@@ -42,6 +46,7 @@ export const prepareDataForSavingToDbFromMongo = (overviewData, labelData, sutSt
         errorRate: roundNumberTwoDecimals((_.failed / _.total) * 100),
         throughput: roundNumberTwoDecimals(_.total / ((_.end - _.start) / 1000)),
         bytesPerSecond: roundNumberTwoDecimals(_.bytes / ((_.end - _.start) / 1000)),
+        bytesSentPerSecond: roundNumberTwoDecimals(_.bytesSent / ((_.end - _.start) / 1000)),
         avgLatency: roundNumberTwoDecimals(_.avgLatency),
         avgConnect: roundNumberTwoDecimals(_.avgConnect)
       }))
@@ -149,6 +154,7 @@ export const transformDataForDb = (_) => {
     _.elapsed = stringToNumber(_.elapsed, 10);
     _.responseCode = stringToNumber(_.responseCode, 10);
     _.bytes = stringToNumber(_.bytes, 10);
+    _.sentBytes = stringToNumber(_.sentBytes, 10);
     _.grpThreads = stringToNumber(_.grpThreads, 10);
     _.allThreads = stringToNumber(_.allThreads, 10);
     _.Latency = stringToNumber(_.Latency, 10);
@@ -264,6 +270,7 @@ export interface Overview {
   startDate: Date;
   endDate: Date;
   bytesPerSecond: number;
+  bytesSentPerSecond: number;
 };
 
 interface DistributedThreadData {
