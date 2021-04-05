@@ -14,10 +14,11 @@ module.exports = {
   'reporters': ['default'],
   'collectCoverageFrom': [
     '**/src/server/**/*.ts',
+    '!**/src/server/routes/test-data-setup.ts',
     '!**/src/server/schema-validator/**/*.ts',
     '!**/src/server/queries/**/*.ts',
     '!**/db/**',
     '!**/node_modules/**'
   ],
-  'coverageReporters': ['lcov']
+  'coverageReporters': ['lcov', 'text']
 };
