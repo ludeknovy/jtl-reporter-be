@@ -115,7 +115,7 @@ export const prepareChartDataForSavingFromMongo = (
     })),
     networkUp: labels.map((label) => ({
       data: labelData.filter((_) => _._id.label === label)
-        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.bytes / _.interval)]),
+        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.bytesSent / _.interval)]),
       name: label
     })),
     networkDown: labels.map((label) => ({
