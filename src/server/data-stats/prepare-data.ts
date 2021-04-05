@@ -75,8 +75,17 @@ export const prepareChartDataForSavingFromMongo = (
       data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.count / _.interval)]),
       name: 'throughput'
     },
-    overallNetwork: {
+    overAllNetworkUp: {
+      data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.bytesSent / _.interval)]),
+      name: 'network up'
+    },
+    overAllNetworkDown: {
       data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.bytes / _.interval)]),
+      name: 'network down'
+    },
+    overAllNetworkV2: {
+      // eslint-disable-next-line max-len
+      data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals((_.bytes + _.bytesSent ) / _.interval)]),
       name: 'network'
     },
     throughput: labels.map((label) => ({
@@ -99,7 +108,17 @@ export const prepareChartDataForSavingFromMongo = (
         .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.maxResponseTime)]),
       name: label
     })),
-    network: labels.map((label) => ({
+    networkV2: labels.map((label) => ({
+      data: labelData.filter((_) => _._id.label === label)
+        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals((_.bytes + _.bytesSent) / _.interval)]),
+      name: label
+    })),
+    networkUp: labels.map((label) => ({
+      data: labelData.filter((_) => _._id.label === label)
+        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.bytesSent / _.interval)]),
+      name: label
+    })),
+    networkDown: labels.map((label) => ({
       data: labelData.filter((_) => _._id.label === label)
         .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.bytes / _.interval)]),
       name: label
@@ -237,6 +256,7 @@ interface ChartOverviewData {
   interval: number;
   errorRate: number;
   bytes: number;
+  bytesSent: number;
 }
 
 interface ChartLabelData {
@@ -253,6 +273,7 @@ interface ChartLabelData {
   maxResponseTime: number;
   interval: number;
   bytes: number;
+  bytesSent: number;
   percentile90: number;
   percentile95: number;
   percentile99: number;
