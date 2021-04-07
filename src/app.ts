@@ -3,6 +3,7 @@ import * as bodyParser from 'body-parser';
 import * as pgp from 'pg-promise';
 import * as boom from 'boom';
 import * as winston from 'winston';
+import * as compression from 'compression';
 import * as expressWinston from 'express-winston';
 import { logger } from './logger';
 import { Router } from './server/router';
@@ -30,6 +31,7 @@ export class App {
   private config(): void {
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: false }));
+    this.app.use(compression());
     this.app.use(expressWinston.logger({
       transports: [
         new winston.transports.Console()
