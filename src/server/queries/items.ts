@@ -122,21 +122,26 @@ export const findAttachements = itemId => {
   };
 };
 
-export const removeCurrentBaseFlag = (scenarioName) => {
+export const removeCurrentBaseFlag = (scenarioName, projectName) => {
   return {
     text: `UPDATE jtl.items SET base = NULL
     WHERE base
-    AND scenario_id = (SELECT id FROM jtl.scenario WHERE name = $1);`,
-    values: [scenarioName]
+    AND scenario_id = (SELECT sc.id FROM jtl.scenario as sc
+      LEFT JOIN jtl.projects as p ON p.id = sc.project_id
+      WHERE sc.name = $1 AND p.project_name = $2);`,
+    values: [scenarioName, projectName]
   };
 };
 
-export const setBaseFlag = (itemId, scenarioName) => {
+export const setBaseFlag = (itemId, scenarioName, projectName) => {
   return {
     text: `UPDATE jtl.items SET base = TRUE
     WHERE id = $1
-    AND scenario_id = (SELECT id FROM jtl.scenario WHERE name = $2);`,
-    values: [itemId, scenarioName]
+    AND scenario_id = (
+      SELECT sc.id FROM jtl.scenario as sc
+      LEFT JOIN jtl.projects as p ON p.id = sc.project_id
+      WHERE sc.name = $2 AND p.project_name = $3);`,
+    values: [itemId, scenarioName, projectName]
   };
 };
 
