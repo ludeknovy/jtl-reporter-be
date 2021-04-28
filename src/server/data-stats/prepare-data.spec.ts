@@ -124,6 +124,29 @@ describe('prepare data', () => {
       const result = transformDataForDb(inputData);
       expect(result.sutHostname).toBeUndefined();
     });
+    it('should process the data even when sentBytes not provided', () => {
+      const inputData = {
+        bytes: '792',
+        label: 'endpoint3',
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        Connect: '155',
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        Latency: '190',
+        elapsed: '191',
+        success: 'true',
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        Hostname: 'localhost',
+        timeStamp: '1555399218911',
+        allThreads: '1',
+        grpThreads: '1',
+        threadName: 'Thread 1-1',
+        responseCode: '200',
+        responseMessage: '',
+        URL: 'file'
+      };
+      const result = transformDataForDb(inputData);
+      expect(result.sentBytes).toEqual(0);
+    });
   });
   describe('stringToNumber', () => {
     it('should convert string to number', () => {
