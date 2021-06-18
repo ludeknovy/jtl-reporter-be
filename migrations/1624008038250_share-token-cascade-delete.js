@@ -10,7 +10,6 @@ exports.up = (pgm) => {
             onDelete: 'CASCADE'
         }
     })
-
 };
 
 
