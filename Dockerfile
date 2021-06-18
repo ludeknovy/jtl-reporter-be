@@ -26,3 +26,4 @@ WORKDIR /src/be
 COPY --from=builder /src/be/ ./
 
 CMD [ "npm", "run", "start" ]
+
