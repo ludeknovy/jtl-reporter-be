@@ -1,7 +1,6 @@
-FROM node:12.13.1-alpine3.10 as builder
+FROM node:14.17.1-alpine3.12 as builder
 
-RUN apk --update add python git \
-  build-base
+RUN apk --update add python2 git build-base
 
 WORKDIR /src/be
 
@@ -17,7 +16,7 @@ COPY /src ./src/
 
 RUN npm run build
 
-FROM node:12.13.1-alpine3.10
+FROM node:14.17.1-alpine3.12
 
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.7.2/wait /wait
 RUN chmod +x /wait
@@ -27,3 +26,4 @@ WORKDIR /src/be
 COPY --from=builder /src/be/ ./
 
 CMD [ "npm", "run", "start" ]
+
