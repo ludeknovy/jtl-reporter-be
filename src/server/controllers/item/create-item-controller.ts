@@ -72,7 +72,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
       const columnSet = new pg.helpers.ColumnSet([
         'elapsed', 'success', 'bytes', 'label',
         {
-          name: 'time',
+          name: 'timestamp',
           prop: 'timeStamp'
         },
         {
@@ -80,7 +80,8 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
           prop: 'Connect'
         }, {
           name: 'hostname',
-          prop: 'Hostname'
+          prop: 'Hostname',
+          def: null,
         }, {
           name: 'status_code',
           prop: 'responseCode'
@@ -97,10 +98,6 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
           prop: 'Latency'
         },
         {
-          name: 'thread_name',
-          prop: 'threadName',
-        },
-        {
           name: 'response_message',
           prop: 'responseMessage',
         },
@@ -108,7 +105,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
           name: 'data_id',
           prop: 'dataId'
         }
-      ], { table: 'data-chunks' });
+      ], { table: 'samples' });
 
 
 
