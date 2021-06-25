@@ -58,13 +58,13 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats): { o
 
 export const prepareChartDataForSavingFromMongo = (
   overviewData: ChartOverviewData[], labelData: ChartLabelData[], distributedThreads?: []) => {
-  const labels = [...new Set(labelData.map((_) => _._id.label))];
+  const labels = [...new Set(labelData.map((_) => _.label))];
   return {
     threads: distributedThreads?.length > 0
       ? calculateDistributedThreads(distributedThreads)
       : overviewData.map((_) => [moment(_.time).valueOf(), _.threads]) as [number, number][],
     overAllFailRate: {
-      data: overviewData.map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.error_rate * 100)]),
+      data: overviewData.map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.error_rate * 100)]),
       name: 'errors'
     },
     overallTimeResponse: {
@@ -91,53 +91,54 @@ export const prepareChartDataForSavingFromMongo = (
       name: 'network'
     },
     throughput: labels.map((label) => ({
-      data: labelData.filter((_) => _._id.label === label)
-        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.count / _.interval)]),
+      data: labelData.filter((_) => _.label === label)
+        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.total / _.interval)]),
       name: label
     })),
     responseTime: labels.map((label) => ({
-      data: labelData.filter((_) => _._id.label === label)
-        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.avgResponseTime)]),
+      data: labelData.filter((_) => _.label === label)
+        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.avg_response)]),
       name: label
     })),
     minResponseTime: labels.map((label) => ({
-      data: labelData.filter((_) => _._id.label === label)
-        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.minResponseTime)]),
+      data: labelData.filter((_) => _.label === label)
+        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.min_response)]),
       name: label
     })),
     maxResponseTime: labels.map((label) => ({
-      data: labelData.filter((_) => _._id.label === label)
-        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.maxResponseTime)]),
+      data: labelData.filter((_) => _.label === label)
+        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.max_response)]),
       name: label
     })),
     networkV2: labels.map((label) => ({
-      data: labelData.filter((_) => _._id.label === label)
-        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals((_.bytes + _.bytesSent) / _.interval)]),
+      data: labelData.filter((_) => _.label === label)
+        .map((_) => [moment(_.time).valueOf(),
+          roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / _.interval)]),
       name: label
     })),
     networkUp: labels.map((label) => ({
-      data: labelData.filter((_) => _._id.label === label)
-        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.bytesSent / _.interval)]),
+      data: labelData.filter((_) => _.label === label)
+        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.bytes_sent_total / _.interval)]),
       name: label
     })),
     networkDown: labels.map((label) => ({
-      data: labelData.filter((_) => _._id.label === label)
-        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.bytes / _.interval)]),
+      data: labelData.filter((_) => _.label === label)
+        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.bytes_received_total / _.interval)]),
       name: label
     })),
     percentile90: labels.map((label) => ({
-      data: labelData.filter((_) => _._id.label === label)
-        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.percentile90)]),
+      data: labelData.filter((_) => _.label === label)
+        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.n90)]),
       name: label
     })),
     percentile95: labels.map((label) => ({
-      data: labelData.filter((_) => _._id.label === label)
-        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.percentile95)]),
+      data: labelData.filter((_) => _.label === label)
+        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.n95)]),
       name: label
     })),
     percentile99: labels.map((label) => ({
-      data: labelData.filter((_) => _._id.label === label)
-        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.percentile99)]),
+      data: labelData.filter((_) => _.label === label)
+        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.n99)]),
       name: label
     }))
   };
@@ -264,23 +265,21 @@ interface ChartOverviewData {
 }
 
 interface ChartLabelData {
-  _id: {
-    interval: Date;
-    label: string;
-  };
+  time: Date;
+  label: string;
   min: Date;
   max: Date;
-  count: number;
+  total: number;
   threads: number;
-  avgResponseTime: number;
-  minResponseTime: number;
-  maxResponseTime: number;
+  avg_response: number;
+  min_response: number;
+  max_response: number;
   interval: number;
-  bytes: number;
-  bytesSent: number;
-  percentile90: number;
-  percentile95: number;
-  percentile99: number;
+  bytes_received_total: number;
+  bytes_sent_total: number;
+  n90: number;
+  n95: number;
+  n99: number;
 }
 
 export interface Overview {

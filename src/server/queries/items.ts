@@ -296,6 +296,30 @@ export const chartOverviewQuery = (interval, dataId) => {
   };
 };
 
+export const charLabelQuery = (interval, dataId) => {
+  return {
+    text: `
+    SELECT
+      time_bucket($1, timestamp) as time,
+      samples.label,
+      percentile_cont(0.99) within group (order by (samples.elapsed))::real as n99,
+      percentile_cont(0.95) within group (order by (samples.elapsed))::real as n95,
+      percentile_cont(0.90) within group (order by (samples.elapsed))::real as n90,
+      MIN(samples.elapsed)::real as min_response,
+      MAX(samples.elapsed)::real as max_response,
+      EXTRACT(EPOCH FROM (MAX(samples.timestamp) - MIN(samples.timestamp))) as interval,
+      (count(*) filter (where samples.success = false)::real / count(*)::real)::real as error_rate,
+      AVG(samples.elapsed)::real as avg_response,
+      SUM(samples.sent_bytes)::int as bytes_sent_total,
+      SUM(samples.bytes)::int as bytes_received_total,
+      COUNT(*)::int as total
+    FROM jtl.samples as samples
+    WHERE data_id = $2
+    GROUP BY time, samples.label;`,
+    values: [interval, dataId]
+  };
+};
+
 export const updateItem = (itemId, reportStatus, startTime) => {
   return {
     text: 'UPDATE jtl.items SET report_status = $2, start_time= $3 WHERE id = $1;',

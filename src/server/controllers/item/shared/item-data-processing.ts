@@ -8,13 +8,10 @@ import {
 } from '../../../data-stats/prepare-data';
 import {
   saveThresholdsResult, saveItemStats, savePlotData, updateItem,
-  saveData, aggOverviewQuery, aggLabelQuery, chartOverviewQuery
+  saveData, aggOverviewQuery, aggLabelQuery, chartOverviewQuery, charLabelQuery
 } from '../../../queries/items';
 import { ItemDataType, ReportStatus } from '../../../queries/items.model';
-import {
-  overviewChartAgg, labelChartAgg, labelAggPipeline,
-  overviewAggPerSutPipeline, threadChartDistributed, overviewAggPipeline
-} from '../../../queries/mongo-db-agg';
+import { threadChartDistributed } from '../../../queries/mongo-db-agg';
 import { chartQueryOptionInterval } from '../../../queries/mongoChartOptionHelper';
 import { getScenarioThresholds, currentScenarioMetrics } from '../../../queries/scenario';
 import { sendNotifications } from '../../../utils/notifications/send-notification';
@@ -31,9 +28,6 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId, da
   try {
     const aggOverview = await db.one(aggOverviewQuery(dataId));
     const aggLabel = await db.many(aggLabelQuery(dataId));
-    console.log(aggOverview)
-    console.log(aggLabel)
-
 
     if (aggOverview.number_of_sut_hostnames > 1) {
       // TODO
@@ -46,15 +40,10 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId, da
       overview: { duration },
       labelStats, sutOverview } = prepareDataForSavingToDb(aggOverview, aggLabel, sutMetrics);
     const interval = chartQueryOptionInterval(duration);
-    console.log(interval)
-    // const overviewChartData = await collection.aggregate(
 
     const overviewChartData = await db.many(chartOverviewQuery(`${interval} milliseconds`, dataId));
-    console.log(overviewChartData)
 
-    const labelChartData = await collection.aggregate(
-      labelChartAgg(dataId, interval), { allowDiskUse: true }).toArray();
-
+    const labelChartData = await db.many(charLabelQuery(`${interval} milliseconds`, dataId));
     // distributed mode
     if (aggOverview['number_of_hostnames'] > 1) {
       distributedThreads = await collection.aggregate(
