@@ -60,10 +60,20 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
       const kpiFilename = kpi[0].path;
       let tempBuffer = [];
 
-      logger.info(`Starting KPI file streaming and saving to Mongo`);
-      res.status(200).send();
+      const item = await db.one(createNewItem(
+        scenarioName,
+        null,
+        environment,
+        note,
+        status,
+        projectName,
+        hostname,
+        ReportStatus.InProgress,
+        dataId
+      ));
+      itemId = item.id;
 
-
+      res.status(200).send({ itemId });
 
       const columnSet = new pg.helpers.ColumnSet([
         'elapsed', 'success', 'bytes', 'label',
@@ -101,45 +111,27 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
           name: 'data_id',
           prop: 'dataId'
         }
-      ], { table: 'samples' });
+      ], { table:  new pg.helpers.TableName({table: 'samples', schema: 'jtl'}) });
 
-
-
-
-      const item = await db.one(createNewItem(
-        scenarioName,
-        null,
-        environment,
-        note,
-        status,
-        projectName,
-        hostname,
-        ReportStatus.InProgress,
-        dataId
-      ));
-      itemId = item.id;
-
-      res.status(200).send({ itemId });
 
       logger.info(`Starting KPI file streaming and saving to Mongo with dataId: ${dataId}`);
       const parsingStart = Date.now();
       const csvStream = fs.createReadStream(kpiFilename)
         .pipe(csv.parse({ headers: true }))
         .on('data', async row => {
-
-          if (tempBuffer.length === (500)) {
-            csvStream.pause();
-            const query = pg.helpers.insert(tempBuffer, columnSet);
-            await db.none(query);
-
-            tempBuffer = [];
-            csvStream.resume();
-          }
-          const data = transformDataForDb(row);
-          if (data) {
-            return tempBuffer.push(data);
-          }
-          return;
+            if (tempBuffer.length === (5000)) {
+              csvStream.pause();
+              const query = pg.helpers.insert(tempBuffer, columnSet);
+              await db.none(query);
+  
+              tempBuffer = [];
+              csvStream.resume();
+            }
+            const data = transformDataForDb(row, dataId);
+            if (data) {
+              return tempBuffer.push(data);
+            }
+            return;
         })
         .on('end', async (rowCount: number) => {
           try {
