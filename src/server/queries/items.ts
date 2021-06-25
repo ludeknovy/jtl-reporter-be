@@ -243,8 +243,8 @@ export const aggOverviewQuery = (dataId) => {
     AVG(samples.connect)::real as avg_connect,
     count(*) filter (where samples.success = false)::int as number_of_failed,
     AVG(samples.elapsed)::real as avg_response,
-    SUM(samples.sent_bytes)::int as bytes_sent_total,
-    SUM(samples.bytes)::int as bytes_received_total,
+    SUM(samples.sent_bytes)::bigint as bytes_sent_total,
+    SUM(samples.bytes)::bigint as bytes_received_total,
     COUNT(*)::int as total
   FROM jtl.samples as samples
   WHERE data_id = $1;`,
@@ -267,8 +267,8 @@ export const aggLabelQuery = (dataId) => {
       MAX(samples.timestamp) as end,
       MIN(samples.timestamp) as start,
       count(*) filter (where samples.success = false)::int as number_of_failed,
-      SUM(samples.sent_bytes)::int as bytes_sent_total,
-      SUM(samples.bytes)::int as bytes_received_total
+      SUM(samples.sent_bytes)::bigint as bytes_sent_total,
+      SUM(samples.bytes)::bigint as bytes_received_total
     FROM jtl.samples as samples
     WHERE data_id = $1
     GROUP BY samples.label;`,
