@@ -5,7 +5,7 @@ import { stateSetup, userSetup } from './helper/state';
 describe('Scenario', () => {
   let credentials;
   beforeAll(async () => {
-    credentials = await userSetup();
+    ({ data: credentials } = await userSetup());
   });
   describe('POST /projects/{projectName}/scenarios', () => {
     it('should be able to create new scenario', async () => {
@@ -13,7 +13,7 @@ describe('Scenario', () => {
       await request(__server__)
         .post('/api/projects/test-project/scenarios')
         .set(__tokenHeaderKey__, credentials.token)
-        .send({ scenarioName: `test-scenario` })
+        .send({ scenarioName: 'test-scenario' })
         .set('Accept', 'application/json')
         .expect(201);
     });
@@ -22,7 +22,7 @@ describe('Scenario', () => {
       await request(__server__)
         .post('/api/projects/test-project/scenarios')
         .set(__tokenHeaderKey__, credentials.token)
-        .send({ scenarioName: `test-scenario` })
+        .send({ scenarioName: 'test-scenario' })
         .set('Accept', 'application/json')
         .expect(409);
     });
@@ -42,7 +42,16 @@ describe('Scenario', () => {
       await request(__server__)
         .put('/api/projects/test-project/scenarios/test-scenario')
         .set(__tokenHeaderKey__, credentials.token)
-        .send({ scenarioName: `test-scenario` })
+        .send({
+          scenarioName: 'test-scenario',
+          analysisEnabled: false,
+          thresholds: {
+            enabled: true,
+            percentile: 4.2,
+            errorRate: 4.2,
+            throughput: 8.3
+          }
+        })
         .set('Accept', 'application/json')
         .expect(204);
     });
@@ -55,6 +64,6 @@ describe('Scenario', () => {
         .set(__tokenHeaderKey__, credentials.token)
         .set('Accept', 'application/json')
         .expect(204);
-     });
+    });
   });
 });

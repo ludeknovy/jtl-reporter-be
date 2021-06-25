@@ -10,8 +10,8 @@ export const updateItemController = async (req: Request, res: Response, next: Ne
     await db.query('BEGIN');
     await db.none(updateTestItemInfo(itemId, scenarioName, projectName, note, environment, hostname));
     if (base) {
-      await db.none(removeCurrentBaseFlag(scenarioName));
-      await db.none(setBaseFlag(itemId, scenarioName));
+      await db.none(removeCurrentBaseFlag(scenarioName, projectName));
+      await db.none(setBaseFlag(itemId, scenarioName, projectName));
     }
     await db.query('COMMIT');
     res.status(204).send();
@@ -19,4 +19,4 @@ export const updateItemController = async (req: Request, res: Response, next: Ne
     await db.query('ROLLBACK');
     return next(error);
   }
-}
+};

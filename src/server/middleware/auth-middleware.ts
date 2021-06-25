@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import * as boom from 'boom';
 import * as jwt from 'jsonwebtoken';
 import { db } from '../../db/db';
@@ -6,17 +6,34 @@ import { getUserById } from '../queries/auth';
 import { getApiToken } from '../queries/api-tokens';
 import { config } from '../config';
 import { IGetUserAuthInfoRequest } from './request.model';
+import { logger } from '../../logger';
+import { findShareToken } from '../queries/items';
 
 const UNAUTHORIZED_MSG = 'The token you provided is invalid';
 
-export const verifyToken = async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
-  const token = req.headers['x-access-token'];
-  if (!token) {
-    return next(boom.unauthorized(`Please provide x-access-token`));
-  }
-  if (isApiToken(token)) {
+export const authenticationMiddleware = async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
+
+  const { token } = req.query;
+  if (token && (token !== 'undefined') && req.allowQueryAuth) {
     try {
-      const [tokenData] = await db.query(getApiToken(token));
+      const { projectName, scenarioName, itemId } = req.params;
+      const shareToken = await db.oneOrNone(findShareToken(projectName, scenarioName, itemId, token));
+      if (shareToken && shareToken.token) {
+        return next();
+      }
+      return next(boom.unauthorized(UNAUTHORIZED_MSG));
+    } catch (error) {
+      logger.error('Error while checking share link token ' + error);
+      return next(boom.internal());
+    }
+  }
+  const accessToken = req.headers['x-access-token'];
+  if (!accessToken) {
+    return next(boom.unauthorized('Please provide x-access-token'));
+  }
+  if (isApiToken(accessToken)) {
+    try {
+      const [tokenData] = await db.query(getApiToken(accessToken));
       if (tokenData) {
         req.user = { userId: tokenData.created_by };
         return next();
@@ -29,7 +46,7 @@ export const verifyToken = async (req: IGetUserAuthInfoRequest, res: Response, n
   }
 
   try {
-    const { userId } = await jwt.verify(token, config.jwtToken);
+    const { userId } = await jwt.verify(accessToken, config.jwtToken);
     const [userData] = await db.query(getUserById(userId));
     if (!userData) {
       return next(boom.unauthorized(UNAUTHORIZED_MSG));

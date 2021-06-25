@@ -2,8 +2,7 @@ require('ts-node/register');
 const { App } = require('../../../app');
 const NodeEnvironment = require('jest-environment-node');
 
-let socketMap = {};
-let lastSocketKey = 0;
+const app = new App();
 
 
 class TestEnvironment extends NodeEnvironment {
@@ -12,31 +11,14 @@ class TestEnvironment extends NodeEnvironment {
   }
   async setup() {
     await super.setup();
-    const app = new App();
+
 
     this.global.__tokenHeaderKey__ = 'x-access-token';
-    this.global.__server__ = require('http')
-      .createServer(app.app)
-      .listen('5000');
-    this.global.__server__.on('connection', function (socket) {
-      /* generate a new, unique socket-key */
-      const socketKey = ++lastSocketKey;
-      /* add socket when it is connected */
-      socketMap[socketKey] = socket;
-      socket.on('close', function () {
-        /* remove socket when it is closed */
-        delete socketMap[socketKey];
-      });
-    });
+    this.global.__server__ = await app.listen();
   }
 
   async teardown() {
-    this.global.__server__.close(function () { console.log('Server closed!'); })
-
-    Object.keys(socketMap).forEach(function (socketKey) {
-      socketMap[socketKey].destroy();
-    });
-
+    await app.close();
     await super.teardown();
   }
 

@@ -1,5 +1,5 @@
 language: node_js
-node_js: "10"
+node_js: "14"
 cache: npm
 services:
   - docker
@@ -9,28 +9,30 @@ branches:
 install: npm install
 jobs:
   include:
-    - stage: Static analysis
-      script: npm run lint
-    - stage: Tests
-      script: npm run unit-tests
     - stage: Contract tests
       env:
         - ENVIRONMENT=CI
+        - JWT_TOKEN=123
+        - JWT_TOKEN_LOGIN=456
       before_script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - docker-compose --file docker-compose.testing.yaml rm -f
         - docker-compose --file docker-compose.testing.yaml up --build -d
-      script: npm run contract-tests
+      script: npm run test:contract
       after_script:
         - docker-compose --file docker-compose.testing.yaml down
     - stage: Integration tests
       env:
         - ENVIRONMENT=CI
+        - JWT_TOKEN=123
+        - JWT_TOKEN_LOGIN=456
       before_script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - docker-compose --file docker-compose.testing.yaml rm -f
-        - docker-compose --file docker-compose.testing.yaml up -d
-      script: npm run integration-tests
+        - docker-compose --file docker-compose.testing.yaml up --build -d
+      script: npm run test:integration
       after_script:
-        - docker-compose down
+        - docker-compose --file docker-compose.testing.yaml down
 
 env:
   global:

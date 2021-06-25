@@ -1,3 +1,5 @@
 export const config = {
-  jwtToken: process.env.JWT_TOKEN || 'A71527A34D15F38E'
+  jwtToken: process.env.JWT_TOKEN,
+  jwtTokenLogin: process.env.JWT_TOKEN_LOGIN,
+  feUrl: process.env.FE_URL
 };

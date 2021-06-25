@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const Joi = require('joi');
 import * as boom from 'boom';
 
@@ -17,7 +18,9 @@ const schemaValidator = (schema, property) => {
   return (req, res, next) => {
     const { error } = Joi.validate(req[property], schema);
     const valid = error == null;
-    if (valid) { next(); } else {
+    if (valid) {
+      next();
+    } else {
       const { details } = error;
       const message = details.map(i => i.message).join(',');
       return next(boom.badRequest(message));

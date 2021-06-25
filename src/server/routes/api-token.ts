@@ -1,7 +1,7 @@
 import * as express from 'express';
 import { Request, Response, NextFunction } from 'express';
 import { bodySchemaValidator } from '../schema-validator/schema-validator-middleware';
-import { verifyToken } from '../middleware/auth-middleware';
+import { authenticationMiddleware } from '../middleware/auth-middleware';
 import { wrapAsync } from '../errors/error-handler';
 import { getTokensController } from '../controllers/api-tokens/get-tokens-controller';
 import { createTokenController } from '../controllers/api-tokens/create-token-controller';
@@ -13,19 +13,18 @@ export class ApiTokensRoutes {
 
   public routes(app: express.Application): void {
     app.route('/api/api-tokens')
-    .get(
-      verifyToken,
-      // tslint:disable-next-line: max-line-length
-      wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getTokensController(req, res, next)))
-    .post(
-      verifyToken,
-      bodySchemaValidator(newTokenSchema),
-      // tslint:disable-next-line: max-line-length
-      wrapAsync(async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => await createTokenController(req, res, next)))
-    .delete(
-      verifyToken,
-      bodySchemaValidator(deleteTokenSchema),
-      // tslint:disable-next-line: max-line-length
-      wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteTokenController(req, res, next)));
-   }
+      .get(
+        authenticationMiddleware,
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getTokensController(req, res, next)))
+      .post(
+        authenticationMiddleware,
+        bodySchemaValidator(newTokenSchema),
+        // eslint-disable-next-line max-len
+        wrapAsync(async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => await createTokenController(req, res, next)))
+      .delete(
+        authenticationMiddleware,
+        bodySchemaValidator(deleteTokenSchema),
+        // eslint-disable-next-line max-len
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteTokenController(req, res, next)));
+  }
 }

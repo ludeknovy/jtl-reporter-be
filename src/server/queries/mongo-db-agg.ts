@@ -15,9 +15,6 @@ export const overviewAggPipeline = (dataId) => {
     }, {
       '$group': {
         '_id': null,
-        'maxVu': {
-          '$max': '$samples.allThreads'
-        },
         'start': {
           '$min': '$samples.timeStamp'
         },
@@ -29,6 +26,15 @@ export const overviewAggPipeline = (dataId) => {
         },
         'avgLatency': {
           '$avg': '$samples.Latency'
+        },
+        'avgResponse': {
+          '$avg': '$samples.elapsed'
+        },
+        'bytes': {
+          '$sum': '$samples.bytes'
+        },
+        'bytesSent': {
+          '$sum': '$samples.sentBytes'
         },
         'total': {
           '$sum': 1
@@ -53,8 +59,91 @@ export const overviewAggPipeline = (dataId) => {
             }
           ]
         },
+        'failed': {
+          '$size': {
+            '$filter': {
+              'input': '$success',
+              'as': 'success',
+              'cond': {
+                '$eq': [
+                  '$$success', false
+                ]
+              }
+            }
+          }
+        }
+      }
+    }, {
+      '$project': {
+        'elapsed': 0,
+        'success': 0
+      }
+    }
+  ];
+};
+
+export const overviewAggPerSutPipeline = (dataId) => {
+  return [
+    {
+      '$match': {
+        'dataId': dataId
+      }
+    }, {
+      '$unwind': {
+        'path': '$samples'
+      }
+    }, {
+      '$sort': {
+        'samples.elapsed': 1
+      }
+    }, {
+      '$group': {
+        '_id': {
+          'sut': '$samples.sutHostname'
+        },
+        'start': {
+          '$min': '$samples.timeStamp'
+        },
+        'end': {
+          '$max': '$samples.timeStamp'
+        },
+        'avgConnect': {
+          '$avg': '$samples.Connect'
+        },
+        'avgLatency': {
+          '$avg': '$samples.Latency'
+        },
         'avgResponse': {
-          '$avg': '$elapsed'
+          '$avg': '$samples.elapsed'
+        },
+        'bytes': {
+          '$sum': '$samples.bytes'
+        },
+        'bytesSent': {
+          '$sum': '$samples.sentBytes'
+        },
+        'total': {
+          '$sum': 1
+        },
+        'elapsed': {
+          '$push': '$samples.elapsed'
+        },
+        'success': {
+          '$push': '$samples.success'
+        }
+      }
+    }, {
+      '$addFields': {
+        'percentil': {
+          '$arrayElemAt': [
+            '$elapsed', {
+              '$floor': {
+                '$multiply': [
+                  0.90, '$total'
+                ]
+              }
+            }
+          ]
         },
         'failed': {
           '$size': {
@@ -73,10 +162,10 @@ export const overviewAggPipeline = (dataId) => {
     }, {
       '$project': {
         'elapsed': 0,
-        'data': 0
+        'success': 0
       }
     }
-  ]
+  ];
 };
 
 
@@ -108,6 +197,12 @@ export const labelAggPipeline = (dataId) => {
         },
         'avgBytes': {
           '$avg': '$samples.bytes'
+        },
+        'bytesSent': {
+          '$sum': '$samples.sentBytes'
+        },
+        'bytes': {
+          '$sum': '$samples.bytes'
         },
         'samplesCount': {
           '$sum': 1
@@ -211,7 +306,7 @@ export const overviewChartAgg = (dataId: string, interval: number) => {
           }
         },
         'min': {
-          '$min': '$samples.timeStamp'
+          '$min': { '$subtract': ['$samples.timeStamp', '$samples.elapsed'] }
         },
         'max': {
           '$max': '$samples.timeStamp'
@@ -224,6 +319,12 @@ export const overviewChartAgg = (dataId: string, interval: number) => {
         },
         'avgResponseTime': {
           '$avg': '$samples.elapsed'
+        },
+        'bytes': {
+          '$sum': '$samples.bytes'
+        },
+        'bytesSent': {
+          '$sum': '$samples.sentBytes'
         },
         'success': {
           '$push': '$samples.success'
@@ -279,7 +380,7 @@ export const overviewChartAgg = (dataId: string, interval: number) => {
         '_id': 1
       }
     }
-  ]
+  ];
 };
 
 
@@ -294,6 +395,11 @@ export const labelChartAgg = (dataId: string, interval: number) => {
         'path': '$samples'
       }
     }, {
+      '$sort': {
+        'samples.elapsed': 1
+      }
+    },
+    {
       '$group': {
         '_id': {
           'interval': {
@@ -314,7 +420,7 @@ export const labelChartAgg = (dataId: string, interval: number) => {
           'label': '$samples.label'
         },
         'min': {
-          '$min': '$samples.timeStamp'
+          '$min': { '$subtract': ['$samples.timeStamp', '$samples.elapsed'] }
         },
         'max': {
           '$max': '$samples.timeStamp'
@@ -322,11 +428,23 @@ export const labelChartAgg = (dataId: string, interval: number) => {
         'count': {
           '$sum': 1
         },
-        'threads': {
-          '$max': '$samples.allThreads'
+        'bytes': {
+          '$sum': '$samples.bytes'
+        },
+        'bytesSent': {
+          '$sum': '$samples.sentBytes'
         },
         'avgResponseTime': {
           '$avg': '$samples.elapsed'
+        },
+        'minResponseTime': {
+          '$min': '$samples.elapsed'
+        },
+        'maxResponseTime': {
+          '$max': '$samples.elapsed'
+        },
+        'elapsed': {
+          '$push': '$samples.elapsed'
         }
       }
     }, {
@@ -339,6 +457,101 @@ export const labelChartAgg = (dataId: string, interval: number) => {
               ]
             }, 1000
           ]
+        },
+        'percentile90': {
+          '$arrayElemAt': [
+            '$elapsed', {
+              '$floor': {
+                '$multiply': [
+                  0.90, '$count'
+                ]
+              }
+            }
+          ]
+        },
+        'percentile95': {
+          '$arrayElemAt': [
+            '$elapsed', {
+              '$floor': {
+                '$multiply': [
+                  0.95, '$count'
+                ]
+              }
+            }
+          ]
+        },
+        'percentile99': {
+          '$arrayElemAt': [
+            '$elapsed', {
+              '$floor': {
+                '$multiply': [
+                  0.99, '$count'
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, {
+      '$sort': {
+        '_id': 1
+      }
+    },
+    {
+      '$project': {
+        'elapsed': 0
+      }
+    }
+  ];
+};
+
+export const threadChartDistributed = (interval, dataId) => {
+  return [
+    {
+      '$match': {
+        'dataId': dataId
+      }
+    }, {
+      '$unwind': {
+        'path': '$samples'
+      }
+    },
+    {
+      '$match': {
+        'samples.responseMessage': {
+          '$not': {
+            '$regex': '^Number of samples in transaction'
+          }
+        }
+      }
+    }, {
+      '$group': {
+        '_id': {
+          'interval': {
+            '$toDate': {
+              '$subtract': [
+                {
+                  '$toLong': '$samples.timeStamp'
+                }, {
+                  '$mod': [
+                    {
+                      '$toLong': '$samples.timeStamp'
+                    }, interval
+                  ]
+                }
+              ]
+            }
+          },
+          'hostname': '$samples.Hostname'
+        },
+        'threadAvg': {
+          '$avg': '$samples.allThreads'
+        }
+      }
+    }, {
+      '$project': {
+        'threads': {
+          '$round': ['$threadAvg']
         }
       }
     }, {
@@ -347,4 +560,4 @@ export const labelChartAgg = (dataId: string, interval: number) => {
       }
     }
   ];
-}
+};

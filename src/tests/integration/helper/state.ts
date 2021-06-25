@@ -1,35 +1,46 @@
-import * as request from 'request-promise-native';
-const PROVIDER_URL = 'http://localhost:5000/api';
+import { AxiosRequestConfig } from 'axios';
+const axios = require('axios');
 
-const options = (state, consumer) => {
+const PROVIDER_URL = 'http://localhost:5000';
+
+const options = (state, consumer): AxiosRequestConfig => {
   return {
-    url: PROVIDER_URL + '/contract/states',
+    url: '/api/contract/states',
+    baseURL: PROVIDER_URL,
     method: 'POST',
-    json: true,
-    body: {
+    data: {
       consumer,
       state
+    },
+    headers: {
+      'Content-Type': 'application/json'
     }
   };
 };
 
 export const stateSetup = async (state, consumer = 'integration-tests') => {
-  return await request(options(state, consumer));
+  return await axios(options(state, consumer));
 };
 
 
 export const userSetup = async () => {
-  return await request({
-    url: PROVIDER_URL + '/contract/test-user',
+  return await axios({
+    url: '/api/contract/test-user',
+    baseURL: PROVIDER_URL,
     method: 'POST',
-    json: true,
+    headers: {
+      'Content-Type': 'application/json'
+    }
   });
 };
 
 export const apiTokenSetup = async () => {
-  return await request({
-    url: PROVIDER_URL + '/contract/api-token',
+  return await axios({
+    url: '/api/contract/api-token',
+    baseURL: PROVIDER_URL,
     method: 'POST',
-    json: true,
+    headers: {
+      'Content-Type': 'application/json'
+    }
   });
 };

@@ -1,8 +1,9 @@
 import { ItemDataType } from './items.model';
 
-// tslint:disable-next-line: max-line-length
+// eslint-disable-next-line max-len
 export const createNewItem = (scenarioName, startTime, environment, note, status, projectName, hostname, reportStatus, dataId) => {
   return {
+    // eslint-disable-next-line max-len
     text: `INSERT INTO jtl.items(scenario_id, start_time, environment, note, status, hostname, report_status, data_id) VALUES(
       (SELECT sc.id FROM jtl.scenario as sc
         LEFT JOIN jtl.projects as p ON p.id = sc.project_id
@@ -21,8 +22,8 @@ export const savePlotData = (itemId, data) => {
 
 export const findItem = (itemId, projectName, scenarioName) => {
   return {
-    // tslint:disable-next-line:max-line-length
-    text: `SELECT charts.plot_data, note, environment, status, hostname, (SELECT items.id FROM jtl.items as items
+    // eslint-disable-next-line max-len
+    text: `SELECT charts.plot_data, note, environment, status, hostname, s.analysis_enabled as "analysisEnabled", threshold_result as "thresholds", report_status as "reportStatus", (SELECT items.id FROM jtl.items as items
       LEFT JOIN jtl.charts as charts ON charts.item_id = items.id
       LEFT JOIN jtl.scenario as s ON s.id = items.scenario_id
       LEFT JOIN jtl.projects as p ON p.id = s.project_id
@@ -42,7 +43,7 @@ export const findItem = (itemId, projectName, scenarioName) => {
 
 export const findItemStats = (testItem) => {
   return {
-    text: 'SELECT stats, overview FROM jtl.item_stat WHERE item_id = $1',
+    text: 'SELECT stats, overview, sut as "sutOverview" FROM jtl.item_stat WHERE item_id = $1',
     values: [testItem]
   };
 };
@@ -54,10 +55,10 @@ export const updateNote = (itemId, projectName, note) => {
   };
 };
 
-export const saveItemStats = (itemId, stats, overview) => {
+export const saveItemStats = (itemId, stats, overview, sutOverview) => {
   return {
-    text: 'INSERT INTO jtl.item_stat(item_id, stats, overview) VALUES($1, $2, $3);',
-    values: [itemId, stats, overview]
+    text: 'INSERT INTO jtl.item_stat(item_id, stats, overview, sut) VALUES($1, $2, $3, $4);',
+    values: [itemId, stats, overview, sutOverview]
   };
 };
 
@@ -121,21 +122,26 @@ export const findAttachements = itemId => {
   };
 };
 
-export const removeCurrentBaseFlag = (scenarioName) => {
+export const removeCurrentBaseFlag = (scenarioName, projectName) => {
   return {
     text: `UPDATE jtl.items SET base = NULL
     WHERE base
-    AND scenario_id = (SELECT id FROM jtl.scenario WHERE name = $1);`,
-    values: [scenarioName]
+    AND scenario_id = (SELECT sc.id FROM jtl.scenario as sc
+      LEFT JOIN jtl.projects as p ON p.id = sc.project_id
+      WHERE sc.name = $1 AND p.project_name = $2);`,
+    values: [scenarioName, projectName]
   };
 };
 
-export const setBaseFlag = (itemId, scenarioName) => {
+export const setBaseFlag = (itemId, scenarioName, projectName) => {
   return {
     text: `UPDATE jtl.items SET base = TRUE
     WHERE id = $1
-    AND scenario_id = (SELECT id FROM jtl.scenario WHERE name = $2);`,
-    values: [itemId, scenarioName]
+    AND scenario_id = (
+      SELECT sc.id FROM jtl.scenario as sc
+      LEFT JOIN jtl.projects as p ON p.id = sc.project_id
+      WHERE sc.name = $2 AND p.project_name = $3);`,
+    values: [itemId, scenarioName, projectName]
   };
 };
 
@@ -145,7 +151,9 @@ export const dashboardStats = () => {
     SELECT round(AVG((overview -> 'maxVu')::int)) as "avgVu",
     round(AVG((overview -> 'duration')::int)) as "avgDuration",
     round(SUM((overview -> 'duration')::int)) as "totalDuration",
-    count(*) as "totalCount" from jtl.item_stat;`
+    count(*) as "totalCount" from jtl.item_stat as stat
+    LEFT JOIN jtl.items as items ON items.id = stat.item_id
+    WHERE items.report_status = 'ready';`
   };
 };
 
@@ -160,7 +168,7 @@ export const getLabelHistory = (scenarioName, projectName, endpointName, itemId,
     WHERE sc.name = $1
     AND pr.project_name = $2
     AND environment = $5
-    ORDER BY its.start_time DESC) as stats
+    ORDER BY its.start_time ASC) as stats
     WHERE labels->>'label' = $3
     AND start_time <= (SELECT start_time FROM jtl.items WHERE id = $4)
     LIMIT 50;`,
@@ -179,7 +187,7 @@ export const getLabelHistoryForVu = (scenarioName, projectName, endpointName, it
     WHERE sc.name = $1
     AND pr.project_name = $2
     AND environment = $5
-    ORDER BY its.start_time DESC) as stats
+    ORDER BY its.start_time ASC) as stats
     WHERE labels->>'label' = $3
     AND start_time <= (SELECT start_time FROM jtl.items WHERE id = $4)
     AND max_vu::integer = $6
@@ -209,7 +217,8 @@ export const getMaxVuForLabel = (scenarioName, projectName, endpointName, itemId
 
 export const getErrorsForLabel = (itemId, labelName) => {
   return {
-    text: `SELECT * FROM (SELECT  jsonb_array_elements(item_data->'testResults'->'httpSample') as error FROM jtl.data d WHERE d.data_type = 'error' AND d.item_id = $1) as errors WHERE error->>'lb' = $2;`,
+    // eslint-disable-next-line max-len
+    text: 'SELECT * FROM (SELECT  jsonb_array_elements(item_data->\'testResults\'->\'httpSample\') as error FROM jtl.data d WHERE d.data_type = \'error\' AND d.item_id = $1) as errors WHERE error->>\'lb\' = $2;',
     values: [itemId, labelName]
   };
 };
@@ -224,6 +233,7 @@ export const updateItemStatus = (itemId, reportStatus) => {
 // tslint:disable-next-line: max-line-length
 export const saveChunks = (timestamp, elapsed, connect, statusCode, allThreads, grpThreads, success, latency, bytes, hostname, threadName, responseMessage, label) => {
   return {
+    // eslint-disable-next-line max-len
     text: `INSERT INTO data_chunks (timestamp, elapsed, connect, status_code, all_threads, grp_threads, success, latency, bytes, hostname, thread_name, response_message, label)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
     // tslint:disable-next-line: max-line-length
@@ -268,5 +278,106 @@ export const getLabelsStats = (itemId) => {
     WHERE item_id = $1
     GROUP BY chunks.label`,
     values: [itemId]
+  };
+};
+
+export const updateItem = (itemId, reportStatus, startTime) => {
+  return {
+    text: 'UPDATE jtl.items SET report_status = $2, start_time= $3 WHERE id = $1;',
+    values: [itemId, reportStatus, startTime]
+  };
+};
+
+export const selectDataId = (itemId, projectName, scenarioName) => {
+  return {
+    text: `SELECT data_id
+    FROM jtl.items as items
+    LEFT JOIN jtl.charts as charts ON charts.item_id = items.id
+    LEFT JOIN jtl.scenario as s ON s.id = items.scenario_id
+    LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE items.id = $1
+    AND p.project_name = $2
+    AND s.name = $3;`,
+    values: [itemId, projectName, scenarioName]
+  };
+};
+
+export const findShareToken = (projectName, scenarioName, itemId, token) => {
+  return {
+    text: `SELECT t.token FROM jtl.share_tokens as t
+    LEFT JOIN jtl.items as it ON it.id = t.item_id
+    LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
+    LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE p.project_name = $1
+    AND s.name = $2
+    AND it.id = $3
+    AND t.token = $4;`,
+    values: [projectName, scenarioName, itemId, token]
+  };
+};
+
+export const selectShareTokens = (projectName, scenarioName, itemId) => {
+  return {
+    text: `SELECT t.id, t.token, t.name FROM jtl.share_tokens as t
+    LEFT JOIN jtl.items as it ON it.id = t.item_id
+    LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
+    LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE p.project_name = $1
+    AND s.name = $2
+    AND t.item_id = $3;`,
+    values: [projectName, scenarioName, itemId]
+  };
+};
+
+export const createShareToken = (projectName, scenarioName, itemId, token, name = null) => {
+  return {
+    text: `INSERT INTO jtl.share_tokens (item_id, token, name) VALUES (
+      (SELECT it.id FROM jtl.items as it
+      LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
+      LEFT JOIN jtl.projects as p ON p.id = s.project_id
+      WHERE p.project_name = $1
+      AND s.name = $2
+      AND it.id = $3), $4, $5);`,
+    values: [projectName, scenarioName, itemId, token, name]
+  };
+};
+
+export const deleteShareToken = (projectName, scenarioName, itemId, id) => {
+  return {
+    text: `DELETE FROM jtl.share_tokens as st
+    USING jtl.scenario as sc
+    WHERE st.id = $4
+    AND st.item_id = $3
+    AND sc.name = $2
+    AND sc.project_id = (SELECT id FROM jtl.projects WHERE project_name = $1)`,
+    values: [projectName, scenarioName, itemId, id]
+  };
+};
+
+export const saveThresholdsResult = (projectName, scenarioName, itemId, threshold) => {
+  return {
+    text: `UPDATE jtl.items as it
+    SET threshold_result = $4
+    FROM jtl.scenario as s
+    WHERE it.id = $1
+    AND s.project_id = (SELECT id FROM jtl.projects WHERE project_name = $2)
+    AND s.name = $3`,
+    values: [itemId, projectName, scenarioName, threshold]
+  };
+};
+
+export const upsertItemChartSettings = (itemId, userId, chartSetting) => {
+  return {
+    text: `INSERT INTO jtl.user_item_chart_settings as settings (item_id, user_id, chart_settings) VALUES ($1, $2, $3) 
+    ON CONFLICT ON CONSTRAINT user_item_chart_settings_user_id_item_id_constraint 
+    DO UPDATE SET chart_settings = $3 WHERE settings.item_id = $1 AND settings.user_id = $2`,
+    values: [itemId, userId, chartSetting]
+  };
+};
+
+export const getItemChartSettings = (itemId, userId) => {
+  return {
+    text: 'SELECT chart_settings as "settings" FROM jtl.user_item_chart_settings WHERE item_id = $1 AND user_id = $2;',
+    values: [itemId, userId]
   };
 };

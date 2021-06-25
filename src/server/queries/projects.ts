@@ -24,7 +24,7 @@ export const findProjectId = projectName => {
 
 export const findProjects = () => {
   return {
-    // tslint:disable-next-line:max-line-length
+    // eslint-disable-next-line max-len
     text: `SELECT project_name as "projectName", p.id, count(DISTINCT(s.name))::int as "scenarioCount", count(i.id)::int as "itemCount", MAX(i.start_time) as "latestRun"
     FROM jtl.projects as p
     LEFT JOIN jtl.scenario as s ON s.project_id = p.id
