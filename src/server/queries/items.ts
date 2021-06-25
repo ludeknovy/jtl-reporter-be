@@ -230,46 +230,69 @@ export const updateItemStatus = (itemId, reportStatus) => {
   };
 };
 
-export const calculateOverview = (itemId) => {
+export const aggOverviewQuery = (dataId) => {
   return {
     text: `
     SELECT
-      MAX(chunks.all_threads),
-      percentile_cont(0.90) within group (order by (chunks.elapsed)::int) as ninety,
-      AVG(chunks.latency::int) as avg_latency,
-      AVG(chunks.connect) as avg_connect,
-      AVG(chunks.elapsed) as avg_elapsed,
-      COUNT(*) as sample_count,
-      MIN(chunks.timestamp) as start,
-      MAX(chunks.timestamp) as end
-    FROM jtl.data_chunks as chunks
-    WHERE chunks.item_id = $1;`,
-    values: [itemId]
+    percentile_cont(0.90) within group (order by (samples.elapsed))::real as n90,
+    COUNT(DISTINCT samples.hostname)::int number_of_hostnames,
+    COUNT(DISTINCT samples.sut_hostname)::int number_of_sut_hostnames,
+    MAX(samples.timestamp) as end,
+    MIN(samples.timestamp) as start,
+    AVG(samples.latency)::real as avg_latency,
+    AVG(samples.connect)::real as avg_connect,
+    count(*) filter (where samples.success = false)::int as number_of_failed,
+    AVG(samples.elapsed)::real as avg_response,
+    SUM(samples.sent_bytes)::int as bytes_sent_total,
+    SUM(samples.bytes)::int as bytes_received_total,
+    COUNT(*)::int as total
+  FROM jtl.samples as samples
+  WHERE data_id = $1;`,
+    values: [dataId]
   };
 };
 
-export const getLabelsStats = (dataId) => {
+export const aggLabelQuery = (dataId) => {
   return {
     text: `
     SELECT 
       samples.label,
-      count(*) as total_samples,
-      AVG(samples.elapsed),
-      MIN(samples.elapsed),
-      MAX(samples.elapsed),
-      AVG(samples.bytes),	
-      percentile_cont(0.99) within group (order by (samples.elapsed)) as n99,
-      percentile_cont(0.95) within group (order by (samples.elapsed)) as n95,
-      percentile_cont(0.90) within group (order by (samples.elapsed)) as n90,
+      count(*)::int as total_samples,
+      AVG(samples.elapsed)::real as avg_response,
+      MIN(samples.elapsed)::real as min_reponse,
+      MAX(samples.elapsed)::real as max_response,
+      percentile_cont(0.99) within group (order by (samples.elapsed))::real as n99,
+      percentile_cont(0.95) within group (order by (samples.elapsed))::real as n95,
+      percentile_cont(0.90) within group (order by (samples.elapsed))::real as n90,
       MAX(samples.timestamp) as end,
       MIN(samples.timestamp) as start,
-      count(*) filter (where samples.success = false) as number_of_failed,
-      SUM(samples.sent_bytes) as bytes_sent_total,
-      SUM(samples.bytes) as bytes_received_total
+      count(*) filter (where samples.success = false)::int as number_of_failed,
+      SUM(samples.sent_bytes)::int as bytes_sent_total,
+      SUM(samples.bytes)::int as bytes_received_total
     FROM jtl.samples as samples
     WHERE data_id = $1
     GROUP BY samples.label;`,
     values: [dataId]
+  };
+};
+
+export const chartOverviewQuery = (interval, dataId) => {
+  return {
+    text: `
+    SELECT
+      time_bucket($1, timestamp) as time,
+      percentile_cont(0.90) within group (order by (samples.elapsed))::real as n90,
+      EXTRACT(EPOCH FROM (MAX(samples.timestamp) - MIN(samples.timestamp))) as interval,
+      (count(*) filter (where samples.success = false)::real / count(*)::real)::real as error_rate,
+      AVG(samples.elapsed)::real as avg_response,
+      SUM(samples.sent_bytes)::int as bytes_sent_total,
+      SUM(samples.bytes)::int as bytes_received_total,
+      MAX(samples.all_threads)::int as threads,
+      COUNT(*)::int as total
+    FROM jtl.samples as samples
+    WHERE data_id = $2
+    GROUP BY time;`,
+    values: [interval, dataId]
   };
 };
 

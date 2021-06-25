@@ -1,6 +1,6 @@
 import {
   calculateDistributedThreads,
-  prepareDataForSavingToDbFromMongo,
+  prepareDataForSavingToDb,
   stringToNumber, transformDataForDb
 } from './prepare-data';
 
@@ -236,7 +236,7 @@ describe('prepare data', () => {
         failed: 0
       }
     ];
-    const { overview, labelStats } = prepareDataForSavingToDbFromMongo(overviewData, labelsData, []);
+    const { overview, labelStats } = prepareDataForSavingToDb(overviewData, labelsData, []);
     expect(overview).toEqual({
       percentil: 271,
       maxVu: undefined,

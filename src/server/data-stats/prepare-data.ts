@@ -3,41 +3,41 @@ import * as moment from 'moment';
 import { logger } from '../../logger';
 
 // eslint-disable-next-line max-len
-export const prepareDataForSavingToDbFromMongo = (overviewData, labelData, sutStats): { overview: Overview; labelStats; sutOverview: {}[] } => {
+export const prepareDataForSavingToDb = (overviewData, labelData, sutStats): { overview: Overview; labelStats; sutOverview: {}[] } => {
   try {
     const startDate = new Date(overviewData.start);
     const endDate = new Date(overviewData.end);
     return {
       overview: {
-        percentil: roundNumberTwoDecimals(overviewData.percentil),
+        percentil: roundNumberTwoDecimals(overviewData.n90),
         maxVu: undefined,
-        avgResponseTime: Math.round(overviewData.avgResponse),
-        errorRate: roundNumberTwoDecimals((overviewData.failed / overviewData.total) * 100),
+        avgResponseTime: Math.round(overviewData.avg_response),
+        errorRate: roundNumberTwoDecimals((overviewData.number_of_failed / overviewData.total) * 100),
         throughput: roundNumberTwoDecimals(overviewData.total / ((overviewData.end - overviewData.start) / 1000)),
-        bytesPerSecond: roundNumberTwoDecimals(overviewData.bytes / ((overviewData.end - overviewData.start) / 1000)),
+        bytesPerSecond:
+          roundNumberTwoDecimals(overviewData.bytes_sent_total / ((overviewData.end - overviewData.start) / 1000)),
         // eslint-disable-next-line max-len
-        bytesSentPerSecond: roundNumberTwoDecimals(overviewData.bytesSent / ((overviewData.end - overviewData.start) / 1000)),
-        avgLatency: roundNumberTwoDecimals(overviewData.avgLatency),
-        avgConnect: roundNumberTwoDecimals(overviewData.avgConnect),
+        bytesSentPerSecond: roundNumberTwoDecimals(overviewData.bytes_received_total / ((overviewData.end - overviewData.start) / 1000)),
+        avgLatency: roundNumberTwoDecimals(overviewData.avg_latency),
+        avgConnect: roundNumberTwoDecimals(overviewData.avg_connect),
         startDate,
         endDate,
         duration: roundNumberTwoDecimals((endDate.getTime() - startDate.getTime()) / 1000 / 60)
       },
       labelStats: labelData.map((_) => ({
-        label: _._id,
-        samples: _.samplesCount,
-        avgResponseTime: Math.round(_.avgResponseTime),
-        minResponseTime: _.minResponseTime,
-        maxResponseTime: _.maxResponseTime,
-        errorRate: roundNumberTwoDecimals(_.failed / _.samplesCount * 100),
-        bytes: roundNumberTwoDecimals(_.avgBytes),
-        bytesPerSecond: roundNumberTwoDecimals(_.bytes / ((_.end - _.start) / 1000)),
-        bytesSentPerSecond: roundNumberTwoDecimals(_.bytesSent / ((_.end - _.start) / 1000)),
+        label: _.label,
+        samples: _.total_samples,
+        avgResponseTime: Math.round(_.avg_response),
+        minResponseTime: _.min_reponse,
+        maxResponseTime: _.max_response,
+        errorRate: roundNumberTwoDecimals(_.number_of_failed / _.total_samples * 100),
+        bytesPerSecond: roundNumberTwoDecimals(_.bytes_received_total / ((_.end - _.start) / 1000)),
+        bytesSentPerSecond: roundNumberTwoDecimals(_.bytes_sent_total / ((_.end - _.start) / 1000)),
         throughput: roundNumberTwoDecimals(
-          _.samplesCount / ((_.end - _.start) / 1000)),
-        n9: _.percentil99,
-        n5: _.percentil95,
-        n0: _.percentil90
+          _.total_samples / ((_.end - _.start) / 1000)),
+        n9: _.n99,
+        n5: _.n95,
+        n0: _.n90
       })),
       sutOverview: sutStats.map((_) => ({
         sutHostname: _._id.sut,
@@ -62,30 +62,32 @@ export const prepareChartDataForSavingFromMongo = (
   return {
     threads: distributedThreads?.length > 0
       ? calculateDistributedThreads(distributedThreads)
-      : overviewData.map((_) => [moment(_._id).valueOf(), _.threads]) as [number, number][],
+      : overviewData.map((_) => [moment(_.time).valueOf(), _.threads]) as [number, number][],
     overAllFailRate: {
-      data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.errorRate)]),
+      data: overviewData.map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.error_rate * 100)]),
       name: 'errors'
     },
     overallTimeResponse: {
-      data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.avgResponseTime)]),
+      data: overviewData.map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.avg_response)]),
       name: 'response time'
     },
     overallThroughput: {
-      data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.count / _.interval)]),
+      data: overviewData.map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.total / _.interval)]),
       name: 'throughput'
     },
     overAllNetworkUp: {
-      data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.bytesSent / _.interval)]),
+      data: overviewData.map((_) => [moment(_.time).valueOf(),
+        roundNumberTwoDecimals(_.bytes_sent_total / _.interval)]),
       name: 'network up'
     },
     overAllNetworkDown: {
-      data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.bytes / _.interval)]),
+      data: overviewData.map((_) => [moment(_.time).valueOf(),
+        roundNumberTwoDecimals(_.bytes_received_total / _.interval)]),
       name: 'network down'
     },
     overAllNetworkV2: {
-      // eslint-disable-next-line max-len
-      data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals((_.bytes + _.bytesSent) / _.interval)]),
+      data: overviewData.map((_) => [moment(_.time).valueOf(),
+        roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / _.interval)]),
       name: 'network'
     },
     throughput: labels.map((label) => ({
@@ -248,16 +250,17 @@ export interface OutputData {
 }
 
 interface ChartOverviewData {
-  _id: Date;
   min: Date;
   max: Date;
-  count: number;
+  total: number;
   threads: number;
-  avgResponseTime: number;
+  avg_response: number;
+  time: Date;
   interval: number;
-  errorRate: number;
-  bytes: number;
-  bytesSent: number;
+  number_of_failed: number;
+  bytes_received_total: number;
+  bytes_sent_total: number;
+  error_rate: number;
 }
 
 interface ChartLabelData {

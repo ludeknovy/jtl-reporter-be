@@ -3,10 +3,13 @@ import { db } from '../../../../db/db';
 import { MongoUtils } from '../../../../db/mongoUtil';
 import { logger } from '../../../../logger';
 import {
-  prepareDataForSavingToDbFromMongo,
+  prepareDataForSavingToDb,
   prepareChartDataForSavingFromMongo
 } from '../../../data-stats/prepare-data';
-import { saveThresholdsResult, saveItemStats, savePlotData, updateItem, saveData } from '../../../queries/items';
+import {
+  saveThresholdsResult, saveItemStats, savePlotData, updateItem,
+  saveData, aggOverviewQuery, aggLabelQuery, chartOverviewQuery
+} from '../../../queries/items';
 import { ItemDataType, ReportStatus } from '../../../queries/items.model';
 import {
   overviewChartAgg, labelChartAgg, labelAggPipeline,
@@ -26,29 +29,34 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId, da
   let sutMetrics = [];
 
   try {
-    const hostnames: [] = await collection.distinct('samples.Hostname', { dataId });
-    const sutHostnames: [] = await collection.distinct('samples.sutHostname', { dataId });
+    const aggOverview = await db.one(aggOverviewQuery(dataId));
+    const aggLabel = await db.many(aggLabelQuery(dataId));
+    console.log(aggOverview)
+    console.log(aggLabel)
 
-    const aggOverview = await overviewAggregationPipeline(collection, dataId);
-    const aggLabel = await labelAggregationPipeline(collection, dataId);
 
-    if (sutHostnames.filter(_ => _).length > 0) {
-      sutMetrics = await overviewAggregationPerSutPipeline(collection, dataId);
+    if (aggOverview.number_of_sut_hostnames > 1) {
+      // TODO
+      // sutMetrics = await overviewAggregationPerSutPipeline(collection, dataId);
     }
 
 
     const {
       overview,
       overview: { duration },
-      labelStats, sutOverview } = prepareDataForSavingToDbFromMongo(aggOverview[0], aggLabel, sutMetrics);
+      labelStats, sutOverview } = prepareDataForSavingToDb(aggOverview, aggLabel, sutMetrics);
     const interval = chartQueryOptionInterval(duration);
-    const overviewChartData = await collection.aggregate(
-      overviewChartAgg(dataId, interval), { allowDiskUse: true }).toArray();
+    console.log(interval)
+    // const overviewChartData = await collection.aggregate(
+
+    const overviewChartData = await db.many(chartOverviewQuery(`${interval} milliseconds`, dataId));
+    console.log(overviewChartData)
+
     const labelChartData = await collection.aggregate(
       labelChartAgg(dataId, interval), { allowDiskUse: true }).toArray();
 
     // distributed mode
-    if (hostnames?.length > 1) {
+    if (aggOverview['number_of_hostnames'] > 1) {
       distributedThreads = await collection.aggregate(
         threadChartDistributed(interval, dataId),
         { allowDiskUse: true }).toArray();
@@ -93,22 +101,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId, da
       await t.none(updateItem(itemId, ReportStatus.Ready, overview.startDate));
     });
   } catch (error) {
+    console.log(error)
     throw new Error(`Error while processing dataId: ${dataId} for item: ${itemId}, error: ${error}`);
   }
-};
-
-
-const overviewAggregationPipeline = async (collection, dataId) => {
-  return await collection.aggregate(
-    overviewAggPipeline(dataId), { allowDiskUse: true }).toArray();
-};
-
-const overviewAggregationPerSutPipeline = async (collection, dataId) => {
-  return await collection.aggregate(
-    overviewAggPerSutPipeline(dataId), { allowDiskUse: true }).toArray();
-};
-
-const labelAggregationPipeline = async (collection, dataId) => {
-  return await collection.aggregate(
-    labelAggPipeline(dataId), { allowDiskUse: true }).toArray();
 };
