@@ -135,7 +135,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
         })
         .on('end', async (rowCount: number) => {
           try {
-            await collection.insertOne({ dataId, samples: tempBuffer });
+            await db.none(pg.helpers.insert(tempBuffer, columnSet));
 
             fs.unlinkSync(kpiFilename);
 
