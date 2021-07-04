@@ -87,7 +87,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
         }, {
           name: 'hostname',
           prop: 'Hostname',
-          def: null,
+          def: null
         }, {
           name: 'status_code',
           prop: 'responseCode'
@@ -105,13 +105,18 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
         },
         {
           name: 'response_message',
-          prop: 'responseMessage',
+          prop: 'responseMessage'
         },
         {
           name: 'data_id',
           prop: 'dataId'
+        },
+        {
+          name: 'sut_hostname',
+          prop: 'sutHostname',
+          def: null
         }
-      ], { table:  new pg.helpers.TableName({table: 'samples', schema: 'jtl'}) });
+      ], { table: new pg.helpers.TableName({ table: 'samples', schema: 'jtl' }) });
 
 
       logger.info(`Starting KPI file streaming and saving to Mongo with dataId: ${dataId}`);
@@ -119,19 +124,19 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
       const csvStream = fs.createReadStream(kpiFilename)
         .pipe(csv.parse({ headers: true }))
         .on('data', async row => {
-            if (tempBuffer.length === (5000)) {
-              csvStream.pause();
-              const query = pg.helpers.insert(tempBuffer, columnSet);
-              await db.none(query);
-  
-              tempBuffer = [];
-              csvStream.resume();
-            }
-            const data = transformDataForDb(row, dataId);
-            if (data) {
-              return tempBuffer.push(data);
-            }
-            return;
+          if (tempBuffer.length === (10000)) {
+            csvStream.pause();
+            const query = pg.helpers.insert(tempBuffer, columnSet);
+            await db.none(query);
+
+            tempBuffer = [];
+            csvStream.resume();
+          }
+          const data = transformDataForDb(row, dataId);
+          if (data) {
+            return tempBuffer.push(data);
+          }
+          return;
         })
         .on('end', async (rowCount: number) => {
           try {
@@ -145,6 +150,8 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
               projectName, scenarioName,
               monitoring, errors
             });
+            logger.info(`Done ${rowCount} in ${(Date.now() - parsingStart) / 1000} seconds`);
+
           } catch (error) {
             await db.none(updateItem(itemId, ReportStatus.Error, null));
             logger.error(`Error while processing item: ${itemId}: ${error}`);

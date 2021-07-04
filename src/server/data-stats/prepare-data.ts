@@ -40,15 +40,15 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats): { o
         n0: _.n90
       })),
       sutOverview: sutStats.map((_) => ({
-        sutHostname: _._id.sut,
-        percentile: roundNumberTwoDecimals(_.percentil),
-        avgResponseTime: Math.round(_.avgResponse),
-        errorRate: roundNumberTwoDecimals((_.failed / _.total) * 100),
+        sutHostname: _.sut_hostname,
+        percentile: roundNumberTwoDecimals(_.n90),
+        avgResponseTime: Math.round(_.avg_response),
+        errorRate: roundNumberTwoDecimals((_.number_of_failed / _.total) * 100),
         throughput: roundNumberTwoDecimals(_.total / ((_.end - _.start) / 1000)),
-        bytesPerSecond: roundNumberTwoDecimals(_.bytes / ((_.end - _.start) / 1000)),
-        bytesSentPerSecond: roundNumberTwoDecimals(_.bytesSent / ((_.end - _.start) / 1000)),
-        avgLatency: roundNumberTwoDecimals(_.avgLatency),
-        avgConnect: roundNumberTwoDecimals(_.avgConnect)
+        bytesPerSecond: roundNumberTwoDecimals(_.bytes_received_total / ((_.end - _.start) / 1000)),
+        bytesSentPerSecond: roundNumberTwoDecimals(_.bytes_sent_total / ((_.end - _.start) / 1000)),
+        avgLatency: roundNumberTwoDecimals(_.avg_latency),
+        avgConnect: roundNumberTwoDecimals(_.avg_connect)
       }))
     };
   } catch (error) {

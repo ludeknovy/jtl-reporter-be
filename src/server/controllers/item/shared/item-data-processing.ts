@@ -8,10 +8,9 @@ import {
 } from '../../../data-stats/prepare-data';
 import {
   saveThresholdsResult, saveItemStats, savePlotData, updateItem,
-  saveData, aggOverviewQuery, aggLabelQuery, chartOverviewQuery, charLabelQuery
+  saveData, aggOverviewQuery, aggLabelQuery, chartOverviewQuery, charLabelQuery, sutOverviewQuery
 } from '../../../queries/items';
 import { ItemDataType, ReportStatus } from '../../../queries/items.model';
-import { threadChartDistributed } from '../../../queries/mongo-db-agg';
 import { chartQueryOptionInterval } from '../../../queries/mongoChartOptionHelper';
 import { getScenarioThresholds, currentScenarioMetrics } from '../../../queries/scenario';
 import { sendNotifications } from '../../../utils/notifications/send-notification';
@@ -30,8 +29,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId, da
     const aggLabel = await db.many(aggLabelQuery(dataId));
 
     if (aggOverview.number_of_sut_hostnames > 1) {
-      // TODO
-      // sutMetrics = await overviewAggregationPerSutPipeline(collection, dataId);
+      sutMetrics = await db.many(sutOverviewQuery(dataId));
     }
 
 
@@ -46,9 +44,9 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId, da
     const labelChartData = await db.many(charLabelQuery(`${interval} milliseconds`, dataId));
     // distributed mode
     if (aggOverview['number_of_hostnames'] > 1) {
-      distributedThreads = await collection.aggregate(
-        threadChartDistributed(interval, dataId),
-        { allowDiskUse: true }).toArray();
+      // distributedThreads = await collection.aggregate(
+      //   threadChartDistributed(interval, dataId),
+      //   { allowDiskUse: true }).toArray();
     }
 
     const chartData = prepareChartDataForSavingFromMongo(overviewChartData, labelChartData, distributedThreads);

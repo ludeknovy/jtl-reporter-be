@@ -276,6 +276,28 @@ export const aggLabelQuery = (dataId) => {
   };
 };
 
+export const sutOverviewQuery = (dataId) => {
+  return {
+    text: `
+    SELECT 
+      samples.sut_hostname,
+      MIN(samples.timestamp) as start,
+      MAX(samples.timestamp) as end,
+      AVG(samples.connect)::real as avg_connect,
+      AVG(samples.latency)::real as avg_latency,
+      AVG(samples.elapsed)::real as avg_response,
+      percentile_cont(0.90) within group (order by (samples.elapsed))::real as n90,
+      SUM(samples.sent_bytes) as bytes_sent_total,
+      SUM(samples.bytes) as bytes_received_total,
+      count(*) filter (where samples.success = false) as number_of_failed,
+      count(*) as total
+    FROM jtl.samples as samples
+    WHERE data_id = $1
+    GROUP BY samples.sut_hostname;`,
+    values: [dataId]
+  };
+};
+
 export const chartOverviewQuery = (interval, dataId) => {
   return {
     text: `
