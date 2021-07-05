@@ -146,7 +146,7 @@ export const prepareChartDataForSavingFromMongo = (
 
 export const calculateDistributedThreads = (distributedThreads: DistributedThreadData[]): [number, number][] => {
   const threadAcc = distributedThreads.reduce((acc, curr) => {
-    const interval = moment(curr._id.interval).valueOf();
+    const interval = moment(curr.time).valueOf();
     if (!acc[interval]) {
       acc[interval] = 0;
     }
@@ -298,9 +298,7 @@ export interface Overview {
 };
 
 interface DistributedThreadData {
-  _id: {
-    interval: Date;
-    hostname: string;
-  };
+  time: Date;
+  hostname: string;
   threads: number;
 };

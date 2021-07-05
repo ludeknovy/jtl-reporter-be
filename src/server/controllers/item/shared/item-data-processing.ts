@@ -7,7 +7,8 @@ import {
 } from '../../../data-stats/prepare-data';
 import {
   saveThresholdsResult, saveItemStats, savePlotData, updateItem,
-  saveData, aggOverviewQuery, aggLabelQuery, chartOverviewQuery, charLabelQuery, sutOverviewQuery
+  saveData, aggOverviewQuery, aggLabelQuery, chartOverviewQuery,
+  charLabelQuery, sutOverviewQuery, distributedThreadsQuery
 } from '../../../queries/items';
 import { ItemDataType, ReportStatus } from '../../../queries/items.model';
 import { chartQueryOptionInterval } from '../../../queries/mongoChartOptionHelper';
@@ -40,10 +41,8 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId, da
 
     const labelChartData = await db.many(charLabelQuery(`${interval} milliseconds`, dataId));
     // distributed mode
-    if (aggOverview['number_of_hostnames'] > 1) {
-      // distributedThreads = await collection.aggregate(
-      //   threadChartDistributed(interval, dataId),
-      //   { allowDiskUse: true }).toArray();
+    if (aggOverview?.number_of_hostnames > 1) {
+      distributedThreads = await db.manyOrNone(distributedThreadsQuery(`${interval} milliseconds`, dataId));
     }
 
     const chartData = prepareChartDataForSavingFromMongo(overviewChartData, labelChartData, distributedThreads);

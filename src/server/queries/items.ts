@@ -342,6 +342,20 @@ export const charLabelQuery = (interval, dataId) => {
   };
 };
 
+export const distributedThreadsQuery = (interval, dataId) => {
+  return {
+    text: `
+    SELECT 
+      time_bucket($1, timestamp) as time,
+      samples.hostname,
+      AVG(samples.all_threads)::int as threads  
+    FROM jtl.samples samples WHERE data_id = $2 
+    GROUP BY time, samples.hostname
+    ORDER BY time ASC;`,
+    values: [interval, dataId]
+  };
+};
+
 export const updateItem = (itemId, reportStatus, startTime) => {
   return {
     text: 'UPDATE jtl.items SET report_status = $2, start_time= $3 WHERE id = $1;',
