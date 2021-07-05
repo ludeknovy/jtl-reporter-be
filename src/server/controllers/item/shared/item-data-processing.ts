@@ -1,6 +1,5 @@
 import csvtojson = require('csvtojson');
 import { db } from '../../../../db/db';
-import { MongoUtils } from '../../../../db/mongoUtil';
 import { logger } from '../../../../logger';
 import {
   prepareDataForSavingToDb,
@@ -19,8 +18,6 @@ import * as parser from 'xml2json';
 import * as fs from 'fs';
 
 export const itemDataProcessing = async ({ projectName, scenarioName, itemId, dataId, errors, monitoring }) => {
-  const jtlDb = MongoUtils.getClient().db('jtl-data');
-  const collection = jtlDb.collection('data-chunks');
   let distributedThreads = null;
   let sutMetrics = [];
 

@@ -82,6 +82,10 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
           prop: 'timeStamp'
         },
         {
+          name: 'sent_bytes',
+          prop: 'sentBytes'
+        },
+        {
           name: 'connect',
           prop: 'Connect'
         }, {
