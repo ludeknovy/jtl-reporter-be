@@ -350,6 +350,7 @@ export const distributedThreadsQuery = (interval, dataId) => {
       samples.hostname,
       AVG(samples.all_threads)::int as threads  
     FROM jtl.samples samples WHERE data_id = $2 
+    AND samples.response_message not like 'Number of samples in transaction%'
     GROUP BY time, samples.hostname
     ORDER BY time ASC;`,
     values: [interval, dataId]
