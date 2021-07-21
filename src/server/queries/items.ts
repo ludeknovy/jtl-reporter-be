@@ -1,15 +1,15 @@
 import { ItemDataType } from './items.model';
 
 // eslint-disable-next-line max-len
-export const createNewItem = (scenarioName, startTime, environment, note, status, projectName, hostname, reportStatus, dataId) => {
+export const createNewItem = (scenarioName, startTime, environment, note, status, projectName, hostname, reportStatus) => {
   return {
     // eslint-disable-next-line max-len
-    text: `INSERT INTO jtl.items(scenario_id, start_time, environment, note, status, hostname, report_status, data_id) VALUES(
+    text: `INSERT INTO jtl.items(scenario_id, start_time, environment, note, status, hostname, report_status) VALUES(
       (SELECT sc.id FROM jtl.scenario as sc
         LEFT JOIN jtl.projects as p ON p.id = sc.project_id
         WHERE sc.name = $1
-        AND p.project_name = $6), $2, $3, $4, $5, $7, $8, $9) RETURNING id`,
-    values: [scenarioName, startTime, environment, note, status, projectName, hostname, reportStatus, dataId]
+        AND p.project_name = $6), $2, $3, $4, $5, $7, $8) RETURNING id`,
+    values: [scenarioName, startTime, environment, note, status, projectName, hostname, reportStatus]
   };
 };
 
@@ -230,7 +230,7 @@ export const updateItemStatus = (itemId, reportStatus) => {
   };
 };
 
-export const aggOverviewQuery = (dataId) => {
+export const aggOverviewQuery = (itemId) => {
   return {
     text: `
     SELECT
@@ -247,12 +247,12 @@ export const aggOverviewQuery = (dataId) => {
     SUM(samples.bytes)::bigint as bytes_received_total,
     COUNT(*)::int as total
   FROM jtl.samples as samples
-  WHERE data_id = $1;`,
-    values: [dataId]
+  WHERE item_id = $1;`,
+    values: [itemId]
   };
 };
 
-export const aggLabelQuery = (dataId) => {
+export const aggLabelQuery = (item_id) => {
   return {
     text: `
     SELECT 
@@ -270,13 +270,13 @@ export const aggLabelQuery = (dataId) => {
       SUM(samples.sent_bytes)::bigint as bytes_sent_total,
       SUM(samples.bytes)::bigint as bytes_received_total
     FROM jtl.samples as samples
-    WHERE data_id = $1
+    WHERE item_id = $1
     GROUP BY samples.label;`,
-    values: [dataId]
+    values: [item_id]
   };
 };
 
-export const sutOverviewQuery = (dataId) => {
+export const sutOverviewQuery = (item_id) => {
   return {
     text: `
     SELECT 
@@ -292,13 +292,13 @@ export const sutOverviewQuery = (dataId) => {
       count(*) filter (where samples.success = false) as number_of_failed,
       count(*) as total
     FROM jtl.samples as samples
-    WHERE data_id = $1
+    WHERE item_id = $1
     GROUP BY samples.sut_hostname;`,
-    values: [dataId]
+    values: [item_id]
   };
 };
 
-export const chartOverviewQuery = (interval, dataId) => {
+export const chartOverviewQuery = (interval, item_id) => {
   return {
     text: `
     SELECT
@@ -312,13 +312,13 @@ export const chartOverviewQuery = (interval, dataId) => {
       MAX(samples.all_threads)::int as threads,
       COUNT(*)::int as total
     FROM jtl.samples as samples
-    WHERE data_id = $2
+    WHERE item_id = $2
     GROUP BY time;`,
-    values: [interval, dataId]
+    values: [interval, item_id]
   };
 };
 
-export const charLabelQuery = (interval, dataId) => {
+export const charLabelQuery = (interval, item_id) => {
   return {
     text: `
     SELECT
@@ -336,24 +336,24 @@ export const charLabelQuery = (interval, dataId) => {
       SUM(samples.bytes)::int as bytes_received_total,
       COUNT(*)::int as total
     FROM jtl.samples as samples
-    WHERE data_id = $2
+    WHERE item_id = $2
     GROUP BY time, samples.label;`,
-    values: [interval, dataId]
+    values: [interval, item_id]
   };
 };
 
-export const distributedThreadsQuery = (interval, dataId) => {
+export const distributedThreadsQuery = (interval, item_id) => {
   return {
     text: `
     SELECT 
       time_bucket($1, timestamp) as time,
       samples.hostname,
       AVG(samples.all_threads)::int as threads  
-    FROM jtl.samples samples WHERE data_id = $2 
+    FROM jtl.samples samples WHERE item_id = $2 
     AND samples.response_message not like 'Number of samples in transaction%'
     GROUP BY time, samples.hostname
     ORDER BY time ASC;`,
-    values: [interval, dataId]
+    values: [interval, item_id]
   };
 };
 
@@ -364,19 +364,6 @@ export const updateItem = (itemId, reportStatus, startTime) => {
   };
 };
 
-export const selectDataId = (itemId, projectName, scenarioName) => {
-  return {
-    text: `SELECT data_id
-    FROM jtl.items as items
-    LEFT JOIN jtl.charts as charts ON charts.item_id = items.id
-    LEFT JOIN jtl.scenario as s ON s.id = items.scenario_id
-    LEFT JOIN jtl.projects as p ON p.id = s.project_id
-    WHERE items.id = $1
-    AND p.project_name = $2
-    AND s.name = $3;`,
-    values: [itemId, projectName, scenarioName]
-  };
-};
 
 export const findShareToken = (projectName, scenarioName, itemId, token) => {
   return {

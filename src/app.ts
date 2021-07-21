@@ -8,7 +8,6 @@ import * as expressWinston from 'express-winston';
 import { logger } from './logger';
 import { Router } from './server/router';
 import * as swaggerUi from 'swagger-ui-express';
-import { MongoUtils } from './db/mongoUtil';
 import * as http from 'http';
 import { config } from './server/config';
 const swaggerDocument = require('../openapi.json');

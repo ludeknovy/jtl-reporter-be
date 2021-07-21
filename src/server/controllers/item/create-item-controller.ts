@@ -8,7 +8,6 @@ import * as boom from 'boom';
 import * as fs from 'fs';
 import * as csv from 'fast-csv';
 import { ReportStatus } from '../../queries/items.model';
-import { MongoUtils } from '../../../db/mongoUtil';
 import { logger } from '../../../logger';
 import * as uuid from 'uuid';
 import { itemDataProcessing } from './shared/item-data-processing';
@@ -49,7 +48,6 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
     logger.info(`Starting new item processing for scenario: ${scenarioName}`);
     try {
       let itemId;
-      const dataId = uuid();
 
       const kpiFilename = kpi[0].path;
       let tempBuffer = [];
@@ -62,8 +60,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
         status,
         projectName,
         hostname,
-        ReportStatus.InProgress,
-        dataId
+        ReportStatus.InProgress
       ));
       itemId = item.id;
 
@@ -106,8 +103,8 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
           prop: 'responseMessage'
         },
         {
-          name: 'data_id',
-          prop: 'dataId'
+          name: 'item_id',
+          prop: 'itemId'
         },
         {
           name: 'sut_hostname',
@@ -117,7 +114,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
       ], { table: new pg.helpers.TableName({ table: 'samples', schema: 'jtl' }) });
 
 
-      logger.info(`Starting KPI file streaming and saving to db with dataId: ${dataId}`);
+      logger.info(`Starting KPI file streaming and saving to db, item_id: ${itemId}`);
       const parsingStart = Date.now();
       const csvStream = fs.createReadStream(kpiFilename)
         .pipe(csv.parse({ headers: true }))
@@ -130,7 +127,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
             tempBuffer = [];
             csvStream.resume();
           }
-          const data = transformDataForDb(row, dataId);
+          const data = transformDataForDb(row, itemId);
           if (data) {
             return tempBuffer.push(data);
           }
@@ -144,7 +141,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
 
             logger.info(`Parsed ${rowCount} records in ${(Date.now() - parsingStart) / 1000} seconds`);
             await itemDataProcessing({
-              itemId, dataId,
+              itemId,
               projectName, scenarioName,
               monitoring, errors
             });

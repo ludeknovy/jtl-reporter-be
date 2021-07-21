@@ -170,7 +170,7 @@ export const stringToNumber = (input: string, radix: number) => {
   return result;
 };
 
-export const transformDataForDb = (_, dataId) => {
+export const transformDataForDb = (_, itemId) => {
   try {
     _.timeStamp = new Date(stringToNumber(_.timeStamp, 10));
     _.elapsed = stringToNumber(_.elapsed, 10);
@@ -183,7 +183,7 @@ export const transformDataForDb = (_, dataId) => {
     _.Connect = stringToNumber(_.Connect, 10);
     _.success = _.success === 'true';
     _.sutHostname = getHostnameFromUrl(_.URL);
-    _.dataId = dataId;
+    _.itemId = itemId;
     return _;
   } catch (error) {
     logger.error(`Error while parsing data: ${error}`);

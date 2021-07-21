@@ -18,16 +18,16 @@ import { scenarioThresholdsCalc } from '../utils/scenario-thresholds-calc';
 import * as parser from 'xml2json';
 import * as fs from 'fs';
 
-export const itemDataProcessing = async ({ projectName, scenarioName, itemId, dataId, errors, monitoring }) => {
+export const itemDataProcessing = async ({ projectName, scenarioName, itemId, errors, monitoring }) => {
   let distributedThreads = null;
   let sutMetrics = [];
 
   try {
-    const aggOverview = await db.one(aggOverviewQuery(dataId));
-    const aggLabel = await db.many(aggLabelQuery(dataId));
+    const aggOverview = await db.one(aggOverviewQuery(itemId));
+    const aggLabel = await db.many(aggLabelQuery(itemId));
 
     if (aggOverview.number_of_sut_hostnames > 1) {
-      sutMetrics = await db.many(sutOverviewQuery(dataId));
+      sutMetrics = await db.many(sutOverviewQuery(itemId));
     }
 
 
@@ -37,12 +37,12 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId, da
       labelStats, sutOverview } = prepareDataForSavingToDb(aggOverview, aggLabel, sutMetrics);
     const interval = chartQueryOptionInterval(duration);
 
-    const overviewChartData = await db.many(chartOverviewQuery(`${interval} milliseconds`, dataId));
+    const overviewChartData = await db.many(chartOverviewQuery(`${interval} milliseconds`, itemId));
 
-    const labelChartData = await db.many(charLabelQuery(`${interval} milliseconds`, dataId));
+    const labelChartData = await db.many(charLabelQuery(`${interval} milliseconds`, itemId));
     // distributed mode
     if (aggOverview?.number_of_hostnames > 1) {
-      distributedThreads = await db.manyOrNone(distributedThreadsQuery(`${interval} milliseconds`, dataId));
+      distributedThreads = await db.manyOrNone(distributedThreadsQuery(`${interval} milliseconds`, itemId));
     }
 
     const chartData = prepareChartDataForSavingFromMongo(overviewChartData, labelChartData, distributedThreads);
@@ -84,7 +84,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId, da
       await t.none(updateItem(itemId, ReportStatus.Ready, overview.startDate));
     });
   } catch (error) {
-    console.log(error)
-    throw new Error(`Error while processing dataId: ${dataId} for item: ${itemId}, error: ${error}`);
+    console.log(error);
+    throw new Error(`Error while processing dataId: ${itemId} for item: ${itemId}, error: ${error}`);
   }
 };
