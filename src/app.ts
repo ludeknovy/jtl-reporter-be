@@ -79,7 +79,6 @@ export class App {
       logger.error('Please provide JWT_TOKEN and JWT_TOKEN_LOGIN env vars');
       process.exit(1);
     }
-    await MongoUtils.connect();
     return this.server = this.app.listen(PORT, () => {
       logger.info('Express server listening on port ' + PORT);
     });

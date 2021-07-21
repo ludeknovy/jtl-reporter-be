@@ -50,8 +50,6 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
     try {
       let itemId;
       const dataId = uuid();
-      const jtlDb = MongoUtils.getClient().db('jtl-data');
-      const collection = jtlDb.collection('data-chunks');
 
       const kpiFilename = kpi[0].path;
       let tempBuffer = [];
@@ -119,7 +117,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
       ], { table: new pg.helpers.TableName({ table: 'samples', schema: 'jtl' }) });
 
 
-      logger.info(`Starting KPI file streaming and saving to Mongo with dataId: ${dataId}`);
+      logger.info(`Starting KPI file streaming and saving to db with dataId: ${dataId}`);
       const parsingStart = Date.now();
       const csvStream = fs.createReadStream(kpiFilename)
         .pipe(csv.parse({ headers: true }))
