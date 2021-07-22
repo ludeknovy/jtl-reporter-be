@@ -9,7 +9,6 @@ import * as fs from 'fs';
 import * as csv from 'fast-csv';
 import { ReportStatus } from '../../queries/items.model';
 import { logger } from '../../../logger';
-import * as uuid from 'uuid';
 import { itemDataProcessing } from './shared/item-data-processing';
 import * as pgp from 'pg-promise';
 
