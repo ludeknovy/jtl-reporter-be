@@ -7,7 +7,7 @@ import {
 describe('prepare data', () => {
   describe('transformDataForDb', () => {
     it('should return undefined when unable to process data', () => {
-      const result = transformDataForDb({});
+      const result = transformDataForDb({}, 'itemId');
       expect(result).toBeUndefined();
     });
     it('should correctly proccess data', () => {
@@ -30,7 +30,7 @@ describe('prepare data', () => {
         responseCode: '200',
         responseMessage: ''
       };
-      const result = transformDataForDb(inputData);
+      const result = transformDataForDb(inputData, 'itemId');
       expect(result).toEqual({
         bytes: 792,
         sentBytes: 124,
@@ -73,7 +73,7 @@ describe('prepare data', () => {
         responseMessage: '',
         URL: 'https://example.com/styles.css'
       };
-      const result = transformDataForDb(inputData);
+      const result = transformDataForDb(inputData, 'itemId');
       expect(result.sutHostname).toEqual('example.com');
     });
     it('should return sutHostname undefined when URL contains empty url', () => {
@@ -97,7 +97,7 @@ describe('prepare data', () => {
         responseMessage: '',
         URL: ''
       };
-      const result = transformDataForDb(inputData);
+      const result = transformDataForDb(inputData, 'itemId');
       expect(result.sutHostname).toBeUndefined();
     });
     it('should return sutHostname undefined when URL contains invalid url', () => {
@@ -121,7 +121,7 @@ describe('prepare data', () => {
         responseMessage: '',
         URL: 'file'
       };
-      const result = transformDataForDb(inputData);
+      const result = transformDataForDb(inputData, 'itemId');
       expect(result.sutHostname).toBeUndefined();
     });
     it('should process the data even when sentBytes not provided', () => {
@@ -144,7 +144,7 @@ describe('prepare data', () => {
         responseMessage: '',
         URL: 'file'
       };
-      const result = transformDataForDb(inputData);
+      const result = transformDataForDb(inputData, 'itemId');
       expect(result.sentBytes).toEqual(0);
     });
   });
@@ -163,24 +163,18 @@ describe('prepare data', () => {
     it('should correctly calculate distributed threads', () => {
       const inputData = [
         {
-          _id: {
-            interval: new Date(1555399218911),
-            hostname: 'generator-1'
-          },
+          time: new Date(1555399218911),
+          hostname: 'generator-1',
           threads: 10
         },
         {
-          _id: {
-            interval: new Date(1555399218911),
-            hostname: 'generator-2'
-          },
+          time: new Date(1555399218911),
+          hostname: 'generator-2',
           threads: 10
         },
         {
-          _id: {
-            interval: new Date(1555399218911),
-            hostname: 'generator-3'
-          },
+          time: new Date(1555399218911),
+          hostname: 'generator-3',
           threads: 5
         }
       ];
