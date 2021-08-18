@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { db } from '../../../db/db';
-import { findItem, findItemStats, findAttachements, findData } from '../../queries/items';
-import { ItemDataType } from '../../queries/items.model';
 import { findMinMax } from '../../data-stats/helper/stats-fc';
+import { findItem, findItemStats, findAttachements, getMonitoringData } from '../../queries/items';
+
 
 export const getItemController = async (req: Request, res: Response, next: NextFunction) => {
   const { projectName, scenarioName, itemId } = req.params;
@@ -19,20 +19,23 @@ export const getItemController = async (req: Request, res: Response, next: NextF
   const files = await db.any(findAttachements(itemId));
   const attachements = files.map(_ => _.type);
 
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const [monitoringLogs = { item_data: [] }] = await db.any(findData(itemId, ItemDataType.MonitoringLogs));
-  monitoringLogs.item_data = monitoringLogs.item_data.map((_) => {
-    _.ts = parseInt(_.ts, 10) * 1000;
-    return _;
+  const monitoring: MonitoringData[] = await db.manyOrNone(getMonitoringData(itemId));
+
+  const monitoringAdjusted = monitoring.map(_ => {
+    return Object.assign(_, { avgCpu: parseFloat(_.avgCpu)});
   });
-  const cpu = monitoringLogs.item_data.map((_) => [_.ts, parseInt(_.cpu, 10)]);
-  const mem = monitoringLogs.item_data.map((_) => [_.ts, parseInt(_.mem, 10)]);
-  const maxCpu = findMinMax(cpu.map(_ => _[1])).max;
-  const maxMem = findMinMax(mem.map(_ => _[1])).max;
+
+  const maxCpu = findMinMax(monitoring.map(_ => _.avgCpu)).max;
+  // const maxMem = findMinMax(monitoring.map(_ => _[1])).max;
 
   res.status(200).send({
     overview, sutOverview, statistics, status,
     plot, note, environment, hostname, reportStatus, thresholds, analysisEnabled,
-    attachements, baseId: base_id, isBase: base_id === itemId, monitoringData: { cpu, mem, maxCpu, maxMem }
+    attachements, baseId: base_id, isBase: base_id === itemId, monitoring: {
+      data: monitoringAdjusted, maxCpu
+    }
   });
 };
+
+
+interface MonitoringData { timestamp: Date; avgCpu: string; name: string }

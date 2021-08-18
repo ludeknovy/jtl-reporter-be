@@ -7,16 +7,14 @@ import {
 } from '../../../data-stats/prepare-data';
 import {
   saveThresholdsResult, saveItemStats, savePlotData, updateItem,
-  saveData, aggOverviewQuery, aggLabelQuery, chartOverviewQuery,
+  aggOverviewQuery, aggLabelQuery, chartOverviewQuery,
   charLabelQuery, sutOverviewQuery, distributedThreadsQuery
 } from '../../../queries/items';
-import { ItemDataType, ReportStatus } from '../../../queries/items.model';
+import { ReportStatus } from '../../../queries/items.model';
 import { chartQueryOptionInterval } from '../../../queries/mongoChartOptionHelper';
 import { getScenarioThresholds, currentScenarioMetrics } from '../../../queries/scenario';
 import { sendNotifications } from '../../../utils/notifications/send-notification';
 import { scenarioThresholdsCalc } from '../utils/scenario-thresholds-calc';
-import * as parser from 'xml2json';
-import * as fs from 'fs';
 
 export const itemDataProcessing = async ({ projectName, scenarioName, itemId, errors, monitoring }) => {
   let distributedThreads = null;
@@ -58,22 +56,6 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId, er
       }
     }
 
-    if (errors) {
-      const filename = errors[0].path;
-      const fileContent = fs.readFileSync(filename);
-      fs.unwatchFile(filename);
-      const jsonErrors = parser.toJson(fileContent);
-      await db.none(saveData(itemId, jsonErrors, ItemDataType.Error));
-    }
-
-
-    if (monitoring) {
-      const filename = monitoring[0].path;
-      const monitoringData = await csvtojson().fromFile(filename);
-      const monitoringDataString = JSON.stringify(monitoringData);
-      fs.unwatchFile(filename);
-      await db.none(saveData(itemId, monitoringDataString, ItemDataType.MonitoringLogs));
-    }
     logger.info(`Item: ${itemId} processing finished`);
     await sendNotifications(projectName, scenarioName, itemId, overview);
 

@@ -92,10 +92,18 @@ export const saveData = (itemId, data, dataType) => {
   };
 };
 
-export const findData = (itemId, dataType) => {
+export const getMonitoringData = (itemId, interval = '5 seconds') => {
   return {
-    text: 'SELECT item_data FROM jtl.data WHERE item_id = $1 AND data_type = $2',
-    values: [itemId, dataType]
+    text: `
+    SELECT 
+      time_bucket($2, timestamp) as timestamp,
+      avg(monitor.cpu)::decimal as "avgCpu",
+      monitor.name as "name"
+    FROM jtl.monitor monitor
+    WHERE item_id = $1
+    GROUP BY timestamp, monitor.name
+    ORDER BY timestamp ASC;`,
+    values: [itemId, interval]
   };
 };
 
