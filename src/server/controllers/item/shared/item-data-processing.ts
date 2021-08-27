@@ -1,4 +1,3 @@
-import csvtojson = require('csvtojson');
 import { db } from '../../../../db/db';
 import { logger } from '../../../../logger';
 import {
