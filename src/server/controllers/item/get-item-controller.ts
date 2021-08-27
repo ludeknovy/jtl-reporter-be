@@ -22,17 +22,19 @@ export const getItemController = async (req: Request, res: Response, next: NextF
   const monitoring: MonitoringData[] = await db.manyOrNone(getMonitoringData(itemId));
 
   const monitoringAdjusted = monitoring.map(_ => {
-    return Object.assign(_, { avgCpu: parseFloat(_.avgCpu)});
+    return Object.assign(_, { avgCpu: parseFloat(_.avgCpu) });
   });
 
   const maxCpu = findMinMax(monitoring.map(_ => _.avgCpu)).max;
-  // const maxMem = findMinMax(monitoring.map(_ => _[1])).max;
 
   res.status(200).send({
     overview, sutOverview, statistics, status,
     plot, note, environment, hostname, reportStatus, thresholds, analysisEnabled,
     attachements, baseId: base_id, isBase: base_id === itemId, monitoring: {
-      data: monitoringAdjusted, maxCpu
+      cpu: {
+        data: monitoringAdjusted,
+        max: maxCpu
+      }
     }
   });
 };
