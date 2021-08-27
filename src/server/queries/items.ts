@@ -121,15 +121,6 @@ export const findErrors = (itemId, projectName) => {
   };
 };
 
-export const findAttachements = itemId => {
-  return {
-    text: `SELECT d.data_type as type FROM jtl.data d
-    WHERE d.item_id = $1
-    AND d.data_type != $2;`,
-    values: [itemId, ItemDataType.Kpi]
-  };
-};
-
 export const removeCurrentBaseFlag = (scenarioName, projectName) => {
   return {
     text: `UPDATE jtl.items SET base = NULL
