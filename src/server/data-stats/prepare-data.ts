@@ -191,6 +191,21 @@ export const transformDataForDb = (_, itemId) => {
   }
 };
 
+export const transformMonitoringDataForDb = (row, itemId): MonitoringTransformedData => {
+  try {
+    return {
+      timestamp: new Date(stringToNumber(row.ts, 10)),
+      cpu: stringToNumber(row.cpu, 10),
+      name: row.name || 'localhost',
+      itemId
+    };
+  } catch (error) {
+    logger.error(`Error while parsing monitring data: ${error}`);
+    return;
+  }
+
+};
+
 export const getHostnameFromUrl = (url) => {
   if (!url) {
     return;
@@ -302,3 +317,10 @@ interface DistributedThreadData {
   hostname: string;
   threads: number;
 };
+
+interface MonitoringTransformedData {
+  timestamp: Date;
+  cpu: number;
+  name: string;
+  itemId: string;
+}

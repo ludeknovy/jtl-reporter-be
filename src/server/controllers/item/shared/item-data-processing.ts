@@ -15,7 +15,7 @@ import { getScenarioThresholds, currentScenarioMetrics } from '../../../queries/
 import { sendNotifications } from '../../../utils/notifications/send-notification';
 import { scenarioThresholdsCalc } from '../utils/scenario-thresholds-calc';
 
-export const itemDataProcessing = async ({ projectName, scenarioName, itemId, errors, monitoring }) => {
+export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) => {
   let distributedThreads = null;
   let sutMetrics = [];
 
