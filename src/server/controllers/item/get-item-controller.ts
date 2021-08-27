@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { db } from '../../../db/db';
 import { findMinMax } from '../../data-stats/helper/stats-fc';
-import { findItem, findItemStats, findAttachements, getMonitoringData } from '../../queries/items';
+import { findItem, findItemStats, getMonitoringData } from '../../queries/items';
 
 
 export const getItemController = async (req: Request, res: Response, next: NextFunction) => {
@@ -16,9 +16,6 @@ export const getItemController = async (req: Request, res: Response, next: NextF
     analysisEnabled } = await db.one(findItem(itemId, projectName, scenarioName));
   const { stats: statistics, overview, sutOverview } = await db.one(findItemStats(itemId));
 
-  const files = await db.any(findAttachements(itemId));
-  const attachements = files.map(_ => _.type);
-
   const monitoring: MonitoringData[] = await db.manyOrNone(getMonitoringData(itemId));
 
   const monitoringAdjusted = monitoring.map(_ => {
@@ -30,7 +27,7 @@ export const getItemController = async (req: Request, res: Response, next: NextF
   res.status(200).send({
     overview, sutOverview, statistics, status,
     plot, note, environment, hostname, reportStatus, thresholds, analysisEnabled,
-    attachements, baseId: base_id, isBase: base_id === itemId, monitoring: {
+    baseId: base_id, isBase: base_id === itemId, monitoring: {
       cpu: {
         data: monitoringAdjusted,
         max: maxCpu
