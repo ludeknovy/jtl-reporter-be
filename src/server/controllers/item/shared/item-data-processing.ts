@@ -19,9 +19,7 @@ import { scenarioThresholdsCalc } from '../utils/scenario-thresholds-calc';
 import * as parser from 'xml2json';
 import * as fs from 'fs';
 
-export const itemDataProcessing = async ({ projectName, scenarioName, itemId, dataId, errors, monitoring }) => {
-  const jtlDb = MongoUtils.getClient().db('jtl-data');
-  const collection = jtlDb.collection('data-chunks');
+export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) => {
   let distributedThreads = null;
   let sutMetrics = [];
 

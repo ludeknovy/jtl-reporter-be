@@ -16,6 +16,8 @@ import { MongoUtils } from '../../../db/mongoUtil';
 import { logger } from '../../../logger';
 import * as uuid from 'uuid';
 import { itemDataProcessing } from './shared/item-data-processing';
+import * as pgp from 'pg-promise';
+import { processMonitoringCsv } from './utils/process-monitoring-csv';
 
 
 
@@ -25,14 +27,13 @@ const upload = multer(
     limits: { fieldSize: 2048 * 1024 * 1024 }
   }).fields([
   { name: 'kpi', maxCount: 1 },
-  { name: 'errors', maxCount: 1 },
   { name: 'monitoring', maxCount: 1 }
 ]);
 
 export const createItemController = (req: Request, res: Response, next: NextFunction) => {
   upload(req, res, async error => {
     const { environment, note, status = ItemStatus.None, hostname } = req.body;
-    const { kpi, errors, monitoring } = <any>req.files;
+    const { kpi,  monitoring } = <any>req.files;
     const { scenarioName, projectName } = req.params;
     if (error) {
       return next(boom.badRequest(error.message));
@@ -56,7 +57,8 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
       const jtlDb = MongoUtils.getClient().db('jtl-data');
       const collection = jtlDb.collection('data-chunks');
 
-      const kpiFilename = kpi[0].path;
+      const kpiFilename = kpi[0]?.path;
+      const monitoringFileName = monitoring[0]?.path;
       let tempBuffer = [];
 
       const item = await db.one(createNewItem(
@@ -76,6 +78,9 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
 
       logger.info(`Starting KPI file streaming and saving to Mongo with dataId: ${dataId}`);
       const parsingStart = Date.now();
+
+      await processMonitoringCsv(monitoringFileName, itemId);
+
       const csvStream = fs.createReadStream(kpiFilename)
         .pipe(csv.parse({ headers: true }))
         .on('data', async row => {
@@ -99,9 +104,8 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
 
             logger.info(`Parsed ${rowCount} records in ${(Date.now() - parsingStart) / 1000} seconds`);
             await itemDataProcessing({
-              itemId, dataId,
-              projectName, scenarioName,
-              monitoring, errors
+              itemId,
+              projectName, scenarioName
             });
           } catch (error) {
             await db.none(updateItem(itemId, ReportStatus.Error, null));

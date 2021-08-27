@@ -16,7 +16,7 @@ export const stopItemAsyncController = async (req: Request, res: Response, next:
     if (reportStatus !== ReportStatus.InProgress) {
       return res.status(400).send('Already processed');
     }
-    await itemDataProcessing({ itemId, dataId, projectName, scenarioName, errors: null, monitoring: null });
+    await itemDataProcessing({ itemId, projectName, scenarioName });
   } catch (e) {
     logger.error(`Processing of item ${itemId} failed ${e}`);
     await db.none(updateItem(itemId, ReportStatus.Error, null));
