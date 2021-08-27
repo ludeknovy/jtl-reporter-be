@@ -49,7 +49,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
       let itemId;
 
       const kpiFilename = kpi[0]?.path;
-      const monitoringFileName = monitoring[0]?.path;
+      const monitoringFileName = monitoring?.[0]?.path;
       let tempBuffer = [];
 
       const item = await db.one(createNewItem(
