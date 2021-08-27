@@ -1,23 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
 import { ItemStatus } from '../../queries/items.model';
-import {
-  transformDataForDb
-} from '../../data-stats/prepare-data';
+import { transformDataForDb } from '../../data-stats/prepare-data';
 import { db } from '../../../db/db';
-import {
-  createNewItem, updateItem
-} from '../../queries/items';
+import { createNewItem, updateItem } from '../../queries/items';
 import * as multer from 'multer';
 import * as boom from 'boom';
 import * as fs from 'fs';
 import * as csv from 'fast-csv';
 import { ReportStatus } from '../../queries/items.model';
-import { MongoUtils } from '../../../db/mongoUtil';
 import { logger } from '../../../logger';
-import * as uuid from 'uuid';
 import { itemDataProcessing } from './shared/item-data-processing';
+import * as pgp from 'pg-promise';
+import { processMonitoringCsv } from './utils/process-monitoring-csv';
 
-
+const pg = pgp();
 
 const upload = multer(
   {
@@ -25,14 +21,13 @@ const upload = multer(
     limits: { fieldSize: 2048 * 1024 * 1024 }
   }).fields([
   { name: 'kpi', maxCount: 1 },
-  { name: 'errors', maxCount: 1 },
   { name: 'monitoring', maxCount: 1 }
 ]);
 
 export const createItemController = (req: Request, res: Response, next: NextFunction) => {
   upload(req, res, async error => {
     const { environment, note, status = ItemStatus.None, hostname } = req.body;
-    const { kpi, errors, monitoring } = <any>req.files;
+    const { kpi,  monitoring } = <any>req.files;
     const { scenarioName, projectName } = req.params;
     if (error) {
       return next(boom.badRequest(error.message));
@@ -52,11 +47,9 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
     logger.info(`Starting new item processing for scenario: ${scenarioName}`);
     try {
       let itemId;
-      const dataId = uuid();
-      const jtlDb = MongoUtils.getClient().db('jtl-data');
-      const collection = jtlDb.collection('data-chunks');
 
-      const kpiFilename = kpi[0].path;
+      const kpiFilename = kpi[0]?.path;
+      const monitoringFileName = monitoring[0]?.path;
       let tempBuffer = [];
 
       const item = await db.one(createNewItem(
@@ -67,25 +60,77 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
         status,
         projectName,
         hostname,
-        ReportStatus.InProgress,
-        dataId
+        ReportStatus.InProgress
       ));
       itemId = item.id;
 
       res.status(200).send({ itemId });
 
-      logger.info(`Starting KPI file streaming and saving to Mongo with dataId: ${dataId}`);
+      const columnSet = new pg.helpers.ColumnSet([
+        'elapsed', 'success', 'bytes', 'label',
+        {
+          name: 'timestamp',
+          prop: 'timeStamp'
+        },
+        {
+          name: 'sent_bytes',
+          prop: 'sentBytes'
+        },
+        {
+          name: 'connect',
+          prop: 'Connect'
+        }, {
+          name: 'hostname',
+          prop: 'Hostname',
+          def: null
+        }, {
+          name: 'status_code',
+          prop: 'responseCode'
+        },
+        {
+          name: 'all_threads',
+          prop: 'allThreads'
+        },
+        {
+          name: 'grp_threads',
+          prop: 'grpThreads'
+        }, {
+          name: 'latency',
+          prop: 'Latency'
+        },
+        {
+          name: 'response_message',
+          prop: 'responseMessage'
+        },
+        {
+          name: 'item_id',
+          prop: 'itemId'
+        },
+        {
+          name: 'sut_hostname',
+          prop: 'sutHostname',
+          def: null
+        }
+      ], { table: new pg.helpers.TableName({ table: 'samples', schema: 'jtl' }) });
+
+
+      logger.info(`Starting KPI file streaming and saving to db, item_id: ${itemId}`);
       const parsingStart = Date.now();
+
+      await processMonitoringCsv(monitoringFileName, itemId);
+
       const csvStream = fs.createReadStream(kpiFilename)
         .pipe(csv.parse({ headers: true }))
         .on('data', async row => {
-          if (tempBuffer.length === (500)) {
+          if (tempBuffer.length === (10000)) {
             csvStream.pause();
-            await collection.insertOne({ dataId, samples: tempBuffer });
+            const query = pg.helpers.insert(tempBuffer, columnSet);
+            await db.none(query);
+
             tempBuffer = [];
             csvStream.resume();
           }
-          const data = transformDataForDb(row);
+          const data = transformDataForDb(row, itemId);
           if (data) {
             return tempBuffer.push(data);
           }
@@ -93,16 +138,17 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
         })
         .on('end', async (rowCount: number) => {
           try {
-            await collection.insertOne({ dataId, samples: tempBuffer });
+            await db.none(pg.helpers.insert(tempBuffer, columnSet));
 
             fs.unlinkSync(kpiFilename);
 
             logger.info(`Parsed ${rowCount} records in ${(Date.now() - parsingStart) / 1000} seconds`);
             await itemDataProcessing({
-              itemId, dataId,
-              projectName, scenarioName,
-              monitoring, errors
+              itemId,
+              projectName, scenarioName
             });
+            logger.info(`Done ${rowCount} in ${(Date.now() - parsingStart) / 1000} seconds`);
+
           } catch (error) {
             await db.none(updateItem(itemId, ReportStatus.Error, null));
             logger.error(`Error while processing item: ${itemId}: ${error}`);
