@@ -1,15 +1,15 @@
 import { ItemDataType } from './items.model';
 
 // eslint-disable-next-line max-len
-export const createNewItem = (scenarioName, startTime, environment, note, status, projectName, hostname, reportStatus, dataId) => {
+export const createNewItem = (scenarioName, startTime, environment, note, status, projectName, hostname, reportStatus) => {
   return {
     // eslint-disable-next-line max-len
-    text: `INSERT INTO jtl.items(scenario_id, start_time, environment, note, status, hostname, report_status, data_id) VALUES(
+    text: `INSERT INTO jtl.items(scenario_id, start_time, environment, note, status, hostname, report_status) VALUES(
       (SELECT sc.id FROM jtl.scenario as sc
         LEFT JOIN jtl.projects as p ON p.id = sc.project_id
         WHERE sc.name = $1
-        AND p.project_name = $6), $2, $3, $4, $5, $7, $8, $9) RETURNING id`,
-    values: [scenarioName, startTime, environment, note, status, projectName, hostname, reportStatus, dataId]
+        AND p.project_name = $6), $2, $3, $4, $5, $7, $8) RETURNING id`,
+    values: [scenarioName, startTime, environment, note, status, projectName, hostname, reportStatus]
   };
 };
 
@@ -92,10 +92,18 @@ export const saveData = (itemId, data, dataType) => {
   };
 };
 
-export const findData = (itemId, dataType) => {
+export const getMonitoringData = (itemId, interval = '5 seconds') => {
   return {
-    text: 'SELECT item_data FROM jtl.data WHERE item_id = $1 AND data_type = $2',
-    values: [itemId, dataType]
+    text: `
+    SELECT 
+      time_bucket($2, timestamp) as timestamp,
+      avg(monitor.cpu)::decimal as "avgCpu",
+      monitor.name as "name"
+    FROM jtl.monitor monitor
+    WHERE item_id = $1
+    GROUP BY timestamp, monitor.name
+    ORDER BY timestamp ASC;`,
+    values: [itemId, interval]
   };
 };
 
@@ -223,6 +231,140 @@ export const getErrorsForLabel = (itemId, labelName) => {
   };
 };
 
+export const updateItemStatus = (itemId, reportStatus) => {
+  return {
+    text: 'UPDATE jtl.items SET report_status = $2 WHERE id = $1;',
+    values: [itemId, reportStatus]
+  };
+};
+
+export const aggOverviewQuery = (itemId) => {
+  return {
+    text: `
+    SELECT
+    percentile_cont(0.90) within group (order by (samples.elapsed))::real as n90,
+    COUNT(DISTINCT samples.hostname)::int number_of_hostnames,
+    COUNT(DISTINCT samples.sut_hostname)::int number_of_sut_hostnames,
+    MAX(samples.timestamp) as end,
+    MIN(samples.timestamp) as start,
+    AVG(samples.latency)::real as avg_latency,
+    AVG(samples.connect)::real as avg_connect,
+    count(*) filter (where samples.success = false)::int as number_of_failed,
+    AVG(samples.elapsed)::real as avg_response,
+    SUM(samples.sent_bytes)::bigint as bytes_sent_total,
+    SUM(samples.bytes)::bigint as bytes_received_total,
+    COUNT(*)::int as total
+  FROM jtl.samples as samples
+  WHERE item_id = $1;`,
+    values: [itemId]
+  };
+};
+
+export const aggLabelQuery = (item_id) => {
+  return {
+    text: `
+    SELECT 
+      samples.label,
+      count(*)::int as total_samples,
+      AVG(samples.elapsed)::real as avg_response,
+      MIN(samples.elapsed)::real as min_reponse,
+      MAX(samples.elapsed)::real as max_response,
+      percentile_cont(0.99) within group (order by (samples.elapsed))::real as n99,
+      percentile_cont(0.95) within group (order by (samples.elapsed))::real as n95,
+      percentile_cont(0.90) within group (order by (samples.elapsed))::real as n90,
+      MAX(samples.timestamp) as end,
+      MIN(samples.timestamp) as start,
+      count(*) filter (where samples.success = false)::int as number_of_failed,
+      SUM(samples.sent_bytes)::bigint as bytes_sent_total,
+      SUM(samples.bytes)::bigint as bytes_received_total
+    FROM jtl.samples as samples
+    WHERE item_id = $1
+    GROUP BY samples.label;`,
+    values: [item_id]
+  };
+};
+
+export const sutOverviewQuery = (item_id) => {
+  return {
+    text: `
+    SELECT 
+      samples.sut_hostname,
+      MIN(samples.timestamp) as start,
+      MAX(samples.timestamp) as end,
+      AVG(samples.connect)::real as avg_connect,
+      AVG(samples.latency)::real as avg_latency,
+      AVG(samples.elapsed)::real as avg_response,
+      percentile_cont(0.90) within group (order by (samples.elapsed))::real as n90,
+      SUM(samples.sent_bytes) as bytes_sent_total,
+      SUM(samples.bytes) as bytes_received_total,
+      count(*) filter (where samples.success = false) as number_of_failed,
+      count(*) as total
+    FROM jtl.samples as samples
+    WHERE item_id = $1
+    GROUP BY samples.sut_hostname;`,
+    values: [item_id]
+  };
+};
+
+export const chartOverviewQuery = (interval, item_id) => {
+  return {
+    text: `
+    SELECT
+      time_bucket($1, timestamp) as time,
+      percentile_cont(0.90) within group (order by (samples.elapsed))::real as n90,
+      EXTRACT(EPOCH FROM (MAX(samples.timestamp) - MIN(samples.timestamp))) as interval,
+      (count(*) filter (where samples.success = false)::real / count(*)::real)::real as error_rate,
+      AVG(samples.elapsed)::real as avg_response,
+      SUM(samples.sent_bytes)::int as bytes_sent_total,
+      SUM(samples.bytes)::int as bytes_received_total,
+      MAX(samples.all_threads)::int as threads,
+      COUNT(*)::int as total
+    FROM jtl.samples as samples
+    WHERE item_id = $2
+    GROUP BY time;`,
+    values: [interval, item_id]
+  };
+};
+
+export const charLabelQuery = (interval, item_id) => {
+  return {
+    text: `
+    SELECT
+      time_bucket($1, timestamp) as time,
+      samples.label,
+      percentile_cont(0.99) within group (order by (samples.elapsed))::real as n99,
+      percentile_cont(0.95) within group (order by (samples.elapsed))::real as n95,
+      percentile_cont(0.90) within group (order by (samples.elapsed))::real as n90,
+      MIN(samples.elapsed)::real as min_response,
+      MAX(samples.elapsed)::real as max_response,
+      EXTRACT(EPOCH FROM (MAX(samples.timestamp) - MIN(samples.timestamp))) as interval,
+      (count(*) filter (where samples.success = false)::real / count(*)::real)::real as error_rate,
+      AVG(samples.elapsed)::real as avg_response,
+      SUM(samples.sent_bytes)::int as bytes_sent_total,
+      SUM(samples.bytes)::int as bytes_received_total,
+      COUNT(*)::int as total
+    FROM jtl.samples as samples
+    WHERE item_id = $2
+    GROUP BY time, samples.label;`,
+    values: [interval, item_id]
+  };
+};
+
+export const distributedThreadsQuery = (interval, item_id) => {
+  return {
+    text: `
+    SELECT 
+      time_bucket($1, timestamp) as time,
+      samples.hostname,
+      AVG(samples.all_threads)::int as threads  
+    FROM jtl.samples samples WHERE item_id = $2 
+    AND samples.response_message not like 'Number of samples in transaction%'
+    GROUP BY time, samples.hostname
+    ORDER BY time ASC;`,
+    values: [interval, item_id]
+  };
+};
+
 export const updateItem = (itemId, reportStatus, startTime) => {
   return {
     text: 'UPDATE jtl.items SET report_status = $2, start_time= $3 WHERE id = $1;',
@@ -230,19 +372,6 @@ export const updateItem = (itemId, reportStatus, startTime) => {
   };
 };
 
-export const selectDataId = (itemId, projectName, scenarioName) => {
-  return {
-    text: `SELECT data_id
-    FROM jtl.items as items
-    LEFT JOIN jtl.charts as charts ON charts.item_id = items.id
-    LEFT JOIN jtl.scenario as s ON s.id = items.scenario_id
-    LEFT JOIN jtl.projects as p ON p.id = s.project_id
-    WHERE items.id = $1
-    AND p.project_name = $2
-    AND s.name = $3;`,
-    values: [itemId, projectName, scenarioName]
-  };
-};
 
 export const findShareToken = (projectName, scenarioName, itemId, token) => {
   return {

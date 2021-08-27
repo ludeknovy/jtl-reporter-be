@@ -1,55 +1,45 @@
-import csvtojson = require('csvtojson');
 import { db } from '../../../../db/db';
-import { MongoUtils } from '../../../../db/mongoUtil';
 import { logger } from '../../../../logger';
 import {
-  prepareDataForSavingToDbFromMongo,
+  prepareDataForSavingToDb,
   prepareChartDataForSavingFromMongo
 } from '../../../data-stats/prepare-data';
-import { saveThresholdsResult, saveItemStats, savePlotData, updateItem, saveData } from '../../../queries/items';
-import { ItemDataType, ReportStatus } from '../../../queries/items.model';
 import {
-  overviewChartAgg, labelChartAgg, labelAggPipeline,
-  overviewAggPerSutPipeline, threadChartDistributed, overviewAggPipeline
-} from '../../../queries/mongo-db-agg';
+  saveThresholdsResult, saveItemStats, savePlotData, updateItem,
+  aggOverviewQuery, aggLabelQuery, chartOverviewQuery,
+  charLabelQuery, sutOverviewQuery, distributedThreadsQuery
+} from '../../../queries/items';
+import { ReportStatus } from '../../../queries/items.model';
 import { chartQueryOptionInterval } from '../../../queries/mongoChartOptionHelper';
 import { getScenarioThresholds, currentScenarioMetrics } from '../../../queries/scenario';
 import { sendNotifications } from '../../../utils/notifications/send-notification';
 import { scenarioThresholdsCalc } from '../utils/scenario-thresholds-calc';
-import * as parser from 'xml2json';
-import * as fs from 'fs';
 
 export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) => {
   let distributedThreads = null;
   let sutMetrics = [];
 
   try {
-    const hostnames: [] = await collection.distinct('samples.Hostname', { dataId });
-    const sutHostnames: [] = await collection.distinct('samples.sutHostname', { dataId });
+    const aggOverview = await db.one(aggOverviewQuery(itemId));
+    const aggLabel = await db.many(aggLabelQuery(itemId));
 
-    const aggOverview = await overviewAggregationPipeline(collection, dataId);
-    const aggLabel = await labelAggregationPipeline(collection, dataId);
-
-    if (sutHostnames.filter(_ => _).length > 0) {
-      sutMetrics = await overviewAggregationPerSutPipeline(collection, dataId);
+    if (aggOverview.number_of_sut_hostnames > 1) {
+      sutMetrics = await db.many(sutOverviewQuery(itemId));
     }
 
 
     const {
       overview,
       overview: { duration },
-      labelStats, sutOverview } = prepareDataForSavingToDbFromMongo(aggOverview[0], aggLabel, sutMetrics);
+      labelStats, sutOverview } = prepareDataForSavingToDb(aggOverview, aggLabel, sutMetrics);
     const interval = chartQueryOptionInterval(duration);
-    const overviewChartData = await collection.aggregate(
-      overviewChartAgg(dataId, interval), { allowDiskUse: true }).toArray();
-    const labelChartData = await collection.aggregate(
-      labelChartAgg(dataId, interval), { allowDiskUse: true }).toArray();
 
+    const overviewChartData = await db.many(chartOverviewQuery(`${interval} milliseconds`, itemId));
+
+    const labelChartData = await db.many(charLabelQuery(`${interval} milliseconds`, itemId));
     // distributed mode
-    if (hostnames?.length > 1) {
-      distributedThreads = await collection.aggregate(
-        threadChartDistributed(interval, dataId),
-        { allowDiskUse: true }).toArray();
+    if (aggOverview?.number_of_hostnames > 1) {
+      distributedThreads = await db.manyOrNone(distributedThreadsQuery(`${interval} milliseconds`, itemId));
     }
 
     const chartData = prepareChartDataForSavingFromMongo(overviewChartData, labelChartData, distributedThreads);
@@ -65,22 +55,6 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
       }
     }
 
-    if (errors) {
-      const filename = errors[0].path;
-      const fileContent = fs.readFileSync(filename);
-      fs.unwatchFile(filename);
-      const jsonErrors = parser.toJson(fileContent);
-      await db.none(saveData(itemId, jsonErrors, ItemDataType.Error));
-    }
-
-
-    if (monitoring) {
-      const filename = monitoring[0].path;
-      const monitoringData = await csvtojson().fromFile(filename);
-      const monitoringDataString = JSON.stringify(monitoringData);
-      fs.unwatchFile(filename);
-      await db.none(saveData(itemId, monitoringDataString, ItemDataType.MonitoringLogs));
-    }
     logger.info(`Item: ${itemId} processing finished`);
     await sendNotifications(projectName, scenarioName, itemId, overview);
 
@@ -91,22 +65,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
       await t.none(updateItem(itemId, ReportStatus.Ready, overview.startDate));
     });
   } catch (error) {
-    throw new Error(`Error while processing dataId: ${dataId} for item: ${itemId}, error: ${error}`);
+    console.log(error);
+    throw new Error(`Error while processing dataId: ${itemId} for item: ${itemId}, error: ${error}`);
   }
-};
-
-
-const overviewAggregationPipeline = async (collection, dataId) => {
-  return await collection.aggregate(
-    overviewAggPipeline(dataId), { allowDiskUse: true }).toArray();
-};
-
-const overviewAggregationPerSutPipeline = async (collection, dataId) => {
-  return await collection.aggregate(
-    overviewAggPerSutPipeline(dataId), { allowDiskUse: true }).toArray();
-};
-
-const labelAggregationPipeline = async (collection, dataId) => {
-  return await collection.aggregate(
-    labelAggPipeline(dataId), { allowDiskUse: true }).toArray();
 };

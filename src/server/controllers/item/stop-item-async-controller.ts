@@ -10,8 +10,8 @@ export const stopItemAsyncController = async (req: Request, res: Response, next:
 
   logger.info(`Stopping async item: ${itemId}`);
   try {
-    const { reportStatus, dataId } = await db
-      .one('SELECT data_id as "dataId", report_status as "reportStatus" FROM jtl.items WHERE id = $1', [itemId]);
+    const { reportStatus } = await db
+      .one('SELECT report_status as "reportStatus" FROM jtl.items WHERE id = $1', [itemId]);
 
     if (reportStatus !== ReportStatus.InProgress) {
       return res.status(400).send('Already processed');

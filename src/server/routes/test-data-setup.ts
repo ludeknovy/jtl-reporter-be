@@ -39,9 +39,8 @@ export class TestDataSetup {
             case States.ExistingTestItem:
               await db.any(createNewProject('test-project'));
               await db.any(createNewScenario('test-project', 'test-scenario'));
-              const dataId = uuid();
               // eslint-disable-next-line max-len
-              const [item] = await db.any(createNewItem('test-scenario', '2019-09-22 20:20:23.265', 'localhost', 'test note', '1', 'test-project', 'localhost', ReportStatus.Ready, dataId));
+              const [item] = await db.any(createNewItem('test-scenario', '2019-09-22 20:20:23.265', 'localhost', 'test note', '1', 'test-project', 'localhost', ReportStatus.Ready));
               await db.any(saveItemStats(
                 item.id, JSON.stringify(testStats),
                 JSON.stringify(testOverview),
