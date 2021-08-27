@@ -9,6 +9,9 @@ const pg = pgp();
 
 
 export const processMonitoringCsv = async (filename: string, itemId: string) => {
+  if (!filename) {
+    return;
+  }
   let tempBuffer = [];
   logger.info(`Starting monitoring csv processing, itemId: ${itemId}`);
   const columnSet = new pg.helpers.ColumnSet([
