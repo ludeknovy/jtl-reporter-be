@@ -27,14 +27,4 @@ services:
     command: sh -c "/wait && npm run migrate up"
     depends_on:
       - db
-      - mongodb
   
-  mongodb:
-    image: mongo:4.2.5-bionic
-    container_name: jtl-reporter-mongodb-test
-    environment:
-      - MONGO_INITDB_DATABASE=jtl-data
-    volumes: 
-      - ./src/db/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-    ports: 
-      - "27017:27017"
