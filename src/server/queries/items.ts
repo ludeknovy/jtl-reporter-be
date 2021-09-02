@@ -258,7 +258,7 @@ export const aggLabelQuery = (item_id) => {
       samples.label,
       count(*)::int as total_samples,
       AVG(samples.elapsed)::real as avg_response,
-      MIN(samples.elapsed)::real as min_reponse,
+      MIN(samples.elapsed)::real as min_response,
       MAX(samples.elapsed)::real as max_response,
       percentile_cont(0.99) within group (order by (samples.elapsed))::real as n99,
       percentile_cont(0.95) within group (order by (samples.elapsed))::real as n95,
