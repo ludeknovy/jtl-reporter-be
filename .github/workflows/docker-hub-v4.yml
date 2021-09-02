@@ -1,4 +1,4 @@
-name: Publish Docker image on master push
+name: Publish Docker image on v4 push
 
 on:
   push:
