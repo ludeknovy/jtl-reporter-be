@@ -46,6 +46,7 @@ describe('prepare data', () => {
         timeStamp: new Date(1555399218911),
         allThreads: 1,
         grpThreads: 1,
+        itemId: 'itemId',
         threadName: 'Thread 1-1',
         responseCode: 200,
         responseMessage: '',
@@ -182,52 +183,50 @@ describe('prepare data', () => {
       expect(distributedThreads).toEqual([[1555399218911, 25]]);
     });
   });
-  describe('prepareDataForSavingToDbFromMongo', () => {
+  describe('prepareDataForSavingToDb', () => {
     const overviewData = {
       _id: null,
       start: new Date('2021-03-29T10:57:10.882Z'),
       end: new Date('2021-03-29T11:27:10.171Z'),
-      avgConnect: 5.802922997682204,
-      avgLatency: 105.62091166623745,
-      avgResponse: 105.72559876384238,
-      bytes: 69848465,
-      bytesSent: 123123,
+      avg_connect: 5.802922997682204,
+      avg_latency: 105.62091166623745,
+      avg_response: 105.72559876384238,
+      bytes_received_total: 123123,
+      bytes_sent_total: 69848465,
       total: 46596,
-      percentil: 271,
-      failed: 3
+      n90: 271,
+      number_of_failed: 3
     };
     const labelsData = [
       {
-        _id: 'label1',
-        minResponseTime: 227,
-        maxResponseTime: 1325,
-        avgResponseTime: 286.97317596566523,
-        avgBytes: 1921.6502145922748,
-        bytes: 123,
-        bytesSent: 1231,
-        samplesCount: 932,
+        label: 'label1',
+        min_response: 227,
+        max_response: 1325,
+        avg_response: 286.97317596566523,
+        bytes_received_total: 123,
+        bytes_sent_total: 1231,
+        total_samples: 932,
         start: new Date('2021-03-29T10:59:01.561Z'),
         end: new Date('2021-03-29T11:27:07.702Z'),
-        percentil90: 343,
-        percentil95: 367,
-        percentil99: 418,
-        failed: 0
+        n90: 343,
+        n95: 367,
+        n99: 418,
+        number_of_failed: 0
       },
       {
-        _id: 'label2',
-        minResponseTime: 35,
-        maxResponseTime: 118,
-        avgResponseTime: 44.93503480278422,
-        avgBytes: 572.2737819025522,
-        samplesCount: 431,
-        bytes: 123,
-        bytesSent: 1231,
+        label: 'label2',
+        min_response: 35,
+        max_response: 118,
+        avg_response: 44.93503480278422,
+        total_samples: 431,
+        bytes_received_total: 123,
+        bytes_sent_total: 1231,
         start: new Date('2021-03-29T11:00:53.221Z'),
         end: new Date('2021-03-29T11:27:01.650Z'),
-        percentil90: 50,
-        percentil95: 56,
-        percentil99: 93,
-        failed: 0
+        n90: 50,
+        n95: 56,
+        n99: 93,
+        number_of_failed: 0
       }
     ];
     const { overview, labelStats } = prepareDataForSavingToDb(overviewData, labelsData, []);
@@ -253,7 +252,6 @@ describe('prepare data', () => {
         minResponseTime: 227,
         maxResponseTime: 1325,
         errorRate: 0,
-        bytes: 1921.65,
         bytesPerSecond: 0.07,
         bytesSentPerSecond: 0.73,
         throughput: 0.55,
@@ -268,7 +266,6 @@ describe('prepare data', () => {
         minResponseTime: 35,
         maxResponseTime: 118,
         errorRate: 0,
-        bytes: 572.27,
         bytesPerSecond: 0.08,
         bytesSentPerSecond: 0.78,
         throughput: 0.27,
