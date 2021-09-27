@@ -4,13 +4,13 @@ import {
   prepareDataForSavingToDb,
   prepareChartDataForSavingFromMongo
 } from '../../../data-stats/prepare-data';
+import { chartQueryOptionInterval } from '../../../queries/duration-helper';
 import {
   saveThresholdsResult, saveItemStats, savePlotData, updateItem,
   aggOverviewQuery, aggLabelQuery, chartOverviewQuery,
   charLabelQuery, sutOverviewQuery, distributedThreadsQuery
 } from '../../../queries/items';
 import { ReportStatus } from '../../../queries/items.model';
-import { chartQueryOptionInterval } from '../../../queries/mongoChartOptionHelper';
 import { getScenarioThresholds, currentScenarioMetrics } from '../../../queries/scenario';
 import { sendNotifications } from '../../../utils/notifications/send-notification';
 import { scenarioThresholdsCalc } from '../utils/scenario-thresholds-calc';
