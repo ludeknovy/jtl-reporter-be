@@ -13,6 +13,12 @@ export const getUserById = (id) => {
   };
 };
 
+export const getUsers = () => {
+  return {
+    text: 'SELECT * FROM jtl.users'
+  };
+};
+
 export const createUser = (username, password) => {
   return {
     text: 'INSERT INTO jtl.users(username, password) VALUES($1, $2)',

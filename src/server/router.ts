@@ -6,6 +6,7 @@ import { TestDataSetup } from './routes/test-data-setup';
 import { AuthRoutes } from './routes/auth';
 import { ApiTokensRoutes } from './routes/api-token';
 import { UsersRoutes } from './routes/users';
+import { InitRoutes } from './routes/init';
 const env = process.env.ENVIRONMENT;
 
 export class Router {
@@ -17,6 +18,7 @@ export class Router {
   private apiTokenRoutes: ApiTokensRoutes;
   private userRoutes: UsersRoutes;
   private testDataSetup: TestDataSetup;
+  private initRoutes: InitRoutes;
   constructor() {
     this.projectRoutes = new ProjectRoutes();
     this.scenarioRoutes = new ScenarioRoutes();
@@ -26,6 +28,7 @@ export class Router {
     this.apiTokenRoutes = new ApiTokensRoutes();
     this.userRoutes = new UsersRoutes();
     this.testDataSetup = new TestDataSetup();
+    this.initRoutes = new InitRoutes()
   }
 
   public getRoutes(app) {
@@ -39,5 +42,6 @@ export class Router {
     if (env === 'CI' || env === 'DEV') {
       this.testDataSetup.routes(app);
     }
+    this.initRoutes.routes(app);
   }
 }
