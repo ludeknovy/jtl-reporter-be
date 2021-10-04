@@ -229,7 +229,10 @@ describe('prepare data', () => {
         number_of_failed: 0
       }
     ];
-    const { overview, labelStats } = prepareDataForSavingToDb(overviewData, labelsData, []);
+    const statusCodes = [
+      { label: 'label2', status_code: 200, count: 433 },
+      { label: 'label1', status_code: 200, count: 932 }];
+    const { overview, labelStats } = prepareDataForSavingToDb(overviewData, labelsData, [], statusCodes);
     expect(overview).toEqual({
       percentil: 271,
       maxVu: undefined,
@@ -257,7 +260,8 @@ describe('prepare data', () => {
         throughput: 0.55,
         n9: 418,
         n5: 367,
-        n0: 343
+        n0: 343,
+        statusCodes: [{ count: 932, statusCode: 200 }]
       },
       {
         label: 'label2',
@@ -271,7 +275,8 @@ describe('prepare data', () => {
         throughput: 0.27,
         n9: 93,
         n5: 56,
-        n0: 50
+        n0: 50,
+        statusCodes: [{ count: 433, statusCode: 200 }]
       }]);
 
   });
