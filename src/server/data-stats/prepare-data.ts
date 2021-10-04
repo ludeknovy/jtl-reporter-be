@@ -3,7 +3,7 @@ import * as moment from 'moment';
 import { logger } from '../../logger';
 
 // eslint-disable-next-line max-len
-export const prepareDataForSavingToDb = (overviewData, labelData, sutStats): { overview: Overview; labelStats; sutOverview: {}[] } => {
+export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, statusCodeDistr: StatusCodeDistribution[]): { overview: Overview; labelStats; sutOverview: {}[] } => {
   try {
     const startDate = new Date(overviewData.start);
     const endDate = new Date(overviewData.end);
@@ -37,7 +37,10 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats): { o
           _.total_samples / ((_.end - _.start) / 1000)),
         n9: _.n99,
         n5: _.n95,
-        n0: _.n90
+        n0: _.n90,
+        statusCodes: statusCodeDistr
+          .filter((sd) => sd.label === _.label)
+          .map((sd) => ({ statusCode: sd.status_code, count: sd.count }))
       })),
       sutOverview: sutStats.map((_) => ({
         sutHostname: _.sut_hostname,
@@ -77,17 +80,17 @@ export const prepareChartDataForSavingFromMongo = (
     },
     overAllNetworkUp: {
       data: overviewData.map((_) => [moment(_.time).valueOf(),
-        roundNumberTwoDecimals(_.bytes_sent_total / _.interval)]),
+      roundNumberTwoDecimals(_.bytes_sent_total / _.interval)]),
       name: 'network up'
     },
     overAllNetworkDown: {
       data: overviewData.map((_) => [moment(_.time).valueOf(),
-        roundNumberTwoDecimals(_.bytes_received_total / _.interval)]),
+      roundNumberTwoDecimals(_.bytes_received_total / _.interval)]),
       name: 'network down'
     },
     overAllNetworkV2: {
       data: overviewData.map((_) => [moment(_.time).valueOf(),
-        roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / _.interval)]),
+      roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / _.interval)]),
       name: 'network'
     },
     throughput: labels.map((label) => ({
@@ -113,7 +116,7 @@ export const prepareChartDataForSavingFromMongo = (
     networkV2: labels.map((label) => ({
       data: labelData.filter((_) => _.label === label)
         .map((_) => [moment(_.time).valueOf(),
-          roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / _.interval)]),
+        roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / _.interval)]),
       name: label
     })),
     networkUp: labels.map((label) => ({
@@ -323,4 +326,10 @@ interface MonitoringTransformedData {
   cpu: number;
   name: string;
   itemId: string;
+}
+
+interface StatusCodeDistribution {
+  label: string;
+  status_code: number;
+  count: number;
 }

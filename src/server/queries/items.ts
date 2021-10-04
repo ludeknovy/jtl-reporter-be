@@ -443,3 +443,11 @@ export const getItemChartSettings = (itemId, userId) => {
     values: [itemId, userId]
   };
 };
+
+export const responseCodeDistribution = (itemId) => {
+  return {
+    // eslint-disable-next-line max-len
+    text: ' SELECT samples.label, samples.status_code, count(samples.status_code)::int FROM jtl.samples samples WHERE samples.item_id = $1 GROUP BY samples.label, samples.status_code;',
+    values: [itemId]
+  };
+};
