@@ -80,17 +80,17 @@ export const prepareChartDataForSavingFromMongo = (
     },
     overAllNetworkUp: {
       data: overviewData.map((_) => [moment(_.time).valueOf(),
-      roundNumberTwoDecimals(_.bytes_sent_total / _.interval)]),
+        roundNumberTwoDecimals(_.bytes_sent_total / _.interval)]),
       name: 'network up'
     },
     overAllNetworkDown: {
       data: overviewData.map((_) => [moment(_.time).valueOf(),
-      roundNumberTwoDecimals(_.bytes_received_total / _.interval)]),
+        roundNumberTwoDecimals(_.bytes_received_total / _.interval)]),
       name: 'network down'
     },
     overAllNetworkV2: {
       data: overviewData.map((_) => [moment(_.time).valueOf(),
-      roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / _.interval)]),
+        roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / _.interval)]),
       name: 'network'
     },
     throughput: labels.map((label) => ({
@@ -116,7 +116,7 @@ export const prepareChartDataForSavingFromMongo = (
     networkV2: labels.map((label) => ({
       data: labelData.filter((_) => _.label === label)
         .map((_) => [moment(_.time).valueOf(),
-        roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / _.interval)]),
+          roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / _.interval)]),
       name: label
     })),
     networkUp: labels.map((label) => ({
