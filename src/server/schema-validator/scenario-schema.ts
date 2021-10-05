@@ -33,5 +33,6 @@ export const updateScenarioSchema = {
     errorRate: Joi.number().min(0).max(100).strict().required(),
     throughput: Joi.number().min(0).max(100).strict().required(),
     percentile: Joi.number().min(0).max(100).strict().required()
-  })
+  }),
+  apdex: Joi.number().min(0).max(600000).strict().required(),
 };
