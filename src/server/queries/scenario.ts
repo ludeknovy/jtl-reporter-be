@@ -35,7 +35,7 @@ export const updateScenario = (projectName, scenarioName, name, analysisEnabled,
   return {
     text: `
     UPDATE jtl.scenario as s
-    SET name = $3, analysis_enabled=$4, threshold_enabled = $5, threshold_percentile = $6, threshold_throughput = $7, threshold_error_rate = $8, adpex = $9
+    SET name = $3, analysis_enabled=$4, threshold_enabled = $5, threshold_percentile = $6, threshold_throughput = $7, threshold_error_rate = $8, apdex = $9
     WHERE s.name = $2
     AND s.project_id = (SELECT id FROM jtl.projects WHERE project_name = $1)`,
     values: [projectName, scenarioName, name, analysisEnabled, thresholds.enabled, thresholds.percentile, thresholds.throughput, thresholds.errorRate, apdex]

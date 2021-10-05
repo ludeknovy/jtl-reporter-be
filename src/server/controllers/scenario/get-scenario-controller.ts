@@ -13,6 +13,7 @@ export const getScenarioController = async (req: Request, res: Response, next: N
       percentile: scenario.threshold_percentile,
       throughput: scenario.threshold_throughput,
       errorRate: scenario.threshold_error_rate
-    }
+    },
+    apdex: scenario.apdex
   });
 };
