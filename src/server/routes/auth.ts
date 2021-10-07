@@ -8,6 +8,8 @@ import { changePasswordController } from '../controllers/auth/change-password-co
 import { authenticationMiddleware } from '../middleware/auth-middleware';
 import { IGetUserAuthInfoRequest } from '../middleware/request.model';
 import { loginWithTokenController } from '../controllers/auth/login-with-token-controller';
+import { initUserController } from '../controllers/auth/init-controller';
+import { newUserSchema } from '../schema-validator/users-schema';
 
 export class AuthRoutes {
   public routes(app: express.Application): void {
@@ -28,5 +30,10 @@ export class AuthRoutes {
         // eslint-disable-next-line max-len
         wrapAsync(async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => await changePasswordController(req, res, next)));
 
+    app.route('/api/auth/initialize-user')
+      .post(
+        bodySchemaValidator(newUserSchema),
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) =>
+          await initUserController(req, res, next)));
   }
 }
