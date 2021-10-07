@@ -28,7 +28,7 @@ export class Router {
     this.apiTokenRoutes = new ApiTokensRoutes();
     this.userRoutes = new UsersRoutes();
     this.testDataSetup = new TestDataSetup();
-    this.initRoutes = new InitRoutes()
+    this.initRoutes = new InitRoutes();
   }
 
   public getRoutes(app) {
