@@ -98,6 +98,7 @@ export const getMonitoringData = (itemId, interval = '5 seconds') => {
     SELECT 
       time_bucket($2, timestamp) as timestamp,
       avg(monitor.cpu)::decimal as "avgCpu",
+      avg(monitor.mem)::decimal as "avgMem",
       monitor.name as "name"
     FROM jtl.monitor monitor
     WHERE item_id = $1
