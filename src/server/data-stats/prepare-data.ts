@@ -197,8 +197,9 @@ export const transformDataForDb = (_, itemId) => {
 export const transformMonitoringDataForDb = (row, itemId): MonitoringTransformedData => {
   try {
     return {
-      timestamp: new Date(stringToNumber(row.ts, 10)),
+      timestamp: new Date(stringToNumber(row.ts, 10) * 1000),
       cpu: stringToNumber(row.cpu, 10),
+      mem: stringToNumber(row.mem || 0, 10),
       name: row.name || 'localhost',
       itemId
     };
@@ -324,6 +325,7 @@ interface DistributedThreadData {
 interface MonitoringTransformedData {
   timestamp: Date;
   cpu: number;
+  mem: number;
   name: string;
   itemId: string;
 }

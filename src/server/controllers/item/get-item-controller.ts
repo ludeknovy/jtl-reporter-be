@@ -19,7 +19,7 @@ export const getItemController = async (req: Request, res: Response, next: NextF
   const monitoring: MonitoringData[] = await db.manyOrNone(getMonitoringData(itemId));
 
   const monitoringAdjusted = monitoring.map(_ => {
-    return Object.assign(_, { avgCpu: parseFloat(_.avgCpu) });
+    return Object.assign(_, { avgCpu: parseFloat(_.avgCpu), avgMem: parseFloat(_.avgMem || '0') });
   });
 
   const maxCpu = findMinMax(monitoring.map(_ => _.avgCpu)).max;
@@ -37,4 +37,4 @@ export const getItemController = async (req: Request, res: Response, next: NextF
 };
 
 
-interface MonitoringData { timestamp: Date; avgCpu: string; name: string }
+interface MonitoringData { timestamp: Date; avgCpu: string; name: string; avgMem: string }

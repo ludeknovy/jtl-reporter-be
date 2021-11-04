@@ -15,7 +15,7 @@ export const processMonitoringCsv = async (filename: string, itemId: string) => 
   let tempBuffer = [];
   logger.info(`Starting monitoring csv processing, itemId: ${itemId}`);
   const columnSet = new pg.helpers.ColumnSet([
-    'timestamp', 'cpu', 'name',     {
+    'timestamp', 'cpu', 'name', 'mem', {
       name: 'item_id',
       prop: 'itemId'
     }
