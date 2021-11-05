@@ -340,7 +340,7 @@ interface StatusCodeDistribution {
 }
 
 interface ResponseMessageFailures {
-  label: string
-  response_message: string
+  label: string;
+  response_message: string;
   count: number;
 }
