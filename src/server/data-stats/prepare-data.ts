@@ -177,7 +177,6 @@ export const transformDataForDb = (_, itemId) => {
   try {
     _.timeStamp = new Date(stringToNumber(_.timeStamp, 10));
     _.elapsed = stringToNumber(_.elapsed, 10);
-    _.responseCode = stringToNumber(_.responseCode, 10);
     _.bytes = stringToNumber(_.bytes, 10);
     _.sentBytes = _.sentBytes ? stringToNumber(_.sentBytes, 10) : 0;
     _.grpThreads = stringToNumber(_.grpThreads, 10);
