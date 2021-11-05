@@ -1,9 +1,10 @@
 import { roundNumberTwoDecimals } from './helper/stats-fc';
 import * as moment from 'moment';
 import { logger } from '../../logger';
+import { responseMessageFailures } from '../queries/items';
 
 // eslint-disable-next-line max-len
-export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, statusCodeDistr: StatusCodeDistribution[]): { overview: Overview; labelStats; sutOverview: {}[] } => {
+export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, statusCodeDistr: StatusCodeDistribution[], responseFailures: ResponseMessageFailures[]): { overview: Overview; labelStats; sutOverview: {}[] } => {
   try {
     const startDate = new Date(overviewData.start);
     const endDate = new Date(overviewData.end);
@@ -40,7 +41,10 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, stat
         n0: _.n90,
         statusCodes: statusCodeDistr
           .filter((sd) => sd.label === _.label)
-          .map((sd) => ({ statusCode: sd.status_code, count: sd.count }))
+          .map((sd) => ({ statusCode: sd.status_code, count: sd.count })),
+        responseMessageFailures: responseFailures
+          .filter((rm) => rm.label === _.label)
+          .map((rm) => ({ responseMessage: rm.response_message, count: rm.count  }))
       })),
       sutOverview: sutStats.map((_) => ({
         sutHostname: _.sut_hostname,
@@ -332,6 +336,12 @@ interface MonitoringTransformedData {
 
 interface StatusCodeDistribution {
   label: string;
-  status_code: number;
+  status_code: string;
+  count: number;
+}
+
+interface ResponseMessageFailures {
+  label: string
+  response_message: string
   count: number;
 }

@@ -448,7 +448,16 @@ export const getItemChartSettings = (itemId, userId) => {
 export const responseCodeDistribution = (itemId) => {
   return {
     // eslint-disable-next-line max-len
-    text: ' SELECT samples.label, samples.status_code, count(samples.status_code)::int FROM jtl.samples samples WHERE samples.item_id = $1 GROUP BY samples.label, samples.status_code;',
+    text: 'SELECT samples.label, samples.status_code, count(samples.status_code)::int FROM jtl.samples samples WHERE samples.item_id = $1 GROUP BY samples.label, samples.status_code;',
+    values: [itemId]
+  };
+};
+
+export const responseMessageFailures = (itemId) => {
+  return {
+    text: `SELECT samples.label, samples.response_message, count(samples.response_message)::int FROM jtl.samples samples
+    WHERE samples.item_id = $1 AND success is false
+    GROUP BY samples.label, samples.response_message`,
     values: [itemId]
   };
 };
