@@ -7,6 +7,7 @@ import { itemDataProcessing } from './shared/item-data-processing';
 
 export const stopItemAsyncController = async (req: Request, res: Response, next: NextFunction) => {
   const { projectName, scenarioName, itemId } = req.params;
+  res.status(200).send();
 
   logger.info(`Stopping async item: ${itemId}`);
   try {
@@ -14,12 +15,12 @@ export const stopItemAsyncController = async (req: Request, res: Response, next:
       .one('SELECT report_status as "reportStatus" FROM jtl.items WHERE id = $1', [itemId]);
 
     if (reportStatus !== ReportStatus.InProgress) {
-      return res.status(400).send('Already processed');
+      logger.info(`Item: ${itemId} was already processed`);
+      return;
     }
     await itemDataProcessing({ itemId, projectName, scenarioName });
   } catch (e) {
     logger.error(`Processing of item ${itemId} failed ${e}`);
     await db.none(updateItem(itemId, ReportStatus.Error, null));
-    res.status(500).send();
   }
 };
