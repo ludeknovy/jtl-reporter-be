@@ -48,7 +48,7 @@ describe('prepare data', () => {
         grpThreads: 1,
         itemId: 'itemId',
         threadName: 'Thread 1-1',
-        responseCode: 200,
+        responseCode: '200',
         responseMessage: '',
         sutHostname: undefined
       });
@@ -230,9 +230,14 @@ describe('prepare data', () => {
       }
     ];
     const statusCodes = [
-      { label: 'label2', status_code: 200, count: 433 },
-      { label: 'label1', status_code: 200, count: 932 }];
-    const { overview, labelStats } = prepareDataForSavingToDb(overviewData, labelsData, [], statusCodes);
+      { label: 'label2', status_code: '200', count: 433 },
+      { label: 'label1', status_code: '200', count: 932 }];
+    const responseFailures = [
+      { label: 'label1', response_message: 'failure', count: 31 },
+      { label: 'label2', response_message: 'failure2', count: 1 }
+    ];
+    const { overview, labelStats } = prepareDataForSavingToDb(overviewData, labelsData, [],
+      statusCodes, responseFailures);
     expect(overview).toEqual({
       percentil: 271,
       maxVu: undefined,
@@ -261,7 +266,10 @@ describe('prepare data', () => {
         n9: 418,
         n5: 367,
         n0: 343,
-        statusCodes: [{ count: 932, statusCode: 200 }]
+        statusCodes: [{ count: 932, statusCode: '200' }],
+        responseMessageFailures: [{
+          count: 31, responseMessage: 'failure'
+        }]
       },
       {
         label: 'label2',
@@ -276,7 +284,10 @@ describe('prepare data', () => {
         n9: 93,
         n5: 56,
         n0: 50,
-        statusCodes: [{ count: 433, statusCode: 200 }]
+        statusCodes: [{ count: 433, statusCode: '200' }],
+        responseMessageFailures: [{
+          count: 1, responseMessage: 'failure2'
+        }]
       }]);
 
   });
