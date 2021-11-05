@@ -8,7 +8,7 @@ import { chartQueryOptionInterval } from '../../../queries/duration-helper';
 import {
   saveThresholdsResult, saveItemStats, savePlotData, updateItem,
   aggOverviewQuery, aggLabelQuery, chartOverviewQuery,
-  charLabelQuery, sutOverviewQuery, distributedThreadsQuery, responseCodeDistribution
+  charLabelQuery, sutOverviewQuery, distributedThreadsQuery, responseCodeDistribution, responseMessageFailures
 } from '../../../queries/items';
 import { ReportStatus } from '../../../queries/items.model';
 import { getScenarioThresholds, currentScenarioMetrics } from '../../../queries/scenario';
@@ -23,6 +23,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
     const aggOverview = await db.one(aggOverviewQuery(itemId));
     const aggLabel = await db.many(aggLabelQuery(itemId));
     const statusCodeDistribution = await db.manyOrNone(responseCodeDistribution(itemId));
+    const responseFailures = await db.manyOrNone(responseMessageFailures(itemId));
 
     if (aggOverview.number_of_sut_hostnames > 1) {
       sutMetrics = await db.many(sutOverviewQuery(itemId));
@@ -32,7 +33,8 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
     const {
       overview,
       overview: { duration },
-      labelStats, sutOverview } = prepareDataForSavingToDb(aggOverview, aggLabel, sutMetrics, statusCodeDistribution);
+      labelStats, sutOverview } = prepareDataForSavingToDb(aggOverview, aggLabel, sutMetrics,
+      statusCodeDistribution, responseFailures);
     const interval = chartQueryOptionInterval(duration);
 
     const overviewChartData = await db.many(chartOverviewQuery(`${interval} milliseconds`, itemId));
