@@ -457,7 +457,8 @@ export const responseMessageFailures = (itemId) => {
   return {
     text: `SELECT samples.label, samples.response_message, count(samples.response_message)::int FROM jtl.samples samples
     WHERE samples.item_id = $1 AND success is false
-    GROUP BY samples.label, samples.response_message`,
+    GROUP BY samples.label, samples.response_message
+    ORDER BY count DESC`,
     values: [itemId]
   };
 };
