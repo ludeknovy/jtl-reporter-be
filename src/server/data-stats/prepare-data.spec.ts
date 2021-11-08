@@ -47,7 +47,7 @@ describe('prepare data', () => {
         allThreads: 1,
         grpThreads: 1,
         threadName: 'Thread 1-1',
-        responseCode: 200,
+        responseCode: '200',
         responseMessage: '',
         sutHostname: undefined
       });
