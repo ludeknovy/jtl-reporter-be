@@ -63,8 +63,9 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, stat
   }
 };
 
-export const prepareChartDataForSavingFromMongo = (
-  overviewData: ChartOverviewData[], labelData: ChartLabelData[], distributedThreads?: []) => {
+export const prepareChartDataForSaving = (
+  overviewData: ChartOverviewData[], labelData: ChartLabelData[], interval: number, distributedThreads?: []) => {
+  const intervalSec = interval / 1000;
   const labels = [...new Set(labelData.map((_) => _.label))];
   return {
     threads: distributedThreads?.length > 0
@@ -79,27 +80,27 @@ export const prepareChartDataForSavingFromMongo = (
       name: 'response time'
     },
     overallThroughput: {
-      data: overviewData.map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.total / _.interval)]),
+      data: overviewData.map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.total / intervalSec)]),
       name: 'throughput'
     },
     overAllNetworkUp: {
       data: overviewData.map((_) => [moment(_.time).valueOf(),
-        roundNumberTwoDecimals(_.bytes_sent_total / _.interval)]),
+        roundNumberTwoDecimals(_.bytes_sent_total / intervalSec)]),
       name: 'network up'
     },
     overAllNetworkDown: {
       data: overviewData.map((_) => [moment(_.time).valueOf(),
-        roundNumberTwoDecimals(_.bytes_received_total / _.interval)]),
+        roundNumberTwoDecimals(_.bytes_received_total / intervalSec)]),
       name: 'network down'
     },
     overAllNetworkV2: {
       data: overviewData.map((_) => [moment(_.time).valueOf(),
-        roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / _.interval)]),
+        roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / intervalSec)]),
       name: 'network'
     },
     throughput: labels.map((label) => ({
       data: labelData.filter((_) => _.label === label)
-        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.total / _.interval)]),
+        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.total / intervalSec)]),
       name: label
     })),
     responseTime: labels.map((label) => ({
@@ -120,17 +121,17 @@ export const prepareChartDataForSavingFromMongo = (
     networkV2: labels.map((label) => ({
       data: labelData.filter((_) => _.label === label)
         .map((_) => [moment(_.time).valueOf(),
-          roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / _.interval)]),
+          roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / intervalSec)]),
       name: label
     })),
     networkUp: labels.map((label) => ({
       data: labelData.filter((_) => _.label === label)
-        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.bytes_sent_total / _.interval)]),
+        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.bytes_sent_total / intervalSec)]),
       name: label
     })),
     networkDown: labels.map((label) => ({
       data: labelData.filter((_) => _.label === label)
-        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.bytes_received_total / _.interval)]),
+        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.bytes_received_total / intervalSec)]),
       name: label
     })),
     percentile90: labels.map((label) => ({
@@ -279,7 +280,6 @@ interface ChartOverviewData {
   threads: number;
   avg_response: number;
   time: Date;
-  interval: number;
   number_of_failed: number;
   bytes_received_total: number;
   bytes_sent_total: number;
@@ -296,7 +296,6 @@ interface ChartLabelData {
   avg_response: number;
   min_response: number;
   max_response: number;
-  interval: number;
   bytes_received_total: number;
   bytes_sent_total: number;
   n90: number;
