@@ -2,7 +2,7 @@ import { db } from '../../../../db/db';
 import { logger } from '../../../../logger';
 import {
   prepareDataForSavingToDb,
-  prepareChartDataForSavingFromMongo
+  prepareChartDataForSaving
 } from '../../../data-stats/prepare-data';
 import { chartQueryOptionInterval } from '../../../queries/duration-helper';
 import {
@@ -45,7 +45,8 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
       distributedThreads = await db.manyOrNone(distributedThreadsQuery(`${interval} milliseconds`, itemId));
     }
 
-    const chartData = prepareChartDataForSavingFromMongo(overviewChartData, labelChartData, distributedThreads);
+    const chartData = prepareChartDataForSaving(
+      overviewChartData, labelChartData, interval, distributedThreads);
 
     overview.maxVu = Math.max(...chartData.threads.map(([, vu]) => vu));
 
