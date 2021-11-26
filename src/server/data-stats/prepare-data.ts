@@ -1,7 +1,6 @@
 import { roundNumberTwoDecimals } from './helper/stats-fc';
 import * as moment from 'moment';
 import { logger } from '../../logger';
-import { responseMessageFailures } from '../queries/items';
 
 // eslint-disable-next-line max-len
 export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, statusCodeDistr: StatusCodeDistribution[], responseFailures: ResponseMessageFailures[]): { overview: Overview; labelStats; sutOverview: {}[] } => {
@@ -59,7 +58,7 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, stat
       }))
     };
   } catch (error) {
-    throw new Error(`Error while processing aggregation pipeline results ${error}`);
+    throw new Error(`Error while processing query results ${error}`);
   }
 };
 
@@ -208,7 +207,7 @@ export const transformMonitoringDataForDb = (row, itemId): MonitoringTransformed
       itemId
     };
   } catch (error) {
-    logger.error(`Error while parsing monitring data: ${error}`);
+    logger.error(`Error while parsing monitoring data: ${error}`);
     return;
   }
 
