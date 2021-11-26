@@ -16,32 +16,6 @@ describe('Items', () => {
     }
 
   });
-  describe('POST /projects/{projectName}/scenarios/{scenarioName}/items', () => {
-    it('should be able to create test item', async () => {
-      await stateSetup(States.ExistingScenario);
-      await request(__server__)
-        .post('/api/projects/test-project/scenarios/test-scenario/items')
-        .set(__tokenHeaderKey__, credentials.token)
-        .attach('kpi', path.join(__dirname, './test-data/kpi.jtl'), 'kpi.jtl')
-        .field('environment', 'test-environment')
-        .field('note', 'test-note')
-        .field('status', ItemStatus.Passed)
-        .field('hostname', 'localhost')
-        .expect(200);
-    });
-    it('should be able to create test item with api token', async () => {
-      await stateSetup(States.ExistingScenario);
-      await request(__server__)
-        .post('/api/projects/test-project/scenarios/test-scenario/items')
-        .set(__tokenHeaderKey__, token)
-        .attach('kpi', path.join(__dirname, './test-data/kpi.jtl'), 'kpi.jtl')
-        .field('environment', 'test-environment')
-        .field('note', 'test-note')
-        .field('status', ItemStatus.Passed)
-        .field('hostname', 'localhost')
-        .expect(200);
-    });
-  });
   describe('POST /api/projects/:projectName/scenarios/:scenarioName/items/start-async', () => {
     it('should be able to start async item', async () => {
       await stateSetup(States.ExistingScenario);
@@ -114,6 +88,32 @@ describe('Items', () => {
         .get(`/api/projects/test-project/scenarios/test-scenario/items/${itemId}/custom-chart-settings`)
         .set(__tokenHeaderKey__, credentials.token)
         .set('Accept', 'application/json')
+        .expect(200);
+    });
+  });
+  describe('POST /projects/{projectName}/scenarios/{scenarioName}/items', () => {
+    it('should be able to create test item', async () => {
+      await stateSetup(States.ExistingScenario);
+      await request(__server__)
+        .post('/api/projects/test-project/scenarios/test-scenario/items')
+        .set(__tokenHeaderKey__, credentials.token)
+        .attach('kpi', path.join(__dirname, './test-data/kpi.jtl'), 'kpi.jtl')
+        .field('environment', 'test-environment')
+        .field('note', 'test-note')
+        .field('status', ItemStatus.Passed)
+        .field('hostname', 'localhost')
+        .expect(200);
+    });
+    it('should be able to create test item with api token', async () => {
+      await stateSetup(States.ExistingScenario);
+      await request(__server__)
+        .post('/api/projects/test-project/scenarios/test-scenario/items')
+        .set(__tokenHeaderKey__, token)
+        .attach('kpi', path.join(__dirname, './test-data/kpi.jtl'), 'kpi.jtl')
+        .field('environment', 'test-environment')
+        .field('note', 'test-note')
+        .field('status', ItemStatus.Passed)
+        .field('hostname', 'localhost')
         .expect(200);
     });
   });

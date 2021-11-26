@@ -21,9 +21,8 @@ services:
       context: ./
       dockerfile: Dockerfile
     environment:
-        - WAIT_HOSTS=db:5432, mongodb:27017
+        - WAIT_HOSTS=db:5432
         - DATABASE_URL=postgres://postgres:password@db/jtl_report
-        - MONGO_CONNECTION_STRING=mongodb://mongodb
     command: sh -c "/wait && npm run migrate up"
     depends_on:
       - db

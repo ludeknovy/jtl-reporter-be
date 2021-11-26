@@ -79,7 +79,7 @@ CREATE TABLE jtl.samples (
     sent_bytes integer,
     connect integer,
     hostname text,
-    status_code integer,
+    status_code text,
     all_threads integer,
     grp_threads integer,
     latency integer,
@@ -95,6 +95,7 @@ ALTER TABLE jtl.samples OWNER TO postgres;
 CREATE TABLE jtl.monitor (
     "timestamp" timestamp without time zone NOT NULL,
     cpu numeric,
+    mem numeric,
     name text,
     item_id uuid
 );
@@ -344,7 +345,7 @@ ALTER TABLE ONLY jtl.data
 
 
 ALTER TABLE ONLY jtl.monitor
-    ADD CONSTRAINT generator_monitor_item_id_fkey FOREIGN KEY (item_id) REFERENCES jtl.items(id);
+    ADD CONSTRAINT generator_monitor_item_id_fkey FOREIGN KEY (item_id) REFERENCES jtl.items(id) ON DELETE CASCADE;
 
 
 ALTER TABLE ONLY jtl.item_stat
@@ -377,11 +378,11 @@ ALTER TABLE ONLY jtl.share_tokens
 
 
 ALTER TABLE ONLY jtl.user_item_chart_settings
-    ADD CONSTRAINT user_item_chart_settings_item_id_fkey FOREIGN KEY (item_id) REFERENCES jtl.items(id);
+    ADD CONSTRAINT user_item_chart_settings_item_id_fkey FOREIGN KEY (item_id) REFERENCES jtl.items(id) ON DELETE CASCADE;
 
 
 ALTER TABLE ONLY jtl.user_item_chart_settings
-    ADD CONSTRAINT user_item_chart_settings_user_id_fkey FOREIGN KEY (user_id) REFERENCES jtl.users(id);
+    ADD CONSTRAINT user_item_chart_settings_user_id_fkey FOREIGN KEY (user_id) REFERENCES jtl.users(id) ON DELETE CASCADE;
 
 
 select * from pg_extension;
