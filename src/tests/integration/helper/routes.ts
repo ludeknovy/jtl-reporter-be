@@ -5,5 +5,6 @@ export const routes = {
     loginWithToken: '/api/auth/login-with-token'
   },
   apiTokens: '/api/api-tokens',
-  users: '/api/users'
+  users: '/api/users',
+  init: '/api/info'
 };

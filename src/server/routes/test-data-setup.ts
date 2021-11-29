@@ -50,6 +50,10 @@ export class TestDataSetup {
             case States.EmptyDb:
               res.sendStatus(201);
               break;
+            case States.NoUsers:
+              await db.any({ text: 'TRUNCATE jtl.users CASCADE' });
+              res.sendStatus(201);
+              break;
             case States.ExistingApiKey:
               const TOKEN = 'at-testToken';
               await createUserInDB('test-user', 'test00010');
