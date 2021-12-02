@@ -77,7 +77,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
   } finally {
     if(scenarioSettings.deleteSamples) {
       logger.info(`Item: ${itemId} deleting samples data`);
-      await db.none(deleteSamples(itemId))
+      await db.none(deleteSamples(itemId));
       logger.info(`Item: ${itemId} samples data deletion done`);
     }
   }
