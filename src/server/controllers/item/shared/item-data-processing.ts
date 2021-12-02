@@ -8,16 +8,18 @@ import { chartQueryOptionInterval } from '../../../queries/duration-helper';
 import {
   saveThresholdsResult, saveItemStats, savePlotData, updateItem,
   aggOverviewQuery, aggLabelQuery, chartOverviewQuery,
-  charLabelQuery, sutOverviewQuery, distributedThreadsQuery, responseCodeDistribution, responseMessageFailures
+  charLabelQuery, sutOverviewQuery, distributedThreadsQuery, responseCodeDistribution, responseMessageFailures,
+  deleteSamples
 } from '../../../queries/items';
 import { ReportStatus } from '../../../queries/items.model';
-import { getScenarioThresholds, currentScenarioMetrics } from '../../../queries/scenario';
+import { getScenarioSettings, currentScenarioMetrics } from '../../../queries/scenario';
 import { sendNotifications } from '../../../utils/notifications/send-notification';
 import { scenarioThresholdsCalc } from '../utils/scenario-thresholds-calc';
 
 export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) => {
   let distributedThreads = null;
   let sutMetrics = [];
+  let scenarioSettings = null;
 
   try {
     const aggOverview = await db.one(aggOverviewQuery(itemId));
@@ -50,10 +52,10 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
 
     overview.maxVu = Math.max(...chartData.threads.map(([, vu]) => vu));
 
-    const scenarioThresholds = await db.one(getScenarioThresholds(projectName, scenarioName));
-    if (scenarioThresholds.enabled) {
+    scenarioSettings = await db.one(getScenarioSettings(projectName, scenarioName));
+    if (scenarioSettings.thresholdEnabled) {
       const scenarioMetrics = await db.one(currentScenarioMetrics(projectName, scenarioName, overview.maxVu));
-      const thresholdResult = scenarioThresholdsCalc(overview, scenarioMetrics, scenarioThresholds);
+      const thresholdResult = scenarioThresholdsCalc(overview, scenarioMetrics, scenarioSettings);
       if (thresholdResult) {
         await db.none(saveThresholdsResult(projectName, scenarioName, itemId, thresholdResult));
       }
@@ -68,8 +70,15 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
       await t.none(savePlotData(itemId, JSON.stringify(chartData)));
       await t.none(updateItem(itemId, ReportStatus.Ready, overview.startDate));
     });
+
   } catch (error) {
     console.log(error);
     throw new Error(`Error while processing dataId: ${itemId} for item: ${itemId}, error: ${error}`);
+  } finally {
+    if(scenarioSettings.deleteSamples) {
+      logger.info(`Item: ${itemId} deleting samples data`);
+      await db.none(deleteSamples(itemId))
+      logger.info(`Item: ${itemId} samples data deletion done`);
+    }
   }
 };

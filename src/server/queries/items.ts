@@ -462,3 +462,11 @@ export const responseMessageFailures = (itemId) => {
     values: [itemId]
   };
 };
+
+
+export const deleteSamples = (itemId) => {
+  return {
+    text: `DELETE FROM jtl.samples samples WHERE samples.item_id = $1;`,
+    values: [itemId]
+  }
+}
