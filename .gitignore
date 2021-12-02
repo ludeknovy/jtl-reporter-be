@@ -7,4 +7,4 @@ pacts
 build/
 dist/
 coverage
-
+.idea

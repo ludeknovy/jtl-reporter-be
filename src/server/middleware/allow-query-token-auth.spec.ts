@@ -1,7 +1,6 @@
 import { allowQueryTokenAuth } from './allow-query-token-auth';
 import { IGetUserAuthInfoRequest } from './request.model';
 import { Response, NextFunction } from 'express';
-import { Request } from '@pact-foundation/pact/common/request';
 
 describe('allowQueryTokenAuth', () => {
   let nextFunction: NextFunction = jest.fn();
