@@ -104,6 +104,18 @@ describe('Items', () => {
         .field('hostname', 'localhost')
         .expect(200);
     });
+    it('should be able to create test item with more test columns', async () => {
+      await stateSetup(States.ExistingScenario);
+      await request(__server__)
+        .post('/api/projects/test-project/scenarios/test-scenario/items')
+        .set(__tokenHeaderKey__, credentials.token)
+        .attach('kpi', path.join(__dirname, './test-data/kpi.jtl'), 'kpi1.jtl')
+        .field('environment', 'test-environment')
+        .field('note', 'test-note')
+        .field('status', ItemStatus.Passed)
+        .field('hostname', 'localhost')
+        .expect(200);
+    });
     it('should be able to create test item with api token', async () => {
       await stateSetup(States.ExistingScenario);
       await request(__server__)

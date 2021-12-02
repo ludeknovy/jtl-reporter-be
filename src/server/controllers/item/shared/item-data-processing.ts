@@ -4,7 +4,7 @@ import {
   prepareDataForSavingToDb,
   prepareChartDataForSaving
 } from '../../../data-stats/prepare-data';
-import { chartQueryOptionInterval } from '../../../queries/duration-helper';
+import { chartQueryOptionInterval } from '../../../data-stats/helper/duration';
 import {
   saveThresholdsResult, saveItemStats, savePlotData, updateItem,
   aggOverviewQuery, aggLabelQuery, chartOverviewQuery,
