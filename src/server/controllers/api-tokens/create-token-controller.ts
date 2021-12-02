@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { db } from '../../../db/db';
 import * as uuid from 'uuid';
 import { createNewApiToken } from '../../queries/api-tokens';
