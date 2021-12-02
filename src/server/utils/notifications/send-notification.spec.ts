@@ -18,6 +18,7 @@ const OVERVIEW = {
   duration: 1,
   endDate: new Date(),
   errorRate: 0,
+  errorCount: 0,
   maxVu: 10,
   startDate: new Date(),
   throughput: 10,

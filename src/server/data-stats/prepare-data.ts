@@ -1,5 +1,5 @@
 import { roundNumberTwoDecimals } from './helper/stats-fc';
-import * as moment from 'moment';
+import * as moment from 'moment';
 import { logger } from '../../logger';
 
 // eslint-disable-next-line max-len
@@ -13,6 +13,7 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, stat
         maxVu: undefined,
         avgResponseTime: Math.round(overviewData.avg_response),
         errorRate: roundNumberTwoDecimals((overviewData.number_of_failed / overviewData.total) * 100),
+        errorCount: overviewData.number_of_failed,
         throughput: roundNumberTwoDecimals(overviewData.total / ((overviewData.end - overviewData.start) / 1000)),
         bytesPerSecond:
           roundNumberTwoDecimals(overviewData.bytes_sent_total / ((overviewData.end - overviewData.start) / 1000)),
@@ -305,6 +306,7 @@ interface ChartLabelData {
 export interface Overview {
   percentil: number;
   errorRate: number;
+  errorCount: number;
   throughput: number;
   duration: number;
   maxVu: number;

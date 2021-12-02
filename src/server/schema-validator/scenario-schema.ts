@@ -28,6 +28,7 @@ export const scenarioNotificationBodySchema = {
 export const updateScenarioSchema = {
   ...scenarioSchema,
   analysisEnabled: Joi.boolean().required(),
+  zeroErrorToleranceEnabled: Joi.boolean().required(),
   deleteSamples: Joi.boolean().required(),
   thresholds: Joi.object({
     enabled: Joi.boolean().required(),

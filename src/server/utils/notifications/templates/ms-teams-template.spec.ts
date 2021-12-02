@@ -8,6 +8,7 @@ describe('MS Teams template', () => {
     avgResponseTime: 1,
     duration: 1,
     endDate: new Date(),
+    errorCount: 0,
     errorRate: 0,
     maxVu: 10,
     startDate: new Date(),

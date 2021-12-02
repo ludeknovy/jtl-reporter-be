@@ -245,6 +245,7 @@ describe('prepare data', () => {
         maxVu: undefined,
         avgResponseTime: 106,
         errorRate: 0.01,
+        errorCount: 3,
         throughput: 25.9,
         bytesPerSecond: 38820.04,
         bytesSentPerSecond: 68.43,
