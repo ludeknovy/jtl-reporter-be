@@ -31,15 +31,15 @@ export const getScenario = (projectName, scenarioName) => {
   };
 };
 
-export const updateScenario = (projectName, scenarioName, name, analysisEnabled, thresholds, zeroErrorToleranceEnabled) => {
+
+export const updateScenario = (projectName, scenarioName, name, analysisEnabled, thresholds, deleteSamples, zeroErrorToleranceEnabled) => {
   return {
     text: `
     UPDATE jtl.scenario as s
-    SET name = $3, analysis_enabled=$4, threshold_enabled = $5, threshold_percentile = $6, threshold_throughput = $7, threshold_error_rate = $8, zero_error_tolerance_enabled = $9
+    SET name = $3, analysis_enabled=$4, threshold_enabled = $5, threshold_percentile = $6, threshold_throughput = $7, threshold_error_rate = $8, delete_samples = $9, zero_error_tolerance_enabled = $10
     WHERE s.name = $2
     AND s.project_id = (SELECT id FROM jtl.projects WHERE project_name = $1)`,
-    values: [projectName, scenarioName, name, analysisEnabled, thresholds.enabled,
-      thresholds.percentile, thresholds.throughput, thresholds.errorRate, zeroErrorToleranceEnabled]
+    values: [projectName, scenarioName, name, analysisEnabled, thresholds.enabled, thresholds.percentile, thresholds.throughput, thresholds.errorRate, deleteSamples, zeroErrorToleranceEnabled]
   };
 };
 
@@ -153,9 +153,9 @@ export const deleteScenarioNotification = (projectName, scenarioName, id) => {
   };
 };
 
-export const getScenarioThresholds = (projectName, scenarioName) => {
+export const getScenarioSettings = (projectName, scenarioName) => {
   return {
-    text: `SELECT s.threshold_error_rate as "errorRate", s.threshold_percentile as "percentile", s.threshold_throughput as "throughput", s.threshold_enabled as "enabled"  FROM jtl.scenario as s
+    text: `SELECT s.threshold_error_rate as "errorRate", s.threshold_percentile as "percentile", s.threshold_throughput as "throughput", s.threshold_enabled as "thresholdEnabled", s.delete_samples as "deleteSamples"  FROM jtl.scenario as s
     LEFT JOIN jtl.projects p ON p.id = s.project_id
     WHERE p.project_name = $1
     AND s.name = $2`,

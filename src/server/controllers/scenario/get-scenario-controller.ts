@@ -9,6 +9,7 @@ export const getScenarioController = async (req: Request, res: Response, next: N
     name: scenario.name,
     analysisEnabled: scenario.analysis_enabled,
     zeroErrorToleranceEnabled: scenario.zero_error_tolerance_enabled,
+    deleteSamples: scenario.delete_samples,
     thresholds: {
       enabled: scenario.threshold_enabled,
       percentile: scenario.threshold_percentile,
