@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 export const findItemsForScenario = (projectName, scenarioName, limit, offset) => {
   return {
-    text: `SELECT it.id, environment, upload_time as "uploadTime", base, status, st.overview->>'startDate' as "startTime", note, hostname, threshold_result->'passed' as "thresholdPassed", overview -> 'errorCount' as "errorCount", overview -> 'maxVu' AS "maxVu", overview -> 'duration' as duration FROM jtl.items as it
+    text: `SELECT it.id, environment, upload_time as "uploadTime", base, status, st.overview->>'startDate' as "startTime", note, hostname, threshold_result->'passed' as "thresholdPassed", overview FROM jtl.items as it
     LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
     LEFT JOIN jtl.item_stat as st ON st.item_id = it.id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
