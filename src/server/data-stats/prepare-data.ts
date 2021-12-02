@@ -1,5 +1,5 @@
 import { roundNumberTwoDecimals } from './helper/stats-fc';
-import * as moment from 'moment';
+import * as moment from 'moment';
 import { logger } from '../../logger';
 
 // eslint-disable-next-line max-len
