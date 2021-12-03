@@ -23,4 +23,18 @@ describe('initUserController', () => {
       response as unknown as Response, nextFunction);
     expect(querySpy).toHaveBeenCalledTimes(1);
   });
+  it('should retrun an error if user already exists', async function () {
+    const querySpy = jest.spyOn(require('boom'), 'forbidden');
+
+    (db.manyOrNone as any).mockResolvedValue(['test']);
+    const nextFunction: NextFunction = jest.fn();
+    const response = mockResponse();
+    const request = {};
+    await initUserController(
+      request as unknown as IGetUserAuthInfoRequest,
+      response as unknown as Response, nextFunction);
+    expect(nextFunction).toHaveBeenCalledTimes(1);
+    expect(querySpy).toHaveBeenCalledTimes(1);
+    expect(querySpy).toHaveBeenCalledWith('User was already initialized');
+  });
 });
