@@ -19,7 +19,6 @@ import { scenarioThresholdsCalc } from '../utils/scenario-thresholds-calc';
 export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) => {
   let distributedThreads = null;
   let sutMetrics = [];
-  let scenarioSettings = null;
 
   try {
     const aggOverview = await db.one(aggOverviewQuery(itemId));
@@ -52,7 +51,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
 
     overview.maxVu = Math.max(...chartData.threads.map(([, vu]) => vu));
 
-    scenarioSettings = await db.one(getScenarioSettings(projectName, scenarioName));
+    const scenarioSettings = await db.one(getScenarioSettings(projectName, scenarioName));
     if (scenarioSettings.thresholdEnabled) {
       const scenarioMetrics = await db.one(currentScenarioMetrics(projectName, scenarioName, overview.maxVu));
       const thresholdResult = scenarioThresholdsCalc(overview, scenarioMetrics, scenarioSettings);
@@ -61,9 +60,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
       }
     }
 
-    logger.info(`Item: ${itemId} processing finished`);
     await sendNotifications(projectName, scenarioName, itemId, overview);
-
 
     await db.tx(async t => {
       await t.none(saveItemStats(itemId, JSON.stringify(labelStats), overview, JSON.stringify(sutOverview)));
@@ -71,14 +68,17 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
       await t.none(updateItem(itemId, ReportStatus.Ready, overview.startDate));
     });
 
-  } catch (error) {
-    console.log(error);
-    throw new Error(`Error while processing dataId: ${itemId} for item: ${itemId}, error: ${error}`);
-  } finally {
+    logger.info(`Item: ${itemId} processing finished`);
+
     if(scenarioSettings.deleteSamples) {
       logger.info(`Item: ${itemId} deleting samples data`);
       await db.none(deleteSamples(itemId));
+      await db.none('VACUUM FULL jtl.samples');
       logger.info(`Item: ${itemId} samples data deletion done`);
     }
+
+  } catch (error) {
+    console.log(error);
+    throw new Error(`Error while processing dataId: ${itemId} for item: ${itemId}, error: ${error}`);
   }
 };
