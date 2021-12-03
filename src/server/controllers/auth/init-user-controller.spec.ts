@@ -23,7 +23,7 @@ describe('initUserController', () => {
       response as unknown as Response, nextFunction);
     expect(querySpy).toHaveBeenCalledTimes(1);
   });
-  it('should retrun an error if user already exists', async function () {
+  it('should return an error if user already exists', async function () {
     const querySpy = jest.spyOn(require('boom'), 'forbidden');
 
     (db.manyOrNone as any).mockResolvedValue(['test']);
