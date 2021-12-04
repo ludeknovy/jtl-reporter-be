@@ -52,7 +52,7 @@ export const scenarioTrends = (projectName, scenarioName) => {
     WHERE s.name = $2
     AND p.project_name = $1
     AND report_status = 'ready'
-    ORDER BY start_time DESC
+    ORDER BY start_time ASC
     LIMIT 15;`,
     values: [projectName, scenarioName]
   };
@@ -95,7 +95,7 @@ export const findScenariosData = (projectName) => {
       ) tmp
       WHERE rownum <= 15
     )
-    ORDER BY it.start_time DESC;`,
+    ORDER BY it.start_time ASC;`,
     values: [projectName]
   };
 };
