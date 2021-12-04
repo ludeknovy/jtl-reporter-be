@@ -1,10 +1,10 @@
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import * as pgp from 'pg-promise';
-import * as boom from 'boom';
-import * as winston from 'winston';
+import * as boom from 'boom';
+import * as winston from 'winston';
 import * as compression from 'compression';
-import * as expressWinston from 'express-winston';
+import * as expressWinston from 'express-winston';
 import { logger } from './logger';
 import { Router } from './server/router';
 import * as swaggerUi from 'swagger-ui-express';

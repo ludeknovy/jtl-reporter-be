@@ -8,7 +8,7 @@ import { changePasswordController } from '../controllers/auth/change-password-co
 import { authenticationMiddleware } from '../middleware/auth-middleware';
 import { IGetUserAuthInfoRequest } from '../middleware/request.model';
 import { loginWithTokenController } from '../controllers/auth/login-with-token-controller';
-import { initUserController } from '../controllers/auth/init-controller';
+import { initUserController } from '../controllers/auth/init-user-controller';
 import { newUserSchema } from '../schema-validator/users-schema';
 
 export class AuthRoutes {
