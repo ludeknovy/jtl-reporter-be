@@ -13,4 +13,4 @@ jobs:
       - name: Run ESLint
         run: npm run lint
       - name: Run TS check
-        run: npm run ts-check
+        run: npm run ts:check
