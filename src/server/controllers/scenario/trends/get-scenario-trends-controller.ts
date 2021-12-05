@@ -6,7 +6,7 @@ export const getScenarioTrendsController = async (req: Request, res: Response, n
   const { projectName, scenarioName } = req.params;
   const data = await db.any(scenarioTrends(projectName, scenarioName));
   const networkAdjustedData = data.map((_) => {
-    const { bytesPerSecond, bytesSentPerSecond } = _.overview;
+    const { bytesPerSecond, bytesSentPerSecond } = _.overview;
     const network = bytesPerSecond + bytesSentPerSecond;
     return {
       id: _.id,
