@@ -61,6 +61,7 @@ export const updateProjectName = (currentProjectName, newProjectName, topMetrics
 
 export const getProject = (projectName) => {
   return {
+    // eslint-disable-next-line max-len
     text: 'SELECT project_name as "projectName", item_top_statistics_settings as "topMetricsSettings" FROM jtl.projects WHERE project_name = $1',
     values: [projectName]
   };

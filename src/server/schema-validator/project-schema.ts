@@ -15,7 +15,7 @@ export const updateProjectSchema = {
     network: Joi.boolean().required(),
     avgLatency: Joi.boolean().required(),
     avgResponseTime: Joi.boolean().required(),
-    avgConnectionTime: Joi.boolean().required(),
+    avgConnectionTime: Joi.boolean().required()
   })
 };
 
