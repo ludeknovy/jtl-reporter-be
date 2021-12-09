@@ -52,9 +52,16 @@ export const deleteProject = (projectName) => {
   };
 };
 
-export const updateProjectName = (currentProjectName, newProjectName) => {
+export const updateProjectName = (currentProjectName, newProjectName, topMetricsSettings) => {
   return {
-    text: 'UPDATE jtl.projects SET project_name = $2 WHERE project_name = $1',
-    values: [currentProjectName, newProjectName]
+    text: 'UPDATE jtl.projects SET project_name = $2, item_top_statistics_settings = $3 WHERE project_name = $1',
+    values: [currentProjectName, newProjectName, topMetricsSettings]
+  };
+};
+
+export const getProject = (projectName) => {
+  return {
+    text: 'SELECT project_name as "projectName", item_top_statistics_settings as "topMetricsSettings" FROM jtl.projects WHERE project_name = $1',
+    values: [projectName]
   };
 };
