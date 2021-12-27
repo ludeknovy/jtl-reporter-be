@@ -17,6 +17,8 @@ jobs:
         run: npm install
       - name: Run unit tests
         run: npm run test:unit
+        env:
+          JWT_TOKEN_LOGIN: ploki
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
