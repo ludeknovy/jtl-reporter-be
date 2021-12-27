@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 export const findItemsForScenario = (projectName, scenarioName, limit, offset) => {
   return {
-    text: `SELECT it.id, environment, upload_time as "uploadTime", base, status, st.overview->>'startDate' as "startTime", note, hostname, threshold_result->'passed' as "thresholdPassed", overview -> 'maxVu' AS "maxVu", overview -> 'duration' as duration FROM jtl.items as it
+    text: `SELECT it.id, environment, upload_time as "uploadTime", base, status, st.overview->>'startDate' as "startTime", note, hostname, threshold_result->'passed' as "thresholdPassed", overview FROM jtl.items as it
     LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
     LEFT JOIN jtl.item_stat as st ON st.item_id = it.id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
@@ -31,14 +31,15 @@ export const getScenario = (projectName, scenarioName) => {
   };
 };
 
-export const updateScenario = (projectName, scenarioName, name, analysisEnabled, thresholds) => {
+
+export const updateScenario = (projectName, scenarioName, name, analysisEnabled, thresholds, deleteSamples, zeroErrorToleranceEnabled) => {
   return {
     text: `
     UPDATE jtl.scenario as s
-    SET name = $3, analysis_enabled=$4, threshold_enabled = $5, threshold_percentile = $6, threshold_throughput = $7, threshold_error_rate = $8
+    SET name = $3, analysis_enabled=$4, threshold_enabled = $5, threshold_percentile = $6, threshold_throughput = $7, threshold_error_rate = $8, delete_samples = $9, zero_error_tolerance_enabled = $10
     WHERE s.name = $2
     AND s.project_id = (SELECT id FROM jtl.projects WHERE project_name = $1)`,
-    values: [projectName, scenarioName, name, analysisEnabled, thresholds.enabled, thresholds.percentile, thresholds.throughput, thresholds.errorRate]
+    values: [projectName, scenarioName, name, analysisEnabled, thresholds.enabled, thresholds.percentile, thresholds.throughput, thresholds.errorRate, deleteSamples, zeroErrorToleranceEnabled]
   };
 };
 
@@ -51,7 +52,7 @@ export const scenarioTrends = (projectName, scenarioName) => {
     WHERE s.name = $2
     AND p.project_name = $1
     AND report_status = 'ready'
-    ORDER BY start_time DESC
+    ORDER BY start_time ASC
     LIMIT 15;`,
     values: [projectName, scenarioName]
   };
@@ -94,7 +95,7 @@ export const findScenariosData = (projectName) => {
       ) tmp
       WHERE rownum <= 15
     )
-    ORDER BY it.start_time DESC;`,
+    ORDER BY it.start_time ASC;`,
     values: [projectName]
   };
 };
@@ -152,9 +153,9 @@ export const deleteScenarioNotification = (projectName, scenarioName, id) => {
   };
 };
 
-export const getScenarioThresholds = (projectName, scenarioName) => {
+export const getScenarioSettings = (projectName, scenarioName) => {
   return {
-    text: `SELECT s.threshold_error_rate as "errorRate", s.threshold_percentile as "percentile", s.threshold_throughput as "throughput", s.threshold_enabled as "enabled"  FROM jtl.scenario as s
+    text: `SELECT s.threshold_error_rate as "errorRate", s.threshold_percentile as "percentile", s.threshold_throughput as "throughput", s.threshold_enabled as "thresholdEnabled", s.delete_samples as "deleteSamples"  FROM jtl.scenario as s
     LEFT JOIN jtl.projects p ON p.id = s.project_id
     WHERE p.project_name = $1
     AND s.name = $2`,

@@ -45,6 +45,8 @@ describe('Scenario', () => {
         .send({
           scenarioName: 'test-scenario',
           analysisEnabled: false,
+          zeroErrorToleranceEnabled: true,
+          deleteSamples: false,
           thresholds: {
             enabled: true,
             percentile: 4.2,

@@ -11,7 +11,7 @@ export const scenarioThresholdsCalc = (overviewData: Overview, scenarioMetrics: 
   const throughputDiff = (overviewData.throughput / parseFloat(scenarioMetrics.throughput)) * 100;
   const errorRateDiff = parseFloat(scenarioMetrics.errorRate) === 0
     ? 100 + overviewData.errorRate
-    : divide(overviewData.errorRate, scenarioMetrics.errorRate) * 100;
+    : divide(overviewData.errorRate, scenarioMetrics.errorRate as unknown as number) * 100;
 
   const percentilePass = percentileDiff < (100 + parseFloat(thresholds.percentile));
   const errorRatePass = errorRateDiff < (100 + parseFloat(thresholds.errorRate));

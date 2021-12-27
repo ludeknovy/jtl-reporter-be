@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { db } from '../../../db/db';
-import { findItem, findItemStats, findAttachements, findData } from '../../queries/items';
-import { ItemDataType } from '../../queries/items.model';
 import { findMinMax } from '../../data-stats/helper/stats-fc';
+import { findItem, findItemStats, getMonitoringData } from '../../queries/items';
+
 
 export const getItemController = async (req: Request, res: Response, next: NextFunction) => {
   const { projectName, scenarioName, itemId } = req.params;
@@ -13,26 +13,34 @@ export const getItemController = async (req: Request, res: Response, next: NextF
     // eslint-disable-next-line @typescript-eslint/naming-convention
     base_id,
     status, hostname, reportStatus, thresholds,
-    analysisEnabled } = await db.one(findItem(itemId, projectName, scenarioName));
+    analysisEnabled, zeroErrorToleranceEnabled, topMetricsSettings
+  } = await db.one(findItem(itemId, projectName, scenarioName));
   const { stats: statistics, overview, sutOverview } = await db.one(findItemStats(itemId));
 
-  const files = await db.any(findAttachements(itemId));
-  const attachements = files.map(_ => _.type);
+  const monitoring: MonitoringData[] = await db.manyOrNone(getMonitoringData(itemId));
 
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const [monitoringLogs = { item_data: [] }] = await db.any(findData(itemId, ItemDataType.MonitoringLogs));
-  monitoringLogs.item_data = monitoringLogs.item_data.map((_) => {
-    _.ts = parseInt(_.ts, 10) * 1000;
-    return _;
+  const monitoringAdjusted = monitoring.map(_ => {
+    return Object.assign(_, {
+      avgCpu: parseFloat(_.avgCpu),
+      avgMem: parseFloat(_.avgMem || '0'),
+      timestamp: new Date(_.timestamp).getTime()
+    });
   });
-  const cpu = monitoringLogs.item_data.map((_) => [_.ts, parseInt(_.cpu, 10)]);
-  const mem = monitoringLogs.item_data.map((_) => [_.ts, parseInt(_.mem, 10)]);
-  const maxCpu = findMinMax(cpu.map(_ => _[1])).max;
-  const maxMem = findMinMax(mem.map(_ => _[1])).max;
+
+  const maxCpu = findMinMax(monitoring.map(_ => _.avgCpu)).max;
 
   res.status(200).send({
     overview, sutOverview, statistics, status,
     plot, note, environment, hostname, reportStatus, thresholds, analysisEnabled,
-    attachements, baseId: base_id, isBase: base_id === itemId, monitoringData: { cpu, mem, maxCpu, maxMem }
+    baseId: base_id, isBase: base_id === itemId, zeroErrorToleranceEnabled, topMetricsSettings,
+    monitoring: {
+      cpu: {
+        data: monitoringAdjusted,
+        max: maxCpu
+      }
+    }
   });
 };
+
+
+interface MonitoringData { timestamp: Date; avgCpu: string; name: string; avgMem: string }

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import * as express from 'express';
 import { wrapAsync } from '../errors/error-handler';
 import { bodySchemaValidator, paramsSchemaValidator } from '../schema-validator/schema-validator-middleware';
-import { createNewProjectSchema, projectNameParam } from '../schema-validator/project-schema';
+import {createNewProjectSchema, projectNameParam, updateProjectSchema} from '../schema-validator/project-schema';
 import { createProjectController } from '../controllers/project/create-project-controller';
 import { getProjectsController } from '../controllers/project/get-projects-controller';
 import { getLatestItemsControllers } from '../controllers/project/get-latest-items-controllers';
@@ -10,6 +10,7 @@ import { deleteProjectController } from '../controllers/project/delete-project-c
 import { updateProjectController } from '../controllers/project/update-project-controller';
 import { getProjectStatsController } from '../controllers/project/get-projects-stats-controller';
 import { authenticationMiddleware } from '../middleware/auth-middleware';
+import {getProjectController} from '../controllers/project/get-project-controller';
 
 export class ProjectRoutes {
   public routes(app: express.Application): void {
@@ -45,10 +46,17 @@ export class ProjectRoutes {
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteProjectController(req, res, next)))
 
+      .get(
+        authenticationMiddleware,
+        paramsSchemaValidator(projectNameParam),
+        // eslint-disable-next-line max-len
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getProjectController(req, res, next)))
+
+
       .put(
         authenticationMiddleware,
         paramsSchemaValidator(projectNameParam),
-        bodySchemaValidator(createNewProjectSchema),
+        bodySchemaValidator(updateProjectSchema),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await updateProjectController(req, res, next)));
   }

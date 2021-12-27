@@ -1,114 +1,84 @@
-import csvtojson = require('csvtojson');
 import { db } from '../../../../db/db';
-import { MongoUtils } from '../../../../db/mongoUtil';
 import { logger } from '../../../../logger';
 import {
-  prepareDataForSavingToDbFromMongo,
-  prepareChartDataForSavingFromMongo
+  prepareDataForSavingToDb,
+  prepareChartDataForSaving
 } from '../../../data-stats/prepare-data';
-import { saveThresholdsResult, saveItemStats, savePlotData, updateItem, saveData } from '../../../queries/items';
-import { ItemDataType, ReportStatus } from '../../../queries/items.model';
+import { chartQueryOptionInterval } from '../../../data-stats/helper/duration';
 import {
-  overviewChartAgg, labelChartAgg, labelAggPipeline,
-  overviewAggPerSutPipeline, threadChartDistributed, overviewAggPipeline
-} from '../../../queries/mongo-db-agg';
-import { chartQueryOptionInterval } from '../../../queries/mongoChartOptionHelper';
-import { getScenarioThresholds, currentScenarioMetrics } from '../../../queries/scenario';
+  saveThresholdsResult, saveItemStats, savePlotData, updateItem,
+  aggOverviewQuery, aggLabelQuery, chartOverviewQuery,
+  charLabelQuery, sutOverviewQuery, distributedThreadsQuery, responseCodeDistribution, responseMessageFailures,
+  deleteSamples
+} from '../../../queries/items';
+import { ReportStatus } from '../../../queries/items.model';
+import { getScenarioSettings, currentScenarioMetrics } from '../../../queries/scenario';
 import { sendNotifications } from '../../../utils/notifications/send-notification';
 import { scenarioThresholdsCalc } from '../utils/scenario-thresholds-calc';
-import * as parser from 'xml2json';
-import * as fs from 'fs';
 
-export const itemDataProcessing = async ({ projectName, scenarioName, itemId, dataId, errors, monitoring }) => {
-  const jtlDb = MongoUtils.getClient().db('jtl-data');
-  const collection = jtlDb.collection('data-chunks');
+export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) => {
   let distributedThreads = null;
   let sutMetrics = [];
 
   try {
-    const hostnames: [] = await collection.distinct('samples.Hostname', { dataId });
-    const sutHostnames: [] = await collection.distinct('samples.sutHostname', { dataId });
+    const aggOverview = await db.one(aggOverviewQuery(itemId));
+    const aggLabel = await db.many(aggLabelQuery(itemId));
+    const statusCodeDistribution = await db.manyOrNone(responseCodeDistribution(itemId));
+    const responseFailures = await db.manyOrNone(responseMessageFailures(itemId));
 
-    const aggOverview = await overviewAggregationPipeline(collection, dataId);
-    const aggLabel = await labelAggregationPipeline(collection, dataId);
-
-    if (sutHostnames.filter(_ => _).length > 0) {
-      sutMetrics = await overviewAggregationPerSutPipeline(collection, dataId);
+    if (aggOverview.number_of_sut_hostnames > 1) {
+      sutMetrics = await db.many(sutOverviewQuery(itemId));
     }
 
 
     const {
       overview,
       overview: { duration },
-      labelStats, sutOverview } = prepareDataForSavingToDbFromMongo(aggOverview[0], aggLabel, sutMetrics);
+      labelStats, sutOverview } = prepareDataForSavingToDb(aggOverview, aggLabel, sutMetrics,
+      statusCodeDistribution, responseFailures);
     const interval = chartQueryOptionInterval(duration);
-    const overviewChartData = await collection.aggregate(
-      overviewChartAgg(dataId, interval), { allowDiskUse: true }).toArray();
-    const labelChartData = await collection.aggregate(
-      labelChartAgg(dataId, interval), { allowDiskUse: true }).toArray();
 
+    const overviewChartData = await db.many(chartOverviewQuery(`${interval} milliseconds`, itemId));
+
+    const labelChartData = await db.many(charLabelQuery(`${interval} milliseconds`, itemId));
     // distributed mode
-    if (hostnames?.length > 1) {
-      distributedThreads = await collection.aggregate(
-        threadChartDistributed(interval, dataId),
-        { allowDiskUse: true }).toArray();
+    if (aggOverview?.number_of_hostnames > 1) {
+      distributedThreads = await db.manyOrNone(distributedThreadsQuery(`${interval} milliseconds`, itemId));
     }
 
-    const chartData = prepareChartDataForSavingFromMongo(overviewChartData, labelChartData, distributedThreads);
+    const chartData = prepareChartDataForSaving(
+      overviewChartData, labelChartData, interval, distributedThreads);
 
     overview.maxVu = Math.max(...chartData.threads.map(([, vu]) => vu));
 
-    const scenarioThresholds = await db.one(getScenarioThresholds(projectName, scenarioName));
-    if (scenarioThresholds.enabled) {
+    const scenarioSettings = await db.one(getScenarioSettings(projectName, scenarioName));
+    if (scenarioSettings.thresholdEnabled) {
       const scenarioMetrics = await db.one(currentScenarioMetrics(projectName, scenarioName, overview.maxVu));
-      const thresholdResult = scenarioThresholdsCalc(overview, scenarioMetrics, scenarioThresholds);
+      const thresholdResult = scenarioThresholdsCalc(overview, scenarioMetrics, scenarioSettings);
       if (thresholdResult) {
         await db.none(saveThresholdsResult(projectName, scenarioName, itemId, thresholdResult));
       }
     }
 
-    if (errors) {
-      const filename = errors[0].path;
-      const fileContent = fs.readFileSync(filename);
-      fs.unwatchFile(filename);
-      const jsonErrors = parser.toJson(fileContent);
-      await db.none(saveData(itemId, jsonErrors, ItemDataType.Error));
-    }
-
-
-    if (monitoring) {
-      const filename = monitoring[0].path;
-      const monitoringData = await csvtojson().fromFile(filename);
-      const monitoringDataString = JSON.stringify(monitoringData);
-      fs.unwatchFile(filename);
-      await db.none(saveData(itemId, monitoringDataString, ItemDataType.MonitoringLogs));
-    }
-    logger.info(`Item: ${itemId} processing finished`);
     await sendNotifications(projectName, scenarioName, itemId, overview);
-
 
     await db.tx(async t => {
       await t.none(saveItemStats(itemId, JSON.stringify(labelStats), overview, JSON.stringify(sutOverview)));
       await t.none(savePlotData(itemId, JSON.stringify(chartData)));
       await t.none(updateItem(itemId, ReportStatus.Ready, overview.startDate));
     });
+
+    logger.info(`Item: ${itemId} processing finished`);
+
+    if(scenarioSettings.deleteSamples) {
+      logger.info(`Item: ${itemId} deleting samples data`);
+      await db.none(deleteSamples(itemId));
+      await db.none('VACUUM FULL jtl.samples');
+      logger.info(`Item: ${itemId} samples data deletion done`);
+    }
+
   } catch (error) {
-    throw new Error(`Error while processing dataId: ${dataId} for item: ${itemId}, error: ${error}`);
+    console.log(error);
+    throw new Error(`Error while processing dataId: ${itemId} for item: ${itemId}, error: ${error}`);
   }
-};
-
-
-const overviewAggregationPipeline = async (collection, dataId) => {
-  return await collection.aggregate(
-    overviewAggPipeline(dataId), { allowDiskUse: true }).toArray();
-};
-
-const overviewAggregationPerSutPipeline = async (collection, dataId) => {
-  return await collection.aggregate(
-    overviewAggPerSutPipeline(dataId), { allowDiskUse: true }).toArray();
-};
-
-const labelAggregationPipeline = async (collection, dataId) => {
-  return await collection.aggregate(
-    labelAggPipeline(dataId), { allowDiskUse: true }).toArray();
 };

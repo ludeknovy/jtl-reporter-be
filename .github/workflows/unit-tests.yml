@@ -10,10 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
       - name: Install modules
         run: npm install
       - name: Run unit tests
         run: npm run test:unit
+        env:
+          JWT_TOKEN_LOGIN: ploki
+          JWT_TOKEN: abcdef
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:

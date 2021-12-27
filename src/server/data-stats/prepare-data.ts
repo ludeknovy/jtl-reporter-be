@@ -1,141 +1,152 @@
 import { roundNumberTwoDecimals } from './helper/stats-fc';
-import * as moment from 'moment';
+import * as moment from 'moment';
 import { logger } from '../../logger';
 
 // eslint-disable-next-line max-len
-export const prepareDataForSavingToDbFromMongo = (overviewData, labelData, sutStats): { overview: Overview; labelStats; sutOverview: {}[] } => {
+export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, statusCodeDistr: StatusCodeDistribution[], responseFailures: ResponseMessageFailures[]): { overview: Overview; labelStats; sutOverview: {}[] } => {
   try {
     const startDate = new Date(overviewData.start);
     const endDate = new Date(overviewData.end);
     return {
       overview: {
-        percentil: roundNumberTwoDecimals(overviewData.percentil),
+        percentil: roundNumberTwoDecimals(overviewData.n90),
         maxVu: undefined,
-        avgResponseTime: Math.round(overviewData.avgResponse),
-        errorRate: roundNumberTwoDecimals((overviewData.failed / overviewData.total) * 100),
+        avgResponseTime: Math.round(overviewData.avg_response),
+        errorRate: roundNumberTwoDecimals((overviewData.number_of_failed / overviewData.total) * 100),
+        errorCount: overviewData.number_of_failed,
         throughput: roundNumberTwoDecimals(overviewData.total / ((overviewData.end - overviewData.start) / 1000)),
-        bytesPerSecond: roundNumberTwoDecimals(overviewData.bytes / ((overviewData.end - overviewData.start) / 1000)),
+        bytesPerSecond:
+          roundNumberTwoDecimals(overviewData.bytes_sent_total / ((overviewData.end - overviewData.start) / 1000)),
         // eslint-disable-next-line max-len
-        bytesSentPerSecond: roundNumberTwoDecimals(overviewData.bytesSent / ((overviewData.end - overviewData.start) / 1000)),
-        avgLatency: roundNumberTwoDecimals(overviewData.avgLatency),
-        avgConnect: roundNumberTwoDecimals(overviewData.avgConnect),
+        bytesSentPerSecond: roundNumberTwoDecimals(overviewData.bytes_received_total / ((overviewData.end - overviewData.start) / 1000)),
+        avgLatency: roundNumberTwoDecimals(overviewData.avg_latency),
+        avgConnect: roundNumberTwoDecimals(overviewData.avg_connect),
         startDate,
         endDate,
         duration: roundNumberTwoDecimals((endDate.getTime() - startDate.getTime()) / 1000 / 60)
       },
       labelStats: labelData.map((_) => ({
-        label: _._id,
-        samples: _.samplesCount,
-        avgResponseTime: Math.round(_.avgResponseTime),
-        minResponseTime: _.minResponseTime,
-        maxResponseTime: _.maxResponseTime,
-        errorRate: roundNumberTwoDecimals(_.failed / _.samplesCount * 100),
-        bytes: roundNumberTwoDecimals(_.avgBytes),
-        bytesPerSecond: roundNumberTwoDecimals(_.bytes / ((_.end - _.start) / 1000)),
-        bytesSentPerSecond: roundNumberTwoDecimals(_.bytesSent / ((_.end - _.start) / 1000)),
+        label: _.label,
+        samples: _.total_samples,
+        avgResponseTime: Math.round(_.avg_response),
+        minResponseTime: _.min_response,
+        maxResponseTime: _.max_response,
+        errorRate: roundNumberTwoDecimals(_.number_of_failed / _.total_samples * 100),
+        bytesPerSecond: roundNumberTwoDecimals(_.bytes_received_total / ((_.end - _.start) / 1000)),
+        bytesSentPerSecond: roundNumberTwoDecimals(_.bytes_sent_total / ((_.end - _.start) / 1000)),
         throughput: roundNumberTwoDecimals(
-          _.samplesCount / ((_.end - _.start) / 1000)),
-        n9: _.percentil99,
-        n5: _.percentil95,
-        n0: _.percentil90
+          _.total_samples / ((_.end - _.start) / 1000)),
+        n9: _.n99,
+        n5: _.n95,
+        n0: _.n90,
+        statusCodes: statusCodeDistr
+          .filter((sd) => sd.label === _.label)
+          .map((sd) => ({ statusCode: sd.status_code, count: sd.count })),
+        responseMessageFailures: responseFailures
+          .filter((rm) => rm.label === _.label)
+          .map((rm) => ({ responseMessage: rm.response_message, count: rm.count  }))
       })),
       sutOverview: sutStats.map((_) => ({
-        sutHostname: _._id.sut,
-        percentile: roundNumberTwoDecimals(_.percentil),
-        avgResponseTime: Math.round(_.avgResponse),
-        errorRate: roundNumberTwoDecimals((_.failed / _.total) * 100),
+        sutHostname: _.sut_hostname,
+        percentile: roundNumberTwoDecimals(_.n90),
+        avgResponseTime: Math.round(_.avg_response),
+        errorRate: roundNumberTwoDecimals((_.number_of_failed / _.total) * 100),
         throughput: roundNumberTwoDecimals(_.total / ((_.end - _.start) / 1000)),
-        bytesPerSecond: roundNumberTwoDecimals(_.bytes / ((_.end - _.start) / 1000)),
-        bytesSentPerSecond: roundNumberTwoDecimals(_.bytesSent / ((_.end - _.start) / 1000)),
-        avgLatency: roundNumberTwoDecimals(_.avgLatency),
-        avgConnect: roundNumberTwoDecimals(_.avgConnect)
+        bytesPerSecond: roundNumberTwoDecimals(_.bytes_received_total / ((_.end - _.start) / 1000)),
+        bytesSentPerSecond: roundNumberTwoDecimals(_.bytes_sent_total / ((_.end - _.start) / 1000)),
+        avgLatency: roundNumberTwoDecimals(_.avg_latency),
+        avgConnect: roundNumberTwoDecimals(_.avg_connect)
       }))
     };
   } catch (error) {
-    throw new Error(`Error while processing aggregation pipeline results ${error}`);
+    throw new Error(`Error while processing query results ${error}`);
   }
 };
 
-export const prepareChartDataForSavingFromMongo = (
-  overviewData: ChartOverviewData[], labelData: ChartLabelData[], distributedThreads?: []) => {
-  const labels = [...new Set(labelData.map((_) => _._id.label))];
+export const prepareChartDataForSaving = (
+  overviewData: ChartOverviewData[], labelData: ChartLabelData[], interval: number, distributedThreads?: []) => {
+  const intervalSec = interval / 1000;
+  const labels = [...new Set(labelData.map((_) => _.label))];
   return {
     threads: distributedThreads?.length > 0
       ? calculateDistributedThreads(distributedThreads)
-      : overviewData.map((_) => [moment(_._id).valueOf(), _.threads]) as [number, number][],
+      : overviewData.map((_) => [moment(_.time).valueOf(), _.threads]) as [number, number][],
     overAllFailRate: {
-      data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.errorRate)]),
+      data: overviewData.map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.error_rate * 100)]),
       name: 'errors'
     },
     overallTimeResponse: {
-      data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.avgResponseTime)]),
+      data: overviewData.map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.avg_response)]),
       name: 'response time'
     },
     overallThroughput: {
-      data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.count / _.interval)]),
+      data: overviewData.map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.total / intervalSec)]),
       name: 'throughput'
     },
     overAllNetworkUp: {
-      data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.bytesSent / _.interval)]),
+      data: overviewData.map((_) => [moment(_.time).valueOf(),
+        roundNumberTwoDecimals(_.bytes_sent_total / intervalSec)]),
       name: 'network up'
     },
     overAllNetworkDown: {
-      data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals(_.bytes / _.interval)]),
+      data: overviewData.map((_) => [moment(_.time).valueOf(),
+        roundNumberTwoDecimals(_.bytes_received_total / intervalSec)]),
       name: 'network down'
     },
     overAllNetworkV2: {
-      // eslint-disable-next-line max-len
-      data: overviewData.map((_) => [moment(_._id).valueOf(), roundNumberTwoDecimals((_.bytes + _.bytesSent) / _.interval)]),
+      data: overviewData.map((_) => [moment(_.time).valueOf(),
+        roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / intervalSec)]),
       name: 'network'
     },
     throughput: labels.map((label) => ({
-      data: labelData.filter((_) => _._id.label === label)
-        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.count / _.interval)]),
+      data: labelData.filter((_) => _.label === label)
+        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.total / intervalSec)]),
       name: label
     })),
     responseTime: labels.map((label) => ({
-      data: labelData.filter((_) => _._id.label === label)
-        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.avgResponseTime)]),
+      data: labelData.filter((_) => _.label === label)
+        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.avg_response)]),
       name: label
     })),
     minResponseTime: labels.map((label) => ({
-      data: labelData.filter((_) => _._id.label === label)
-        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.minResponseTime)]),
+      data: labelData.filter((_) => _.label === label)
+        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.min_response)]),
       name: label
     })),
     maxResponseTime: labels.map((label) => ({
-      data: labelData.filter((_) => _._id.label === label)
-        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.maxResponseTime)]),
+      data: labelData.filter((_) => _.label === label)
+        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.max_response)]),
       name: label
     })),
     networkV2: labels.map((label) => ({
-      data: labelData.filter((_) => _._id.label === label)
-        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals((_.bytes + _.bytesSent) / _.interval)]),
+      data: labelData.filter((_) => _.label === label)
+        .map((_) => [moment(_.time).valueOf(),
+          roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / intervalSec)]),
       name: label
     })),
     networkUp: labels.map((label) => ({
-      data: labelData.filter((_) => _._id.label === label)
-        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.bytesSent / _.interval)]),
+      data: labelData.filter((_) => _.label === label)
+        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.bytes_sent_total / intervalSec)]),
       name: label
     })),
     networkDown: labels.map((label) => ({
-      data: labelData.filter((_) => _._id.label === label)
-        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.bytes / _.interval)]),
+      data: labelData.filter((_) => _.label === label)
+        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.bytes_received_total / intervalSec)]),
       name: label
     })),
     percentile90: labels.map((label) => ({
-      data: labelData.filter((_) => _._id.label === label)
-        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.percentile90)]),
+      data: labelData.filter((_) => _.label === label)
+        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.n90)]),
       name: label
     })),
     percentile95: labels.map((label) => ({
-      data: labelData.filter((_) => _._id.label === label)
-        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.percentile95)]),
+      data: labelData.filter((_) => _.label === label)
+        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.n95)]),
       name: label
     })),
     percentile99: labels.map((label) => ({
-      data: labelData.filter((_) => _._id.label === label)
-        .map((_) => [moment(_._id.interval).valueOf(), roundNumberTwoDecimals(_.percentile99)]),
+      data: labelData.filter((_) => _.label === label)
+        .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.n99)]),
       name: label
     }))
   };
@@ -143,7 +154,7 @@ export const prepareChartDataForSavingFromMongo = (
 
 export const calculateDistributedThreads = (distributedThreads: DistributedThreadData[]): [number, number][] => {
   const threadAcc = distributedThreads.reduce((acc, curr) => {
-    const interval = moment(curr._id.interval).valueOf();
+    const interval = moment(curr.time).valueOf();
     if (!acc[interval]) {
       acc[interval] = 0;
     }
@@ -167,7 +178,7 @@ export const stringToNumber = (input: string, radix: number) => {
   return result;
 };
 
-export const transformDataForDb = (_) => {
+export const transformDataForDb = (_, itemId) => {
   try {
     _.timeStamp = new Date(stringToNumber(_.timeStamp, 10));
     _.elapsed = stringToNumber(_.elapsed, 10);
@@ -179,11 +190,28 @@ export const transformDataForDb = (_) => {
     _.Connect = stringToNumber(_.Connect, 10);
     _.success = _.success === 'true';
     _.sutHostname = getHostnameFromUrl(_.URL);
+    _.itemId = itemId;
     return _;
   } catch (error) {
     logger.error(`Error while parsing data: ${error}`);
     return;
   }
+};
+
+export const transformMonitoringDataForDb = (row, itemId): MonitoringTransformedData => {
+  try {
+    return {
+      timestamp: new Date(stringToNumber(row.ts, 10) * 1000),
+      cpu: stringToNumber(row.cpu, 10),
+      mem: stringToNumber(row.mem || 0, 10),
+      name: row.name || 'localhost',
+      itemId
+    };
+  } catch (error) {
+    logger.error(`Error while parsing monitoring data: ${error}`);
+    return;
+  }
+
 };
 
 export const getHostnameFromUrl = (url) => {
@@ -246,41 +274,39 @@ export interface OutputData {
 }
 
 interface ChartOverviewData {
-  _id: Date;
   min: Date;
   max: Date;
-  count: number;
+  total: number;
   threads: number;
-  avgResponseTime: number;
-  interval: number;
-  errorRate: number;
-  bytes: number;
-  bytesSent: number;
+  avg_response: number;
+  time: Date;
+  number_of_failed: number;
+  bytes_received_total: number;
+  bytes_sent_total: number;
+  error_rate: number;
 }
 
 interface ChartLabelData {
-  _id: {
-    interval: Date;
-    label: string;
-  };
+  time: Date;
+  label: string;
   min: Date;
   max: Date;
-  count: number;
+  total: number;
   threads: number;
-  avgResponseTime: number;
-  minResponseTime: number;
-  maxResponseTime: number;
-  interval: number;
-  bytes: number;
-  bytesSent: number;
-  percentile90: number;
-  percentile95: number;
-  percentile99: number;
+  avg_response: number;
+  min_response: number;
+  max_response: number;
+  bytes_received_total: number;
+  bytes_sent_total: number;
+  n90: number;
+  n95: number;
+  n99: number;
 }
 
 export interface Overview {
   percentil: number;
   errorRate: number;
+  errorCount: number;
   throughput: number;
   duration: number;
   maxVu: number;
@@ -294,9 +320,27 @@ export interface Overview {
 };
 
 interface DistributedThreadData {
-  _id: {
-    interval: Date;
-    hostname: string;
-  };
+  time: Date;
+  hostname: string;
   threads: number;
 };
+
+interface MonitoringTransformedData {
+  timestamp: Date;
+  cpu: number;
+  mem: number;
+  name: string;
+  itemId: string;
+}
+
+interface StatusCodeDistribution {
+  label: string;
+  status_code: string;
+  count: number;
+}
+
+interface ResponseMessageFailures {
+  label: string;
+  response_message: string;
+  count: number;
+}
