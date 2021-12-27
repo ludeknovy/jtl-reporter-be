@@ -19,6 +19,7 @@ jobs:
         run: npm run test:unit
         env:
           JWT_TOKEN_LOGIN: ploki
+          JWT_TOKEN: abcdef
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
