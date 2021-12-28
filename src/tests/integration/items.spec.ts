@@ -15,9 +15,11 @@ describe('Items', () => {
       console.log(error);
     }
   });
+
   afterEach(async () => {
     await new Promise(resolve => setTimeout(resolve, 2000));
-  })
+  });
+
   describe('POST /api/projects/:projectName/scenarios/:scenarioName/items/start-async', () => {
     it('should be able to start async item', async () => {
       await stateSetup(States.ExistingScenario);
