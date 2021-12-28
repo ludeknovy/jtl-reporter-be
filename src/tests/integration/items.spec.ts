@@ -14,8 +14,10 @@ describe('Items', () => {
     } catch (error) {
       console.log(error);
     }
-
   });
+  afterEach(async () => {
+    await new Promise(resolve => setTimeout(resolve, 2000));
+  })
   describe('POST /api/projects/:projectName/scenarios/:scenarioName/items/start-async', () => {
     it('should be able to start async item', async () => {
       await stateSetup(States.ExistingScenario);
@@ -117,8 +119,6 @@ describe('Items', () => {
         .expect(200);
     });
     it('should be able to create test item with api token', async () => {
-      // FIXME: remove the nasty timeout
-      await new Promise(resolve => setTimeout(resolve, 2000));
       await stateSetup(States.ExistingScenario);
       await request(__server__)
         .post('/api/projects/test-project/scenarios/test-scenario/items')
