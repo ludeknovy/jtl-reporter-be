@@ -2,15 +2,26 @@ import { Request, Response, NextFunction } from 'express';
 import * as express from 'express';
 import { wrapAsync } from '../errors/error-handler';
 import { paramsSchemaValidator, bodySchemaValidator } from '../schema-validator/schema-validator-middleware';
-import { paramsSchema, scenarioUpdateSchema } from '../schema-validator/scenario-schema';
-import { projectNameParam, newScenarioSchema } from '../schema-validator/project-schema';
+import {
+  paramSchemaNotification, paramsSchema,
+  scenarioNotificationBodySchema, updateScenarioSchema
+} from '../schema-validator/scenario-schema';
+import { projectNameParam, scenarioSchema } from '../schema-validator/project-schema';
 import { getScenariosController } from '../controllers/scenario/get-scenarios-controller';
 import { createScenarioController } from '../controllers/scenario/create-scenario-controller';
 import { deleteScenarioController } from '../controllers/scenario/delete-scenario-controller';
-import { getScenarioTrendsController } from '../controllers/scenario/get-scenario-trends-controller';
 import { authentication } from '../middleware/authentication-middleware';
 import { authorization, AllowedRoles } from '../middleware/authorization-middleware';
+import { getScenarioTrendsController } from '../controllers/scenario/trends/get-scenario-trends-controller';
+// eslint-disable-next-line max-len
+import { getScenarioNotificationsController } from '../controllers/scenario/notifications/get-notifications-controllers';
+// eslint-disable-next-line max-len
+import { createScenarioNotificationController } from '../controllers/scenario/notifications/create-notification-controller';
+// eslint-disable-next-line max-len
+import { deleteScenarioNotificationController } from '../controllers/scenario/notifications/delete-scenario-notification-controller';
+// eslint-disable-next-line max-len
 import { updateScenarioController } from '../controllers/scenario/update-scenario-controller';
+import { getScenarioController } from '../controllers/scenario/get-scenario-controller';
 
 export class ScenarioRoutes {
 
@@ -21,38 +32,68 @@ export class ScenarioRoutes {
         authentication,
         authorization([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(projectNameParam),
-        // tslint:disable-next-line: max-line-length
+        // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getScenariosController(req, res, next)))
+
       .post(
         authentication,
         authorization([AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(projectNameParam),
-        bodySchemaValidator(newScenarioSchema),
-        // tslint:disable-next-line: max-line-length
+        bodySchemaValidator(scenarioSchema),
+        // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await createScenarioController(req, res, next)));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName')
+      .get(
+        authorization([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
+        paramsSchemaValidator(paramsSchema),
+        // eslint-disable-next-line max-len
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getScenarioController(req, res, next))
+      )
+
       .put(
         authentication,
         authorization([AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
-        bodySchemaValidator(scenarioUpdateSchema),
-        // tslint:disable-next-line: max-line-length
+        bodySchemaValidator(updateScenarioSchema),
+        // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await updateScenarioController(req, res, next)))
 
       .delete(
         authentication,
         authorization([AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
-        // tslint:disable-next-line: max-line-length
+        // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteScenarioController(req, res, next)));
+
+    app.route('/api/projects/:projectName/scenarios/:scenarioName/notifications')
+      .get(
+        authorization([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
+        paramsSchemaValidator(paramsSchema),
+        // eslint-disable-next-line max-len
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getScenarioNotificationsController(req, res, next)))
+
+      .post(
+        authorization([AllowedRoles.Regular, AllowedRoles.Admin]),
+        paramsSchemaValidator(paramsSchema),
+        bodySchemaValidator(scenarioNotificationBodySchema),
+        // eslint-disable-next-line max-len
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await createScenarioNotificationController(req, res, next)));
+
+
+    app.route('/api/projects/:projectName/scenarios/:scenarioName/notifications/:notificationId')
+      .delete(
+        authorization([AllowedRoles.Regular, AllowedRoles.Admin]),
+        paramsSchemaValidator(paramSchemaNotification),
+        // eslint-disable-next-line max-len
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteScenarioNotificationController(req, res, next)));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/trends')
       .get(
         authentication,
         authorization([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
-        // tslint:disable-next-line: max-line-length
+        // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getScenarioTrendsController(req, res, next)));
   }
 }

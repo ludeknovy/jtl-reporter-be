@@ -3,25 +3,37 @@ import { Request, Response, NextFunction } from 'express';
 import { bodySchemaValidator } from '../schema-validator/schema-validator-middleware';
 import { wrapAsync } from '../errors/error-handler';
 import { loginController } from '../controllers/auth/login-controller';
-import { authQuerySchema, changePasswordSchema, } from '../schema-validator/auth-schema';
+import { authQuerySchema, authWithTokenSchema, changePasswordSchema } from '../schema-validator/auth-schema';
 import { changePasswordController } from '../controllers/auth/change-password-controller';
 import { authentication } from '../middleware/authentication-middleware';
 import { IGetUserAuthInfoRequest } from '../middleware/request.model';
+import { loginWithTokenController } from '../controllers/auth/login-with-token-controller';
+import { initUserController } from '../controllers/auth/init-user-controller';
+import { newUserSchema } from '../schema-validator/users-schema';
 
 export class AuthRoutes {
   public routes(app: express.Application): void {
 
     app.route('/api/auth/login')
       .post(bodySchemaValidator(authQuerySchema),
-        // tslint:disable-next-line: max-line-length
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await loginController(req, res, next)));
+
+    app.route('/api/auth/login-with-token')
+      .post(bodySchemaValidator(authWithTokenSchema),
+        // eslint-disable-next-line max-len
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await loginWithTokenController(req, res, next)));
 
     app.route('/api/auth/change-password')
       .post(
         authentication,
         bodySchemaValidator(changePasswordSchema),
-        // tslint:disable-next-line: max-line-length
+        // eslint-disable-next-line max-len
         wrapAsync(async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => await changePasswordController(req, res, next)));
 
+    app.route('/api/auth/initialize-user')
+      .post(
+        bodySchemaValidator(newUserSchema),
+        wrapAsync(async (req: Request, res: Response, next: NextFunction) =>
+          await initUserController(req, res, next)));
   }
 }

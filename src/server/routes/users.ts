@@ -16,7 +16,7 @@ export class UsersRoutes {
         authentication,
         authorization([AllowedRoles.Admin]),
         bodySchemaValidator(newUserSchema),
-        // tslint:disable-next-line: max-line-length
+        // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await createNewUserController(req, res, next)))
 
       .get(

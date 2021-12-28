@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express';
 import { db } from '../../../db/db';
-import { getAllApiTokens, getOnlyMyApiTokens } from '../../queries/api-tokens';
+import { getApiToken, getOnlyMyApiTokens } from '../../queries/api-tokens';
 import { IGetUserAuthInfoRequest } from '../../middleware/request.model';
 import { AllowedRoles } from '../../middleware/authorization-middleware';
 
@@ -10,6 +10,6 @@ export const getTokensController = async (req: IGetUserAuthInfoRequest, res: Res
     const myApiKeys = await db.any(getOnlyMyApiTokens(userId));
     return res.status(200).send(myApiKeys);
   }
-  const result = await db.many(getAllApiTokens);
+  const result = await db.many(getApiToken);
   res.status(200).send(result);
 };

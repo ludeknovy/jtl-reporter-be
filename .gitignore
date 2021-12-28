@@ -6,3 +6,5 @@ data/*
 pacts
 build/
 dist/
+coverage
+.idea

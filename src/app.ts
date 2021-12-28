@@ -1,14 +1,15 @@
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import * as pgp from 'pg-promise';
-import * as boom from 'boom';
-import * as winston from 'winston';
-import * as expressWinston from 'express-winston';
+import * as boom from 'boom';
+import * as winston from 'winston';
+import * as compression from 'compression';
+import * as expressWinston from 'express-winston';
 import { logger } from './logger';
 import { Router } from './server/router';
 import * as swaggerUi from 'swagger-ui-express';
-import { MongoUtils } from './db/mongoUtil';
 import * as http from 'http';
+import { config } from './server/config';
 const swaggerDocument = require('../openapi.json');
 
 const PORT = 5000;
@@ -29,6 +30,7 @@ export class App {
   private config(): void {
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: false }));
+    this.app.use(compression());
     this.app.use(expressWinston.logger({
       transports: [
         new winston.transports.Console()
@@ -55,7 +57,7 @@ export class App {
         return res.status(error.output.statusCode).json({ message });
       } else {
         logger.error(`Unexpected error: ${error}`);
-        return res.status(500).json({ message: `Something went wrong` });
+        return res.status(500).json({ message: 'Something went wrong' });
       }
     });
   }
@@ -72,7 +74,10 @@ export class App {
   }
 
   public async listen() {
-    await MongoUtils.connect();
+    if (!config.jwtToken || !config.jwtTokenLogin) {
+      logger.error('Please provide JWT_TOKEN and JWT_TOKEN_LOGIN env vars');
+      process.exit(1);
+    }
     return this.server = this.app.listen(PORT, () => {
       logger.info('Express server listening on port ' + PORT);
     });

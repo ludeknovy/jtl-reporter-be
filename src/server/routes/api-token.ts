@@ -5,7 +5,7 @@ import { authentication } from '../middleware/authentication-middleware';
 import { wrapAsync } from '../errors/error-handler';
 import { getTokensController } from '../controllers/api-tokens/get-tokens-controller';
 import { createTokenController } from '../controllers/api-tokens/create-token-controller';
-import { deleteTokenController } from '../controllers/api-tokens/delete-token-controlle';
+import { deleteTokenController } from '../controllers/api-tokens/delete-token-controller';
 import { newTokenSchema, deleteTokenSchema } from '../schema-validator/token-schema';
 import { IGetUserAuthInfoRequest } from '../middleware/request.model';
 import { authorization, AllowedRoles } from '../middleware/authorization-middleware';

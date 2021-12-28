@@ -19,7 +19,7 @@ export class LabelRoutes {
         authorization([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(labelParamSchema),
         queryParamsValidator(labelQuerySchema),
-        // tslint:disable-next-line: max-line-length
+        // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getLabelTrendController(req, res, next)));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label/:label/virtual-users')
@@ -28,7 +28,7 @@ export class LabelRoutes {
         authorization([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(labelParamSchema),
         queryParamsValidator(labelQuerySchema),
-        // tslint:disable-next-line: max-line-length
+        // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getLabelVirtualUsersController(req, res, next)));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label/:label/errors')
@@ -36,7 +36,7 @@ export class LabelRoutes {
         authentication,
         authorization([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(labelParamSchema),
-        // tslint:disable-next-line: max-line-length
+        // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getLabelErrorsController(req, res, next)));
   }
 }

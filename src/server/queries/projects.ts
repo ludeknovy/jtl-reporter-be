@@ -24,7 +24,7 @@ export const findProjectId = projectName => {
 
 export const findProjects = () => {
   return {
-    // tslint:disable-next-line:max-line-length
+    // eslint-disable-next-line max-len
     text: `SELECT project_name as "projectName", p.id, count(DISTINCT(s.name))::int as "scenarioCount", count(i.id)::int as "itemCount", MAX(i.start_time) as "latestRun"
     FROM jtl.projects as p
     LEFT JOIN jtl.scenario as s ON s.project_id = p.id
@@ -35,7 +35,7 @@ export const findProjects = () => {
 
 export const latestItems = () => {
   return {
-    // tslint:disable-next-line:max-line-length
+    // eslint-disable-next-line max-len
     text: `SELECT i.id, s.name, environment, project_name as "projectName", stat.overview->'startDate' as "startTime", status FROM jtl.items as i
     LEFT JOIN jtl.scenario as s ON s.id = i.scenario_id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
@@ -52,9 +52,17 @@ export const deleteProject = (projectName) => {
   };
 };
 
-export const updateProjectName = (currentProjectName, newProjectName) => {
+export const updateProjectName = (currentProjectName, newProjectName, topMetricsSettings) => {
   return {
-    text: 'UPDATE jtl.projects SET project_name = $2 WHERE project_name = $1',
-    values: [currentProjectName, newProjectName]
+    text: 'UPDATE jtl.projects SET project_name = $2, item_top_statistics_settings = $3 WHERE project_name = $1',
+    values: [currentProjectName, newProjectName, topMetricsSettings]
+  };
+};
+
+export const getProject = (projectName) => {
+  return {
+    // eslint-disable-next-line max-len
+    text: 'SELECT project_name as "projectName", item_top_statistics_settings as "topMetricsSettings" FROM jtl.projects WHERE project_name = $1',
+    values: [projectName]
   };
 };

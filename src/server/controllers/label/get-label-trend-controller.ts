@@ -15,15 +15,15 @@ export const getLabelTrendController = async (req: Request, res: Response, next:
       itemId, environment));
   const { timePoints, n0, n5, n9,
     errorRate, throughput, threads } = queryResult.reduce((accumulator, current) => {
-      accumulator.timePoints.push(moment(current.start_time).format(`DD.MM.YYYY HH:mm:SS`));
-      accumulator.n0.push(current.labels.n0);
-      accumulator.n5.push(current.labels.n5);
-      accumulator.n9.push(current.labels.n9);
-      accumulator.errorRate.push(current.labels.errorRate);
-      accumulator.throughput.push(current.labels.throughput);
-      accumulator.threads.push(current.max_vu);
-      return accumulator;
-    }, { timePoints: [], n0: [], n5: [], n9: [], errorRate: [], throughput: [], threads: [] });
+    accumulator.timePoints.push(moment(current.start_time).format('DD.MM.YYYY HH:mm:SS'));
+    accumulator.n0.push(current.labels.n0);
+    accumulator.n5.push(current.labels.n5);
+    accumulator.n9.push(current.labels.n9);
+    accumulator.errorRate.push(current.labels.errorRate);
+    accumulator.throughput.push(current.labels.throughput);
+    accumulator.threads.push(current.max_vu);
+    return accumulator;
+  }, { timePoints: [], n0: [], n5: [], n9: [], errorRate: [], throughput: [], threads: [] });
   res.status(200).send({
     timePoints,
     n0, n5, n9,
