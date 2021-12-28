@@ -118,7 +118,7 @@ describe('Items', () => {
     });
     it('should be able to create test item with api token', async () => {
       // FIXME: remove the nasty timeout
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      await new Promise(resolve => setTimeout(resolve, 2000));
       await stateSetup(States.ExistingScenario);
       await request(__server__)
         .post('/api/projects/test-project/scenarios/test-scenario/items')
