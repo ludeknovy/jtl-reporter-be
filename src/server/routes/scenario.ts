@@ -10,7 +10,7 @@ import { projectNameParam, scenarioSchema } from '../schema-validator/project-sc
 import { getScenariosController } from '../controllers/scenario/get-scenarios-controller';
 import { createScenarioController } from '../controllers/scenario/create-scenario-controller';
 import { deleteScenarioController } from '../controllers/scenario/delete-scenario-controller';
-import { authentication } from '../middleware/authentication-middleware';
+import { authenticationMiddleware } from '../middleware/authentication-middleware';
 import { authorization, AllowedRoles } from '../middleware/authorization-middleware';
 import { getScenarioTrendsController } from '../controllers/scenario/trends/get-scenario-trends-controller';
 // eslint-disable-next-line max-len
@@ -29,14 +29,14 @@ export class ScenarioRoutes {
 
     app.route('/api/projects/:projectName/scenarios')
       .get(
-        authentication,
+        authenticationMiddleware,
         authorization([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(projectNameParam),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getScenariosController(req, res, next)))
 
       .post(
-        authentication,
+        authenticationMiddleware,
         authorization([AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(projectNameParam),
         bodySchemaValidator(scenarioSchema),
@@ -52,7 +52,7 @@ export class ScenarioRoutes {
       )
 
       .put(
-        authentication,
+        authenticationMiddleware,
         authorization([AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
         bodySchemaValidator(updateScenarioSchema),
@@ -60,7 +60,7 @@ export class ScenarioRoutes {
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await updateScenarioController(req, res, next)))
 
       .delete(
-        authentication,
+        authenticationMiddleware,
         authorization([AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
         // eslint-disable-next-line max-len
@@ -90,7 +90,7 @@ export class ScenarioRoutes {
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/trends')
       .get(
-        authentication,
+        authenticationMiddleware,
         authorization([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
         // eslint-disable-next-line max-len

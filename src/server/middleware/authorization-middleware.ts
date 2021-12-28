@@ -1,6 +1,6 @@
 import * as boom from 'boom';
 
-export const authorization = (allowedRoles: AllowedRoles[]) => {
+export const authorizationMiddleware = (allowedRoles: AllowedRoles[]) => {
   return (request, response, next) => {
     if (allowedRoles.find((role) => role === request.user.role))
       next(); // role is allowed, so continue on the next middleware
