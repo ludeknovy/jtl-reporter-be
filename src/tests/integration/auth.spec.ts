@@ -88,7 +88,7 @@ describe('Auth', () => {
       });
     });
   });
-  describe.only('Login with token', () => {
+  describe('Login with token', () => {
     it('should be able to login with valid token', async () => {
       await request(__server__)
         .post(routes.auth.loginWithToken)

@@ -6,7 +6,7 @@ module.exports = {
   ],
   'preset': 'ts-jest',
   'testMatch': [
-    '**/src/tests/integration/**/*.spec.(ts|tsx|js)'
+    '**/src/tests/integration/**/*.spec.ts'
   ],
   'verbose': true,
   'testEnvironment': '<rootDir>/src/tests/integration/helper/test-environment.js',
