@@ -17,7 +17,6 @@ import { updateItemController } from '../controllers/item/update-item-controller
 import { deleteItemController } from '../controllers/item/delete-item-controller';
 import { createItemController } from '../controllers/item/create-item-controller';
 import { authenticationMiddleware } from '../middleware/auth-middleware';
-import { getItemErrorsController } from '../controllers/item/get-item-errors-controller';
 import { getProcessingItemsController } from '../controllers/item/get-processing-items-controller';
 import { createItemAsyncController } from '../controllers/item/create-item-async-controller';
 import { stopItemAsyncController } from '../controllers/item/stop-item-async-controller';
@@ -97,10 +96,6 @@ export class ItemsRoutes {
         paramsSchemaValidator(shareTokenSchema),
         // eslint-disable-next-line max-len
         wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteItemShareTokenController(req, res, next)));
-
-    app.route('/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/errors')
-      // eslint-disable-next-line max-len
-      .get(wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getItemErrorsController(req, res, next)));
 
     app.route('/api/projects/:projectName/scenarios/:scenarioName/processing-items')
       .get(
