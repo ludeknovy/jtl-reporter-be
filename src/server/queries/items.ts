@@ -111,20 +111,6 @@ export const getMonitoringData = (itemId, interval = '5 seconds') => {
   };
 };
 
-
-export const findErrors = (itemId, projectName) => {
-  return {
-    text: `SELECT item_data as errors FROM jtl.items as items
-    LEFT JOIN jtl.data as data ON data.item_id = items.id
-    LEFT JOIN jtl.scenario as s ON s.id = items.scenario_id
-    LEFT JOIN jtl.projects as p ON p.id = s.project_id
-    WHERE items.id = $1
-    AND p.project_name = $2
-    AND data_type = $3`,
-    values: [itemId, projectName, ItemDataType.Error]
-  };
-};
-
 export const removeCurrentBaseFlag = (scenarioName, projectName) => {
   return {
     text: `UPDATE jtl.items SET base = NULL
