@@ -157,7 +157,7 @@ export const getLabelHistory = (scenarioName, projectName, endpointName, itemId,
     WHERE sc.name = $1
     AND pr.project_name = $2
     AND environment = $5
-    ORDER BY its.start_time ASC) as stats
+    ORDER BY its.start_time DESC) as stats
     WHERE labels->>'label' = $3
     AND start_time <= (SELECT start_time FROM jtl.items WHERE id = $4)
     LIMIT 50;`,
@@ -176,7 +176,7 @@ export const getLabelHistoryForVu = (scenarioName, projectName, endpointName, it
     WHERE sc.name = $1
     AND pr.project_name = $2
     AND environment = $5
-    ORDER BY its.start_time ASC) as stats
+    ORDER BY its.start_time DESC) as stats
     WHERE labels->>'label' = $3
     AND start_time <= (SELECT start_time FROM jtl.items WHERE id = $4)
     AND max_vu::integer = $6

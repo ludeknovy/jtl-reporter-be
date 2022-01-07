@@ -13,6 +13,9 @@ export const getLabelTrendController = async (req: Request, res: Response, next:
     : await db.query(getLabelHistory(
       scenarioName, projectName, label,
       itemId, environment));
+
+  queryResult.sort((a, b) => a.start_time - b.start_time);
+
   const { timePoints, n0, n5, n9,
     errorRate, throughput, threads } = queryResult.reduce((accumulator, current) => {
     accumulator.timePoints.push(moment(current.start_time).format('DD.MM.YYYY HH:mm:SS'));
