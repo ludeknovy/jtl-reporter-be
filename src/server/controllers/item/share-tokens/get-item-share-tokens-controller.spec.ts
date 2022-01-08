@@ -16,7 +16,7 @@ describe("getItemLinksController", () => {
     const request = {
       params: { projectName: "project", scenarioName: "scenario", itemId: "id" },
     }
-    await getItemLinksController(request as unknown as Request, response as unknown as Response, nextFunction)
+    await getItemLinksController(request as unknown as Request, response as unknown as Response)
     expect(querySpy).toHaveBeenCalledTimes(1)
     expect(response.send).toHaveBeenCalledTimes(1)
   })

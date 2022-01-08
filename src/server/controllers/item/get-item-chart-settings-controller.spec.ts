@@ -19,7 +19,7 @@ describe("getItemChartSettingsController", () => {
       user: { userId: "testUser" },
     }
     await getItemChartSettingsController(request as unknown as IGetUserAuthInfoRequest,
-      response as unknown as Response, nextFunction)
+      response as unknown as Response)
     expect(querySpy).toHaveBeenCalledTimes(1)
     expect(response.send).toHaveBeenCalledTimes(1)
   })

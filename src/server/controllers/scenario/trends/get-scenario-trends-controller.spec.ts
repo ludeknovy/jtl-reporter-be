@@ -15,7 +15,6 @@ describe("getScenarioTrendsController", function () {
   it("should return data", async function () {
     (db.any as any).mockResolvedValueOnce([{ overview: { bytesPerSecond: 100, bytesSentPerSecond: 200 }, id: "id1" }])
 
-    const nextFunction: NextFunction = jest.fn()
     const response = mockResponse()
     const request = {
       params: "scenario-name",
@@ -23,7 +22,7 @@ describe("getScenarioTrendsController", function () {
     }
     await getScenarioTrendsController(
       request as unknown as IGetUserAuthInfoRequest,
-      response as unknown as Response, nextFunction)
+      response as unknown as Response)
     expect(response.send).toBeCalledWith([{
       id: "id1",
       overview: {

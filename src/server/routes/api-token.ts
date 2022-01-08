@@ -25,6 +25,6 @@ export class ApiTokensRoutes {
         authenticationMiddleware,
         bodySchemaValidator(deleteTokenSchema),
         // eslint-disable-next-line max-len
-        wrapAsync( (req: Request, res: Response, next: NextFunction) => deleteTokenController(req, res, next)))
+        wrapAsync( (req: Request, res: Response) => deleteTokenController(req, res)))
   }
 }

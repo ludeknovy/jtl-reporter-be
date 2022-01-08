@@ -1,4 +1,4 @@
-import { Response, NextFunction } from "express"
+import { Response } from "express"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 import { upsertItemChartSettingsController } from "./upsert-item-chart-settings-controller"
 jest.mock("../../../db/db")
@@ -11,7 +11,6 @@ const mockResponse = () => {
 
 describe("upsertItemChartSettingsController", () => {
   it("should save data to db", async () => {
-    const nextFunction: NextFunction = jest.fn()
     const response = mockResponse()
     const querySpy = jest.spyOn(require("../../queries/items"), "upsertItemChartSettings")
     const request = {
@@ -19,7 +18,7 @@ describe("upsertItemChartSettingsController", () => {
       user: { userId: "testUser" },
     }
     await upsertItemChartSettingsController(request as unknown as IGetUserAuthInfoRequest,
-      response as unknown as Response, nextFunction)
+      response as unknown as Response)
     expect(querySpy).toHaveBeenCalledTimes(1)
     expect(response.send).toHaveBeenCalledTimes(1)
   })

@@ -37,7 +37,7 @@ export class ItemsRoutes {
         authenticationMiddleware,
         paramsSchemaValidator(scenarioParamsSchema),
         queryParamsValidator(querySchema),
-        wrapAsync( (req: Request, res: Response, next: NextFunction) => getItemsController(req, res, next)))
+        wrapAsync( (req: Request, res: Response) => getItemsController(req, res)))
 
       .post(
         authenticationMiddleware,

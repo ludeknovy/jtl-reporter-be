@@ -23,7 +23,7 @@ export class ProjectRoutes {
 
       .get(
         authenticationMiddleware,
-        wrapAsync( (req: Request, res: Response, next: NextFunction) => getProjectsController(req, res, next)))
+        wrapAsync( (req: Request, res: Response) => getProjectsController(req, res)))
 
     app.route("/api/projects/latest-items")
       .get(

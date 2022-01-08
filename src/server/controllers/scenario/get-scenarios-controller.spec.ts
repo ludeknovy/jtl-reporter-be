@@ -19,14 +19,13 @@ describe("getScenariosController", () => {
       { scenario_id: "id1", name: "scenario1", overview: { test: 2 } },
       { scenario_id: "id2", name: "scenario2", overview: { test: 2 } },
     ])
-    const nextFunction: NextFunction = jest.fn()
     const response = mockResponse()
     const request = {
       params: "scenario-name",
     }
     await getScenariosController(
       request as unknown as IGetUserAuthInfoRequest,
-      response as unknown as Response, nextFunction)
+      response as unknown as Response)
     expect(response.send).toBeCalledWith([
       { name: "scenario1", id: "id1", data: [{ test: 1 }, { test: 2 }] },
       { name: "scenario2", id: "id2", data: [{ test: 2 }] },
@@ -37,14 +36,13 @@ describe("getScenariosController", () => {
     (db.any as any).mockResolvedValueOnce([
       { scenario_id: "id1", name: "scenario1", overview: { test: 1 } },
     ])
-    const nextFunction: NextFunction = jest.fn()
     const response = mockResponse()
     const request = {
       params: "scenario-name",
     }
     await getScenariosController(
       request as unknown as IGetUserAuthInfoRequest,
-      response as unknown as Response, nextFunction)
+      response as unknown as Response)
     expect(response.send).toBeCalledWith([
       { name: "scenario1", id: "id1", data: [{ test: 1 }] },
       { name: "scenario2", id: "id2", data: [] },

@@ -10,7 +10,7 @@ import { Router } from "./server/router"
 import * as swaggerUi from "swagger-ui-express"
 import * as http from "http"
 import { config } from "./server/config"
-import { StatusCodes } from "./server/utils/status-codes"
+import { StatusCode } from "./server/utils/status-code"
 import { NextFunction, Request, Response } from "express"
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const swaggerDocument = require("../openapi.json")
@@ -61,7 +61,7 @@ export class App {
         return res.status(error.output.statusCode).json({ message })
       }
         logger.error(`Unexpected error: ${error}`)
-        return res.status(StatusCodes.InternalError).json({ message: "Something went wrong" })
+        return res.status(StatusCode.InternalError).json({ message: "Something went wrong" })
 
     })
   }

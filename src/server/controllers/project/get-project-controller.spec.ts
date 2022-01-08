@@ -21,7 +21,7 @@ describe("getProjectController", () => {
     };
     (db.one as any).mockResolvedValue(responseStub)
     await getProjectController(request as unknown as IGetUserAuthInfoRequest,
-      response as unknown as Response, nextFunction)
+      response as unknown as Response)
     expect(response.send).toHaveBeenCalledTimes(1)
     expect(response.send).toBeCalledWith(responseStub)
   })
