@@ -4,7 +4,6 @@ import { getLabelTrendController } from './get-label-trend-controller';
 import { db } from '../../../db/db';
 
 jest.mock('../../../db/db');
-jest.mock('../../../db/db');
 
 const mockResponse = () => {
   const res: Partial<Response> = {};
