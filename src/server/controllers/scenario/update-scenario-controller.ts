@@ -4,9 +4,16 @@ import { updateScenario } from '../../queries/scenario';
 
 
 export const updateScenarioController = async (req: Request, res: Response, next: NextFunction) => {
-  const {projectName, scenarioName} = req.params;
-  const {thresholds, analysisEnabled, scenarioName: name, deleteSamples, zeroErrorToleranceEnabled} = req.body;
+  const { projectName, scenarioName } = req.params;
+  const {
+    thresholds,
+    analysisEnabled,
+    scenarioName: name,
+    deleteSamples,
+    zeroErrorToleranceEnabled,
+    keepTestRunsPeriod
+  } = req.body;
   await db.none(updateScenario(projectName, scenarioName, name, analysisEnabled,
-    thresholds, deleteSamples, zeroErrorToleranceEnabled));
+    thresholds, deleteSamples, zeroErrorToleranceEnabled, keepTestRunsPeriod));
   res.status(204).send();
 };
