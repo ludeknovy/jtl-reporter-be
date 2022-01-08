@@ -10,7 +10,7 @@ export class InitRoutes {
 
     app.route("/api/info")
 
-      .get(wrapAsync(async (req: Request, res: Response, next: NextFunction) =>
-        await getInitController(req, res, next)))
+      .get(wrapAsync( (req: Request, res: Response, next: NextFunction) =>
+         getInitController(req, res, next)))
   }
 }

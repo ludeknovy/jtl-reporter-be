@@ -1,10 +1,14 @@
 import * as Joi from "joi"
 
+const NOTE_MAX_LENGTH = 250
+const HOSTNAME_MAX_LENGTH = 200
+const ENVIRONMENT_MAX_LENGTH = 50
+
 const projectName = Joi.string().required()
-const environment = Joi.string().min(1).max(50).required()
+const environment = Joi.string().min(1).max(ENVIRONMENT_MAX_LENGTH).required()
 const scenarioName = Joi.string().required()
-const hostname = Joi.string().max(200).allow("").allow(null)
-const note = Joi.string().max(250).allow("").allow(null)
+const hostname = Joi.string().max(HOSTNAME_MAX_LENGTH).allow("").allow(null)
+const note = Joi.string().max(NOTE_MAX_LENGTH).allow("").allow(null)
 const itemId = Joi.string().uuid().required()
 
 export const labelParamSchema = {

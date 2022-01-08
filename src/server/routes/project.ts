@@ -19,36 +19,31 @@ export class ProjectRoutes {
       .post(
         authenticationMiddleware,
         bodySchemaValidator(createNewProjectSchema),
-        wrapAsync( async (req: Request, res: Response, next: NextFunction) => await createProjectController(req, res, next)))
+        wrapAsync( (req: Request, res: Response, next: NextFunction) => createProjectController(req, res, next)))
 
       .get(
         authenticationMiddleware,
-        // eslint-disable-next-line max-len
-        wrapAsync( async (req: Request, res: Response, next: NextFunction) => await getProjectsController(req, res, next)))
+        wrapAsync( (req: Request, res: Response, next: NextFunction) => getProjectsController(req, res, next)))
 
     app.route("/api/projects/latest-items")
       .get(
         authenticationMiddleware,
-        // eslint-disable-next-line max-len
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getLatestItemsControllers(req, res)))
+        wrapAsync( (req: Request, res: Response ) => getLatestItemsControllers(req, res)))
 
     app.route("/api/projects/overall-stats")
       .get(
         authenticationMiddleware,
-        // eslint-disable-next-line max-len
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getProjectStatsController(req, res)))
+        wrapAsync( (req: Request, res: Response ) => getProjectStatsController(req, res)))
 
     app.route("/api/projects/:projectName")
       .delete(
         authenticationMiddleware,
         paramsSchemaValidator(projectNameParam),
-        // eslint-disable-next-line max-len
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteProjectController(req, res)))
+        wrapAsync( (req: Request, res: Response) => deleteProjectController(req, res)))
 
       .get(
         authenticationMiddleware,
         paramsSchemaValidator(projectNameParam),
-        // eslint-disable-next-line max-len
         wrapAsync( (req: Request, res: Response) => getProjectController(req, res)))
 
 
@@ -56,7 +51,6 @@ export class ProjectRoutes {
         authenticationMiddleware,
         paramsSchemaValidator(projectNameParam),
         bodySchemaValidator(updateProjectSchema),
-        // eslint-disable-next-line max-len
         wrapAsync( (req: Request, res: Response) => updateProjectController(req, res)))
   }
 

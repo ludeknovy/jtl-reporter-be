@@ -8,7 +8,7 @@ import { db } from "../../../../db/db"
 const pg = pgp()
 
 
-export const processMonitoringCsv = async (filename: string, itemId: string) => {
+export const processMonitoringCsv = (filename: string, itemId: string) => {
   if (!filename) {
     return
   }
@@ -49,7 +49,7 @@ export const processMonitoringCsv = async (filename: string, itemId: string) => 
         logger.error(`Error while processing monitoring data, itemId - ${itemId}: ${error}`)
       }
     })
-    .on("error", async (error) => {
+    .on("error", (error) => {
       logger.error(`Not valid monitoring csv file provided: ${error}`)
     })
 }

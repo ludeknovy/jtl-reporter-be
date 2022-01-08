@@ -1,16 +1,15 @@
-import { Request, Response, NextFunction } from "express"
+import { Request, Response } from "express"
 import { db } from "../../../db/db"
 import { logger } from "../../../logger"
 import { createNewItem } from "../../queries/items"
 import { ItemStatus, ReportStatus } from "../../queries/items.model"
 
-export const createItemAsyncController = async (req: Request, res: Response, next: NextFunction) => {
+export const createItemAsyncController = async (req: Request, res: Response) => {
   const { environment, note, status = ItemStatus.None, hostname } = req.body
   const { scenarioName, projectName } = req.params
 
   logger.info(`Creating new item for scenario: ${scenarioName}`)
   try {
-    let itemId
 
     const item = await db.one(createNewItem(
       scenarioName,
@@ -22,7 +21,7 @@ export const createItemAsyncController = async (req: Request, res: Response, nex
       hostname,
       ReportStatus.InProgress
     ))
-    itemId = item.id
+    const itemId = item.id
     logger.info(`New item for scenario: ${scenarioName} created with id: ${itemId}`)
     res.status(201).send({ itemId })
   } catch(e) {

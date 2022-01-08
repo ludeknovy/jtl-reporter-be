@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express"
-import { ItemStatus } from "../../queries/items.model"
+import { ItemStatus, ReportStatus } from "../../queries/items.model"
 import { transformDataForDb } from "../../data-stats/prepare-data"
 import { db } from "../../../db/db"
 import { createNewItem, updateItem } from "../../queries/items"
@@ -7,7 +7,6 @@ import * as multer from "multer"
 import * as boom from "boom"
 import * as fs from "fs"
 import * as csv from "fast-csv"
-import { ReportStatus } from "../../queries/items.model"
 import { logger } from "../../../logger"
 import { itemDataProcessing } from "./shared/item-data-processing"
 import * as pgp from "pg-promise"
@@ -27,7 +26,7 @@ const upload = multer(
 export const createItemController = (req: Request, res: Response, next: NextFunction) => {
   upload(req, res, async error => {
     const { environment, note, status = ItemStatus.None, hostname } = req.body
-    const { kpi, monitoring } = <any>req.files
+    const { kpi, monitoring } = req.files as { kpi: unknown; monitoring: unknown}
     const { scenarioName, projectName } = req.params
     if (error) {
       return next(boom.badRequest(error.message))
@@ -46,7 +45,6 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
     }
     logger.info(`Starting new item processing for scenario: ${scenarioName}`)
     try {
-      let itemId
 
       const kpiFilename = kpi[0]?.path
       const monitoringFileName = monitoring?.[0]?.path
@@ -62,7 +60,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
         hostname,
         ReportStatus.InProgress
       ))
-      itemId = item.id
+      const itemId = item.id
 
       res.status(200).send({ itemId })
 
@@ -149,14 +147,14 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
             })
             logger.info(`Done ${rowCount} in ${(Date.now() - parsingStart) / 1000} seconds`)
 
-          } catch(error) {
+          } catch(onEndError) {
             await db.none(updateItem(itemId, ReportStatus.Error, null))
-            logger.error(`Error while processing item: ${itemId}: ${error}`)
+            logger.error(`Error while processing item: ${itemId}: ${onEndError}`)
           }
         })
-        .on("error", async (error) => {
+        .on("error", async (onErrorError) => {
           await db.none(updateItem(itemId, ReportStatus.Error, null))
-          logger.error(`Not valid csv file provided: ${error}`)
+          logger.error(`Not valid csv file provided: ${onErrorError}`)
         })
     } catch(e) {
       logger.error(e)

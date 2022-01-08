@@ -3,7 +3,8 @@ import * as moment from "moment"
 import { logger } from "../../logger"
 
 // eslint-disable-next-line max-len
-export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, statusCodeDistr: StatusCodeDistribution[], responseFailures: ResponseMessageFailures[]): { overview: Overview; labelStats; sutOverview: Array<{}> } => {
+export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, statusCodeDistr: StatusCodeDistribution[], responseFailures: ResponseMessageFailures[]):
+    { overview: Overview; labelStats; sutOverview: Array<Record<string, unknown>> } => {
   try {
     const startDate = new Date(overviewData.start)
     const endDate = new Date(overviewData.end)
@@ -173,6 +174,7 @@ export const calculateDistributedThreads = (distributedThreads: DistributedThrea
 export const stringToNumber = (input: string, radix: number) => {
   const result = parseInt(input, radix)
   if (isNaN(result)) {
+    // eslint-disable-next-line no-throw-literal
     throw ("not a number")
   }
   return result

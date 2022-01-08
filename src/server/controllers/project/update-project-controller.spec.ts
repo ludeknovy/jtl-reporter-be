@@ -1,4 +1,4 @@
-import { Response, NextFunction } from "express"
+import { Response } from "express"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 import { updateProjectController } from "./update-project-controller"
 jest.mock("../../../db/db")
@@ -12,7 +12,6 @@ const mockResponse = () => {
 
 describe("updateProjectController", () => {
   it("should return project settings", async function () {
-    const nextFunction: NextFunction = jest.fn()
     const response = mockResponse()
     const querySpy = jest.spyOn(require("../../queries/projects"), "updateProjectName")
 
@@ -21,7 +20,7 @@ describe("updateProjectController", () => {
       body: { projectName: "newProjectName", topMetricsSettings: { errorRate: true } },
     }
     await updateProjectController(request as unknown as IGetUserAuthInfoRequest,
-      response as unknown as Response, nextFunction)
+      response as unknown as Response)
     expect(response.send).toHaveBeenCalledTimes(1)
     expect(querySpy).toBeCalledWith("project", "newProjectName", { errorRate: true })
   })

@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers, max-lines */
+
+
 import {
   calculateDistributedThreads,
   prepareChartDataForSaving,

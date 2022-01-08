@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 // eslint-disable-next-line max-len
 export const createNewItem = (scenarioName, startTime, environment, note, status, projectName, hostname, reportStatus) => {
   return {
@@ -46,13 +47,6 @@ export const findItemStats = (testItem) => {
   return {
     text: "SELECT stats, overview, sut as \"sutOverview\" FROM jtl.item_stat WHERE item_id = $1",
     values: [testItem],
-  }
-}
-
-export const updateNote = (itemId, projectName, note) => {
-  return {
-    text: "UPDATE jtl.items SET note = $3 WHERE id = $1 AND project_id = $2;",
-    values: [itemId, projectName, note],
   }
 }
 
@@ -427,7 +421,7 @@ export const upsertItemChartSettings = (itemId, userId, chartSetting) => {
 
 export const getItemChartSettings = (itemId, userId) => {
   return {
-    text: "SELECT chart_settings as 'settings' FROM jtl.user_item_chart_settings WHERE item_id = $1 AND user_id = $2;",
+    text: "SELECT chart_settings as settings FROM jtl.user_item_chart_settings WHERE item_id = $1 AND user_id = $2;",
     values: [itemId, userId],
   }
 }

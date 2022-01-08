@@ -12,6 +12,7 @@ import * as http from "http"
 import { config } from "./server/config"
 import { StatusCodes } from "./server/utils/status-codes"
 import { NextFunction, Request, Response } from "express"
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const swaggerDocument = require("../openapi.json")
 
 const PORT = 5000;
@@ -25,6 +26,8 @@ export class App {
     this.app = express()
     this.config()
     this.router.getRoutes(this.app)
+    this.databaseErrorHandler()
+    this.errorHandler()
   }
 
   private config(): void {
@@ -47,13 +50,11 @@ export class App {
       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, x-access-token, Content-Type, Accept")
       next()
     })
-    this.databaseErrorHandler()
-    // this.errorHandler()
-
   }
 
   private errorHandler() {
-    this.app.use(function (error: Error, req: Request, res: Response) {
+    // eslint-disable-next-line no-unused-vars
+    this.app.use(function (error: Error, req: Request, res: Response, next: NextFunction) {
       console.log("ERROR_HANDLER")
       if (boom.isBoom(error)) {
         const { payload: { message } } = error.output

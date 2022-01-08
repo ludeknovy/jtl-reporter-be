@@ -15,18 +15,18 @@ export class UsersRoutes {
         authenticationMiddleware,
         bodySchemaValidator(newUserSchema),
         // eslint-disable-next-line max-len
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await createNewUserController(req, res, next)))
+        wrapAsync( (req: Request, res: Response, next: NextFunction) => createNewUserController(req, res, next)))
 
       .get(
         authenticationMiddleware,
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getUsersController(req, res))
+        wrapAsync( (req: Request, res: Response) => getUsersController(req, res))
       )
 
     app.route("/api/users/:userId")
       .delete(
         authenticationMiddleware,
         paramsSchemaValidator(userSchema),
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteUserController(req, res))
+        wrapAsync( (req: Request, res: Response) => deleteUserController(req, res))
       )
   }
 }

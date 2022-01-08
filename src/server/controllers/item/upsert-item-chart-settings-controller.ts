@@ -2,7 +2,7 @@ import { Response } from "express"
 import { db } from "../../../db/db"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 import { upsertItemChartSettings } from "../../queries/items"
-import {StatusCodes} from "../../utils/status-codes";
+import { StatusCodes } from "../../utils/status-codes"
 
 
 export const upsertItemChartSettingsController = async (

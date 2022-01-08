@@ -6,7 +6,6 @@ export const passwordMatch = async (password, hashPassword): Promise<boolean> =>
   return match
 }
 
-export const hashPassword = async (password): Promise<string> => {
-  const hashPassword = await bcrypt.hash(password, SALT_ROUNDS)
-  return hashPassword
+export const hashPassword = (password): Promise<string> => {
+  return bcrypt.hash(password, SALT_ROUNDS)
 }

@@ -11,6 +11,7 @@ import { findShareToken } from "../queries/items"
 
 const UNAUTHORIZED_MSG = "The token you provided is invalid"
 
+// eslint-disable-next-line complexity
 export const authenticationMiddleware = async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
 
   const { token } = req.query

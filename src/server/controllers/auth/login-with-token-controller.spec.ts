@@ -1,7 +1,6 @@
 import { NextFunction, Response } from "express"
 import { db } from "../../../db/db"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
-import { passwordMatch } from "./helper/passwords"
 import { loginWithTokenController } from "./login-with-token-controller"
 
 jest.mock("../../../db/db")

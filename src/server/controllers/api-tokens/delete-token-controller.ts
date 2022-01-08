@@ -1,9 +1,10 @@
-import { Request, Response, NextFunction } from "express"
+import { Request, Response } from "express"
 import { db } from "../../../db/db"
 import { deleteToken } from "../../queries/api-tokens"
+import { StatusCodes } from "../../utils/status-codes"
 
-export const deleteTokenController = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteTokenController = async (req: Request, res: Response) => {
   const { id } = req.body
   await db.query(deleteToken(id))
-  return res.status(204).send()
+  return res.status(StatusCodes.NoContent).send()
 }

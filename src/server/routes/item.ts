@@ -102,7 +102,7 @@ export class ItemsRoutes {
         authenticationMiddleware,
         paramsSchemaValidator(scenarioParamsSchema),
         // eslint-disable-next-line max-len
-        wrapAsync(async (req: Request, res: Response, next) =>  await getProcessingItemsController(req, res)))
+        wrapAsync( (req: Request, res: Response) => getProcessingItemsController(req, res)))
 
     app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/custom-chart-settings")
       .post(
@@ -110,11 +110,11 @@ export class ItemsRoutes {
         paramsSchemaValidator(paramsSchema),
         bodySchemaValidator(upsertUserItemChartSettings),
         // eslint-disable-next-line max-len
-        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response, next) => upsertItemChartSettingsController(req, res))
+        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => upsertItemChartSettingsController(req, res))
       )
       .get(authenticationMiddleware,
         paramsSchemaValidator(paramsSchema),
         // eslint-disable-next-line max-len
-        wrapAsync( async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => await getItemChartSettingsController(req, res, next)))
+        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => getItemChartSettingsController(req, res)))
   }
 }
