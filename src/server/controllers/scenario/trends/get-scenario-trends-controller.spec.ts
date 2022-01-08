@@ -1,4 +1,4 @@
-import { NextFunction, Response } from "express"
+import { Response } from "express"
 import { IGetUserAuthInfoRequest } from "../../../middleware/request.model"
 import { db } from "../../../../db/db"
 import { getScenarioTrendsController } from "./get-scenario-trends-controller"

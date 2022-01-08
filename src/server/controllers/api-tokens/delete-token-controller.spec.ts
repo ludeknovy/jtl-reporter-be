@@ -1,4 +1,4 @@
-import { Response, NextFunction } from "express"
+import { Response } from "express"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 import { deleteTokenController } from "./delete-token-controller"
 jest.mock("../../../db/db")
@@ -11,7 +11,6 @@ const mockResponse = () => {
 
 describe("deleteTokenController", () => {
   it("should call delete token query", async () => {
-    const nextFunction: NextFunction = jest.fn()
     const response = mockResponse()
     const querySpy = jest.spyOn(require("../../queries/api-tokens"), "deleteToken")
     const request = {

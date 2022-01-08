@@ -1,5 +1,5 @@
 import { getItemLinksController } from "./get-item-share-tokens-controller"
-import { Request, Response, NextFunction } from "express"
+import { Request, Response } from "express"
 jest.mock("../../../../db/db")
 const mockResponse = () => {
   const res: Partial<Response> = {}
@@ -10,7 +10,6 @@ const mockResponse = () => {
 
 describe("getItemLinksController", () => {
   it("should fetch data from db", async () => {
-    const nextFunction: NextFunction = jest.fn()
     const response = mockResponse()
     const querySpy = jest.spyOn(require("../../../queries/items"), "selectShareTokens")
     const request = {

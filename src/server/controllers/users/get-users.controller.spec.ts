@@ -1,5 +1,5 @@
 import { db } from "../../../db/db"
-import { NextFunction, Response } from "express"
+import { Response } from "express"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 import { getUsersController } from "./get-users-controller"
 
@@ -15,7 +15,6 @@ describe("getUsersController", () => {
   it("should return query output", async function () {
     const users = ["test"];
     (db.query as any).mockResolvedValue(users)
-    const nextFunction: NextFunction = jest.fn()
     const response = mockResponse()
     const request = {}
     await getUsersController(

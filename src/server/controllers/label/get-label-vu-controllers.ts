@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express"
 import { getMaxVuForLabel } from "../../queries/items"
 import { db } from "../../../db/db"
+import { StatusCode } from "../../utils/status-code"
 
 export const getLabelVirtualUsersController = async (req: Request, res: Response, next: NextFunction) => {
   const { projectName, scenarioName, itemId, label } = req.params
@@ -9,7 +10,7 @@ export const getLabelVirtualUsersController = async (req: Request, res: Response
     const result = await db.query(getMaxVuForLabel(
       scenarioName, projectName, label,
       itemId, environment))
-    res.status(200).send({ result })
+    res.status(StatusCode.Ok).send({ result })
   } catch(error) {
     return next(error)
   }

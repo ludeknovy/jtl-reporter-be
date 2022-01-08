@@ -1,6 +1,7 @@
 import { Request, Response } from "express"
 import { db } from "../../../db/db"
 import { findScenarios, findScenariosData } from "../../queries/scenario"
+import { StatusCode } from "../../utils/status-code"
 
 export const getScenariosController = async (req: Request, res: Response) => {
   const { projectName } = req.params
@@ -22,5 +23,5 @@ export const getScenariosController = async (req: Request, res: Response) => {
       groupedData.push({ name: scenario.name, id: scenario.id, data: [] })
     }
   })
-  res.status(200).send(groupedData)
+  res.status(StatusCode.Ok).send(groupedData)
 }

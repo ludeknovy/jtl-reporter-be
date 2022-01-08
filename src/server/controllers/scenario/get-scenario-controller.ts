@@ -1,11 +1,12 @@
 import { Request, Response } from "express"
 import { db } from "../../../db/db"
 import { getScenario } from "../../queries/scenario"
+import { StatusCode } from "../../utils/status-code"
 
 export const getScenarioController = async (req: Request, res: Response) => {
   const { projectName, scenarioName } = req.params
   const scenario = await db.oneOrNone(getScenario(projectName, scenarioName))
-  res.status(200).send({
+  res.status(StatusCode.Ok).send({
     name: scenario.name,
     analysisEnabled: scenario.analysis_enabled,
     zeroErrorToleranceEnabled: scenario.zero_error_tolerance_enabled,

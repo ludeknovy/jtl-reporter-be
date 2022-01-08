@@ -2,6 +2,7 @@ import { Request, Response } from "express"
 import { getLabelHistoryForVu, getLabelHistory } from "../../queries/items"
 import * as moment from "moment"
 import { db } from "../../../db/db"
+import { StatusCode } from "../../utils/status-code"
 
 export const getLabelTrendController = async (req: Request, res: Response) => {
   const { projectName, scenarioName, itemId, label } = req.params
@@ -27,7 +28,7 @@ export const getLabelTrendController = async (req: Request, res: Response) => {
     accumulator.threads.push(current.max_vu)
     return accumulator
   }, { timePoints: [], n0: [], n5: [], n9: [], errorRate: [], throughput: [], threads: [] })
-  res.status(200).send({
+  res.status(StatusCode.Ok).send({
     timePoints,
     n0, n5, n9,
     errorRate,

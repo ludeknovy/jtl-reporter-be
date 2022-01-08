@@ -4,9 +4,11 @@ import { itemsForScenarioCount, findItemsForScenario } from "../../queries/scena
 import { db } from "../../../db/db"
 import { StatusCode } from "../../utils/status-code"
 
+const LIMIT = 15
+
 export const getItemsController = async (req: Request, res: Response) => {
   const { projectName, scenarioName } = req.params
-  const { limit = 15, offset = 0 } = req.query
+  const { limit = LIMIT, offset = 0 } = req.query
   const { total } = await db.one(itemsForScenarioCount(projectName, scenarioName))
   const ids = await db.any(findItemsForScenario(projectName, scenarioName, limit, offset))
   const idsBaseUpdate = ids.map(_ => {

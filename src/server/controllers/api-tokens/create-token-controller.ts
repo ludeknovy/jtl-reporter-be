@@ -3,7 +3,7 @@ import { db } from "../../../db/db"
 import * as uuid from "uuid"
 import { createNewApiToken } from "../../queries/api-tokens"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
-import {StatusCode} from "../../utils/status-code";
+import { StatusCode } from "../../utils/status-code"
 
 export const createTokenController = async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
   const { description } = req.body

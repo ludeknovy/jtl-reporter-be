@@ -1,4 +1,5 @@
 export const roundNumberTwoDecimals = number => {
+  // eslint-disable-next-line @typescript-eslint/no-magic-numbers
   return Math.round(number * 100) / 100
 }
 

@@ -1,4 +1,4 @@
-import { Response, NextFunction } from "express"
+import { Response } from "express"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 import { getProjectController } from "./get-project-controller"
 import { db } from "../../../db/db"
@@ -14,7 +14,6 @@ const mockResponse = () => {
 describe("getProjectController", () => {
   it("should return project settings", async function () {
     const responseStub = { name: "project" }
-    const nextFunction: NextFunction = jest.fn()
     const response = mockResponse()
     const request = {
       params: { projectName: "project" },

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import { Response, NextFunction } from "express"
+import { Response } from "express"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 import { getLabelTrendController } from "./get-label-trend-controller"
 import { db } from "../../../db/db"
@@ -15,7 +15,6 @@ const mockResponse = () => {
 
 describe("getItemChartSettingsController", () => {
   it("should fetch getLabelHistoryForVu from db", async () => {
-    const nextFunction: NextFunction = jest.fn()
     const response = mockResponse()
     const querySpy = jest.spyOn(require("../../queries/items"), "getLabelHistoryForVu")
     const request = {
@@ -29,7 +28,6 @@ describe("getItemChartSettingsController", () => {
     expect(response.send).toHaveBeenCalledTimes(1)
   })
   it("should fetch getLabelHistory from db", async () => {
-    const nextFunction: NextFunction = jest.fn()
     const response = mockResponse()
     const querySpy = jest.spyOn(require("../../queries/items"), "getLabelHistory")
     const request = {
@@ -44,7 +42,6 @@ describe("getItemChartSettingsController", () => {
     expect(response.send).toHaveBeenCalledTimes(1)
   })
   it("should sort query output from oldest to newest", async () => {
-    const nextFunction: NextFunction = jest.fn()
     const response = mockResponse()
     const request = {
       params: { projectName: "project", scenarioName: "scenario", itemId: "id", label: "test-label" },

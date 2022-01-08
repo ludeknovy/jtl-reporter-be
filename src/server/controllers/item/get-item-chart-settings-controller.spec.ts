@@ -1,4 +1,4 @@
-import { Response, NextFunction } from "express"
+import { Response } from "express"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 import { getItemChartSettingsController } from "./get-item-chart-settings-controller"
 jest.mock("../../../db/db")
@@ -11,7 +11,6 @@ const mockResponse = () => {
 
 describe("getItemChartSettingsController", () => {
   it("should fetch data from db", async () => {
-    const nextFunction: NextFunction = jest.fn()
     const response = mockResponse()
     const querySpy = jest.spyOn(require("../../queries/items"), "getItemChartSettings")
     const request = {

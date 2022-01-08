@@ -1,6 +1,7 @@
 import { Request, Response } from "express"
 import { db } from "../../../../db/db"
 import { scenarioTrends } from "../../../queries/scenario"
+import { StatusCode } from "../../../utils/status-code"
 
 export const getScenarioTrendsController = async (req: Request, res: Response) => {
   const { projectName, scenarioName } = req.params
@@ -16,5 +17,5 @@ export const getScenarioTrendsController = async (req: Request, res: Response) =
       },
     }
   })
-  res.status(200).send(networkAdjustedData)
+  res.status(StatusCode.Ok).send(networkAdjustedData)
 }

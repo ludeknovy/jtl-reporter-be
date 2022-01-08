@@ -11,20 +11,25 @@ import { logger } from "../../../logger"
 import { itemDataProcessing } from "./shared/item-data-processing"
 import * as pgp from "pg-promise"
 import { processMonitoringCsv } from "./utils/process-monitoring-csv"
+import { StatusCode } from "../../utils/status-code"
 
 const pg = pgp()
 
 const upload = multer(
   {
     dest: "./uploads",
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     limits: { fieldSize: 2048 * 1024 * 1024 },
   }).fields([
   { name: "kpi", maxCount: 1 },
   { name: "monitoring", maxCount: 1 },
 ])
 
+const SECONDS_DIVISOR = 1000
+
 export const createItemController = (req: Request, res: Response, next: NextFunction) => {
   upload(req, res, async error => {
+    const HOSTNAME_LENGTH = 200
     const { environment, note, status = ItemStatus.None, hostname } = req.body
     const { kpi, monitoring } = req.files as { kpi: unknown; monitoring: unknown}
     const { scenarioName, projectName } = req.params
@@ -40,7 +45,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
     if (!Object.values(ItemStatus).some(_ => _ === status)) {
       return next(boom.badRequest("invalid status type"))
     }
-    if (hostname && hostname.lenght > 200) {
+    if (hostname && hostname.lenght > HOSTNAME_LENGTH) {
       return next(boom.badRequest("too long hostname. max length is 200."))
     }
     logger.info(`Starting new item processing for scenario: ${scenarioName}`)
@@ -62,7 +67,7 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
       ))
       const itemId = item.id
 
-      res.status(200).send({ itemId })
+      res.status(StatusCode.Ok).send({ itemId })
 
       const columnSet = new pg.helpers.ColumnSet([
         "elapsed", "success", "bytes", "label",
@@ -116,11 +121,11 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
       const parsingStart = Date.now()
 
       await processMonitoringCsv(monitoringFileName, itemId)
-
+      const BUFFER_SIZE = 10000
       const csvStream = fs.createReadStream(kpiFilename)
         .pipe(csv.parse({ headers: true }))
         .on("data", async row => {
-          if (tempBuffer.length === (10000)) {
+          if (tempBuffer.length === BUFFER_SIZE) {
             csvStream.pause()
             const query = pg.helpers.insert(tempBuffer, columnSet)
             await db.none(query)
@@ -140,12 +145,12 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
 
             fs.unlinkSync(kpiFilename)
 
-            logger.info(`Parsed ${rowCount} records in ${(Date.now() - parsingStart) / 1000} seconds`)
+            logger.info(`Parsed ${rowCount} records in ${(Date.now() - parsingStart) / SECONDS_DIVISOR } seconds`)
             await itemDataProcessing({
               itemId,
               projectName, scenarioName,
             })
-            logger.info(`Done ${rowCount} in ${(Date.now() - parsingStart) / 1000} seconds`)
+            logger.info(`Done ${rowCount} in ${(Date.now() - parsingStart) / SECONDS_DIVISOR } seconds`)
 
           } catch(onEndError) {
             await db.none(updateItem(itemId, ReportStatus.Error, null))

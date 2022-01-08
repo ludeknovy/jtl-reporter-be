@@ -3,6 +3,7 @@ import { createUser } from "../../queries/auth"
 import { db } from "../../../db/db"
 import * as boom from "boom"
 import { hashPassword } from "../auth/helper/passwords"
+import { StatusCode } from "../../utils/status-code"
 
 
 export const createNewUserController = async (req: Request, res: Response, next: NextFunction) => {
@@ -10,7 +11,7 @@ export const createNewUserController = async (req: Request, res: Response, next:
 
   try {
     await createUserInDB(username, password)
-    res.status(201).send()
+    res.status(StatusCode.Created).send()
   } catch(error) {
     if (error.routine === "_bt_check_unique") {
       return next(boom.conflict("Username already exists"))

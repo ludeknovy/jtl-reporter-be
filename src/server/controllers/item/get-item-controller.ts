@@ -2,6 +2,7 @@ import { Request, Response } from "express"
 import { db } from "../../../db/db"
 import { findMinMax } from "../../data-stats/helper/stats-fc"
 import { findItem, findItemStats, getMonitoringData } from "../../queries/items"
+import { StatusCode } from "../../utils/status-code"
 
 
 export const getItemController = async (req: Request, res: Response) => {
@@ -29,7 +30,7 @@ export const getItemController = async (req: Request, res: Response) => {
 
   const maxCpu = findMinMax(monitoring.map(_ => _.avgCpu)).max
 
-  res.status(200).send({
+  res.status(StatusCode.Ok).send({
     overview, sutOverview, statistics, status,
     plot, note, environment, hostname, reportStatus, thresholds, analysisEnabled,
     baseId: base_id, isBase: base_id === itemId, zeroErrorToleranceEnabled, topMetricsSettings,

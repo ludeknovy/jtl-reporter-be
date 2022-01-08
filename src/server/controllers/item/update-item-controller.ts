@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express"
 import { updateTestItemInfo, removeCurrentBaseFlag, setBaseFlag } from "../../queries/items"
 import { db } from "../../../db/db"
+import { StatusCode } from "../../utils/status-code"
 
 
 export const updateItemController = async (req: Request, res: Response, next: NextFunction) => {
@@ -14,7 +15,7 @@ export const updateItemController = async (req: Request, res: Response, next: Ne
       await db.none(setBaseFlag(itemId, scenarioName, projectName))
     }
     await db.query("COMMIT")
-    res.status(204).send()
+    res.status(StatusCode.NoContent).send()
   } catch(error) {
     await db.query("ROLLBACK")
     return next(error)

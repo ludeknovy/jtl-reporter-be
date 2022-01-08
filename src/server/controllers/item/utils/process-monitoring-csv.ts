@@ -6,6 +6,7 @@ import { transformMonitoringDataForDb } from "../../../data-stats/prepare-data"
 import { db } from "../../../../db/db"
 
 const pg = pgp()
+const BUFFER_SIZE = 1000
 
 
 export const processMonitoringCsv = (filename: string, itemId: string) => {
@@ -20,11 +21,10 @@ export const processMonitoringCsv = (filename: string, itemId: string) => {
       prop: "itemId",
     },
   ], { table: new pg.helpers.TableName({ table: "monitor", schema: "jtl" }) })
-
   const csvStream = fs.createReadStream(filename)
     .pipe(csv.parse({ headers: true }))
     .on("data", async row => {
-      if (tempBuffer.length === (1000)) {
+      if (tempBuffer.length === (BUFFER_SIZE)) {
         csvStream.pause()
         const query = pg.helpers.insert(tempBuffer, columnSet)
         await db.none(query)

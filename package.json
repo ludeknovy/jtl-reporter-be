@@ -11,7 +11,7 @@
     "test:contract": "jest --config=contract.config.js -w=5",
     "test:integration": "jest --forceExit --config=integration.config.js --runInBand",
     "lint": "eslint -c .eslintrc --quiet --ext .ts .",
-    "lint:fix": "eslint -c .eslintrc --ext .ts . --fix",
+    "lint:fix": "eslint -c .eslintrc --quiet --ext .ts . --fix",
     "ts:check": "tsc --noEmit"
   },
   "keywords": [],

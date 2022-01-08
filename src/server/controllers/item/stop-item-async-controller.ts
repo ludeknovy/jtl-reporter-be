@@ -4,10 +4,11 @@ import { logger } from "../../../logger"
 import { updateItem } from "../../queries/items"
 import { ReportStatus } from "../../queries/items.model"
 import { itemDataProcessing } from "./shared/item-data-processing"
+import { StatusCode } from "../../utils/status-code"
 
 export const stopItemAsyncController = async (req: Request, res: Response) => {
   const { projectName, scenarioName, itemId } = req.params
-  res.status(200).send()
+  res.status(StatusCode.Ok).send()
 
   logger.info(`Stopping async item: ${itemId}`)
   try {
