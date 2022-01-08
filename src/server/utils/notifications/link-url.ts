@@ -1,10 +1,10 @@
-import { config } from '../../config';
+import { config } from "../../config"
 
 export const linkUrl = (projectName, scenarioName, id): string | undefined => {
   if (!config.feUrl) {
-    return;
+    return
   }
-  const baseUrl = config.feUrl;
-  const url = `${baseUrl}/project/${projectName}/scenario/${scenarioName}/item/${id}`;
-  return url;
-};
+  const baseUrl = config.feUrl
+  const url = `${baseUrl}/project/${projectName}/scenario/${scenarioName}/item/${id}`
+  return url
+}

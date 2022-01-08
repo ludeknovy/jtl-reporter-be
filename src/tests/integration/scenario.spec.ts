@@ -1,49 +1,50 @@
-import * as request from 'supertest';
-import { States } from '../contract/states.model';
-import { stateSetup, userSetup } from './helper/state';
+import * as request from "supertest"
+import { States } from "../contract/states.model"
+import { stateSetup, userSetup } from "./helper/state"
+import { StatusCodes } from "../../server/utils/status-codes"
 
-describe('Scenario', () => {
-  let credentials;
+describe("Scenario", () => {
+  let credentials
   beforeAll(async () => {
-    ({ data: credentials } = await userSetup());
-  });
-  describe('POST /projects/{projectName}/scenarios', () => {
-    it('should be able to create new scenario', async () => {
-      await stateSetup(States.ExistingProject);
+    ({ data: credentials } = await userSetup())
+  })
+  describe("POST /projects/{projectName}/scenarios", () => {
+    it("should be able to create new scenario", async () => {
+      await stateSetup(States.ExistingProject)
       await request(__server__)
-        .post('/api/projects/test-project/scenarios')
+        .post("/api/projects/test-project/scenarios")
         .set(__tokenHeaderKey__, credentials.token)
-        .send({ scenarioName: 'test-scenario' })
-        .set('Accept', 'application/json')
-        .expect(201);
-    });
-    it('should not be able to create two scenarios with same name', async () => {
-      await stateSetup(States.ExistingScenario);
+        .send({ scenarioName: "test-scenario" })
+        .set("Accept", "application/json")
+        .expect(StatusCodes.Created)
+    })
+    it("should not be able to create two scenarios with same name", async () => {
+      await stateSetup(States.ExistingScenario)
       await request(__server__)
-        .post('/api/projects/test-project/scenarios')
+        .post("/api/projects/test-project/scenarios")
         .set(__tokenHeaderKey__, credentials.token)
-        .send({ scenarioName: 'test-scenario' })
-        .set('Accept', 'application/json')
-        .expect(409);
-    });
-    it('should return 400 when no scenarioName provided', async () => {
-      await stateSetup(States.ExistingScenario);
+        .send({ scenarioName: "test-scenario" })
+        .set("Accept", "application/json")
+        .expect(StatusCodes.Conflict)
+    })
+    it("should return 400 when no scenarioName provided", async () => {
+      await stateSetup(States.ExistingScenario)
       await request(__server__)
-        .post('/api/projects/test-project/scenarios')
+        .post("/api/projects/test-project/scenarios")
         .set(__tokenHeaderKey__, credentials.token)
         .send({})
-        .set('Accept', 'application/json')
-        .expect(400);
-    });
-  });
-  describe('PUT /projects/{projectName}/scenarios/{scenarioName}', () => {
-    it('should be able to update scenario', async () => {
-      await stateSetup(States.ExistingScenario);
+        .set("Accept", "application/json")
+        .expect(StatusCodes.BadRequest)
+    })
+  })
+  describe("PUT /projects/{projectName}/scenarios/{scenarioName}", () => {
+    it("should be able to update scenario", async () => {
+      await stateSetup(States.ExistingScenario)
       await request(__server__)
-        .put('/api/projects/test-project/scenarios/test-scenario')
+        .put("/api/projects/test-project/scenarios/test-scenario")
         .set(__tokenHeaderKey__, credentials.token)
         .send({
-          scenarioName: 'test-scenario',
+          scenarioName: "test-scenario",
           analysisEnabled: false,
           zeroErrorToleranceEnabled: true,
           deleteSamples: false,
@@ -51,21 +52,21 @@ describe('Scenario', () => {
             enabled: true,
             percentile: 4.2,
             errorRate: 4.2,
-            throughput: 8.3
-          }
+            throughput: 8.3,
+          },
         })
-        .set('Accept', 'application/json')
-        .expect(204);
-    });
-  });
-  describe('DELETE /projects/{projectName}/scenarios/{scenarioName}', () => {
-    it('should be able to delete scenario', async () => {
-      await stateSetup(States.ExistingScenario);
+        .set("Accept", "application/json")
+        .expect(StatusCodes.Created)
+    })
+  })
+  describe("DELETE /projects/{projectName}/scenarios/{scenarioName}", () => {
+    it("should be able to delete scenario", async () => {
+      await stateSetup(States.ExistingScenario)
       await request(__server__)
-        .delete('/api/projects/test-project/scenarios/test-scenario')
+        .delete("/api/projects/test-project/scenarios/test-scenario")
         .set(__tokenHeaderKey__, credentials.token)
-        .set('Accept', 'application/json')
-        .expect(204);
-    });
-  });
-});
+        .set("Accept", "application/json")
+        .expect(StatusCodes.Created)
+    })
+  })
+})

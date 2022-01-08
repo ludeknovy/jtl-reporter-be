@@ -1,94 +1,95 @@
-import * as request from 'supertest';
-import { userSetup } from './helper/state';
-import { routes } from './helper/routes';
+import * as request from "supertest"
+import { userSetup } from "./helper/state"
+import { routes } from "./helper/routes"
+import { StatusCodes } from "../../server/utils/status-codes"
 
-describe('Api tokens', () => {
-  let credentials;
+describe("Api tokens", () => {
+  let credentials
   beforeAll(async () => {
-    ({ data: credentials } = await userSetup());
-  });
-  describe('POST /api-tokens', () => {
-    it('should not be able to create new api token as unathorized user', async () => {
+    ({ data: credentials } = await userSetup())
+  })
+  describe("POST /api-tokens", () => {
+    it("should not be able to create new api token as unathorized user", async () => {
       await request(__server__)
         .post(routes.apiTokens)
         .send({
-          description: 'new-api-token'
+          description: "new-api-token",
         })
-        .expect(401);
-    });
-    it('should not be able to create token when no description provided', async () => {
+        .expect(StatusCodes.Unathorized)
+    })
+    it("should not be able to create token when no description provided", async () => {
       await request(__server__)
         .post(routes.apiTokens)
         .set(__tokenHeaderKey__, credentials.token)
         .send({
-          description: null
+          description: null,
         })
-        .expect(400);
-    });
-  });
-  it('should be able to create new api token', async () => {
+        .expect(StatusCodes.BadRequest)
+    })
+  })
+  it("should be able to create new api token", async () => {
     await request(__server__)
       .post(routes.apiTokens)
       .set(__tokenHeaderKey__, credentials.token)
       .send({
-        description: 'new-api-token'
+        description: "new-api-token",
       })
-      .expect(201);
+      .expect(StatusCodes.Created)
     await request(__server__)
       .get(routes.apiTokens)
       .set(__tokenHeaderKey__, credentials.token)
       .send()
       .then(({ body }) => {
-        expect(body.length).toEqual(1);
-      });
-  });
+        expect(body.length).toEqual(1)
+      })
+  })
 
-  describe('GET /api-tokens', () => {
-    it('should not be able to get api tokens as unathorized user', async () => {
+  describe("GET /api-tokens", () => {
+    it("should not be able to get api tokens as unathorized user", async () => {
       await request(__server__)
         .get(routes.apiTokens)
         .send()
-        .expect(401);
-    });
-    it('should be able to get api tokens', async () => {
+        .expect(StatusCodes.Unathorized)
+    })
+    it("should be able to get api tokens", async () => {
       await request(__server__)
         .get(routes.apiTokens)
         .set(__tokenHeaderKey__, credentials.token)
         .send()
-        .expect(200);
-    });
-  });
-  describe('DELETE /api-tokens', () => {
-    let tokenId;
+        .expect(StatusCodes.Ok)
+    })
+  })
+  describe("DELETE /api-tokens", () => {
+    let tokenId
     beforeAll(async () => {
       await request(__server__)
         .get(routes.apiTokens)
         .set(__tokenHeaderKey__, credentials.token)
         .send()
-        .expect(200)
+        .expect(StatusCodes.Ok)
         .then(({ body }) => {
-          tokenId = body[0].id;
-        });
-    });
-    it('should not be able to delete api token as uanthorized user', async () => {
+          tokenId = body[0].id
+        })
+    })
+    it("should not be able to delete api token as uanthorized user", async () => {
       await request(__server__)
         .delete(routes.apiTokens)
         .send()
-        .expect(401);
-    });
-    it('should be able to delete api token', async () => {
+        .expect(StatusCodes.Unathorized)
+    })
+    it("should be able to delete api token", async () => {
       await request(__server__)
         .delete(routes.apiTokens)
         .set(__tokenHeaderKey__, credentials.token)
         .send({ id: tokenId })
-        .expect(204);
-    });
-    it('should return 400 when no token id provided', async () => {
+        .expect(StatusCodes.NoContent)
+    })
+    it("should return 400 when no token id provided", async () => {
       await request(__server__)
         .delete(routes.apiTokens)
         .set(__tokenHeaderKey__, credentials.token)
         .send({ id: null })
-        .expect(400);
-    });
-  });
-});
+        .expect(StatusCodes.BadRequest)
+    })
+  })
+})

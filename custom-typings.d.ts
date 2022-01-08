@@ -1,3 +1,4 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-declare const __server__: any;
-declare const __tokenHeaderKey__: any;
+// eslint-disable-next-line no-unused-vars
+declare const __server__: any
+// eslint-disable-next-line no-unused-vars
+declare const __tokenHeaderKey__: any

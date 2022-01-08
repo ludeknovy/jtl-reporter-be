@@ -8,9 +8,9 @@ export const findItemsForScenario = (projectName, scenarioName, limit, offset) =
     WHERE s.name = $2 AND p.project_name = $1 AND it.report_status = 'ready'
     ORDER BY start_time DESC
     LIMIT $3 OFFSET $4`,
-    values: [projectName, scenarioName, limit, offset]
-  };
-};
+    values: [projectName, scenarioName, limit, offset],
+  }
+}
 
 export const itemsForScenarioCount = (projectName, scenarioName) => {
   return {
@@ -19,17 +19,17 @@ export const itemsForScenarioCount = (projectName, scenarioName) => {
     LEFT JOIN jtl.item_stat as st ON st.item_id = it.id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
     WHERE s.name = $2 AND p.project_name = $1 AND report_status = 'ready';`,
-    values: [projectName, scenarioName]
-  };
-};
+    values: [projectName, scenarioName],
+  }
+}
 
 export const getScenario = (projectName, scenarioName) => {
   return {
     text: `SELECT * FROM jtl.scenario
     WHERE name = $2 AND project_id = (SELECT id FROM jtl.projects WHERE project_name = $1);`,
-    values: [projectName, scenarioName]
-  };
-};
+    values: [projectName, scenarioName],
+  }
+}
 
 
 export const updateScenario = (projectName, scenarioName, name, analysisEnabled, thresholds, deleteSamples, zeroErrorToleranceEnabled) => {
@@ -39,9 +39,9 @@ export const updateScenario = (projectName, scenarioName, name, analysisEnabled,
     SET name = $3, analysis_enabled=$4, threshold_enabled = $5, threshold_percentile = $6, threshold_throughput = $7, threshold_error_rate = $8, delete_samples = $9, zero_error_tolerance_enabled = $10
     WHERE s.name = $2
     AND s.project_id = (SELECT id FROM jtl.projects WHERE project_name = $1)`,
-    values: [projectName, scenarioName, name, analysisEnabled, thresholds.enabled, thresholds.percentile, thresholds.throughput, thresholds.errorRate, deleteSamples, zeroErrorToleranceEnabled]
-  };
-};
+    values: [projectName, scenarioName, name, analysisEnabled, thresholds.enabled, thresholds.percentile, thresholds.throughput, thresholds.errorRate, deleteSamples, zeroErrorToleranceEnabled],
+  }
+}
 
 export const scenarioTrends = (projectName, scenarioName) => {
   return {
@@ -54,35 +54,35 @@ export const scenarioTrends = (projectName, scenarioName) => {
     AND report_status = 'ready'
     ORDER BY start_time ASC
     LIMIT 15;`,
-    values: [projectName, scenarioName]
-  };
-};
+    values: [projectName, scenarioName],
+  }
+}
 
 export const deleteScenario = (projectName, scenarioName) => {
   return {
     text: `DELETE FROM jtl.scenario
     WHERE name = $2 AND project_id = (SELECT id FROM jtl.projects WHERE project_name = $1);`,
-    values: [projectName, scenarioName]
-  };
-};
+    values: [projectName, scenarioName],
+  }
+}
 
 export const createNewScenario = (projectName, scenarioName) => {
   return {
     text: `INSERT INTO jtl.scenario(name, project_id, analysis_enabled) VALUES($2, (
       SELECT id FROM jtl.projects WHERE project_name = $1
     ), $3)`,
-    values: [projectName, scenarioName, true]
-  };
-};
+    values: [projectName, scenarioName, true],
+  }
+}
 
 export const findScenarios = projectName => {
   return {
     text: `SELECT s.id, s.name FROM jtl.scenario as s
     LEFT JOIN jtl.projects p ON p.id = s.project_id
     WHERE p.project_name = $1;`,
-    values: [projectName]
-  };
-};
+    values: [projectName],
+  }
+}
 
 export const findScenariosData = (projectName) => {
   return {
@@ -96,9 +96,9 @@ export const findScenariosData = (projectName) => {
       WHERE rownum <= 15
     )
     ORDER BY it.start_time ASC;`,
-    values: [projectName]
-  };
-};
+    values: [projectName],
+  }
+}
 
 export const isExistingScenario = (scenarioName, projectName) => {
   return {
@@ -106,9 +106,9 @@ export const isExistingScenario = (scenarioName, projectName) => {
       LEFT JOIN jtl.projects as p ON p.id = s.project_id
       WHERE p.project_name = $2
       AND s.name = $1)`,
-    values: [scenarioName, projectName]
-  };
-};
+    values: [scenarioName, projectName],
+  }
+}
 
 export const getProcessingItems = (projectName, scenarioName) => {
   return {
@@ -117,9 +117,9 @@ export const getProcessingItems = (projectName, scenarioName) => {
     LEFT JOIN jtl.item_stat as st ON st.item_id = it.id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
     WHERE s.name = $1 AND p.project_name = $2 AND it.report_status != 'ready';`,
-    values: [scenarioName, projectName]
-  };
-};
+    values: [scenarioName, projectName],
+  }
+}
 
 export const scenarioNotifications = (projectName, scenarioName) => {
   return {
@@ -127,9 +127,9 @@ export const scenarioNotifications = (projectName, scenarioName) => {
     LEFT JOIN jtl.scenario as s ON s.id = notif.scenario_id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
     WHERE s.name = $2 AND p.project_name = $1`,
-    values: [projectName, scenarioName]
-  };
-};
+    values: [projectName, scenarioName],
+  }
+}
 
 export const createScenarioNotification = (projectName, scenarioName, type, url, name) => {
   return {
@@ -138,9 +138,9 @@ export const createScenarioNotification = (projectName, scenarioName, type, url,
       LEFT JOIN jtl.projects as p ON p.id = s.project_id
       WHERE s.name = $2 AND p.project_name = $1 
     ), $3, $4, $5)`,
-    values: [projectName, scenarioName, type, url, name]
-  };
-};
+    values: [projectName, scenarioName, type, url, name],
+  }
+}
 
 export const deleteScenarioNotification = (projectName, scenarioName, id) => {
   return {
@@ -149,9 +149,9 @@ export const deleteScenarioNotification = (projectName, scenarioName, id) => {
        SELECT s.id FROM jtl.scenario as s
        LEFT JOIN jtl.projects as p ON p.id = project_id
        WHERE s.name = $2 AND p.project_name = $1)`,
-    values: [projectName, scenarioName, id]
-  };
-};
+    values: [projectName, scenarioName, id],
+  }
+}
 
 export const getScenarioSettings = (projectName, scenarioName) => {
   return {
@@ -159,9 +159,9 @@ export const getScenarioSettings = (projectName, scenarioName) => {
     LEFT JOIN jtl.projects p ON p.id = s.project_id
     WHERE p.project_name = $1
     AND s.name = $2`,
-    values: [projectName, scenarioName]
-  };
-};
+    values: [projectName, scenarioName],
+  }
+}
 
 
 export const currentScenarioMetrics = (projectName, scenarioName, vu) => {
@@ -174,7 +174,7 @@ export const currentScenarioMetrics = (projectName, scenarioName, vu) => {
     AND p.project_name = $1
     AND report_status = 'ready'
     AND (st.overview->>'maxVu')::numeric = $3`,
-    values: [projectName, scenarioName, vu]
-  };
-};
+    values: [projectName, scenarioName, vu],
+  }
+}
 

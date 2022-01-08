@@ -10,7 +10,7 @@
     "test:unit": "jest --config=jest-unit.config.js -w=5 --coverage",
     "test:contract": "jest --config=contract.config.js -w=5",
     "test:integration": "jest --forceExit --config=integration.config.js --runInBand",
-    "lint": "eslint -c .eslintrc --ext .ts .",
+    "lint": "eslint -c .eslintrc --quiet --ext .ts .",
     "lint:fix": "eslint -c .eslintrc --ext .ts . --fix",
     "ts:check": "tsc --noEmit"
   },
