@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 import { db } from "../../../db/db"
 import { getErrorsForLabel } from "../../queries/items"
-import { StatusCodes } from "../../utils/status-codes"
+import { StatusCode } from "../../utils/status-code"
 
 export const getLabelErrorsController = async (req: Request, res: Response) => {
   const { itemId, label } = req.params
@@ -13,5 +13,5 @@ export const getLabelErrorsController = async (req: Request, res: Response) => {
       : acc[rc] = 1
     return acc
   }, {})
-  res.status(StatusCodes.Ok).send({ stat })
+  res.status(StatusCode.Ok).send({ stat })
 }

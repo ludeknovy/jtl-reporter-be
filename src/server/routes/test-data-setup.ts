@@ -15,7 +15,7 @@ import { generateToken } from "../controllers/auth/helper/token-generator"
 import { createNewApiToken } from "../queries/api-tokens"
 import * as uuid from "uuid"
 import { ReportStatus } from "../queries/items.model"
-import { StatusCodes } from "../utils/status-codes"
+import { StatusCode } from "../utils/status-code"
 
 export class TestDataSetup {
 
@@ -30,12 +30,12 @@ export class TestDataSetup {
           switch (state) {
             case States.ExistingProject:
               await db.any(createNewProject("test-project"))
-              res.sendStatus(StatusCodes.Created)
+              res.sendStatus(StatusCode.Created)
               break
             case States.ExistingScenario:
               await db.any(createNewProject("test-project"))
               await db.any(createNewScenario("test-project", "test-scenario"))
-              res.sendStatus(StatusCodes.Created)
+              res.sendStatus(StatusCode.Created)
               break
             case States.ExistingTestItem:
               await db.any(createNewProject("test-project"))
@@ -48,14 +48,14 @@ export class TestDataSetup {
                 item.id, JSON.stringify(testStats),
                 JSON.stringify(testOverview),
                 JSON.stringify([])))
-              res.status(StatusCodes.Ok).send({ itemId: item.id })
+              res.status(StatusCode.Ok).send({ itemId: item.id })
               break
             case States.EmptyDb:
-              res.sendStatus(StatusCodes.Created)
+              res.sendStatus(StatusCode.Created)
               break
             case States.NoUsers:
               await db.any({ text: "TRUNCATE jtl.users CASCADE" })
-              res.sendStatus(StatusCodes.Created)
+              res.sendStatus(StatusCode.Created)
               break
             case States.ExistingApiKey:
                 // eslint-disable-next-line no-case-declarations
@@ -64,10 +64,10 @@ export class TestDataSetup {
                 // eslint-disable-next-line no-case-declarations
               const { id } = await db.one(getUser("test-user"))
               await db.any(createNewApiToken(TOKEN, "test-token", id))
-              res.status(StatusCodes.Ok).send({ token: TOKEN })
+              res.status(StatusCode.Ok).send({ token: TOKEN })
               break
             default:
-              res.sendStatus(StatusCodes.BadRequest)
+              res.sendStatus(StatusCode.BadRequest)
               break
           }
         }))
@@ -81,7 +81,7 @@ export class TestDataSetup {
           await createUserInDB(username, password)
           const { id } = await db.one(getUser(username))
           const token = generateToken(id)
-          res.status(StatusCodes.Ok).send({ token, username, password, id })
+          res.status(StatusCode.Ok).send({ token, username, password, id })
         })
       )
 
@@ -93,7 +93,7 @@ export class TestDataSetup {
           await createUserInDB("test-user", "test0000")
           const { id } = await db.one(getUser("test-user"))
           await db.any(createNewApiToken(TOKEN, "test-token", id))
-          res.status(StatusCodes.Ok).send({ token: TOKEN })
+          res.status(StatusCode.Ok).send({ token: TOKEN })
         })
       )
   }

@@ -2,7 +2,7 @@ import * as request from "supertest"
 import { apiTokenSetup, userSetup } from "./helper/state"
 import { routes } from "./helper/routes"
 import * as assert from "assert"
-import { StatusCodes } from "../../server/utils/status-codes"
+import { StatusCode } from "../../server/utils/status-code"
 
 describe("Auth", () => {
   let credentials
@@ -19,7 +19,7 @@ describe("Auth", () => {
           username: credentials.username,
           password: credentials.password,
         })
-        .expect(StatusCodes.Ok)
+        .expect(StatusCode.Ok)
     })
     it("should not be able to login without valid credentials", async () => {
       await request(__server__)
@@ -28,13 +28,13 @@ describe("Auth", () => {
           username: credentials.username,
           password: "test",
         })
-        .expect(StatusCodes.Unathorized)
+        .expect(StatusCode.Unathorized)
     })
     it("should return 400 when invalid payload provided", async () => {
       await request(__server__)
         .post(routes.auth.login)
         .send({})
-        .expect(StatusCodes.BadRequest)
+        .expect(StatusCode.BadRequest)
     })
   })
   describe("Change password", () => {
@@ -45,7 +45,7 @@ describe("Auth", () => {
           currentPassword: credentials.password,
           newPassword: "test123",
         })
-        .expect(StatusCodes.Unathorized)
+        .expect(StatusCode.Unathorized)
     })
     it("should not be able to change password when is not long enough", async () => {
       await request(__server__)
@@ -55,7 +55,7 @@ describe("Auth", () => {
           currentPassword: credentials.password,
           newPassword: "test123",
         })
-        .expect(StatusCodes.BadRequest)
+        .expect(StatusCode.BadRequest)
     })
     describe("Change password flow", () => {
       const newPassword = "test12345"
@@ -67,7 +67,7 @@ describe("Auth", () => {
             currentPassword: credentials.password,
             newPassword,
           })
-          .expect(StatusCodes.NoContent)
+          .expect(StatusCode.NoContent)
       })
       it("should not be able log in with old password", async () => {
         await request(__server__)
@@ -76,7 +76,7 @@ describe("Auth", () => {
             username: credentials.username,
             password: credentials.password,
           })
-          .expect(StatusCodes.Unathorized)
+          .expect(StatusCode.Unathorized)
       })
       it("should be be able to log in with new password", async () => {
         await request(__server__)
@@ -85,7 +85,7 @@ describe("Auth", () => {
             username: credentials.username,
             password: newPassword,
           })
-          .expect(StatusCodes.Ok)
+          .expect(StatusCode.Ok)
       })
     })
   })
@@ -94,7 +94,7 @@ describe("Auth", () => {
       await request(__server__)
         .post(routes.auth.loginWithToken)
         .send({ token })
-        .expect(StatusCodes.Ok)
+        .expect(StatusCode.Ok)
         .then((r) => {
           assert.ok(r.body.jwtToken.length > 0)
         })
@@ -103,7 +103,7 @@ describe("Auth", () => {
       await request(__server__)
         .post(routes.auth.loginWithToken)
         .send({ token: "at-test" })
-        .expect(StatusCodes.Unathorized)
+        .expect(StatusCode.Unathorized)
     })
   })
 })

@@ -2,7 +2,7 @@ import { Request, Response } from "express"
 
 import { itemsForScenarioCount, findItemsForScenario } from "../../queries/scenario"
 import { db } from "../../../db/db"
-import { StatusCodes } from "../../utils/status-codes"
+import { StatusCode } from "../../utils/status-code"
 
 export const getItemsController = async (req: Request, res: Response) => {
   const { projectName, scenarioName } = req.params
@@ -13,5 +13,5 @@ export const getItemsController = async (req: Request, res: Response) => {
     _.base = !_.base ? false : true
     return _
   })
-  res.status(StatusCodes.Ok).send({ name: scenarioName, data: idsBaseUpdate, total: parseInt(total, 10) })
+  res.status(StatusCode.Ok).send({ name: scenarioName, data: idsBaseUpdate, total: parseInt(total, 10) })
 }

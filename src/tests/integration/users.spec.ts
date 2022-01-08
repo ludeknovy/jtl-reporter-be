@@ -2,7 +2,7 @@ import * as request from "supertest"
 import { userSetup } from "./helper/state"
 import { routes } from "./helper/routes"
 import * as uuid from "uuid"
-import { StatusCodes } from "../../server/utils/status-codes"
+import { StatusCode } from "../../server/utils/status-code"
 
 describe("Users", () => {
   let credentials
@@ -17,7 +17,7 @@ describe("Users", () => {
           username: "new.user",
           password: "test12345",
         })
-        .expect(StatusCodes.Unathorized)
+        .expect(StatusCode.Unathorized)
     })
     it("should be able to create new user", async () => {
       const USERNAME = "new.test.user"
@@ -28,13 +28,13 @@ describe("Users", () => {
           username: USERNAME,
           password: "test12345",
         })
-        .expect(StatusCodes.Created)
+        .expect(StatusCode.Created)
 
       await request(__server__)
         .get(routes.users)
         .set(__tokenHeaderKey__, credentials.token)
         .send()
-        .expect(StatusCodes.Ok)
+        .expect(StatusCode.Ok)
         .then(({ body }) => {
           expect(body.find((_) => _.username === USERNAME)).toBeDefined()
         })
@@ -50,7 +50,7 @@ describe("Users", () => {
         .post(routes.users)
         .set(__tokenHeaderKey__, credentials.token)
         .send(body)
-        .expect(StatusCodes.BadRequest)
+        .expect(StatusCode.BadRequest)
     })
 
   })
@@ -59,14 +59,14 @@ describe("Users", () => {
       await request(__server__)
         .get(routes.users)
         .send()
-        .expect(StatusCodes.Unathorized)
+        .expect(StatusCode.Unathorized)
     })
     it("should be able to get users", async () => {
       await request(__server__)
         .get(routes.users)
         .set(__tokenHeaderKey__, credentials.token)
         .send()
-        .expect(StatusCodes.Ok)
+        .expect(StatusCode.Ok)
     })
   })
   describe("DELETE /users/:userId", () => {
@@ -74,28 +74,28 @@ describe("Users", () => {
       await request(__server__)
         .delete(routes.users + `/${credentials.id}`)
         .send()
-        .expect(StatusCodes.Unathorized)
+        .expect(StatusCode.Unathorized)
     })
     it("should return 404 when deleting unexisting user", async () => {
       await request(__server__)
         .delete(routes.users + `/${uuid()}`)
         .set(__tokenHeaderKey__, credentials.token)
         .send()
-        .expect(StatusCodes.NoContent)
+        .expect(StatusCode.NoContent)
     })
     it("should return 400 when no valid userId provided", async () => {
       await request(__server__)
         .delete(routes.users + "/abcd")
         .set(__tokenHeaderKey__, credentials.token)
         .send()
-        .expect(StatusCodes.BadRequest)
+        .expect(StatusCode.BadRequest)
     })
     it("should be able to delete user", async () => {
       await request(__server__)
         .delete(routes.users + `/${credentials.id}`)
         .set(__tokenHeaderKey__, credentials.token)
         .send()
-        .expect(StatusCodes.Ok)
+        .expect(StatusCode.Ok)
     })
   })
 })

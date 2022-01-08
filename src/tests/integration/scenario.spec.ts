@@ -1,7 +1,7 @@
 import * as request from "supertest"
 import { States } from "../contract/states.model"
 import { stateSetup, userSetup } from "./helper/state"
-import { StatusCodes } from "../../server/utils/status-codes"
+import { StatusCode } from "../../server/utils/status-code"
 
 describe("Scenario", () => {
   let credentials
@@ -16,7 +16,7 @@ describe("Scenario", () => {
         .set(__tokenHeaderKey__, credentials.token)
         .send({ scenarioName: "test-scenario" })
         .set("Accept", "application/json")
-        .expect(StatusCodes.Created)
+        .expect(StatusCode.Created)
     })
     it("should not be able to create two scenarios with same name", async () => {
       await stateSetup(States.ExistingScenario)
@@ -25,7 +25,7 @@ describe("Scenario", () => {
         .set(__tokenHeaderKey__, credentials.token)
         .send({ scenarioName: "test-scenario" })
         .set("Accept", "application/json")
-        .expect(StatusCodes.Conflict)
+        .expect(StatusCode.Conflict)
     })
     it("should return 400 when no scenarioName provided", async () => {
       await stateSetup(States.ExistingScenario)
@@ -34,7 +34,7 @@ describe("Scenario", () => {
         .set(__tokenHeaderKey__, credentials.token)
         .send({})
         .set("Accept", "application/json")
-        .expect(StatusCodes.BadRequest)
+        .expect(StatusCode.BadRequest)
     })
   })
   describe("PUT /projects/{projectName}/scenarios/{scenarioName}", () => {
@@ -56,7 +56,7 @@ describe("Scenario", () => {
           },
         })
         .set("Accept", "application/json")
-        .expect(StatusCodes.Created)
+        .expect(StatusCode.Created)
     })
   })
   describe("DELETE /projects/{projectName}/scenarios/{scenarioName}", () => {
@@ -66,7 +66,7 @@ describe("Scenario", () => {
         .delete("/api/projects/test-project/scenarios/test-scenario")
         .set(__tokenHeaderKey__, credentials.token)
         .set("Accept", "application/json")
-        .expect(StatusCodes.Created)
+        .expect(StatusCode.Created)
     })
   })
 })

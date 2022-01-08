@@ -1,7 +1,7 @@
 import * as request from "supertest"
 import { userSetup } from "./helper/state"
 import { routes } from "./helper/routes"
-import { StatusCodes } from "../../server/utils/status-codes"
+import { StatusCode } from "../../server/utils/status-code"
 
 describe("Api tokens", () => {
   let credentials
@@ -15,7 +15,7 @@ describe("Api tokens", () => {
         .send({
           description: "new-api-token",
         })
-        .expect(StatusCodes.Unathorized)
+        .expect(StatusCode.Unathorized)
     })
     it("should not be able to create token when no description provided", async () => {
       await request(__server__)
@@ -24,7 +24,7 @@ describe("Api tokens", () => {
         .send({
           description: null,
         })
-        .expect(StatusCodes.BadRequest)
+        .expect(StatusCode.BadRequest)
     })
   })
   it("should be able to create new api token", async () => {
@@ -34,7 +34,7 @@ describe("Api tokens", () => {
       .send({
         description: "new-api-token",
       })
-      .expect(StatusCodes.Created)
+      .expect(StatusCode.Created)
     await request(__server__)
       .get(routes.apiTokens)
       .set(__tokenHeaderKey__, credentials.token)
@@ -49,14 +49,14 @@ describe("Api tokens", () => {
       await request(__server__)
         .get(routes.apiTokens)
         .send()
-        .expect(StatusCodes.Unathorized)
+        .expect(StatusCode.Unathorized)
     })
     it("should be able to get api tokens", async () => {
       await request(__server__)
         .get(routes.apiTokens)
         .set(__tokenHeaderKey__, credentials.token)
         .send()
-        .expect(StatusCodes.Ok)
+        .expect(StatusCode.Ok)
     })
   })
   describe("DELETE /api-tokens", () => {
@@ -66,7 +66,7 @@ describe("Api tokens", () => {
         .get(routes.apiTokens)
         .set(__tokenHeaderKey__, credentials.token)
         .send()
-        .expect(StatusCodes.Ok)
+        .expect(StatusCode.Ok)
         .then(({ body }) => {
           tokenId = body[0].id
         })
@@ -75,21 +75,21 @@ describe("Api tokens", () => {
       await request(__server__)
         .delete(routes.apiTokens)
         .send()
-        .expect(StatusCodes.Unathorized)
+        .expect(StatusCode.Unathorized)
     })
     it("should be able to delete api token", async () => {
       await request(__server__)
         .delete(routes.apiTokens)
         .set(__tokenHeaderKey__, credentials.token)
         .send({ id: tokenId })
-        .expect(StatusCodes.NoContent)
+        .expect(StatusCode.NoContent)
     })
     it("should return 400 when no token id provided", async () => {
       await request(__server__)
         .delete(routes.apiTokens)
         .set(__tokenHeaderKey__, credentials.token)
         .send({ id: null })
-        .expect(StatusCodes.BadRequest)
+        .expect(StatusCode.BadRequest)
     })
   })
 })

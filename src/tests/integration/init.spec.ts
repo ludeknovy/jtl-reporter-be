@@ -2,7 +2,7 @@ import { routes } from "./helper/routes"
 import { stateSetup, userSetup } from "./helper/state"
 import * as request from "supertest"
 import { States } from "../contract/states.model"
-import { StatusCodes } from "../../server/utils/status-codes"
+import { StatusCode } from "../../server/utils/status-code"
 
 describe("init", () => {
   it("should return true when user created", async () => {
@@ -10,13 +10,13 @@ describe("init", () => {
     await request(__server__)
       .get(routes.init)
       .send()
-      .expect(StatusCodes.Ok, { initialized: true })
+      .expect(StatusCode.Ok, { initialized: true })
   })
   it("should return false when no user created", async () => {
     await stateSetup(States.NoUsers)
     await request(__server__)
       .get(routes.init)
       .send()
-      .expect(StatusCodes.Ok, { initialized: false })
+      .expect(StatusCode.Ok, { initialized: false })
   })
 })

@@ -1,7 +1,7 @@
 import * as request from "supertest"
 import { States } from "../contract/states.model"
 import { stateSetup, userSetup } from "./helper/state"
-import { StatusCodes } from "../../server/utils/status-codes"
+import { StatusCode } from "../../server/utils/status-code"
 
 
 describe("Projects", () => {
@@ -17,7 +17,7 @@ describe("Projects", () => {
         .set(__tokenHeaderKey__, credentials.token)
         .send({ projectName: "test-project-000" })
         .set("Accept", "application/json")
-        .expect(StatusCodes.Created)
+        .expect(StatusCode.Created)
     })
     it("should return 400 when no projectName provided", async () => {
       await stateSetup(States.EmptyDb)
@@ -26,7 +26,7 @@ describe("Projects", () => {
         .set(__tokenHeaderKey__, credentials.token)
         .send({})
         .set("Accept", "application/json")
-        .expect(StatusCodes.BadRequest)
+        .expect(StatusCode.BadRequest)
     })
     it("should not be able to create two project with same name", async () => {
       await stateSetup(States.ExistingProject)
@@ -35,7 +35,7 @@ describe("Projects", () => {
         .set(__tokenHeaderKey__, credentials.token)
         .send({ projectName: "test-project" })
         .set("Accept", "application/json")
-        .expect(StatusCodes.Conflict)
+        .expect(StatusCode.Conflict)
     })
   })
   describe("PUT /projects/${projectName}", () => {
@@ -46,7 +46,7 @@ describe("Projects", () => {
         .set(__tokenHeaderKey__, credentials.token)
         .send({ projectName: "test-project" })
         .set("Accept", "application/json")
-        .expect(StatusCodes.NoContent)
+        .expect(StatusCode.NoContent)
     })
   })
   describe("DELETE /projects/${projectName}", () => {
@@ -56,7 +56,7 @@ describe("Projects", () => {
         .delete("/api/projects/test-project")
         .set(__tokenHeaderKey__, credentials.token)
         .set("Accept", "application/json")
-        .expect(StatusCodes.NoContent)
+        .expect(StatusCode.NoContent)
     })
   })
 })
