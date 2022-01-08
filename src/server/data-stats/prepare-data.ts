@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { roundNumberTwoDecimals } from "./helper/stats-fc"
 import * as moment from "moment"
 import { logger } from "../../logger"

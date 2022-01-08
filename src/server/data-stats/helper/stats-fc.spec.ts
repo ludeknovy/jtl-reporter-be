@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 import { roundNumberTwoDecimals, findMinMax } from "./stats-fc"
 
 describe("Stats Helper", () => {

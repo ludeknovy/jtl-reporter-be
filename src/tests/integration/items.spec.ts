@@ -3,7 +3,7 @@ import { stateSetup, userSetup, apiTokenSetup } from "./helper/state"
 import { States } from "../contract/states.model"
 import { ItemStatus } from "../../server/queries/items.model"
 import * as path from "path"
-import { StatusCodes } from "../../server/utils/status-codes"
+import { StatusCode } from "../../server/utils/status-code"
 
 const TIMEOUT = 2000
 
@@ -31,7 +31,7 @@ describe("Items", () => {
         .set(__tokenHeaderKey__, credentials.token)
         .set("Accept", "application/json")
         .send({ environment: "test" })
-        .expect(StatusCodes.Created)
+        .expect(StatusCode.Created)
     })
   })
   describe("PUT /projects/{projectName}/scenarios/{scenarioName}/items/{itemId}", () => {
@@ -46,7 +46,7 @@ describe("Items", () => {
           note: "new-test-note",
           base: true,
         })
-        .expect(StatusCodes.NoContent)
+        .expect(StatusCode.NoContent)
     })
   })
   describe("DELETE /projects/{projectName}/scenarios/{scenarioName}/items/{itemId}", () => {
@@ -61,7 +61,7 @@ describe("Items", () => {
           note: "new-test-note",
           base: true,
         })
-        .expect(StatusCodes.NoContent)
+        .expect(StatusCode.NoContent)
     })
   })
   describe("POST /projects/{projectName}/scenarios/{scenarioName}/items/{itemId}/share-tokens", () => {
@@ -74,7 +74,7 @@ describe("Items", () => {
         .send({
           name: "test-token",
         })
-        .expect(StatusCodes.Created)
+        .expect(StatusCode.Created)
     })
   })
   describe("POST /projects/{projectName}/scenarios/{scenarioName}/items/{itemId}/custom-chart-settings", () => {
@@ -85,7 +85,7 @@ describe("Items", () => {
         .set(__tokenHeaderKey__, credentials.token)
         .set("Accept", "application/json")
         .send([{ name: "test", metric: "test" }])
-        .expect(StatusCodes.Ok)
+        .expect(StatusCode.Ok)
     })
   })
   describe("GET /projects/{projectName}/scenarios/{scenarioName}/items/{itemId}/custom-chart-settings", () => {
@@ -95,7 +95,7 @@ describe("Items", () => {
         .get(`/api/projects/test-project/scenarios/test-scenario/items/${itemId}/custom-chart-settings`)
         .set(__tokenHeaderKey__, credentials.token)
         .set("Accept", "application/json")
-        .expect(StatusCodes.Ok)
+        .expect(StatusCode.Ok)
     })
   })
   describe("POST /projects/{projectName}/scenarios/{scenarioName}/items", () => {
@@ -109,7 +109,7 @@ describe("Items", () => {
         .field("note", "test-note")
         .field("status", ItemStatus.Passed)
         .field("hostname", "localhost")
-        .expect(StatusCodes.Ok)
+        .expect(StatusCode.Ok)
     })
     it("should be able to create test item with more test columns", async () => {
       await stateSetup(States.ExistingScenario)
@@ -121,7 +121,7 @@ describe("Items", () => {
         .field("note", "test-note")
         .field("status", ItemStatus.Passed)
         .field("hostname", "localhost")
-        .expect(StatusCodes.Ok)
+        .expect(StatusCode.Ok)
     })
     it("should be able to create test item with api token", async () => {
       await stateSetup(States.ExistingScenario)
@@ -133,7 +133,7 @@ describe("Items", () => {
         .field("note", "test-note")
         .field("status", ItemStatus.Passed)
         .field("hostname", "localhost")
-        .expect(StatusCodes.Ok)
+        .expect(StatusCode.Ok)
     })
   })
 })

@@ -4,6 +4,7 @@ import { getUser } from "../../queries/auth"
 import * as boom from "boom"
 import { passwordMatch } from "./helper/passwords"
 import { generateToken } from "./helper/token-generator"
+import { StatusCode } from "../../utils/status-code"
 
 
 export const loginController = async (req: Request, res: Response, next: NextFunction) => {
@@ -17,7 +18,7 @@ export const loginController = async (req: Request, res: Response, next: NextFun
       return next(boom.unauthorized("Invalid credentials"))
     }
     const token = generateToken(result[0].id)
-    return res.status(200).send({ token, username })
+    return res.status(StatusCode.Ok).send({ token, username })
   } catch(error) {
     return next(error)
   }

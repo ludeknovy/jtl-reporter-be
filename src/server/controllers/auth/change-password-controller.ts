@@ -4,6 +4,7 @@ import { getUserById, updatePassword } from "../../queries/auth"
 import { passwordMatch, hashPassword } from "./helper/passwords"
 import * as boom from "boom"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
+import {StatusCode} from "../../utils/status-code";
 
 export const changePasswordController = async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
   const { currentPassword, newPassword } = req.body
@@ -15,7 +16,7 @@ export const changePasswordController = async (req: IGetUserAuthInfoRequest, res
     }
     const passwordHash = await hashPassword(newPassword)
     await db.query(updatePassword(userId, passwordHash))
-    return res.status(204).send()
+    return res.status(StatusCode.NoContent).send()
   } catch(error) {
     next(error)
   }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Response, NextFunction } from "express"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 import { getLabelTrendController } from "./get-label-trend-controller"
@@ -23,7 +24,7 @@ describe("getItemChartSettingsController", () => {
     };
     (db.query as any).mockResolvedValue([])
     await getLabelTrendController(request as unknown as IGetUserAuthInfoRequest,
-      response as unknown as Response, nextFunction)
+      response as unknown as Response)
     expect(querySpy).toHaveBeenCalledTimes(1)
     expect(response.send).toHaveBeenCalledTimes(1)
   })
@@ -38,7 +39,7 @@ describe("getItemChartSettingsController", () => {
     (db.query as any).mockResolvedValue([])
 
     await getLabelTrendController(request as unknown as IGetUserAuthInfoRequest,
-      response as unknown as Response, nextFunction)
+      response as unknown as Response)
     expect(querySpy).toHaveBeenCalledTimes(1)
     expect(response.send).toHaveBeenCalledTimes(1)
   })
@@ -94,7 +95,7 @@ describe("getItemChartSettingsController", () => {
     ])
 
     await getLabelTrendController(request as unknown as IGetUserAuthInfoRequest,
-      response as unknown as Response, nextFunction)
+      response as unknown as Response)
     expect(response.send).toHaveBeenCalledWith({
       errorRate: [100, 10],
       n0: [1, 10],
