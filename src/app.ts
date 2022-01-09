@@ -55,7 +55,6 @@ export class App {
   private errorHandler() {
     // eslint-disable-next-line no-unused-vars
     this.app.use(function (error: Error, req: Request, res: Response, next: NextFunction) {
-      console.log("ERROR_HANDLER")
       if (boom.isBoom(error)) {
         const { payload: { message } } = error.output
         return res.status(error.output.statusCode).json({ message })
@@ -68,7 +67,6 @@ export class App {
 
   private databaseErrorHandler() {
     this.app.use(function (error: Error, req: Request, res: Response, next: NextFunction) {
-      logger.info("DB_HANDLER")
       logger.error(error)
       if (error instanceof pgp.errors.QueryResultError) {
         return next(boom.notFound())

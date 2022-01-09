@@ -70,7 +70,7 @@ describe("Users", () => {
     })
   })
   describe("DELETE /users/:userId", () => {
-    it("should return 401 when deleting user as unathorized", async () => {
+    it("should return 401 when deleting user as unauthorized", async () => {
       await request(__server__)
         .delete(routes.users + `/${credentials.id}`)
         .send()
@@ -81,7 +81,7 @@ describe("Users", () => {
         .delete(routes.users + `/${uuid()}`)
         .set(__tokenHeaderKey__, credentials.token)
         .send()
-        .expect(StatusCode.NoContent)
+        .expect(StatusCode.NotFound)
     })
     it("should return 400 when no valid userId provided", async () => {
       await request(__server__)

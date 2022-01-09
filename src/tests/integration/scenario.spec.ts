@@ -57,7 +57,7 @@ describe("Scenario", () => {
           },
         })
         .set("Accept", "application/json")
-        .expect(StatusCode.Created)
+        .expect(StatusCode.NoContent)
     })
   })
   describe("DELETE /projects/{projectName}/scenarios/{scenarioName}", () => {
@@ -67,7 +67,7 @@ describe("Scenario", () => {
         .delete("/api/projects/test-project/scenarios/test-scenario")
         .set(__tokenHeaderKey__, credentials.token)
         .set("Accept", "application/json")
-        .expect(StatusCode.Created)
+        .expect(StatusCode.NoContent)
     })
   })
 })
