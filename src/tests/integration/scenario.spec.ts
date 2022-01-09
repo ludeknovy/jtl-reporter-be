@@ -47,6 +47,7 @@ describe('Scenario', () => {
           analysisEnabled: false,
           zeroErrorToleranceEnabled: true,
           deleteSamples: false,
+          keepTestRunsPeriod: 7,
           thresholds: {
             enabled: true,
             percentile: 4.2,
