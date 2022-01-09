@@ -1,19 +1,20 @@
-import { Request, Response, NextFunction } from 'express';
-import { db } from '../../../db/db';
-import { updateScenario } from '../../queries/scenario';
+import { Request, Response } from "express"
+import { db } from "../../../db/db"
+import { updateScenario } from "../../queries/scenario"
+import { StatusCode } from "../../utils/status-code"
 
 
-export const updateScenarioController = async (req: Request, res: Response, next: NextFunction) => {
-  const { projectName, scenarioName } = req.params;
+export const updateScenarioController = async (req: Request, res: Response) => {
+  const { projectName, scenarioName } = req.params
   const {
     thresholds,
     analysisEnabled,
     scenarioName: name,
     deleteSamples,
     zeroErrorToleranceEnabled,
-    keepTestRunsPeriod
-  } = req.body;
+    keepTestRunsPeriod,
+  } = req.body
   await db.none(updateScenario(projectName, scenarioName, name, analysisEnabled,
-    thresholds, deleteSamples, zeroErrorToleranceEnabled, keepTestRunsPeriod));
-  res.status(204).send();
-};
+    thresholds, deleteSamples, zeroErrorToleranceEnabled, keepTestRunsPeriod))
+  res.status(StatusCode.NoContent).send()
+}

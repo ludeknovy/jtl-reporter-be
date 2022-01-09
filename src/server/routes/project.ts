@@ -1,64 +1,57 @@
-import { Request, Response, NextFunction } from 'express';
-import * as express from 'express';
-import { wrapAsync } from '../errors/error-handler';
-import { bodySchemaValidator, paramsSchemaValidator } from '../schema-validator/schema-validator-middleware';
-import {createNewProjectSchema, projectNameParam, updateProjectSchema} from '../schema-validator/project-schema';
-import { createProjectController } from '../controllers/project/create-project-controller';
-import { getProjectsController } from '../controllers/project/get-projects-controller';
-import { getLatestItemsControllers } from '../controllers/project/get-latest-items-controllers';
-import { deleteProjectController } from '../controllers/project/delete-project-controller';
-import { updateProjectController } from '../controllers/project/update-project-controller';
-import { getProjectStatsController } from '../controllers/project/get-projects-stats-controller';
-import { authenticationMiddleware } from '../middleware/auth-middleware';
-import {getProjectController} from '../controllers/project/get-project-controller';
+import { Request, Response, NextFunction } from "express"
+import * as express from "express"
+import { wrapAsync } from "../errors/error-handler"
+import { bodySchemaValidator, paramsSchemaValidator } from "../schema-validator/schema-validator-middleware"
+import { createNewProjectSchema, projectNameParam, updateProjectSchema } from "../schema-validator/project-schema"
+import { createProjectController } from "../controllers/project/create-project-controller"
+import { getProjectsController } from "../controllers/project/get-projects-controller"
+import { getLatestItemsControllers } from "../controllers/project/get-latest-items-controllers"
+import { deleteProjectController } from "../controllers/project/delete-project-controller"
+import { updateProjectController } from "../controllers/project/update-project-controller"
+import { getProjectStatsController } from "../controllers/project/get-projects-stats-controller"
+import { authenticationMiddleware } from "../middleware/auth-middleware"
+import { getProjectController } from "../controllers/project/get-project-controller"
 
 export class ProjectRoutes {
-  public routes(app: express.Application): void {
+  routes(app: express.Application): void {
 
-    app.route('/api/projects')
+    app.route("/api/projects")
       .post(
         authenticationMiddleware,
         bodySchemaValidator(createNewProjectSchema),
-        // eslint-disable-next-line max-len
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await createProjectController(req, res, next)))
+        wrapAsync( (req: Request, res: Response, next: NextFunction) => createProjectController(req, res, next)))
 
       .get(
         authenticationMiddleware,
-        // eslint-disable-next-line max-len
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getProjectsController(req, res, next)));
+        wrapAsync( (req: Request, res: Response) => getProjectsController(req, res)))
 
-    app.route('/api/projects/latest-items')
+    app.route("/api/projects/latest-items")
       .get(
         authenticationMiddleware,
-        // eslint-disable-next-line max-len
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getLatestItemsControllers(req, res, next)));
+        wrapAsync( (req: Request, res: Response ) => getLatestItemsControllers(req, res)))
 
-    app.route('/api/projects/overall-stats')
+    app.route("/api/projects/overall-stats")
       .get(
         authenticationMiddleware,
-        // eslint-disable-next-line max-len
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getProjectStatsController(req, res, next)));
+        wrapAsync( (req: Request, res: Response ) => getProjectStatsController(req, res)))
 
-    app.route('/api/projects/:projectName')
+    app.route("/api/projects/:projectName")
       .delete(
         authenticationMiddleware,
         paramsSchemaValidator(projectNameParam),
-        // eslint-disable-next-line max-len
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteProjectController(req, res, next)))
+        wrapAsync( (req: Request, res: Response) => deleteProjectController(req, res)))
 
       .get(
         authenticationMiddleware,
         paramsSchemaValidator(projectNameParam),
-        // eslint-disable-next-line max-len
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getProjectController(req, res, next)))
+        wrapAsync( (req: Request, res: Response) => getProjectController(req, res)))
 
 
       .put(
         authenticationMiddleware,
         paramsSchemaValidator(projectNameParam),
         bodySchemaValidator(updateProjectSchema),
-        // eslint-disable-next-line max-len
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await updateProjectController(req, res, next)));
+        wrapAsync( (req: Request, res: Response) => updateProjectController(req, res)))
   }
 
 }

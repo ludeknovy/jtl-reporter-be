@@ -14,7 +14,7 @@ class TestEnvironment extends NodeEnvironment {
 
 
     this.global.__tokenHeaderKey__ = 'x-access-token';
-    this.global.__server__ = await app.listen();
+    this.global.__server__ = app.listen();
   }
 
   async teardown() {

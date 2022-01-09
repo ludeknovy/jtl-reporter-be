@@ -1,3 +1,3 @@
-import { App } from './app';
+import { App } from "./app"
 
-export default new App().listen();
+export default new App().listen()

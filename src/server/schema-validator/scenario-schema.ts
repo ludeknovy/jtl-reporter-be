@@ -1,28 +1,29 @@
-import { scenarioSchema } from './project-schema';
+import { scenarioSchema } from "./project-schema"
+import * as Joi from "joi"
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-const Joi = require('joi');
+const MAX_NUMBER = 100
+const URL_MAX_LENGTH = 400
 
 export const paramsSchema = {
   projectName: Joi.string().required(),
-  scenarioName: Joi.string().required()
-};
+  scenarioName: Joi.string().required(),
+}
 
 export const paramSchemaNotification = {
   ...paramsSchema,
-  notificationId: Joi.string().required()
-};
+  notificationId: Joi.string().required(),
+}
 
 export const querySchema = {
-  limit: Joi.number().integer().min(0).max(100),
-  offset: Joi.number().integer()
-};
+  limit: Joi.number().integer().min(0).max(MAX_NUMBER),
+  offset: Joi.number().integer(),
+}
 
 export const scenarioNotificationBodySchema = {
-  url: Joi.string().max(400).required(),
-  type: Joi.string().valid('ms-teams').required(),
-  name: Joi.string().min(1).max(100).required()
-};
+  url: Joi.string().max(URL_MAX_LENGTH).required(),
+  type: Joi.string().valid("ms-teams").required(),
+  name: Joi.string().min(1).max(MAX_NUMBER).required(),
+}
 
 
 export const updateScenarioSchema = {
@@ -33,8 +34,8 @@ export const updateScenarioSchema = {
   keepTestRunsPeriod: Joi.number().required(),
   thresholds: Joi.object({
     enabled: Joi.boolean().required(),
-    errorRate: Joi.number().min(0).max(100).strict().required(),
-    throughput: Joi.number().min(0).max(100).strict().required(),
-    percentile: Joi.number().min(0).max(100).strict().required()
-  })
-};
+    errorRate: Joi.number().min(0).max(MAX_NUMBER).strict().required(),
+    throughput: Joi.number().min(0).max(MAX_NUMBER).strict().required(),
+    percentile: Joi.number().min(0).max(MAX_NUMBER).strict().required(),
+  }),
+}

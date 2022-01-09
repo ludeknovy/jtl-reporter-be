@@ -1,46 +1,47 @@
-import { Overview } from '../../../data-stats/prepare-data';
-import { divide } from 'mathjs';
+import { Overview } from "../../../data-stats/prepare-data"
+import { divide } from "mathjs"
 
+const PERC = 100
 
 // eslint-disable-next-line max-len
 export const scenarioThresholdsCalc = (overviewData: Overview, scenarioMetrics: Thresholds<string>, thresholds: Thresholds<string>) => {
   if (!scenarioMetrics.errorRate || !scenarioMetrics.percentile || !scenarioMetrics.throughput) {
-    return undefined;
+    return undefined
   }
-  const percentileDiff = (overviewData.percentil / parseFloat(scenarioMetrics.percentile)) * 100;
-  const throughputDiff = (overviewData.throughput / parseFloat(scenarioMetrics.throughput)) * 100;
+  const percentileDiff = (overviewData.percentil / parseFloat(scenarioMetrics.percentile)) * PERC
+  const throughputDiff = (overviewData.throughput / parseFloat(scenarioMetrics.throughput)) * PERC
   const errorRateDiff = parseFloat(scenarioMetrics.errorRate) === 0
-    ? 100 + overviewData.errorRate
-    : divide(overviewData.errorRate, scenarioMetrics.errorRate as unknown as number) * 100;
+    ? PERC + overviewData.errorRate
+    : divide(overviewData.errorRate, scenarioMetrics.errorRate as unknown as number) * PERC
 
-  const percentilePass = percentileDiff < (100 + parseFloat(thresholds.percentile));
-  const errorRatePass = errorRateDiff < (100 + parseFloat(thresholds.errorRate));
-  const throughputPass = throughputDiff >= (100 - parseFloat(thresholds.throughput));
+  const percentilePass = percentileDiff < (PERC + parseFloat(thresholds.percentile))
+  const errorRatePass = errorRateDiff < (PERC + parseFloat(thresholds.errorRate))
+  const throughputPass = throughputDiff >= (PERC - parseFloat(thresholds.throughput))
 
   return {
     passed: percentilePass && throughputPass && errorRatePass,
     result: {
       percentile: {
         passed: percentilePass,
-        diffValue: percentileDiff
+        diffValue: percentileDiff,
       },
       throughput: {
         passed: throughputPass,
-        diffValue: throughputDiff
+        diffValue: throughputDiff,
       },
       errorRate: {
         passed: errorRatePass,
-        diffValue: errorRateDiff
-      }
+        diffValue: errorRateDiff,
+      },
     },
     scenarioMetrics,
-    thresholds
-  };
-};
+    thresholds,
+  }
+}
 
 
 interface Thresholds<T> {
-  percentile: T;
-  throughput: T;
-  errorRate: T;
-};
+  percentile: T
+  throughput: T
+  errorRate: T
+}

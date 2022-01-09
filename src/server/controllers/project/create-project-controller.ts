@@ -1,15 +1,16 @@
-import { Request, Response, NextFunction } from 'express';
-import { db } from '../../../db/db';
-import { isExistingProject, createNewProject } from '../../queries/projects';
-import * as boom from 'boom';
+import { Request, Response, NextFunction } from "express"
+import { db } from "../../../db/db"
+import { isExistingProject, createNewProject } from "../../queries/projects"
+import * as boom from "boom"
+import { StatusCode } from "../../utils/status-code"
 
 export const createProjectController = async (req: Request, res: Response, next: NextFunction) => {
-  const { body: { projectName } } = req;
-  const { exists } = await db.one(isExistingProject(projectName));
+  const { body: { projectName } } = req
+  const { exists } = await db.one(isExistingProject(projectName))
   if (!exists) {
-    await db.none(createNewProject(projectName));
+    await db.none(createNewProject(projectName))
   } else {
-    return next(boom.conflict('Project already exists'));
+    return next(boom.conflict("Project already exists"))
   }
-  res.status(201).send();
-};
+  res.status(StatusCode.Created).send()
+}
