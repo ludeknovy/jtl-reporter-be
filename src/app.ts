@@ -86,6 +86,7 @@ export class App {
     this.server = this.app.listen(PORT, () => {
       logger.info("Express server listening on port " + PORT)
     })
+    return this.server
   }
 
   close() {
