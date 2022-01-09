@@ -90,7 +90,7 @@ export class App {
   }
 
   close() {
-    this.server.close(() => {
+    return this.server.close(() => {
       logger.info("Server closed")
     })
   }
