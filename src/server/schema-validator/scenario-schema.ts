@@ -31,6 +31,7 @@ export const updateScenarioSchema = {
   analysisEnabled: Joi.boolean().required(),
   zeroErrorToleranceEnabled: Joi.boolean().required(),
   deleteSamples: Joi.boolean().required(),
+  keepTestRunsPeriod: Joi.number().required(),
   thresholds: Joi.object({
     enabled: Joi.boolean().required(),
     errorRate: Joi.number().min(0).max(MAX_NUMBER).strict().required(),
