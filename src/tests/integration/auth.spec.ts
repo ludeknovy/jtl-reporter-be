@@ -1,108 +1,109 @@
-import * as request from 'supertest';
-import { apiTokenSetup, userSetup } from './helper/state';
-import { routes } from './helper/routes';
-import * as assert from 'assert';
+import * as request from "supertest"
+import { apiTokenSetup, userSetup } from "./helper/state"
+import { routes } from "./helper/routes"
+import * as assert from "assert"
+import { StatusCode } from "../../server/utils/status-code"
 
-describe('Auth', () => {
-  let credentials;
-  let token;
+describe("Auth", () => {
+  let credentials
+  let token
   beforeAll(async () => {
     ({ data: credentials } = await userSetup());
-    ({  data: { token } } = await apiTokenSetup());
-  });
-  describe('Login', () => {
-    it('should be able to login with valid credentials', async () => {
+    ({ data: { token } } = await apiTokenSetup())
+  })
+  describe("Login", () => {
+    it("should be able to login with valid credentials", async () => {
       await request(__server__)
         .post(routes.auth.login)
         .send({
           username: credentials.username,
-          password: credentials.password
+          password: credentials.password,
         })
-        .expect(200);
-    });
-    it('should not be able to login without valid credentials', async () => {
+        .expect(StatusCode.Ok)
+    })
+    it("should not be able to login without valid credentials", async () => {
       await request(__server__)
         .post(routes.auth.login)
         .send({
           username: credentials.username,
-          password: 'test'
+          password: "test",
         })
-        .expect(401);
-    });
-    it('should return 400 when invalid payload provided', async () => {
+        .expect(StatusCode.Unathorized)
+    })
+    it("should return 400 when invalid payload provided", async () => {
       await request(__server__)
         .post(routes.auth.login)
         .send({})
-        .expect(400);
-    });
-  });
-  describe('Change password', () => {
-    it('should not be able to change password when unathorized', async () => {
+        .expect(StatusCode.BadRequest)
+    })
+  })
+  describe("Change password", () => {
+    it("should not be able to change password when unathorized", async () => {
       await request(__server__)
         .post(routes.auth.changePassword)
         .send({
           currentPassword: credentials.password,
-          newPassword: 'test123'
+          newPassword: "test123",
         })
-        .expect(401);
-    });
-    it('should not be able to change password when is not long enough', async () => {
+        .expect(StatusCode.Unathorized)
+    })
+    it("should not be able to change password when is not long enough", async () => {
       await request(__server__)
         .post(routes.auth.changePassword)
         .set(__tokenHeaderKey__, credentials.token)
         .send({
           currentPassword: credentials.password,
-          newPassword: 'test123'
+          newPassword: "test123",
         })
-        .expect(400);
-    });
-    describe('Change password flow', () => {
-      const newPassword = 'test12345';
-      it('should be able to change password', async () => {
+        .expect(StatusCode.BadRequest)
+    })
+    describe("Change password flow", () => {
+      const newPassword = "test12345"
+      it("should be able to change password", async () => {
         await request(__server__)
           .post(routes.auth.changePassword)
           .set(__tokenHeaderKey__, credentials.token)
           .send({
             currentPassword: credentials.password,
-            newPassword
+            newPassword,
           })
-          .expect(204);
-      });
-      it('should not be able log in with old password', async () => {
+          .expect(StatusCode.NoContent)
+      })
+      it("should not be able log in with old password", async () => {
         await request(__server__)
           .post(routes.auth.login)
           .send({
             username: credentials.username,
-            password: credentials.password
+            password: credentials.password,
           })
-          .expect(401);
-      });
-      it('should be be able to log in with new password', async () => {
+          .expect(StatusCode.Unathorized)
+      })
+      it("should be be able to log in with new password", async () => {
         await request(__server__)
           .post(routes.auth.login)
           .send({
             username: credentials.username,
-            password: newPassword
+            password: newPassword,
           })
-          .expect(200);
-      });
-    });
-  });
-  describe.only('Login with token', () => {
-    it('should be able to login with valid token', async () => {
+          .expect(StatusCode.Ok)
+      })
+    })
+  })
+  describe("Login with token", () => {
+    it("should be able to login with valid token", async () => {
       await request(__server__)
         .post(routes.auth.loginWithToken)
         .send({ token })
-        .expect(200)
+        .expect(StatusCode.Ok)
         .then((r) => {
-          assert.ok(r.body.jwtToken.length > 0);
-        });
-    });
-    it('should not be able to login with invalid token', async () => {
+          assert.ok(r.body.jwtToken.length > 0)
+        })
+    })
+    it("should not be able to login with invalid token", async () => {
       await request(__server__)
         .post(routes.auth.loginWithToken)
-        .send({ token: 'at-test' })
-        .expect(401);
-    });
-  });
-});
+        .send({ token: "at-test" })
+        .expect(StatusCode.Unathorized)
+    })
+  })
+})

@@ -1,36 +1,36 @@
-import { Request, Response, NextFunction } from 'express';
-import * as express from 'express';
-import { authenticationMiddleware } from '../middleware/authentication-middleware';
-import { bodySchemaValidator, paramsSchemaValidator } from '../schema-validator/schema-validator-middleware';
-import { wrapAsync } from '../errors/error-handler';
-import { createNewUserController } from '../controllers/users/create-new-user-controller';
-import { getUsersController } from '../controllers/users/get-users-controller';
-import { newUserSchema, userSchema } from '../schema-validator/users-schema';
-import { deleteUserController } from '../controllers/users/delete-user-controller';
-import { authorization, AllowedRoles } from '../middleware/authorization-middleware';
+import { Request, Response, NextFunction } from "express"
+import * as express from "express"
+import { authenticationMiddleware } from "../middleware/authentication-middleware"
+import { bodySchemaValidator, paramsSchemaValidator } from "../schema-validator/schema-validator-middleware"
+import { wrapAsync } from "../errors/error-handler"
+import { createNewUserController } from "../controllers/users/create-new-user-controller"
+import { getUsersController } from "../controllers/users/get-users-controller"
+import { newUserSchema, userSchema } from "../schema-validator/users-schema"
+import { deleteUserController } from "../controllers/users/delete-user-controller"
+import { authorizationMiddleware, AllowedRoles } from "../middleware/authorization-middleware"
 
 export class UsersRoutes {
-  public routes(app: express.Application): void {
-    app.route('/api/users')
+  routes(app: express.Application): void {
+    app.route("/api/users")
       .post(
         authenticationMiddleware,
-        authorization([AllowedRoles.Admin]),
+        authorizationMiddleware([AllowedRoles.Admin]),
         bodySchemaValidator(newUserSchema),
         // eslint-disable-next-line max-len
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await createNewUserController(req, res, next)))
+        wrapAsync( (req: Request, res: Response, next: NextFunction) => createNewUserController(req, res, next)))
 
       .get(
         authenticationMiddleware,
-        authorization([AllowedRoles.Admin]),
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await getUsersController(req, res, next))
-      );
+        authorizationMiddleware([AllowedRoles.Admin]),
+        wrapAsync( (req: Request, res: Response) => getUsersController(req, res))
+      )
 
-    app.route('/api/users/:userId')
+    app.route("/api/users/:userId")
       .delete(
         authenticationMiddleware,
-        authorization([AllowedRoles.Admin]),
+        authorizationMiddleware([AllowedRoles.Admin]),
         paramsSchemaValidator(userSchema),
-        wrapAsync(async (req: Request, res: Response, next: NextFunction) => await deleteUserController(req, res, next))
-      );
+        wrapAsync( (req: Request, res: Response) => deleteUserController(req, res))
+      )
   }
 }

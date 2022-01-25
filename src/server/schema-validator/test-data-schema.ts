@@ -1,7 +1,6 @@
-// eslint-disable-next-line @typescript-eslint/naming-convention
-const Joi = require('joi');
+import * as Joi from "joi"
 
 export const testDataSchema = {
   consumer: Joi.string().required(),
-  state: Joi.string().required()
-};
+  state: Joi.string().required(),
+}

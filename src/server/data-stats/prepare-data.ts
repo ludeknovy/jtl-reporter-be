@@ -1,12 +1,14 @@
-import { roundNumberTwoDecimals } from './helper/stats-fc';
-import * as moment from 'moment';
-import { logger } from '../../logger';
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+import { roundNumberTwoDecimals } from "./helper/stats-fc"
+import * as moment from "moment"
+import { logger } from "../../logger"
 
 // eslint-disable-next-line max-len
-export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, statusCodeDistr: StatusCodeDistribution[], responseFailures: ResponseMessageFailures[]): { overview: Overview; labelStats; sutOverview: {}[] } => {
+export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, statusCodeDistr: StatusCodeDistribution[], responseFailures: ResponseMessageFailures[]):
+    { overview: Overview; labelStats; sutOverview: Array<Record<string, unknown>> } => {
   try {
-    const startDate = new Date(overviewData.start);
-    const endDate = new Date(overviewData.end);
+    const startDate = new Date(overviewData.start)
+    const endDate = new Date(overviewData.end)
     return {
       overview: {
         percentil: roundNumberTwoDecimals(overviewData.n90),
@@ -23,7 +25,7 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, stat
         avgConnect: roundNumberTwoDecimals(overviewData.avg_connect),
         startDate,
         endDate,
-        duration: roundNumberTwoDecimals((endDate.getTime() - startDate.getTime()) / 1000 / 60)
+        duration: roundNumberTwoDecimals((endDate.getTime() - startDate.getTime()) / 1000 / 60),
       },
       labelStats: labelData.map((_) => ({
         label: _.label,
@@ -44,7 +46,7 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, stat
           .map((sd) => ({ statusCode: sd.status_code, count: sd.count })),
         responseMessageFailures: responseFailures
           .filter((rm) => rm.label === _.label)
-          .map((rm) => ({ responseMessage: rm.response_message, count: rm.count  }))
+          .map((rm) => ({ responseMessage: rm.response_message, count: rm.count })),
       })),
       sutOverview: sutStats.map((_) => ({
         sutHostname: _.sut_hostname,
@@ -55,292 +57,293 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, stat
         bytesPerSecond: roundNumberTwoDecimals(_.bytes_received_total / ((_.end - _.start) / 1000)),
         bytesSentPerSecond: roundNumberTwoDecimals(_.bytes_sent_total / ((_.end - _.start) / 1000)),
         avgLatency: roundNumberTwoDecimals(_.avg_latency),
-        avgConnect: roundNumberTwoDecimals(_.avg_connect)
-      }))
-    };
-  } catch (error) {
-    throw new Error(`Error while processing query results ${error}`);
+        avgConnect: roundNumberTwoDecimals(_.avg_connect),
+      })),
+    }
+  } catch(error) {
+    throw new Error(`Error while processing query results ${error}`)
   }
-};
+}
 
 export const prepareChartDataForSaving = (
   overviewData: ChartOverviewData[], labelData: ChartLabelData[], interval: number, distributedThreads?: []) => {
-  const intervalSec = interval / 1000;
-  const labels = [...new Set(labelData.map((_) => _.label))];
+  const intervalSec = interval / 1000
+  const labels = [...new Set(labelData.map((_) => _.label))]
   return {
     threads: distributedThreads?.length > 0
       ? calculateDistributedThreads(distributedThreads)
-      : overviewData.map((_) => [moment(_.time).valueOf(), _.threads]) as [number, number][],
+      : overviewData.map((_) => [moment(_.time).valueOf(), _.threads]) as Array<[number, number]>,
     overAllFailRate: {
       data: overviewData.map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.error_rate * 100)]),
-      name: 'errors'
+      name: "errors",
     },
     overallTimeResponse: {
       data: overviewData.map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.avg_response)]),
-      name: 'response time'
+      name: "response time",
     },
     overallThroughput: {
       data: overviewData.map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.total / intervalSec)]),
-      name: 'throughput'
+      name: "throughput",
     },
     overAllNetworkUp: {
       data: overviewData.map((_) => [moment(_.time).valueOf(),
         roundNumberTwoDecimals(_.bytes_sent_total / intervalSec)]),
-      name: 'network up'
+      name: "network up",
     },
     overAllNetworkDown: {
       data: overviewData.map((_) => [moment(_.time).valueOf(),
         roundNumberTwoDecimals(_.bytes_received_total / intervalSec)]),
-      name: 'network down'
+      name: "network down",
     },
     overAllNetworkV2: {
       data: overviewData.map((_) => [moment(_.time).valueOf(),
         roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / intervalSec)]),
-      name: 'network'
+      name: "network",
     },
     throughput: labels.map((label) => ({
       data: labelData.filter((_) => _.label === label)
         .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.total / intervalSec)]),
-      name: label
+      name: label,
     })),
     responseTime: labels.map((label) => ({
       data: labelData.filter((_) => _.label === label)
         .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.avg_response)]),
-      name: label
+      name: label,
     })),
     minResponseTime: labels.map((label) => ({
       data: labelData.filter((_) => _.label === label)
         .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.min_response)]),
-      name: label
+      name: label,
     })),
     maxResponseTime: labels.map((label) => ({
       data: labelData.filter((_) => _.label === label)
         .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.max_response)]),
-      name: label
+      name: label,
     })),
     networkV2: labels.map((label) => ({
       data: labelData.filter((_) => _.label === label)
         .map((_) => [moment(_.time).valueOf(),
           roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / intervalSec)]),
-      name: label
+      name: label,
     })),
     networkUp: labels.map((label) => ({
       data: labelData.filter((_) => _.label === label)
         .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.bytes_sent_total / intervalSec)]),
-      name: label
+      name: label,
     })),
     networkDown: labels.map((label) => ({
       data: labelData.filter((_) => _.label === label)
         .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.bytes_received_total / intervalSec)]),
-      name: label
+      name: label,
     })),
     percentile90: labels.map((label) => ({
       data: labelData.filter((_) => _.label === label)
         .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.n90)]),
-      name: label
+      name: label,
     })),
     percentile95: labels.map((label) => ({
       data: labelData.filter((_) => _.label === label)
         .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.n95)]),
-      name: label
+      name: label,
     })),
     percentile99: labels.map((label) => ({
       data: labelData.filter((_) => _.label === label)
         .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.n99)]),
-      name: label
-    }))
-  };
-};
+      name: label,
+    })),
+  }
+}
 
-export const calculateDistributedThreads = (distributedThreads: DistributedThreadData[]): [number, number][] => {
+export const calculateDistributedThreads = (distributedThreads: DistributedThreadData[]): Array<[number, number]> => {
   const threadAcc = distributedThreads.reduce((acc, curr) => {
-    const interval = moment(curr.time).valueOf();
+    const interval = moment(curr.time).valueOf()
     if (!acc[interval]) {
-      acc[interval] = 0;
+      acc[interval] = 0
     }
-    acc[interval] += curr.threads;
-    return acc;
-  }, {});
+    acc[interval] += curr.threads
+    return acc
+  }, {})
 
-  const threads = [];
+  const threads = []
 
   for (const key in threadAcc) {
-    threads.push([parseInt(key, 10), threadAcc[key]]);
+    threads.push([parseInt(key, 10), threadAcc[key]])
   }
-  return threads;
-};
+  return threads
+}
 
 export const stringToNumber = (input: string, radix: number) => {
-  const result = parseInt(input, radix);
+  const result = parseInt(input, radix)
   if (isNaN(result)) {
-    throw ('not a number');
+    // eslint-disable-next-line no-throw-literal
+    throw ("not a number")
   }
-  return result;
-};
+  return result
+}
 
 export const transformDataForDb = (_, itemId) => {
   try {
-    _.timeStamp = new Date(stringToNumber(_.timeStamp, 10));
-    _.elapsed = stringToNumber(_.elapsed, 10);
-    _.bytes = stringToNumber(_.bytes, 10);
-    _.sentBytes = _.sentBytes ? stringToNumber(_.sentBytes, 10) : 0;
-    _.grpThreads = stringToNumber(_.grpThreads, 10);
-    _.allThreads = stringToNumber(_.allThreads, 10);
-    _.Latency = stringToNumber(_.Latency, 10);
-    _.Connect = stringToNumber(_.Connect, 10);
-    _.success = _.success === 'true';
-    _.sutHostname = getHostnameFromUrl(_.URL);
-    _.itemId = itemId;
-    return _;
-  } catch (error) {
-    logger.error(`Error while parsing data: ${error}`);
-    return;
+    _.timeStamp = new Date(stringToNumber(_.timeStamp, 10))
+    _.elapsed = stringToNumber(_.elapsed, 10)
+    _.bytes = stringToNumber(_.bytes, 10)
+    _.sentBytes = _.sentBytes ? stringToNumber(_.sentBytes, 10) : 0
+    _.grpThreads = stringToNumber(_.grpThreads, 10)
+    _.allThreads = stringToNumber(_.allThreads, 10)
+    _.Latency = stringToNumber(_.Latency, 10)
+    _.Connect = stringToNumber(_.Connect, 10)
+    _.success = _.success === "true"
+    _.sutHostname = getHostnameFromUrl(_.URL)
+    _.itemId = itemId
+    return _
+  } catch(error) {
+    logger.error(`Error while parsing data: ${error}`)
+
   }
-};
+}
 
 export const transformMonitoringDataForDb = (row, itemId): MonitoringTransformedData => {
   try {
     return {
-      timestamp: new Date(stringToNumber(row.ts, 10) * 1000),
+      timestamp: new Date(stringToNumber(row.ts, 10) * 1000),
       cpu: stringToNumber(row.cpu, 10),
       mem: stringToNumber(row.mem || 0, 10),
-      name: row.name || 'localhost',
-      itemId
-    };
-  } catch (error) {
-    logger.error(`Error while parsing monitoring data: ${error}`);
-    return;
+      name: row.name || "localhost",
+      itemId,
+    }
+  } catch(error) {
+    logger.error(`Error while parsing monitoring data: ${error}`)
+
   }
 
-};
+}
 
 export const getHostnameFromUrl = (url) => {
   if (!url) {
-    return;
-  };
-  try {
-    const hostname = new URL(url).hostname;
-    if (hostname && hostname.length > 0) {
-      return hostname;
-    }
-  } catch (error) {
-    return;
+    return
   }
-};
+  try {
+    const hostname = new URL(url).hostname
+    if (hostname && hostname.length > 0) {
+      return hostname
+    }
+  } catch(error) {
+
+  }
+}
 
 export interface ItemDbData {
-  itemStats: any;
-  overview: any;
-  startTime: Date;
-  sortedData: any;
+  itemStats: any
+  overview: any
+  startTime: Date
+  sortedData: any
 }
 
 export interface InputData {
-  timeStamp: string;
-  elapsed: string;
-  label: string;
-  responseCode: string;
-  responseMessage: string;
-  threadName: string;
-  success: string;
-  bytes: string;
-  grpThreads: string;
-  allThreads: string;
+  timeStamp: string
+  elapsed: string
+  label: string
+  responseCode: string
+  responseMessage: string
+  threadName: string
+  success: string
+  bytes: string
+  grpThreads: string
+  allThreads: string
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  Latency: string;
+  Latency: string
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  Hostname: string;
+  Hostname: string
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  Connect: string;
+  Connect: string
 }
 
 export interface OutputData {
-  timeStamp: number;
-  elapsed: number;
-  label: string;
-  responseCode: number;
-  responseMessage: string;
-  threadName: string;
-  success: boolean;
-  bytes: number;
-  grpThreads: number;
-  allThreads: number;
+  timeStamp: number
+  elapsed: number
+  label: string
+  responseCode: number
+  responseMessage: string
+  threadName: string
+  success: boolean
+  bytes: number
+  grpThreads: number
+  allThreads: number
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  Latency: number;
+  Latency: number
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  Hostname: string;
+  Hostname: string
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  Connect: number;
+  Connect: number
 }
 
 interface ChartOverviewData {
-  min: Date;
-  max: Date;
-  total: number;
-  threads: number;
-  avg_response: number;
-  time: Date;
-  number_of_failed: number;
-  bytes_received_total: number;
-  bytes_sent_total: number;
-  error_rate: number;
+  min: Date
+  max: Date
+  total: number
+  threads: number
+  avg_response: number
+  time: Date
+  number_of_failed: number
+  bytes_received_total: number
+  bytes_sent_total: number
+  error_rate: number
 }
 
 interface ChartLabelData {
-  time: Date;
-  label: string;
-  min: Date;
-  max: Date;
-  total: number;
-  threads: number;
-  avg_response: number;
-  min_response: number;
-  max_response: number;
-  bytes_received_total: number;
-  bytes_sent_total: number;
-  n90: number;
-  n95: number;
-  n99: number;
+  time: Date
+  label: string
+  min: Date
+  max: Date
+  total: number
+  threads: number
+  avg_response: number
+  min_response: number
+  max_response: number
+  bytes_received_total: number
+  bytes_sent_total: number
+  n90: number
+  n95: number
+  n99: number
 }
 
 export interface Overview {
-  percentil: number;
-  errorRate: number;
-  errorCount: number;
-  throughput: number;
-  duration: number;
-  maxVu: number;
-  avgResponseTime: number;
-  avgLatency: number;
-  avgConnect: number;
-  startDate: Date;
-  endDate: Date;
-  bytesPerSecond: number;
-  bytesSentPerSecond: number;
-};
+  percentil: number
+  errorRate: number
+  errorCount: number
+  throughput: number
+  duration: number
+  maxVu: number
+  avgResponseTime: number
+  avgLatency: number
+  avgConnect: number
+  startDate: Date
+  endDate: Date
+  bytesPerSecond: number
+  bytesSentPerSecond: number
+}
 
 interface DistributedThreadData {
-  time: Date;
-  hostname: string;
-  threads: number;
-};
+  time: Date
+  hostname: string
+  threads: number
+}
 
 interface MonitoringTransformedData {
-  timestamp: Date;
-  cpu: number;
-  mem: number;
-  name: string;
-  itemId: string;
+  timestamp: Date
+  cpu: number
+  mem: number
+  name: string
+  itemId: string
 }
 
 interface StatusCodeDistribution {
-  label: string;
-  status_code: string;
-  count: number;
+  label: string
+  status_code: string
+  count: number
 }
 
 interface ResponseMessageFailures {
-  label: string;
-  response_message: string;
-  count: number;
+  label: string
+  response_message: string
+  count: number
 }

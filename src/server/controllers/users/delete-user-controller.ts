@@ -1,13 +1,14 @@
-import { Request, Response, NextFunction } from 'express';
-import { db } from '../../../db/db';
-import { deleteUser, isExistingUser } from '../../queries/users';
+import { Request, Response } from "express"
+import { db } from "../../../db/db"
+import { deleteUser, isExistingUser } from "../../queries/users"
+import { StatusCode } from "../../utils/status-code"
 
-export const deleteUserController = async (req: Request, res: Response, next: NextFunction) => {
-  const { userId } = req.params;
-  const [{ exists }] = await db.query(isExistingUser(userId));
+export const deleteUserController = async (req: Request, res: Response) => {
+  const { userId } = req.params
+  const [{ exists }] = await db.query(isExistingUser(userId))
   if (exists) {
-    await db.query(deleteUser(userId));
-    res.status(200).send();
+    await db.query(deleteUser(userId))
+    res.status(StatusCode.Ok).send()
   }
-  res.status(404).send();
-};
+  res.status(StatusCode.NotFound).send()
+}

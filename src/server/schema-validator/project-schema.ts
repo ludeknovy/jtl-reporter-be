@@ -1,12 +1,14 @@
-// eslint-disable-next-line @typescript-eslint/naming-convention
-const Joi = require('joi');
+import * as Joi from "joi"
+
+const MIN_LENGTH = 3
+const MAX_LENGTH = 50
 
 export const createNewProjectSchema = {
-  projectName: Joi.string().min(3).max(50).required()
-};
+  projectName: Joi.string().min(MIN_LENGTH).max(MAX_LENGTH).required(),
+}
 
 export const updateProjectSchema = {
-  projectName: Joi.string().min(3).max(50).required(),
+  projectName: Joi.string().min(MIN_LENGTH).max(MAX_LENGTH).required(),
   topMetricsSettings: Joi.object({
     virtualUsers: Joi.boolean().required(),
     errorRate: Joi.boolean().required(),
@@ -15,14 +17,14 @@ export const updateProjectSchema = {
     network: Joi.boolean().required(),
     avgLatency: Joi.boolean().required(),
     avgResponseTime: Joi.boolean().required(),
-    avgConnectionTime: Joi.boolean().required()
-  })
-};
+    avgConnectionTime: Joi.boolean().required(),
+  }),
+}
 
 export const projectNameParam = {
-  projectName: Joi.string().required()
-};
+  projectName: Joi.string().required(),
+}
 
 export const scenarioSchema = {
-  scenarioName: Joi.string().min(1).max(50).required()
-};
+  scenarioName: Joi.string().min(1).max(MAX_LENGTH).required(),
+}

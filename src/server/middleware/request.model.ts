@@ -1,10 +1,10 @@
-import { Request } from 'express';
-import { AllowedRoles } from './authorization-middleware';
+import { Request } from "express"
+import { AllowedRoles } from "./authorization-middleware"
 
 export interface IGetUserAuthInfoRequest extends Request {
   user: {
-    userId: string;
+    userId: string
     role: AllowedRoles
-  };
-  allowQueryAuth?: boolean;
+  }
+  allowQueryAuth?: boolean
 }
