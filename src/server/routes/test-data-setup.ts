@@ -59,8 +59,10 @@ export class TestDataSetup {
               res.sendStatus(StatusCode.Created)
               break
             case States.ExistingApiKey:
+              // eslint-disable-next-line no-case-declarations
               const TOKEN = "at-testToken"
               await createUserInDB("test-user", "test00010", AllowedRoles.Admin)
+              // eslint-disable-next-line no-case-declarations
               const { id } = await db.one(getUser("test-user"))
               await db.any(createNewApiToken(TOKEN, "test-token", id))
               res.status(StatusCode.Ok).send({ token: TOKEN })

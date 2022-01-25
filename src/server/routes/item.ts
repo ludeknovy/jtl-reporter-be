@@ -49,6 +49,7 @@ export class ItemsRoutes {
 
     app.route("/api/projects/:projectName/scenarios/:scenarioName/items/start-async")
       .post(
+        authenticationMiddleware,
         authorizationMiddleware([AllowedRoles.Regular, AllowedRoles.Admin]),
         bodySchemaValidator(newAsyncItemStartBodySchema),
         paramsSchemaValidator(newItemParamSchema),

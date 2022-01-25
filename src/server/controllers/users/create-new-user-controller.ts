@@ -11,7 +11,7 @@ export const createNewUserController = async (req: Request, res: Response, next:
 
   try {
     await createUserInDB(username, password, role)
-    res.status(StatusCode.Ok).send()
+    res.status(StatusCode.Created).send()
   } catch(error) {
     if (error.routine === "_bt_check_unique") {
       return next(boom.conflict("Username already exists"))

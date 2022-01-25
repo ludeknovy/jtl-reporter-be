@@ -39,9 +39,7 @@ export const authenticationMiddleware = async (req: IGetUserAuthInfoRequest, res
         req.user = { userId: tokenData.created_by, role: tokenData.role }
         return next()
       }
-        return next(boom.unauthorized(UNAUTHORIZED_MSG))
-
-        return next(boom.unauthorized(UNAUTHORIZED_MSG))
+      return next(boom.unauthorized(UNAUTHORIZED_MSG))
 
     } catch(error) {
       return next(boom.unauthorized(UNAUTHORIZED_MSG))

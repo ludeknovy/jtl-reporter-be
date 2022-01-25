@@ -16,8 +16,8 @@ describe("getTokenController", () => {
     const querySpy = jest.spyOn(require("../../queries/api-tokens"), "getApiTokens")
     const request = {
       user: {
-        role: AllowedRoles.Admin
-      }
+        role: AllowedRoles.Admin,
+      },
     }
     await getTokensController(
       request as unknown as IGetUserAuthInfoRequest,

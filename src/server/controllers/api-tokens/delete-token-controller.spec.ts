@@ -20,7 +20,7 @@ describe("deleteTokenController", () => {
       user: {
         userId: "test",
         role: AllowedRoles.Admin,
-      }
+      },
     }
     await deleteTokenController(
       request as unknown as IGetUserAuthInfoRequest,
