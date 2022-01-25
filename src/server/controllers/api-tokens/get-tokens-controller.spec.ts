@@ -1,4 +1,5 @@
 import { Response } from "express"
+import { AllowedRoles } from "../../middleware/authorization-middleware"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 import { getTokensController } from "./get-tokens-controller"
 jest.mock("../../../db/db")
@@ -14,6 +15,9 @@ describe("getTokenController", () => {
     const response = mockResponse()
     const querySpy = jest.spyOn(require("../../queries/api-tokens"), "getApiTokens")
     const request = {
+      user: {
+        role: AllowedRoles.Admin
+      }
     }
     await getTokensController(
       request as unknown as IGetUserAuthInfoRequest,

@@ -1,9 +1,9 @@
-import { authenticationMiddleware } from "./auth-middleware"
 import { Response, NextFunction } from "express"
 import { IGetUserAuthInfoRequest } from "./request.model"
 import Boom = require("boom")
 import { db } from "../../db/db"
 import * as jwt from "jsonwebtoken"
+import { authenticationMiddleware } from "./authentication-middleware"
 
 jest.mock("../../db/db")
 jest.mock("jsonwebtoken")
