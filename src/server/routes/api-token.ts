@@ -17,7 +17,7 @@ export class ApiTokensRoutes {
     .get(
       authenticationMiddleware,
       authorizationMiddleware([AllowedRoles.Regular, AllowedRoles.Admin]),
-      wrapAsync( (req: Request, res: Response) => getTokensController(req, res)))
+      wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => getTokensController(req, res)))
 
     .post(
       authenticationMiddleware,
@@ -30,7 +30,7 @@ export class ApiTokensRoutes {
       authenticationMiddleware,
       authorizationMiddleware([AllowedRoles.Regular, AllowedRoles.Admin]),
       bodySchemaValidator(deleteTokenSchema),
-      wrapAsync( (req: Request, res: Response, next: NextFunction) => deleteTokenController(req, res, next)))
+      wrapAsync( (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => deleteTokenController(req, res, next)))
     }
   }
 
