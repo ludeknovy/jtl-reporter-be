@@ -16,7 +16,7 @@ export class LabelRoutes {
     app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label/:label/trend")
       .get(
         authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(labelParamSchema),
         queryParamsValidator(labelQuerySchema),
         wrapAsync( (req: Request, res: Response) => getLabelTrendController(req, res)))
@@ -24,7 +24,7 @@ export class LabelRoutes {
     app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label/:label/virtual-users")
       .get(
         authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(labelParamSchema),
         queryParamsValidator(labelQuerySchema),
         wrapAsync( (req: Request, res: Response, next: NextFunction) => getLabelVirtualUsersController(req, res, next)))
@@ -32,7 +32,7 @@ export class LabelRoutes {
     app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label/:label/errors")
       .get(
         authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(labelParamSchema),
         wrapAsync( (req: Request, res: Response) => getLabelErrorsController(req, res)))
   }

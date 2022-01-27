@@ -16,19 +16,19 @@ export class ApiTokensRoutes {
     app.route("/api/api-tokens")
     .get(
       authenticationMiddleware,
-      authorizationMiddleware([AllowedRoles.Regular, AllowedRoles.Admin]),
+      authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
       wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => getTokensController(req, res)))
 
     .post(
       authenticationMiddleware,
-      authorizationMiddleware([AllowedRoles.Regular, AllowedRoles.Admin]),
+      authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
       bodySchemaValidator(newTokenSchema),
       wrapAsync((req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) =>
         createTokenController(req, res, next)))
 
     .delete(
       authenticationMiddleware,
-      authorizationMiddleware([AllowedRoles.Regular, AllowedRoles.Admin]),
+      authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
       bodySchemaValidator(deleteTokenSchema),
       wrapAsync((req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) =>
         deleteTokenController(req, res, next)))

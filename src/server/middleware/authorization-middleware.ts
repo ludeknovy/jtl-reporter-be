@@ -14,6 +14,6 @@ export const authorizationMiddleware = (allowedRoles: AllowedRoles[]) => {
 
 export enum AllowedRoles {
   Admin = "admin",
-  Regular = "regular",
+  Operator = "operator",
   Readonly = "readonly"
 }

@@ -28,13 +28,13 @@ export class ScenarioRoutes {
     app.route("/api/projects/:projectName/scenarios")
       .get(
         authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(projectNameParam),
         wrapAsync( (req: Request, res: Response) => getScenariosController(req, res)))
 
       .post(
         authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Regular, AllowedRoles.Admin]),
+        authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(projectNameParam),
         bodySchemaValidator(scenarioSchema),
         wrapAsync( (req: Request, res: Response, next: NextFunction) => createScenarioController(req, res, next)))
@@ -42,34 +42,34 @@ export class ScenarioRoutes {
     app.route("/api/projects/:projectName/scenarios/:scenarioName")
       .get(
         authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
         wrapAsync( (req: Request, res: Response) => getScenarioController(req, res))
       )
 
       .put(
         authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Regular, AllowedRoles.Admin]),
+        authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
         bodySchemaValidator(updateScenarioSchema),
         wrapAsync( (req: Request, res: Response) => updateScenarioController(req, res)))
 
       .delete(
         authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Regular, AllowedRoles.Admin]),
+        authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
         wrapAsync( (req: Request, res: Response) => deleteScenarioController(req, res)))
 
     app.route("/api/projects/:projectName/scenarios/:scenarioName/notifications")
       .get(
         authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
         wrapAsync( (req: Request, res: Response) => getScenarioNotificationsController(req, res)))
 
       .post(
         authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Regular, AllowedRoles.Admin]),
+        authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
         bodySchemaValidator(scenarioNotificationBodySchema),
         wrapAsync( (req: Request, res: Response) => createScenarioNotificationController(req, res)))
@@ -78,14 +78,14 @@ export class ScenarioRoutes {
     app.route("/api/projects/:projectName/scenarios/:scenarioName/notifications/:notificationId")
       .delete(
         authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Regular, AllowedRoles.Admin]),
+        authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramSchemaNotification),
         wrapAsync( (req: Request, res: Response) => deleteScenarioNotificationController(req, res)))
 
     app.route("/api/projects/:projectName/scenarios/:scenarioName/trends")
       .get(
         authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Regular, AllowedRoles.Admin]),
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
         wrapAsync( (req: Request, res: Response) => getScenarioTrendsController(req, res)))
   }
