@@ -65,7 +65,7 @@ describe("AuthenticationMiddleware", () => {
         params: { projectName: "project", scenarioName: "scenario", itemId: "id" },
         allowQueryAuth: true,
         user: null,
-      } 
+      }
       await authenticationMiddleware(req as unknown as IGetUserAuthInfoRequest,
       mockResponse as Response, nextFunction)
       expect(req.user).toEqual({ role:AllowedRoles.Readonly })
