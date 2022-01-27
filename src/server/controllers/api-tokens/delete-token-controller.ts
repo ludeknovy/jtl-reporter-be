@@ -10,7 +10,7 @@ export const deleteTokenController = async (req: IGetUserAuthInfoRequest, res: R
   const { id } = req.body
   const { userId, role } = req.user
 
-  // regular user is allowed to detlete only its own api tokens
+  // operator user is allowed to detlete only its own api tokens
   if (role === AllowedRoles.Operator) {
     const { exists: isMine } = await db.one(isMyToken(id, userId))
     if (isMine) {
@@ -18,8 +18,6 @@ export const deleteTokenController = async (req: IGetUserAuthInfoRequest, res: R
       return res.status(StatusCode.NoContent).send()
     }
       return next(boom.forbidden())
-
-
   }
   await db.query(deleteToken(id))
   return res.status(StatusCode.NoContent).send()

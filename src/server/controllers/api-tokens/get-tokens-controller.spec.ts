@@ -11,12 +11,27 @@ const mockResponse = () => {
 }
 
 describe("getTokenController", () => {
-  it("should call get api token query", async () => {
+  it("should call getApiToken query when admin role", async () => {
     const response = mockResponse()
     const querySpy = jest.spyOn(require("../../queries/api-tokens"), "getApiTokens")
     const request = {
       user: {
         role: AllowedRoles.Admin,
+      },
+    }
+    await getTokensController(
+      request as unknown as IGetUserAuthInfoRequest,
+      response as unknown as Response)
+    expect(querySpy).toHaveBeenCalledTimes(1)
+    expect(response.send).toHaveBeenCalledTimes(1)
+  })
+
+  it("should call getOnlyMyApiTokens query when operator role", async () => {
+    const response = mockResponse()
+    const querySpy = jest.spyOn(require("../../queries/api-tokens"), "getOnlyMyApiTokens")
+    const request = {
+      user: {
+        role: AllowedRoles.Operator,
       },
     }
     await getTokensController(
