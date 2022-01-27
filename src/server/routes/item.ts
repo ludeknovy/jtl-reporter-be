@@ -88,20 +88,20 @@ export class ItemsRoutes {
         authenticationMiddleware,
         authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
-        wrapAsync( (req: Request, res: Response) => getItemLinksController(req, res)))
+        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => getItemLinksController(req, res)))
 
       .post(
         authenticationMiddleware,
         authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
-        wrapAsync( (req: Request, res: Response) => createItemLinkController(req, res)))
+        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => createItemLinkController(req, res)))
 
     app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/share-tokens/:tokenId")
       .delete(
         authenticationMiddleware,
         authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(shareTokenSchema),
-        wrapAsync( (req: Request, res: Response) => deleteItemShareTokenController(req, res)))
+        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => deleteItemShareTokenController(req, res)))
 
     app.route("/api/projects/:projectName/scenarios/:scenarioName/processing-items")
       .get(
@@ -113,7 +113,7 @@ export class ItemsRoutes {
     app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/custom-chart-settings")
       .post(
         authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
         bodySchemaValidator(upsertUserItemChartSettings),
         wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => upsertItemChartSettingsController(req, res))
