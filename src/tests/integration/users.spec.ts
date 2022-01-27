@@ -28,7 +28,7 @@ describe("Users", () => {
         .send({
           username: USERNAME,
           password: "test12345",
-          role: AllowedRoles.Operator
+          role: AllowedRoles.Operator,
         })
         .expect(StatusCode.Created)
 
