@@ -4,6 +4,7 @@ import Boom = require("boom")
 import { db } from "../../db/db"
 import * as jwt from "jsonwebtoken"
 import { authenticationMiddleware } from "./authentication-middleware"
+import { AllowedRoles } from "./authorization-middleware"
 
 jest.mock("../../db/db")
 jest.mock("jsonwebtoken")
@@ -55,6 +56,20 @@ describe("AuthenticationMiddleware", () => {
       } as unknown as IGetUserAuthInfoRequest,
       mockResponse as Response, nextFunction)
       expect(nextFunction).toHaveBeenCalledWith(Boom.internal())
+    })
+    it("should add role to the user object", async () => {
+      db.oneOrNone = jest.fn().mockResolvedValue({ token: "test" })
+      const req = {
+        headers: {},
+        query: { token: "123" },
+        params: { projectName: "project", scenarioName: "scenario", itemId: "id" },
+        allowQueryAuth: true,
+        user: null,
+      } 
+      await authenticationMiddleware(req as unknown as IGetUserAuthInfoRequest,
+      mockResponse as Response, nextFunction)
+      expect(req.user).toEqual({ role:AllowedRoles.Readonly })
+      expect(nextFunction).toHaveBeenCalledWith()
     })
   })
   describe("Api token", () => {
