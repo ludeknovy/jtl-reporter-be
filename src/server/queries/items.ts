@@ -387,7 +387,7 @@ export const selectOnlyMyShareTokens = (projectName, scenarioName, itemId, userI
   }
 }
 
-export const createShareToken = (projectName, scenarioName, itemId, token, name = null, userId) => {
+export const createShareToken = (projectName, scenarioName, itemId, token, userId, name = null) => {
   return {
     text: `INSERT INTO jtl.share_tokens (item_id, token, name, created_by) VALUES (
       (SELECT it.id FROM jtl.items as it

@@ -1,4 +1,4 @@
-import { Request, Response } from "express"
+import { Response } from "express"
 import { randomBytes } from "crypto"
 import { db } from "../../../../db/db"
 import { createShareToken } from "../../../queries/items"
@@ -11,6 +11,6 @@ export const createItemLinkController = async (req: IGetUserAuthInfoRequest, res
   const { note } = req.body
   const SIZE = 40
   const token = randomBytes(SIZE).toString("hex")
-  await db.none(createShareToken(projectName, scenarioName, itemId, token, note, user.userId ))
+  await db.none(createShareToken(projectName, scenarioName, itemId, token, user.userId, note ))
   res.status(StatusCode.Created).send({ token })
 }

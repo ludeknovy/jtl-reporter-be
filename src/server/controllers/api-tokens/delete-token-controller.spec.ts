@@ -34,7 +34,9 @@ describe("deleteTokenController", () => {
     expect(querySpy).toHaveBeenCalledTimes(1)
     expect(response.send).toHaveBeenCalledTimes(1)
   })
-  it("should return forbidden when trying to delete api key that the user did not created as operator role", async () => {
+
+  it("should return forbidden when trying to delete api key that the user did not created as operator role",
+    async () => {
     (db.one as any).mockResolvedValue({ exists: false })
 
     const nextFunction: NextFunction = jest.fn()
@@ -71,5 +73,6 @@ describe("deleteTokenController", () => {
       request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response, nextFunction)
       expect(querySpy).toHaveBeenCalledTimes(1)
-      expect(response.send).toHaveBeenCalledTimes(1)  })
+      expect(response.send).toHaveBeenCalledTimes(1)
+})
 })

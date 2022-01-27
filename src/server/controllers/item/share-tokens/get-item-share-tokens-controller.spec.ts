@@ -15,7 +15,7 @@ describe("getItemLinksController", () => {
     const querySpy = jest.spyOn(require("../../../queries/items"), "selectShareTokens")
     const request = {
       params: { projectName: "project", scenarioName: "scenario", itemId: "id" },
-      user: { userId: "userId" }
+      user: { userId: "userId" },
     }
     await getItemLinksController(request as unknown as IGetUserAuthInfoRequest, response as unknown as Response)
     expect(querySpy).toHaveBeenCalledTimes(1)
