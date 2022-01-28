@@ -238,8 +238,8 @@ describe("prepare data", () => {
         { label: "label2", status_code: "200", count: 433 },
         { label: "label1", status_code: "200", count: 932 }]
       const responseFailures = [
-        { label: "label1", response_message: "failure", count: 31 },
-        { label: "label2", response_message: "failure2", count: 1 },
+        { label: "label1", response_message: "failure", count: 31, status_code: "100" },
+        { label: "label2", response_message: "failure2", count: 1, status_code: "101" },
       ]
       const { overview, labelStats } = prepareDataForSavingToDb(overviewData, labelsData, [],
         statusCodes, responseFailures)
@@ -274,7 +274,7 @@ describe("prepare data", () => {
           n0: 343,
           statusCodes: [{ count: 932, statusCode: "200" }],
           responseMessageFailures: [{
-            count: 31, responseMessage: "failure",
+            count: 31, responseMessage: "failure", statusCode: "100",
           }],
         },
         {
@@ -292,7 +292,7 @@ describe("prepare data", () => {
           n0: 50,
           statusCodes: [{ count: 433, statusCode: "200" }],
           responseMessageFailures: [{
-            count: 1, responseMessage: "failure2",
+            count: 1, responseMessage: "failure2", statusCode: "101",
           }],
         }])
     })
