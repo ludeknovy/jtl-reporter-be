@@ -38,7 +38,8 @@ export const isMyToken = (id, userId) => {
 
 export const getApiToken = (token) => {
   return {
-    text: "SELECT * FROM jtl.api_tokens WHERE token = $1;",
+    text: `SELECT tokens.created_by, users.role FROM jtl.api_tokens tokens 
+    LEFT JOIN jtl.users users on users.id = tokens.created_by WHERE token = $1;`,
     values: [token],
   }
 }
