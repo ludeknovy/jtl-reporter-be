@@ -3,7 +3,8 @@ import { logger } from "../../logger"
 
 export const authorizationMiddleware = (allowedRoles: AllowedRoles[]) => {
   return (request, response, next) => {
-    logger.info(`User ${request.user.userId} with role ${request.user.role} asking access to a resource with allowed roles: ${allowedRoles}`)
+    const user = request.user
+    logger.info(`User ${user.userId} with role ${user.role} accessing a resource with allowed roles: ${allowedRoles}`)
     if (allowedRoles.find((role) => role === request.user.role)) {
       // role is allowed, so continue on the next middleware
       next()
