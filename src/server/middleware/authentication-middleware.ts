@@ -8,6 +8,7 @@ import { config } from "../config"
 import { IGetUserAuthInfoRequest } from "./request.model"
 import { logger } from "../../logger"
 import { findShareToken } from "../queries/items"
+import { AllowedRoles } from "./authorization-middleware"
 
 const UNAUTHORIZED_MSG = "The token you provided is invalid"
 
@@ -20,6 +21,8 @@ export const authenticationMiddleware = async (req: IGetUserAuthInfoRequest, res
       const { projectName, scenarioName, itemId } = req.params
       const shareToken = await db.oneOrNone(findShareToken(projectName, scenarioName, itemId, token))
       if (shareToken && shareToken.token) {
+        // patch the role so it passes authorization middleware
+        req.user = { role: AllowedRoles.Readonly }
         return next()
       }
       return next(boom.unauthorized(UNAUTHORIZED_MSG))
@@ -36,10 +39,10 @@ export const authenticationMiddleware = async (req: IGetUserAuthInfoRequest, res
     try {
       const [tokenData] = await db.query(getApiToken(accessToken))
       if (tokenData) {
-        req.user = { userId: tokenData.created_by }
+        req.user = { userId: tokenData.created_by, role: tokenData.role }
         return next()
       }
-        return next(boom.unauthorized(UNAUTHORIZED_MSG))
+      return next(boom.unauthorized(UNAUTHORIZED_MSG))
 
     } catch(error) {
       return next(boom.unauthorized(UNAUTHORIZED_MSG))
@@ -52,7 +55,7 @@ export const authenticationMiddleware = async (req: IGetUserAuthInfoRequest, res
     if (!userData) {
       return next(boom.unauthorized(UNAUTHORIZED_MSG))
     }
-    req.user = { userId }
+    req.user = { userId, role: userData.role }
     next()
   } catch(error) {
     return next(boom.unauthorized(UNAUTHORIZED_MSG))

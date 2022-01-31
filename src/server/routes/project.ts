@@ -9,8 +9,9 @@ import { getLatestItemsControllers } from "../controllers/project/get-latest-ite
 import { deleteProjectController } from "../controllers/project/delete-project-controller"
 import { updateProjectController } from "../controllers/project/update-project-controller"
 import { getProjectStatsController } from "../controllers/project/get-projects-stats-controller"
-import { authenticationMiddleware } from "../middleware/auth-middleware"
 import { getProjectController } from "../controllers/project/get-project-controller"
+import { AllowedRoles, authorizationMiddleware } from "../middleware/authorization-middleware"
+import { authenticationMiddleware } from "../middleware/authentication-middleware"
 
 export class ProjectRoutes {
   routes(app: express.Application): void {
@@ -18,37 +19,44 @@ export class ProjectRoutes {
     app.route("/api/projects")
       .post(
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
         bodySchemaValidator(createNewProjectSchema),
         wrapAsync( (req: Request, res: Response, next: NextFunction) => createProjectController(req, res, next)))
 
       .get(
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         wrapAsync( (req: Request, res: Response) => getProjectsController(req, res)))
 
     app.route("/api/projects/latest-items")
       .get(
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         wrapAsync( (req: Request, res: Response ) => getLatestItemsControllers(req, res)))
 
     app.route("/api/projects/overall-stats")
       .get(
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         wrapAsync( (req: Request, res: Response ) => getProjectStatsController(req, res)))
 
     app.route("/api/projects/:projectName")
       .delete(
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(projectNameParam),
         wrapAsync( (req: Request, res: Response) => deleteProjectController(req, res)))
 
       .get(
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(projectNameParam),
         wrapAsync( (req: Request, res: Response) => getProjectController(req, res)))
 
 
       .put(
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(projectNameParam),
         bodySchemaValidator(updateProjectSchema),
         wrapAsync( (req: Request, res: Response) => updateProjectController(req, res)))

@@ -31,6 +31,9 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
   upload(req, res, async error => {
     const HOSTNAME_LENGTH = 200
     const { environment, note, status = ItemStatus.None, hostname } = req.body
+    if (!req.files) {
+      return next(boom.badRequest())
+    }
     const { kpi, monitoring } = req.files as { kpi: unknown; monitoring: unknown}
     const { scenarioName, projectName } = req.params
     if (error) {

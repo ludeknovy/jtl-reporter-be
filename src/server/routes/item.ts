@@ -16,7 +16,6 @@ import { getItemController } from "../controllers/item/get-item-controller"
 import { updateItemController } from "../controllers/item/update-item-controller"
 import { deleteItemController } from "../controllers/item/delete-item-controller"
 import { createItemController } from "../controllers/item/create-item-controller"
-import { authenticationMiddleware } from "../middleware/auth-middleware"
 import { getProcessingItemsController } from "../controllers/item/get-processing-items-controller"
 import { createItemAsyncController } from "../controllers/item/create-item-async-controller"
 import { stopItemAsyncController } from "../controllers/item/stop-item-async-controller"
@@ -27,6 +26,8 @@ import { deleteItemShareTokenController } from "../controllers/item/share-tokens
 import { IGetUserAuthInfoRequest } from "../middleware/request.model"
 import { upsertItemChartSettingsController } from "../controllers/item/upsert-item-chart-settings-controller"
 import { getItemChartSettingsController } from "../controllers/item/get-item-chart-settings-controller"
+import { AllowedRoles, authorizationMiddleware } from "../middleware/authorization-middleware"
+import { authenticationMiddleware } from "../middleware/authentication-middleware"
 
 export class ItemsRoutes {
 
@@ -35,18 +36,21 @@ export class ItemsRoutes {
     app.route("/api/projects/:projectName/scenarios/:scenarioName/items")
       .get(
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(scenarioParamsSchema),
         queryParamsValidator(querySchema),
         wrapAsync( (req: Request, res: Response) => getItemsController(req, res)))
 
       .post(
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(newItemParamSchema),
         createItemController)
 
     app.route("/api/projects/:projectName/scenarios/:scenarioName/items/start-async")
       .post(
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
         bodySchemaValidator(newAsyncItemStartBodySchema),
         paramsSchemaValidator(newItemParamSchema),
         createItemAsyncController)
@@ -55,66 +59,69 @@ export class ItemsRoutes {
       .get(
         allowQueryTokenAuth,
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
         wrapAsync( (req: Request, res: Response) => getItemController(req, res)))
 
       .put(
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
         bodySchemaValidator(updateItemBodySchema),
-        // eslint-disable-next-line max-len
         wrapAsync( (req: Request, res: Response, next: NextFunction) => updateItemController(req, res, next)))
 
       .delete(
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
-        // eslint-disable-next-line max-len
         wrapAsync( (req: Request, res: Response) => deleteItemController(req, res)))
 
     app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/stop-async")
       .post(
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
         stopItemAsyncController)
 
     app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/share-tokens")
       .get(
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
-        // eslint-disable-next-line max-len
-        wrapAsync( (req: Request, res: Response) => getItemLinksController(req, res)))
+        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => getItemLinksController(req, res)))
 
       .post(
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
-        // eslint-disable-next-line max-len
-        wrapAsync( (req: Request, res: Response) => createItemLinkController(req, res)))
+        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => createItemLinkController(req, res)))
 
     app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/share-tokens/:tokenId")
       .delete(
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(shareTokenSchema),
-        // eslint-disable-next-line max-len
-        wrapAsync( (req: Request, res: Response) => deleteItemShareTokenController(req, res)))
+        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => deleteItemShareTokenController(req, res)))
 
     app.route("/api/projects/:projectName/scenarios/:scenarioName/processing-items")
       .get(
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(scenarioParamsSchema),
-        // eslint-disable-next-line max-len
         wrapAsync( (req: Request, res: Response) => getProcessingItemsController(req, res)))
 
     app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/custom-chart-settings")
       .post(
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
         bodySchemaValidator(upsertUserItemChartSettings),
-        // eslint-disable-next-line max-len
         wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => upsertItemChartSettingsController(req, res))
       )
-      .get(authenticationMiddleware,
+      .get(
+        authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
-        // eslint-disable-next-line max-len
         wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => getItemChartSettingsController(req, res)))
   }
 }

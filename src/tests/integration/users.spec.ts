@@ -3,6 +3,7 @@ import { userSetup } from "./helper/state"
 import { routes } from "./helper/routes"
 import * as uuid from "uuid"
 import { StatusCode } from "../../server/utils/status-code"
+import { AllowedRoles } from "../../server/middleware/authorization-middleware"
 
 describe("Users", () => {
   let credentials
@@ -27,6 +28,7 @@ describe("Users", () => {
         .send({
           username: USERNAME,
           password: "test12345",
+          role: AllowedRoles.Operator,
         })
         .expect(StatusCode.Created)
 

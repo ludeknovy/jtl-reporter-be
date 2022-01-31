@@ -373,16 +373,30 @@ export const selectShareTokens = (projectName, scenarioName, itemId) => {
   }
 }
 
-export const createShareToken = (projectName, scenarioName, itemId, token, name = null) => {
+export const selectOnlyMyShareTokens = (projectName, scenarioName, itemId, userId) => {
   return {
-    text: `INSERT INTO jtl.share_tokens (item_id, token, name) VALUES (
+    text: `SELECT t.id, t.token, t.name FROM jtl.share_tokens as t
+    LEFT JOIN jtl.items as it ON it.id = t.item_id
+    LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
+    LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE p.project_name = $1
+    AND s.name = $2
+    AND t.item_id = $3
+    And t.created_by = $4;`,
+    values: [projectName, scenarioName, itemId, userId],
+  }
+}
+
+export const createShareToken = (projectName, scenarioName, itemId, token, userId, name = null) => {
+  return {
+    text: `INSERT INTO jtl.share_tokens (item_id, token, name, created_by) VALUES (
       (SELECT it.id FROM jtl.items as it
       LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
       LEFT JOIN jtl.projects as p ON p.id = s.project_id
       WHERE p.project_name = $1
       AND s.name = $2
-      AND it.id = $3), $4, $5);`,
-    values: [projectName, scenarioName, itemId, token, name],
+      AND it.id = $3), $4, $5, $6);`,
+    values: [projectName, scenarioName, itemId, token, name, userId],
   }
 }
 
@@ -395,6 +409,19 @@ export const deleteShareToken = (projectName, scenarioName, itemId, id) => {
     AND sc.name = $2
     AND sc.project_id = (SELECT id FROM jtl.projects WHERE project_name = $1)`,
     values: [projectName, scenarioName, itemId, id],
+  }
+}
+
+export const deleteMyShareToken = (projectName, scenarioName, itemId, id, userId) => {
+  return {
+    text: `DELETE FROM jtl.share_tokens as st
+    USING jtl.scenario as sc
+    WHERE st.id = $4
+    AND st.created_by = $5
+    AND st.item_id = $3
+    AND sc.name = $2
+    AND sc.project_id = (SELECT id FROM jtl.projects WHERE project_name = $1);`,
+    values: [projectName, scenarioName, itemId, id, userId],
   }
 }
 
