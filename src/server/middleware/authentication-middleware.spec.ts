@@ -1,9 +1,10 @@
-import { authenticationMiddleware } from "./auth-middleware"
 import { Response, NextFunction } from "express"
 import { IGetUserAuthInfoRequest } from "./request.model"
 import Boom = require("boom")
 import { db } from "../../db/db"
 import * as jwt from "jsonwebtoken"
+import { authenticationMiddleware } from "./authentication-middleware"
+import { AllowedRoles } from "./authorization-middleware"
 
 jest.mock("../../db/db")
 jest.mock("jsonwebtoken")
@@ -56,6 +57,20 @@ describe("AuthenticationMiddleware", () => {
       mockResponse as Response, nextFunction)
       expect(nextFunction).toHaveBeenCalledWith(Boom.internal())
     })
+    it("should add role to the user object", async () => {
+      db.oneOrNone = jest.fn().mockResolvedValue({ token: "test" })
+      const req = {
+        headers: {},
+        query: { token: "123" },
+        params: { projectName: "project", scenarioName: "scenario", itemId: "id" },
+        allowQueryAuth: true,
+        user: null,
+      }
+      await authenticationMiddleware(req as unknown as IGetUserAuthInfoRequest,
+      mockResponse as Response, nextFunction)
+      expect(req.user).toEqual({ role:AllowedRoles.Readonly })
+      expect(nextFunction).toHaveBeenCalledWith()
+    })
   })
   describe("Api token", () => {
     it("should proceed when valid token provided", async () => {
@@ -64,7 +79,6 @@ describe("AuthenticationMiddleware", () => {
         headers: { "x-access-token": "at-test" },
         query: {},
         params: { projectName: "project", scenarioName: "scenario", itemId: "id" },
-        allowQueryAuth: true,
       } as unknown as IGetUserAuthInfoRequest,
       mockResponse as Response, nextFunction)
       expect(nextFunction).toHaveBeenCalledWith()
@@ -75,7 +89,6 @@ describe("AuthenticationMiddleware", () => {
         headers: { "x-access-token": "at-test" },
         query: {},
         params: { projectName: "project", scenarioName: "scenario", itemId: "id" },
-        allowQueryAuth: true,
       } as unknown as IGetUserAuthInfoRequest,
       mockResponse as Response, nextFunction)
       expect(nextFunction).toHaveBeenCalledWith(Boom.unauthorized("The token you provided is invalid"))
@@ -86,10 +99,22 @@ describe("AuthenticationMiddleware", () => {
         headers: { "x-access-token": "at-test" },
         query: {},
         params: { projectName: "project", scenarioName: "scenario", itemId: "id" },
-        allowQueryAuth: true,
       } as unknown as IGetUserAuthInfoRequest,
       mockResponse as Response, nextFunction)
       expect(nextFunction).toHaveBeenCalledWith(Boom.unauthorized("The token you provided is invalid"))
+    })
+    it("should add role to the user object", async () => {
+      db.query = jest.fn().mockResolvedValue([{ created_by: "test-user-id", role: AllowedRoles.Operator }])
+      const req = {
+        headers: { "x-access-token": "at-test" },
+        query: { },
+        params: { projectName: "project", scenarioName: "scenario", itemId: "id" },
+        user: null,
+      }
+      await authenticationMiddleware(req as unknown as IGetUserAuthInfoRequest,
+      mockResponse as Response, nextFunction)
+      expect(req.user).toEqual({ role:AllowedRoles.Operator, userId: "test-user-id" })
+      expect(nextFunction).toHaveBeenCalledWith()
     })
   })
   describe("JWT token", () => {

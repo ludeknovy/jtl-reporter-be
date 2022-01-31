@@ -16,6 +16,7 @@ import { createNewApiToken } from "../queries/api-tokens"
 import * as uuid from "uuid"
 import { ReportStatus } from "../queries/items.model"
 import { StatusCode } from "../utils/status-code"
+import { AllowedRoles } from "../middleware/authorization-middleware"
 
 export class TestDataSetup {
 
@@ -58,10 +59,10 @@ export class TestDataSetup {
               res.sendStatus(StatusCode.Created)
               break
             case States.ExistingApiKey:
-                // eslint-disable-next-line no-case-declarations
+              // eslint-disable-next-line no-case-declarations
               const TOKEN = "at-testToken"
-              await createUserInDB("test-user", "test00010")
-                // eslint-disable-next-line no-case-declarations
+              await createUserInDB("test-user", "test00010", AllowedRoles.Admin)
+              // eslint-disable-next-line no-case-declarations
               const { id } = await db.one(getUser("test-user"))
               await db.any(createNewApiToken(TOKEN, "test-token", id))
               res.status(StatusCode.Ok).send({ token: TOKEN })
@@ -78,7 +79,7 @@ export class TestDataSetup {
 
           const username = "contract"
           const password = "YK8K95TKHVPprcLv"
-          await createUserInDB(username, password)
+          await createUserInDB(username, password, AllowedRoles.Admin)
           const { id } = await db.one(getUser(username))
           const token = generateToken(id)
           res.status(StatusCode.Ok).send({ token, username, password, id })
@@ -90,7 +91,7 @@ export class TestDataSetup {
         wrapAsync(async (req: Request, res: Response) => {
           await db.any({ text: "TRUNCATE jtl.api_tokens CASCADE" })
           const TOKEN = `at-${uuid()}`
-          await createUserInDB("test-user", "test0000")
+          await createUserInDB("test-user", "test0000", AllowedRoles.Admin)
           const { id } = await db.one(getUser("test-user"))
           await db.any(createNewApiToken(TOKEN, "test-token", id))
           res.status(StatusCode.Ok).send({ token: TOKEN })

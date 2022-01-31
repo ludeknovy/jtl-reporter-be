@@ -6,7 +6,8 @@ import { labelParamSchema, labelQuerySchema } from "../schema-validator/item-sch
 import { getLabelTrendController } from "../controllers/label/get-label-trend-controller"
 import { getLabelVirtualUsersController } from "../controllers/label/get-label-vu-controllers"
 import { getLabelErrorsController } from "../controllers/label/get-label-errors-controller"
-import { authenticationMiddleware } from "../middleware/auth-middleware"
+import { AllowedRoles, authorizationMiddleware } from "../middleware/authorization-middleware"
+import { authenticationMiddleware } from "../middleware/authentication-middleware"
 
 export class LabelRoutes {
 
@@ -15,24 +16,24 @@ export class LabelRoutes {
     app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label/:label/trend")
       .get(
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(labelParamSchema),
         queryParamsValidator(labelQuerySchema),
-        // eslint-disable-next-line max-len
         wrapAsync( (req: Request, res: Response) => getLabelTrendController(req, res)))
 
     app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label/:label/virtual-users")
       .get(
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(labelParamSchema),
         queryParamsValidator(labelQuerySchema),
-        // eslint-disable-next-line max-len
         wrapAsync( (req: Request, res: Response, next: NextFunction) => getLabelVirtualUsersController(req, res, next)))
 
     app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label/:label/errors")
       .get(
         authenticationMiddleware,
+        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(labelParamSchema),
-        // eslint-disable-next-line max-len
         wrapAsync( (req: Request, res: Response) => getLabelErrorsController(req, res)))
   }
 }

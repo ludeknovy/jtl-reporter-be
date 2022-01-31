@@ -13,6 +13,15 @@ export const getApiTokens = () => {
   }
 }
 
+export const getOnlyMyApiTokens = (userId) => {
+  return {
+    // eslint-disable-next-line max-len
+    text: `SELECT tokens.id, description, token, tokens.create_date as "createDate", users.username as "createdBy" FROM jtl.api_tokens tokens
+    LEFT JOIN jtl.users users on users.id = tokens.created_by WHERE created_by = $1;`,
+    values: [userId],
+  }
+}
+
 export const deleteToken = (id) => {
   return {
     text: "DELETE FROM jtl.api_tokens WHERE id = $1;",
@@ -20,9 +29,17 @@ export const deleteToken = (id) => {
   }
 }
 
+export const isMyToken = (id, userId) => {
+  return {
+    text: `SELECT EXISTS (SELECT * FROM jtl.api_tokens WHERE id = $1 AND created_by = $2) `,
+    values: [id, userId],
+  }
+}
+
 export const getApiToken = (token) => {
   return {
-    text: "SELECT * FROM jtl.api_tokens WHERE token = $1;",
+    text: `SELECT tokens.created_by, users.role FROM jtl.api_tokens tokens 
+    LEFT JOIN jtl.users users on users.id = tokens.created_by WHERE token = $1;`,
     values: [token],
   }
 }
