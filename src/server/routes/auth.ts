@@ -9,7 +9,7 @@ import { authenticationMiddleware } from "../middleware/authentication-middlewar
 import { IGetUserAuthInfoRequest } from "../middleware/request.model"
 import { loginWithTokenController } from "../controllers/auth/login-with-token-controller"
 import { initUserController } from "../controllers/auth/init-user-controller"
-import { newUserSchema } from "../schema-validator/users-schema"
+import { initUserScheam } from "../schema-validator/users-schema"
 
 export class AuthRoutes {
   routes(app: express.Application): void {
@@ -31,7 +31,7 @@ export class AuthRoutes {
 
     app.route("/api/auth/initialize-user")
       .post(
-        bodySchemaValidator(newUserSchema),
+        bodySchemaValidator(initUserScheam),
         wrapAsync( (req: Request, res: Response, next: NextFunction) =>
            initUserController(req, res, next)))
   }

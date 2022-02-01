@@ -2,6 +2,7 @@ import { NextFunction, Response } from "express"
 import { db } from "../../../db/db"
 import { initUserController } from "./init-user-controller"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
+import { AllowedRoles } from "../../middleware/authorization-middleware"
 
 jest.mock("../../../db/db")
 const mockResponse = () => {
@@ -17,11 +18,12 @@ describe("initUserController", () => {
     (db.manyOrNone as any).mockResolvedValue([])
     const nextFunction: NextFunction = jest.fn()
     const response = mockResponse()
-    const request = {}
+    const request = { body: { username: "test", password: "123" } }
     await initUserController(
       request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response, nextFunction)
     expect(querySpy).toHaveBeenCalledTimes(1)
+    expect(request.body).toEqual({ username: "test", password: "123", role: AllowedRoles.Admin })
   })
   it("should return an error if user already exists", async function () {
     const querySpy = jest.spyOn(require("boom"), "forbidden");
