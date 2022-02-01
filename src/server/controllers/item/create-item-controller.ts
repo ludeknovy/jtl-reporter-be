@@ -117,6 +117,11 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
           prop: "sutHostname",
           def: null,
         },
+        {
+          name: "failure_message",
+          prop: "failureMessage",
+          def: null,
+        },
       ], { table: new pg.helpers.TableName({ table: "samples", schema: "jtl" }) })
 
 

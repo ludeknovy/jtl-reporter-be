@@ -464,9 +464,9 @@ export const responseCodeDistribution = (itemId) => {
 export const responseMessageFailures = (itemId) => {
   return {
     // eslint-disable-next-line max-len
-    text: `SELECT samples.label, samples.status_code, samples.response_message, count(samples.response_message)::int FROM jtl.samples samples
+    text: `SELECT samples.label, samples.status_code, samples.response_message, samples.failure_message, count(samples.response_message)::int FROM jtl.samples samples
     WHERE samples.item_id = $1 AND success is false
-    GROUP BY samples.label, samples.response_message, samples.status_code
+    GROUP BY samples.label, samples.response_message, samples.status_code, samples.failure_message
     ORDER BY count DESC`,
     values: [itemId],
   }
