@@ -46,7 +46,9 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, stat
           .map((sd) => ({ statusCode: sd.status_code, count: sd.count })),
         responseMessageFailures: responseFailures
           .filter((rm) => rm.label === _.label)
-          .map((rm) => ({ responseMessage: rm.response_message, count: rm.count, statusCode: rm.status_code })),
+          .map((rm) => ({ responseMessage: rm.response_message,
+            count: rm.count, statusCode: rm.status_code,
+            failureMessage: rm.failure_message })),
       })),
       sutOverview: sutStats.map((_) => ({
         sutHostname: _.sut_hostname,
@@ -347,4 +349,5 @@ interface ResponseMessageFailures {
   response_message: string
   status_code: string
   count: number
+  failure_message: string
 }
