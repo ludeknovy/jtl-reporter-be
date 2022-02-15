@@ -1,11 +1,14 @@
-import { Request, Response } from "express"
+import { Response } from "express"
 import { db } from "../../../db/db"
 import { logger } from "../../../logger"
-import { createNewItem } from "../../queries/items"
+import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
+import { createNewItem, createShareToken } from "../../queries/items"
 import { ItemStatus, ReportStatus } from "../../queries/items.model"
+import { scenarioGenerateToken } from "../../queries/scenario"
 import { StatusCode } from "../../utils/status-code"
+import { generateShareToken } from "./utils/generateShareToken"
 
-export const createItemAsyncController = async (req: Request, res: Response) => {
+export const createItemAsyncController = async (req: IGetUserAuthInfoRequest, res: Response) => {
   const { environment, note, status = ItemStatus.None, hostname, name } = req.body
   const { scenarioName, projectName } = req.params
 
@@ -23,9 +26,19 @@ export const createItemAsyncController = async (req: Request, res: Response) => 
       ReportStatus.InProgress,
       name
     ))
+
+    const { generate_share_token: shouldGenerateToken } = await db.one(
+      scenarioGenerateToken(projectName, scenarioName))
+    let shareToken
+    if (shouldGenerateToken) {
+      shareToken = generateShareToken()
+      await db.none(createShareToken(projectName, scenarioName, item.id,
+        shareToken, req.user.userId, "automatically generated token"))
+    }
+
     const itemId = item.id
     logger.info(`New item for scenario: ${scenarioName} created with id: ${itemId}`)
-    res.status(StatusCode.Created).send({ itemId })
+    res.status(StatusCode.Created).send({ itemId, shareToken })
   } catch(e) {
     logger.error(`Creating new async item failed ${e}`)
     res.status(StatusCode.InternalError).send()
