@@ -49,6 +49,7 @@ describe("Scenario", () => {
           zeroErrorToleranceEnabled: true,
           deleteSamples: false,
           keepTestRunsPeriod: 7,
+          generateShareToken: true,
           thresholds: {
             enabled: true,
             percentile: 4.2,
