@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 export const findItemsForScenario = (projectName, scenarioName, limit, offset) => {
   return {
-    text: `SELECT it.id, environment, upload_time as "uploadTime", base, status, st.overview->>'startDate' as "startTime", note, hostname, threshold_result->'passed' as "thresholdPassed", overview FROM jtl.items as it
+    text: `SELECT it.id, environment, upload_time as "uploadTime", base, status, st.overview->>'startDate' as "startTime", note, hostname, it.name, threshold_result->'passed' as "thresholdPassed", overview FROM jtl.items as it
     LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
     LEFT JOIN jtl.item_stat as st ON st.item_id = it.id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
@@ -86,7 +86,7 @@ export const findScenarios = projectName => {
 
 export const findScenariosData = (projectName) => {
   return {
-    text: `SELECT s.id as scenario_id, name, s.analysis_enabled, st.overview FROM jtl.item_stat st
+    text: `SELECT s.id as scenario_id, s.name, s.analysis_enabled, st.overview FROM jtl.item_stat st
     LEFT JOIN jtl.items as it ON it.id = st.item_id
     LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
     WHERE st.item_id IN (

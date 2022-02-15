@@ -14,7 +14,7 @@ export const getItemController = async (req: Request, res: Response) => {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     base_id,
     status, hostname, reportStatus, thresholds,
-    analysisEnabled, zeroErrorToleranceEnabled, topMetricsSettings,
+    analysisEnabled, zeroErrorToleranceEnabled, topMetricsSettings, name,
   } = await db.one(findItem(itemId, projectName, scenarioName))
   const { stats: statistics, overview, sutOverview } = await db.one(findItemStats(itemId))
 
@@ -34,6 +34,7 @@ export const getItemController = async (req: Request, res: Response) => {
     overview, sutOverview, statistics, status,
     plot, note, environment, hostname, reportStatus, thresholds, analysisEnabled,
     baseId: base_id, isBase: base_id === itemId, zeroErrorToleranceEnabled, topMetricsSettings,
+    name,
     monitoring: {
       cpu: {
         data: monitoringAdjusted,

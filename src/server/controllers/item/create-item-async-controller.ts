@@ -6,7 +6,7 @@ import { ItemStatus, ReportStatus } from "../../queries/items.model"
 import { StatusCode } from "../../utils/status-code"
 
 export const createItemAsyncController = async (req: Request, res: Response) => {
-  const { environment, note, status = ItemStatus.None, hostname } = req.body
+  const { environment, note, status = ItemStatus.None, hostname, name } = req.body
   const { scenarioName, projectName } = req.params
 
   logger.info(`Creating new item for scenario: ${scenarioName}`)
@@ -20,7 +20,8 @@ export const createItemAsyncController = async (req: Request, res: Response) => 
       status,
       projectName,
       hostname,
-      ReportStatus.InProgress
+      ReportStatus.InProgress,
+      name
     ))
     const itemId = item.id
     logger.info(`New item for scenario: ${scenarioName} created with id: ${itemId}`)

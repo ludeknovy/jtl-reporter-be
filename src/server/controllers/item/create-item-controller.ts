@@ -30,7 +30,7 @@ const SECONDS_DIVISOR = 1000
 export const createItemController = (req: Request, res: Response, next: NextFunction) => {
   upload(req, res, async error => {
     const HOSTNAME_LENGTH = 200
-    const { environment, note, status = ItemStatus.None, hostname } = req.body
+    const { environment, note, status = ItemStatus.None, hostname, name } = req.body
     if (!req.files) {
       return next(boom.badRequest())
     }
@@ -66,7 +66,8 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
         status,
         projectName,
         hostname,
-        ReportStatus.InProgress
+        ReportStatus.InProgress,
+        name
       ))
       const itemId = item.id
 
