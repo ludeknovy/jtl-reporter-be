@@ -18,13 +18,13 @@ jobs:
       - name: Run contract tests
         run: npm run test:contract
         env:
-          - ENVIRONMENT=CI
-          - JWT_TOKEN=123
-          - JWT_TOKEN_LOGIN=456
+          ENVIRONMENT: CI
+          JWT_TOKEN: 123
+          JWT_TOKEN_LOGIN: 456
       - name: Run integration tests
         run: npm run test:integration
         env:
-          - ENVIRONMENT=CI
-          - JWT_TOKEN=123
-          - JWT_TOKEN_LOGIN=456
+          ENVIRONMENT: CI
+          JWT_TOKEN: 123
+          JWT_TOKEN_LOGIN: 456
      
