@@ -25,6 +25,7 @@ describe("updateScenariosController", () => {
       deleteSamples: false,
       zeroErrorToleranceEnabled: false,
       keepTestRunsPeriod: 7,
+      generateShareToken: true,
     }
     const request = {
       params: { projectName: "project", scenarioName: "test-scenario" },
@@ -35,7 +36,7 @@ describe("updateScenariosController", () => {
     expect(response.send).toHaveBeenCalledTimes(1)
     expect(querySpy).toBeCalledWith("project", "test-scenario", "test-scenario",
       body.analysisEnabled, body.thresholds, body.deleteSamples, body.zeroErrorToleranceEnabled,
-      body.keepTestRunsPeriod)
+      body.keepTestRunsPeriod, body.generateShareToken)
     expect(response.send).toHaveBeenCalledTimes(1)
   })
 })
