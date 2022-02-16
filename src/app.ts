@@ -12,6 +12,7 @@ import * as http from "http"
 import { config } from "./server/config"
 import { StatusCode } from "./server/utils/status-code"
 import { NextFunction, Request, Response } from "express"
+import { PgError } from "./server/errors/pgError"
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const swaggerDocument = require("../openapi.json")
 
@@ -66,8 +67,7 @@ export class App {
   }
 
   private databaseErrorHandler() {
-    this.app.use(function (error: Error | any, req: Request, res: Response, next: NextFunction) {
-      console.log("DB ERROR HANDLER")
+    this.app.use(function (error: PgError, req: Request, res: Response, next: NextFunction) {
       logger.error(error)
       if (error instanceof pgp.errors.QueryResultError) {
         return next(boom.notFound())
