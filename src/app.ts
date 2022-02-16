@@ -13,6 +13,7 @@ import { config } from "./server/config"
 import { StatusCode } from "./server/utils/status-code"
 import { NextFunction, Request, Response } from "express"
 import { PgError } from "./server/errors/pgError"
+import * as uuid from "uuid"
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const swaggerDocument = require("../openapi.json")
 
@@ -60,8 +61,9 @@ export class App {
         const { payload: { message } } = error.output
         return res.status(error.output.statusCode).json({ message })
       }
-        logger.error(`Unexpected error: ${error}`)
-        return res.status(StatusCode.InternalError).json({ message: "Something went wrong" })
+      const errorId = uuid()
+      logger.error(`Unexpected error: ${error}, errorId: ${errorId}`)
+      return res.status(StatusCode.InternalError).json({ message: `Unexpected error occurred: ${errorId}` })
 
     })
   }
@@ -73,7 +75,7 @@ export class App {
         return next(boom.notFound())
       }
       if (error?.code === "ECONNREFUSED") {
-        return next(boom.serverUnavailable(`Could not connect to the databse: ${error.address}:${error.port}`))
+        return next(boom.serverUnavailable(`Could not connect to the database: ${error.address}:${error.port}`))
       }
       return next(error)
 
