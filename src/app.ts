@@ -66,10 +66,14 @@ export class App {
   }
 
   private databaseErrorHandler() {
-    this.app.use(function (error: Error, req: Request, res: Response, next: NextFunction) {
+    this.app.use(function (error: Error | any, req: Request, res: Response, next: NextFunction) {
+      console.log("DB ERROR HANDLER")
       logger.error(error)
       if (error instanceof pgp.errors.QueryResultError) {
         return next(boom.notFound())
+      }
+      if (error?.code === "ECONNREFUSED") {
+        return next(boom.serverUnavailable(`Could not connect to the databse: ${error.address}:${error.port}`))
       }
       return next(error)
 
