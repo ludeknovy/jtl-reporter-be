@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 export const findItemsForScenario = (projectName, scenarioName, limit, offset) => {
   return {
-    text: `SELECT it.id, environment, upload_time as "uploadTime", base, status, st.overview->>'startDate' as "startTime", note, hostname, threshold_result->'passed' as "thresholdPassed", overview FROM jtl.items as it
+    text: `SELECT it.id, environment, upload_time as "uploadTime", base, status, st.overview->>'startDate' as "startTime", note, hostname, it.name, threshold_result->'passed' as "thresholdPassed", overview FROM jtl.items as it
     LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
     LEFT JOIN jtl.item_stat as st ON st.item_id = it.id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
@@ -31,15 +31,23 @@ export const getScenario = (projectName, scenarioName) => {
   }
 }
 
+export const scenarioGenerateToken = (projectName, scenarioName) => {
+  return {
+    text: `SELECT generate_share_token FROM jtl.scenario
+    WHERE name = $2 AND project_id = (SELECT id FROM jtl.projects WHERE project_name = $1);`,
+    values: [projectName, scenarioName],
+  }
+}
 
-export const updateScenario = (projectName, scenarioName, name, analysisEnabled, thresholds, deleteSamples, zeroErrorToleranceEnabled, keepTestRunPeriod) => {
+
+export const updateScenario = (projectName, scenarioName, name, analysisEnabled, thresholds, deleteSamples, zeroErrorToleranceEnabled, keepTestRunPeriod, generateShareToken) => {
   return {
     text: `
     UPDATE jtl.scenario as s
-    SET name = $3, analysis_enabled=$4, threshold_enabled = $5, threshold_percentile = $6, threshold_throughput = $7, threshold_error_rate = $8, delete_samples = $9, zero_error_tolerance_enabled = $10, keep_test_runs_period = $11
+    SET name = $3, analysis_enabled=$4, threshold_enabled = $5, threshold_percentile = $6, threshold_throughput = $7, threshold_error_rate = $8, delete_samples = $9, zero_error_tolerance_enabled = $10, keep_test_runs_period = $11, generate_share_token = $12
     WHERE s.name = $2
     AND s.project_id = (SELECT id FROM jtl.projects WHERE project_name = $1)`,
-    values: [projectName, scenarioName, name, analysisEnabled, thresholds.enabled, thresholds.percentile, thresholds.throughput, thresholds.errorRate, deleteSamples, zeroErrorToleranceEnabled, keepTestRunPeriod],
+    values: [projectName, scenarioName, name, analysisEnabled, thresholds.enabled, thresholds.percentile, thresholds.throughput, thresholds.errorRate, deleteSamples, zeroErrorToleranceEnabled, keepTestRunPeriod, generateShareToken],
   }
 }
 
@@ -86,7 +94,7 @@ export const findScenarios = projectName => {
 
 export const findScenariosData = (projectName) => {
   return {
-    text: `SELECT s.id as scenario_id, name, s.analysis_enabled, st.overview FROM jtl.item_stat st
+    text: `SELECT s.id as scenario_id, s.name, s.analysis_enabled, st.overview FROM jtl.item_stat st
     LEFT JOIN jtl.items as it ON it.id = st.item_id
     LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
     WHERE st.item_id IN (

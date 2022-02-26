@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction } from "express"
+import { Response, NextFunction } from "express"
 import { ItemStatus, ReportStatus } from "../../queries/items.model"
 import { transformDataForDb } from "../../data-stats/prepare-data"
 import { db } from "../../../db/db"
-import { createNewItem, updateItem } from "../../queries/items"
+import { createNewItem, createShareToken, updateItem } from "../../queries/items"
 import * as multer from "multer"
 import * as boom from "boom"
 import * as fs from "fs"
@@ -12,6 +12,9 @@ import { itemDataProcessing } from "./shared/item-data-processing"
 import * as pgp from "pg-promise"
 import { processMonitoringCsv } from "./utils/process-monitoring-csv"
 import { StatusCode } from "../../utils/status-code"
+import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
+import { scenarioGenerateToken } from "../../queries/scenario"
+import { generateShareToken } from "./utils/generateShareToken"
 
 const pg = pgp()
 
@@ -27,10 +30,10 @@ const upload = multer(
 
 const SECONDS_DIVISOR = 1000
 
-export const createItemController = (req: Request, res: Response, next: NextFunction) => {
+export const createItemController = (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
   upload(req, res, async error => {
     const HOSTNAME_LENGTH = 200
-    const { environment, note, status = ItemStatus.None, hostname } = req.body
+    const { environment, note, status = ItemStatus.None, hostname, name } = req.body
     if (!req.files) {
       return next(boom.badRequest())
     }
@@ -66,11 +69,23 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
         status,
         projectName,
         hostname,
-        ReportStatus.InProgress
+        ReportStatus.InProgress,
+        name
       ))
+
+      const { generate_share_token: shouldGenerateToken } = await db.one(
+        scenarioGenerateToken(projectName, scenarioName))
+      let shareToken
+      if (shouldGenerateToken) {
+        shareToken = generateShareToken()
+        await db.none(createShareToken(projectName, scenarioName, item.id,
+          shareToken, req.user.userId, "automatically generated token"))
+      }
+
+
       const itemId = item.id
 
-      res.status(StatusCode.Ok).send({ itemId })
+      res.status(StatusCode.Ok).send({ itemId, shareToken })
 
       const columnSet = new pg.helpers.ColumnSet([
         "elapsed", "success", "bytes", "label",
@@ -175,3 +190,4 @@ export const createItemController = (req: Request, res: Response, next: NextFunc
     }
   })
 }
+

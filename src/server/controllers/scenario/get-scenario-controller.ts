@@ -12,6 +12,7 @@ export const getScenarioController = async (req: Request, res: Response) => {
     zeroErrorToleranceEnabled: scenario.zero_error_tolerance_enabled,
     deleteSamples: scenario.delete_samples,
     keepTestRunsPeriod: scenario.keep_test_runs_period,
+    generateShareToken: scenario.generate_share_token,
     thresholds: {
       enabled: scenario.threshold_enabled,
       percentile: scenario.threshold_percentile,

@@ -1,0 +1,30 @@
+name: Tests
+on:
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [master]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: Install modules
+        run: npm install
+      - name: Build the docker-compose stack
+        run: docker-compose -f docker-compose.testing.yaml up -d
+      # - name: Run contract tests
+      #   run: npm run test:contract
+      #   env:
+      #     ENVIRONMENT: CI
+      #     JWT_TOKEN: 123
+      #     JWT_TOKEN_LOGIN: 456
+      - name: Run integration tests
+        run: npm run test:integration
+        env:
+          ENVIRONMENT: CI
+          JWT_TOKEN: 123
+          JWT_TOKEN_LOGIN: 456
+     
