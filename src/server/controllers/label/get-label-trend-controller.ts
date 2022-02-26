@@ -16,7 +16,6 @@ export const getLabelTrendController = async (req: Request, res: Response) => {
       itemId, environment))
 
   queryResult.sort((a, b) => a.start_time - b.start_time)
-  console.log(queryResult)
 
   const { timePoints, n0, n5, n9,
     errorRate, throughput, threads, avgResponseTime, latency, connect } = queryResult.reduce((accumulator, current) => {
