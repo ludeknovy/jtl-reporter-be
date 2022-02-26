@@ -63,6 +63,8 @@ describe("getItemChartSettingsController", () => {
         minResponseTime: 0,
         bytesSentPerSecond: 0,
         responseMessageFailures: [],
+        latency: 1,
+        connect: 1,
       },
       item_id: "102312c6-710c-4f93-ab5f-cfebcb690921",
       start_time: new Date("2021-12-30T21:25:57"),
@@ -79,11 +81,13 @@ describe("getItemChartSettingsController", () => {
         throughput: 2586.48,
         statusCodes: [],
         bytesPerSecond: 6675715.08,
-        avgResponseTime: 1,
+        avgResponseTime: 5,
         maxResponseTime: 182,
         minResponseTime: 0,
         bytesSentPerSecond: 0,
         responseMessageFailures: [],
+        latency: 2,
+        connect: 2,
       },
       item_id: "305f602f-db7d-442d-8e13-a8b00d278a41",
       start_time: new Date("2021-12-10T21:25:57"),
@@ -101,6 +105,9 @@ describe("getItemChartSettingsController", () => {
       threads: [8, 8],
       throughput: [ 2586.48, 25860.48],
       timePoints: ["10.12.2021 21:25:00", "30.12.2021 21:25:00"],
+      avgResponseTime: [5, 1],
+      latency: [2, 1],
+      connect: [2, 1],
     })
   })
 })

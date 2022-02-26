@@ -18,7 +18,7 @@ export const getLabelTrendController = async (req: Request, res: Response) => {
   queryResult.sort((a, b) => a.start_time - b.start_time)
 
   const { timePoints, n0, n5, n9,
-    errorRate, throughput, threads } = queryResult.reduce((accumulator, current) => {
+    errorRate, throughput, threads, avgResponseTime, latency, connect } = queryResult.reduce((accumulator, current) => {
     accumulator.timePoints.push(moment(current.start_time).format("DD.MM.YYYY HH:mm:SS"))
     accumulator.n0.push(current.labels.n0)
     accumulator.n5.push(current.labels.n5)
@@ -26,13 +26,21 @@ export const getLabelTrendController = async (req: Request, res: Response) => {
     accumulator.errorRate.push(current.labels.errorRate)
     accumulator.throughput.push(current.labels.throughput)
     accumulator.threads.push(current.max_vu)
+    accumulator.avgResponseTime.push(current.labels.avgResponseTime)
+    accumulator.connect.push(current.labels.connect)
+    accumulator.latency.push(current.labels.latency)
     return accumulator
-  }, { timePoints: [], n0: [], n5: [], n9: [], errorRate: [], throughput: [], threads: [] })
+  }, { timePoints: [], n0: [], n5: [], n9: [], errorRate: [], throughput: [], threads: [], avgResponseTime: [],
+    connect: [], latency: [] })
+
   res.status(StatusCode.Ok).send({
     timePoints,
     n0, n5, n9,
     errorRate,
     throughput,
     threads,
+    latency,
+    connect,
+    avgResponseTime,
   })
 }

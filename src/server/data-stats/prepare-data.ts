@@ -31,6 +31,8 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, stat
         label: _.label,
         samples: _.total_samples,
         avgResponseTime: Math.round(_.avg_response),
+        latency: _.latency,
+        connect: _.connect,
         minResponseTime: _.min_response,
         maxResponseTime: _.max_response,
         errorRate: roundNumberTwoDecimals(_.number_of_failed / _.total_samples * 100),
