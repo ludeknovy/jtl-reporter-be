@@ -242,6 +242,8 @@ export const aggLabelQuery = (item_id) => {
       AVG(samples.elapsed)::real as avg_response,
       MIN(samples.elapsed)::real as min_response,
       MAX(samples.elapsed)::real as max_response,
+      AVG(samples.latency)::real as latency,
+      AVG(samples.connect)::real as connect, 
       percentile_cont(0.99) within group (order by (samples.elapsed))::real as n99,
       percentile_cont(0.95) within group (order by (samples.elapsed))::real as n95,
       percentile_cont(0.90) within group (order by (samples.elapsed))::real as n90,
