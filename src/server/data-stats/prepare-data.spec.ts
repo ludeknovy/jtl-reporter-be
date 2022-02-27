@@ -216,6 +216,8 @@ describe("prepare data", () => {
           n90: 343,
           n95: 367,
           n99: 418,
+          latency: 1,
+          connect: 2,
           number_of_failed: 0,
         },
         {
@@ -231,6 +233,8 @@ describe("prepare data", () => {
           n90: 50,
           n95: 56,
           n99: 93,
+          latency: 3,
+          connect: 4,
           number_of_failed: 0,
         },
       ]
@@ -272,6 +276,8 @@ describe("prepare data", () => {
           n9: 418,
           n5: 367,
           n0: 343,
+          latency: 1,
+          connect: 2,
           statusCodes: [{ count: 932, statusCode: "200" }],
           responseMessageFailures: [{
             count: 31, responseMessage: "failure", statusCode: "100", failureMessage: "failure",
@@ -290,6 +296,8 @@ describe("prepare data", () => {
           n9: 93,
           n5: 56,
           n0: 50,
+          latency: 3,
+          connect: 4,
           statusCodes: [{ count: 433, statusCode: "200" }],
           responseMessageFailures: [{
             count: 1, responseMessage: "failure2", statusCode: "101", failureMessage: "failure1",
