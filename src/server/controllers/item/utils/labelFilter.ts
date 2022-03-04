@@ -10,6 +10,7 @@ export const shouldSkipLabel = (label: string, labelFilterSettings: LabelFilterS
         if (settings.operator === "match") {
             return label === settings.labelTerm
         }
+        return false
     })
     return labelFilterMatch ? true : false
 }
