@@ -2,6 +2,7 @@
 import { roundNumberTwoDecimals } from "./helper/stats-fc"
 import * as moment from "moment"
 import { logger } from "../../logger"
+import { shouldSkipLabel } from "../controllers/item/utils/labelFilter"
 
 // eslint-disable-next-line max-len
 export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, statusCodeDistr: StatusCodeDistribution[], responseFailures: ResponseMessageFailures[]):
@@ -185,7 +186,10 @@ export const stringToNumber = (input: string, radix: number) => {
   return result
 }
 
-export const transformDataForDb = (_, itemId) => {
+export const transformDataForDb = (_, itemId, labelFilterSettings) => {
+  if (shouldSkipLabel(_.label, labelFilterSettings)) {
+    return
+  }
   try {
     _.timeStamp = new Date(stringToNumber(_.timeStamp, 10))
     _.elapsed = stringToNumber(_.elapsed, 10)
@@ -201,7 +205,6 @@ export const transformDataForDb = (_, itemId) => {
     return _
   } catch(error) {
     logger.error(`Error while parsing data: ${error}`)
-
   }
 }
 

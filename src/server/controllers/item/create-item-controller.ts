@@ -73,8 +73,10 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
         name
       ))
 
-      const { generate_share_token: shouldGenerateToken } = await db.one(
-        scenarioGenerateToken(projectName, scenarioName))
+      const {
+          generate_share_token: shouldGenerateToken,
+          label_filter_settings: labelFilterSettings,
+        } = await db.one(scenarioGenerateToken(projectName, scenarioName))
       let shareToken
       if (shouldGenerateToken) {
         shareToken = generateShareToken()
@@ -156,7 +158,7 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
             tempBuffer = []
             csvStream.resume()
           }
-          const data = transformDataForDb(row, itemId)
+          const data = transformDataForDb(row, itemId, labelFilterSettings)
           if (data) {
             return tempBuffer.push(data)
           }
