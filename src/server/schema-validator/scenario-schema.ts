@@ -39,4 +39,10 @@ export const updateScenarioSchema = {
     throughput: Joi.number().min(0).max(MAX_NUMBER).strict().required(),
     percentile: Joi.number().min(0).max(MAX_NUMBER).strict().required(),
   }),
+  labelFilterSettings: Joi.array().items(
+    Joi.object({
+      labelTerm: Joi.string(),
+      operator: Joi.string().valid("match", "includes"),
+    })
+  ),
 }

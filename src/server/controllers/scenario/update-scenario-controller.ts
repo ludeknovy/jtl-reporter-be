@@ -14,8 +14,10 @@ export const updateScenarioController = async (req: Request, res: Response) => {
     generateShareToken,
     zeroErrorToleranceEnabled,
     keepTestRunsPeriod,
+    labelFilterSettings,
   } = req.body
   await db.none(updateScenario(projectName, scenarioName, name, analysisEnabled,
-    thresholds, deleteSamples, zeroErrorToleranceEnabled, keepTestRunsPeriod, generateShareToken))
+    thresholds, deleteSamples, zeroErrorToleranceEnabled, keepTestRunsPeriod, 
+    generateShareToken, JSON.stringify(labelFilterSettings)))
   res.status(StatusCode.NoContent).send()
 }

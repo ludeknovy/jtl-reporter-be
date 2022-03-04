@@ -19,5 +19,6 @@ export const getScenarioController = async (req: Request, res: Response) => {
       throughput: scenario.threshold_throughput,
       errorRate: scenario.threshold_error_rate,
     },
+    labelFilterSettings: scenario.label_filter_settings,
   })
 }
