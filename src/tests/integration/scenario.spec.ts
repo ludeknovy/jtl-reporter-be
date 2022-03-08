@@ -56,6 +56,17 @@ describe("Scenario", () => {
             errorRate: 4.2,
             throughput: 8.3,
           },
+          labelTrendChartSettings: {
+            avgConnectionTime: true,
+            avgLatency: true,
+            avgResponseTime: true,
+            errorRate: true,
+            p90: true,
+            p95: true,
+            p99: true,
+            throughput: false,
+            virtualUsers: true,
+          },
         })
         .set("Accept", "application/json")
         .expect(StatusCode.NoContent)
