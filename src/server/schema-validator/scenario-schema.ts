@@ -45,4 +45,15 @@ export const updateScenarioSchema = {
       operator: Joi.string().valid("match", "includes"),
     })
   ),
+  labelTrendChartSettings: Joi.object({
+    virtualUsers: Joi.boolean().required(),
+    throughput: Joi.boolean().required(),
+    avgConnectionTime: Joi.boolean().required(),
+    avgLatency: Joi.boolean().required(),
+    avgResponseTime: Joi.boolean().required(),
+    p90: Joi.boolean().required(),
+    p95: Joi.boolean().required(),
+    p99: Joi.boolean().required(),
+    errorRate: Joi.boolean().required(),
+  }),
 }
