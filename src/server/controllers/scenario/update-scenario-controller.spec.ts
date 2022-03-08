@@ -27,6 +27,7 @@ describe("updateScenariosController", () => {
       keepTestRunsPeriod: 7,
       generateShareToken: true,
       labelFilterSettings: [],
+      labelTrendChartSettings: {},
     }
     const request = {
       params: { projectName: "project", scenarioName: "test-scenario" },
@@ -37,7 +38,8 @@ describe("updateScenariosController", () => {
     expect(response.send).toHaveBeenCalledTimes(1)
     expect(querySpy).toBeCalledWith("project", "test-scenario", "test-scenario",
       body.analysisEnabled, body.thresholds, body.deleteSamples, body.zeroErrorToleranceEnabled,
-      body.keepTestRunsPeriod, body.generateShareToken, JSON.stringify(body.labelFilterSettings))
+      body.keepTestRunsPeriod, body.generateShareToken, JSON.stringify(body.labelFilterSettings), 
+      JSON.stringify(body.labelTrendChartSettings))
     expect(response.send).toHaveBeenCalledTimes(1)
   })
 })

@@ -21,7 +21,8 @@ describe("getItemChartSettingsController", () => {
       params: { projectName: "project", scenarioName: "scenario", itemId: "id" },
       query: { virtualUsers: "10" },
     };
-    (db.query as any).mockResolvedValue([])
+    (db.query as any).mockResolvedValue([]);
+    (db.one as any).mockResolvedValue({})
     await getLabelTrendController(request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response)
     expect(querySpy).toHaveBeenCalledTimes(1)
@@ -34,7 +35,8 @@ describe("getItemChartSettingsController", () => {
       params: { projectName: "project", scenarioName: "scenario", itemId: "id", label: "test-label" },
       query: { virtualUsers: "0" },
     };
-    (db.query as any).mockResolvedValue([])
+    (db.query as any).mockResolvedValue([]);
+    (db.one as any).mockResolvedValue({})
 
     await getLabelTrendController(request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response)
@@ -95,19 +97,29 @@ describe("getItemChartSettingsController", () => {
     },
     ])
 
+    const chartSettings = {
+      label_trend_chart_settings: {
+        virtualUsers: true,
+      },
+    };
+    (db.one as any).mockResolvedValue(chartSettings)
+
     await getLabelTrendController(request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response)
     expect(response.send).toHaveBeenCalledWith({
-      errorRate: [100, 10],
-      n0: [1, 10],
-      n5: [2, 20],
-      n9: [7, 70],
-      threads: [8, 8],
-      throughput: [ 2586.48, 25860.48],
-      timePoints: ["10.12.2021 21:25:00", "30.12.2021 21:25:00"],
-      avgResponseTime: [5, 1],
-      latency: [2, 1],
-      connect: [2, 1],
+      chartSeries: {
+        errorRate: [100, 10],
+        p90: [1, 10],
+        p95: [2, 20],
+        p99: [7, 70],
+        virtualUsers: [8, 8],
+        throughput: [ 2586.48, 25860.48],
+        timePoints: ["10.12.2021 21:25:00", "30.12.2021 21:25:00"],
+        avgResponseTime: [5, 1],
+        avgLatency: [2, 1],
+        avgConnectionTime: [2, 1],
+      },
+      chartSettings: chartSettings.label_trend_chart_settings,
     })
   })
 })
