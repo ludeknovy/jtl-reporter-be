@@ -20,5 +20,6 @@ export const getScenarioController = async (req: Request, res: Response) => {
       errorRate: scenario.threshold_error_rate,
     },
     labelFilterSettings: scenario.label_filter_settings,
+    labelTrendChartSettings: scenario.label_trend_chart_settings,
   })
 }
