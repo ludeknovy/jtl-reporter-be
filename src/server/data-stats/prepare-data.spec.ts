@@ -11,8 +11,32 @@ import {
 describe("prepare data", () => {
   describe("transformDataForDb", () => {
     it("should return undefined when unable to process data", () => {
-      const result = transformDataForDb({}, "itemId")
+      const result = transformDataForDb({}, "itemId", [])
       expect(result).toBeUndefined()
+    })
+    it("should call shouldSkipLabel function", () => {
+      const shouldSkipLabelSpy = jest.spyOn(require("../controllers/item/utils/labelFilter"), "shouldSkipLabel")
+      const inputData = {
+        bytes: "792",
+        sentBytes: "124",
+        label: "endpoint3",
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        Connect: "155",
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        Latency: "190",
+        elapsed: "191",
+        success: "true",
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        Hostname: "localhost",
+        timeStamp: "1555399218911",
+        allThreads: "1",
+        grpThreads: "1",
+        threadName: "Thread 1-1",
+        responseCode: "200",
+        responseMessage: "",
+      }
+      transformDataForDb(inputData, "itemId", [])
+      expect(shouldSkipLabelSpy).toHaveBeenCalledWith(inputData.label, [])
     })
     it("should correctly proccess data", () => {
       const inputData = {
@@ -34,7 +58,7 @@ describe("prepare data", () => {
         responseCode: "200",
         responseMessage: "",
       }
-      const result = transformDataForDb(inputData, "itemId")
+      const result = transformDataForDb(inputData, "itemId", [])
       expect(result).toEqual({
         bytes: 792,
         sentBytes: 124,
@@ -78,7 +102,7 @@ describe("prepare data", () => {
         responseMessage: "",
         URL: "https://example.com/styles.css",
       }
-      const result = transformDataForDb(inputData, "itemId")
+      const result = transformDataForDb(inputData, "itemId", [])
       expect(result.sutHostname).toEqual("example.com")
     })
     it("should return sutHostname undefined when URL contains empty url", () => {
@@ -102,7 +126,7 @@ describe("prepare data", () => {
         responseMessage: "",
         URL: "",
       }
-      const result = transformDataForDb(inputData, "itemId")
+      const result = transformDataForDb(inputData, "itemId", [])
       expect(result.sutHostname).toBeUndefined()
     })
     it("should return sutHostname undefined when URL contains invalid url", () => {
@@ -126,7 +150,7 @@ describe("prepare data", () => {
         responseMessage: "",
         URL: "file",
       }
-      const result = transformDataForDb(inputData, "itemId")
+      const result = transformDataForDb(inputData, "itemId", [])
       expect(result.sutHostname).toBeUndefined()
     })
     it("should process the data even when sentBytes not provided", () => {
@@ -149,7 +173,7 @@ describe("prepare data", () => {
         responseMessage: "",
         URL: "file",
       }
-      const result = transformDataForDb(inputData, "itemId")
+      const result = transformDataForDb(inputData, "itemId", [])
       expect(result.sentBytes).toEqual(0)
     })
   })
