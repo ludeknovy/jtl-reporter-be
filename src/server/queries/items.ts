@@ -50,6 +50,13 @@ export const findItemStats = (testItem) => {
   }
 }
 
+export const findRequestStats = (itemId) => {
+  return {
+    text: "SELECT stats FROM jtl.item_stat WHERE item_id = $1",
+    values: [itemId],
+  }
+}
+
 export const saveItemStats = (itemId, stats, overview, sutOverview) => {
   return {
     text: "INSERT INTO jtl.item_stat(item_id, stats, overview, sut) VALUES($1, $2, $3, $4);",

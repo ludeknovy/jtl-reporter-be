@@ -37,7 +37,8 @@
     "pg-promise": "^10.10.2",
     "swagger-ui-express": "^4.0.7",
     "uuid": "^3.3.2",
-    "winston": "^3.2.1"
+    "winston": "^3.2.1",
+    "xlsx": "^0.18.4"
   },
   "devDependencies": {
     "@pact-foundation/pact": "^9.2.0",
