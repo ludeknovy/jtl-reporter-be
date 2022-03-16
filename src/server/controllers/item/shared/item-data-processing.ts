@@ -35,18 +35,33 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
       overview: { duration },
       labelStats, sutOverview } = prepareDataForSavingToDb(aggOverview, aggLabel, sutMetrics,
       statusCodeDistribution, responseFailures)
-    const interval = chartQueryOptionInterval(duration)
+    const defaultInterval = chartQueryOptionInterval(duration)
+    let chartData
+    const extraChartData = []
 
-    const overviewChartData = await db.many(chartOverviewQuery(`${interval} milliseconds`, itemId))
+    const intervals = [`${defaultInterval} milliseconds`, "5 seconds", "10 seconds", "30 seconds",
+      "1 minute", "10 minute", "30 minutes", "1 hour"]
+    for (const [index, interval] of Object.entries(intervals)) {
 
-    const labelChartData = await db.many(charLabelQuery(`${interval} milliseconds`, itemId))
-    // distributed mode
-    if (aggOverview?.number_of_hostnames > 1) {
-      distributedThreads = await db.manyOrNone(distributedThreadsQuery(`${interval} milliseconds`, itemId))
+      // distributed mode
+      if (aggOverview?.number_of_hostnames > 1) {
+        distributedThreads = await db.manyOrNone(distributedThreadsQuery(`${defaultInterval} milliseconds`, itemId))
+      }
+
+
+      const labelChart = await db.many(charLabelQuery(interval, itemId))
+      const overviewChart = await db.many(chartOverviewQuery(interval, itemId))
+      if (parseInt(index, 10) === 0) { // default interval
+        chartData = prepareChartDataForSaving(
+          overviewChart, labelChart, defaultInterval, distributedThreads)
+
+
+      } else if (overviewChart.length > 1) {
+        const extraChart = prepareChartDataForSaving(
+          overviewChart, labelChart, defaultInterval, distributedThreads)
+        extraChartData.push({ interval, data: extraChart })
+      }
     }
-
-    const chartData = prepareChartDataForSaving(
-      overviewChartData, labelChartData, interval, distributedThreads)
 
     overview.maxVu = Math.max(...chartData.threads.map(([, vu]) => vu))
 
@@ -60,10 +75,11 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
     }
 
     await sendNotifications(projectName, scenarioName, itemId, overview)
+    console.log(JSON.stringify(extraChartData))
 
     await db.tx(async t => {
       await t.none(saveItemStats(itemId, JSON.stringify(labelStats), overview, JSON.stringify(sutOverview)))
-      await t.none(savePlotData(itemId, JSON.stringify(chartData)))
+      await t.none(savePlotData(itemId, JSON.stringify(chartData), JSON.stringify(extraChartData)))
       await t.none(updateItem(itemId, ReportStatus.Ready, overview.startDate))
     })
 
