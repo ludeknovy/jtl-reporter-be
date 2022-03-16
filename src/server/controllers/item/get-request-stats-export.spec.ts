@@ -35,8 +35,8 @@ describe("getRequestStatsExportController", () => {
         await getRequestStatsExportController(request as unknown as Request, response as Response)
 
           expect(excelServiceSpy).lastCalledWith([
-              { "P90 [ms]": 1, "P95 [ms]": 2, "P99 [ms]": 3, "avg [ms]": 10, "error rate": 3,
-              label: "test", "max [ms]": 2, mbps: 0.11, "min [ms]": 1, "requests/s": 10, samples: 10 }])
+              { "P90 [ms]": 1, "P95 [ms]": 2, "P99 [ms]": 3, "avg [ms]": 10, "error rate [%]": 3,
+              label: "test", "max [ms]": 2, "network [mbps]": 0.11, "min [ms]": 1, "reqs/s": 10, samples: 10 }])
         expect(response.end).toHaveBeenCalledTimes(1)
         expect(response.writeHead).toHaveBeenCalledWith(
             StatusCode.Ok,
