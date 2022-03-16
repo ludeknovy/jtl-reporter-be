@@ -28,6 +28,7 @@ import { upsertItemChartSettingsController } from "../controllers/item/upsert-it
 import { getItemChartSettingsController } from "../controllers/item/get-item-chart-settings-controller"
 import { AllowedRoles, authorizationMiddleware } from "../middleware/authorization-middleware"
 import { authenticationMiddleware } from "../middleware/authentication-middleware"
+import { getRequestStatsExportController } from "../controllers/item/get-request-stats-export-controller"
 
 export class ItemsRoutes {
 
@@ -75,6 +76,14 @@ export class ItemsRoutes {
         authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
         wrapAsync( (req: Request, res: Response) => deleteItemController(req, res)))
+
+    app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/request-stats-export")
+        .get(
+          authenticationMiddleware,
+          authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+          paramsSchemaValidator(paramsSchema),
+          wrapAsync( (req: Request, res: Response) => getRequestStatsExportController(req, res)))
+
 
     app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/stop-async")
       .post(
