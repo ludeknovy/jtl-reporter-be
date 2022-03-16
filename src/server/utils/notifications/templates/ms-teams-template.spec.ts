@@ -38,7 +38,7 @@ describe("MS Teams template", () => {
                 facts: [
                   { title: "Error Rate", value: "0 %" },
                   { title: "90% percentile", value: "10 ms" },
-                  { title: "Throughput", value: "10 hits/s" },
+                  { title: "Throughput", value: "10 reqs/s" },
                   { title: "Duration", value: "1 min" }],
               }],
             actions: [
@@ -71,7 +71,7 @@ describe("MS Teams template", () => {
                 facts: [
                   { title: "Error Rate", value: "0 %" },
                   { title: "90% percentile", value: "10 ms" },
-                  { title: "Throughput", value: "10 hits/s" },
+                  { title: "Throughput", value: "10 reqs/s" },
                   { title: "Duration", value: "1 min" }],
               }],
             actions: [],
