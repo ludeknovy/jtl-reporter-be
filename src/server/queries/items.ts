@@ -22,7 +22,7 @@ export const savePlotData = (itemId, data, extraPlotData) => {
 export const findItem = (itemId, projectName, scenarioName) => {
   return {
     // eslint-disable-next-line max-len
-    text: `SELECT charts.plot_data, note, environment, status, hostname, s.analysis_enabled as "analysisEnabled",
+    text: `SELECT charts.plot_data, charts.extra_plot_data, note, environment, status, hostname, s.analysis_enabled as "analysisEnabled",
             s.zero_error_tolerance_enabled as "zeroErrorToleranceEnabled", threshold_result as "thresholds", 
             report_status as "reportStatus", p.item_top_statistics_settings as "topMetricsSettings", items.name,
            (SELECT items.id FROM jtl.items as items

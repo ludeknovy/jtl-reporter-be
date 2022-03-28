@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import { db } from "../../../../db/db"
 import { logger } from "../../../../logger"
 import {
@@ -17,6 +18,7 @@ import { sendNotifications } from "../../../utils/notifications/send-notificatio
 import { scenarioThresholdsCalc } from "../utils/scenario-thresholds-calc"
 
 export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) => {
+  const MAX_LABEL_CHART_LENGTH = 100000
   let distributedThreads = null
   let sutMetrics = []
 
@@ -40,7 +42,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
     const extraChartData = []
 
     const intervals = [`${defaultInterval} milliseconds`, "5 seconds", "10 seconds", "30 seconds",
-      "1 minute", "10 minute", "30 minutes", "1 hour"]
+    "1 minute", "5 minute", "10 minutes", "30 minutes", "1 hour"]
     for (const [index, interval] of Object.entries(intervals)) {
 
       // distributed mode
@@ -54,9 +56,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
       if (parseInt(index, 10) === 0) { // default interval
         chartData = prepareChartDataForSaving(
           overviewChart, labelChart, defaultInterval, distributedThreads)
-
-
-      } else if (overviewChart.length > 1) {
+      } else if (overviewChart.length > 1 && labelChart.length < MAX_LABEL_CHART_LENGTH) {
         const extraChart = prepareChartDataForSaving(
           overviewChart, labelChart, defaultInterval, distributedThreads)
         extraChartData.push({ interval, data: extraChart })
@@ -75,7 +75,6 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
     }
 
     await sendNotifications(projectName, scenarioName, itemId, overview)
-    console.log(JSON.stringify(extraChartData))
 
     await db.tx(async t => {
       await t.none(saveItemStats(itemId, JSON.stringify(labelStats), overview, JSON.stringify(sutOverview)))
