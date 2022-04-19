@@ -27,6 +27,8 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
     const aggLabel = await db.many(aggLabelQuery(itemId))
     const statusCodeDistribution = await db.manyOrNone(responseCodeDistribution(itemId))
     const responseFailures = await db.manyOrNone(responseMessageFailures(itemId))
+    const scenarioSettings = await db.one(getScenarioSettings(projectName, scenarioName))
+
 
     if (aggOverview.number_of_sut_hostnames > 1) {
       sutMetrics = await db.many(sutOverviewQuery(itemId))
@@ -44,6 +46,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
     const intervals = [`${defaultInterval} milliseconds`, "5 seconds", "10 seconds", "30 seconds",
     "1 minute", "5 minute", "10 minutes", "30 minutes", "1 hour"]
     for (const [index, interval] of Object.entries(intervals)) {
+      console.log(index)
 
       // distributed mode
       if (aggOverview?.number_of_hostnames > 1) {
@@ -61,11 +64,14 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
           overviewChart, labelChart, defaultInterval, distributedThreads)
         extraChartData.push({ interval, data: extraChart })
       }
+
+      if (!scenarioSettings.extraAggregations) {
+        break
+      }
     }
 
     overview.maxVu = Math.max(...chartData.threads.map(([, vu]) => vu))
 
-    const scenarioSettings = await db.one(getScenarioSettings(projectName, scenarioName))
     if (scenarioSettings.thresholdEnabled) {
       const scenarioMetrics = await db.one(currentScenarioMetrics(projectName, scenarioName, overview.maxVu))
       const thresholdResult = scenarioThresholdsCalc(overview, scenarioMetrics, scenarioSettings)

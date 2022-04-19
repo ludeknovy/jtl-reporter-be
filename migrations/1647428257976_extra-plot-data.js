@@ -6,4 +6,11 @@ exports.up = (pgm) => {
             notNull: false,
         },
     })
+    pgm.addColumn({ schema: "jtl", name: "scenario" }, {
+        extra_aggregations: {
+            type: "boolean",
+            "default": false,
+            notNull: true,
+        },
+    })
 }
