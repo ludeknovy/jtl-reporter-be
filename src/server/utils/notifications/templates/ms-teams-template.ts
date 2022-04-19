@@ -29,7 +29,7 @@ export const msTeamsTemplate = (scenarioName: string, url, overview: Overview) =
                 },
                 {
                   title: "Throughput",
-                  value: overview.throughput + " hits/s",
+                  value: overview.throughput + " reqs/s",
                 }, {
                   title: "Duration",
                   value: overview.duration + " min",
