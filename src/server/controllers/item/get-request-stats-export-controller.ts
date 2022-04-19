@@ -14,9 +14,9 @@ export const getRequestStatsExportController = async (req: Request, res: Respons
     const exportData = stats.map((label) =>
       ({ label: label.label, samples: label.samples, "avg [ms]": label.avgResponseTime,
        "min [ms]": label.minResponseTime, "max [ms]": label.maxResponseTime, "P90 [ms]": label.n0,
-       "P95 [ms]": label.n5, "P99 [ms]": label.n9, "requests/s": label.throughput,
-       mbps: roundNumberTwoDecimals(bytesToMbps(label.bytesPerSecond + label.bytesSentPerSecond)),
-       "error rate": label.errorRate }))
+       "P95 [ms]": label.n5, "P99 [ms]": label.n9, "reqs/s": label.throughput,
+       "network [mbps]": roundNumberTwoDecimals(bytesToMbps(label.bytesPerSecond + label.bytesSentPerSecond)),
+       "error rate [%]": label.errorRate }))
 
     const excelData = ExcelService.generateExcelBuffer(exportData)
 
