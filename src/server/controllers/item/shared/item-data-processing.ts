@@ -65,7 +65,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         extraChartData.push({ interval, data: extraChart })
       }
 
-      if (!scenarioSettings.extraAggregations) {
+      if (!scenarioSettings.extraAggregations) {
         break
       }
     }
