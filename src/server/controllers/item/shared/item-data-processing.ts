@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import { db } from "../../../../db/db"
 import { logger } from "../../../../logger"
 import {
@@ -17,6 +18,7 @@ import { sendNotifications } from "../../../utils/notifications/send-notificatio
 import { scenarioThresholdsCalc } from "../utils/scenario-thresholds-calc"
 
 export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) => {
+  const MAX_LABEL_CHART_LENGTH = 100000
   let distributedThreads = null
   let sutMetrics = []
 
@@ -25,6 +27,8 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
     const aggLabel = await db.many(aggLabelQuery(itemId))
     const statusCodeDistribution = await db.manyOrNone(responseCodeDistribution(itemId))
     const responseFailures = await db.manyOrNone(responseMessageFailures(itemId))
+    const scenarioSettings = await db.one(getScenarioSettings(projectName, scenarioName))
+
 
     if (aggOverview.number_of_sut_hostnames > 1) {
       sutMetrics = await db.many(sutOverviewQuery(itemId))
@@ -35,22 +39,39 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
       overview: { duration },
       labelStats, sutOverview } = prepareDataForSavingToDb(aggOverview, aggLabel, sutMetrics,
       statusCodeDistribution, responseFailures)
-    const interval = chartQueryOptionInterval(duration)
+    const defaultInterval = chartQueryOptionInterval(duration)
+    let chartData
+    const extraChartData = []
 
-    const overviewChartData = await db.many(chartOverviewQuery(`${interval} milliseconds`, itemId))
+    const intervals = [`${defaultInterval} milliseconds`, "5 seconds", "10 seconds", "30 seconds",
+    "1 minute", "5 minute", "10 minutes", "30 minutes", "1 hour"]
+    for (const [index, interval] of Object.entries(intervals)) {
+      console.log(index)
 
-    const labelChartData = await db.many(charLabelQuery(`${interval} milliseconds`, itemId))
-    // distributed mode
-    if (aggOverview?.number_of_hostnames > 1) {
-      distributedThreads = await db.manyOrNone(distributedThreadsQuery(`${interval} milliseconds`, itemId))
+      // distributed mode
+      if (aggOverview?.number_of_hostnames > 1) {
+        distributedThreads = await db.manyOrNone(distributedThreadsQuery(`${defaultInterval} milliseconds`, itemId))
+      }
+
+
+      const labelChart = await db.many(charLabelQuery(interval, itemId))
+      const overviewChart = await db.many(chartOverviewQuery(interval, itemId))
+      if (parseInt(index, 10) === 0) { // default interval
+        chartData = prepareChartDataForSaving(
+          overviewChart, labelChart, defaultInterval, distributedThreads)
+      } else if (overviewChart.length > 1 && labelChart.length < MAX_LABEL_CHART_LENGTH) {
+        const extraChart = prepareChartDataForSaving(
+          overviewChart, labelChart, defaultInterval, distributedThreads)
+        extraChartData.push({ interval, data: extraChart })
+      }
+
+      if (!scenarioSettings.extraAggregations) {
+        break
+      }
     }
-
-    const chartData = prepareChartDataForSaving(
-      overviewChartData, labelChartData, interval, distributedThreads)
 
     overview.maxVu = Math.max(...chartData.threads.map(([, vu]) => vu))
 
-    const scenarioSettings = await db.one(getScenarioSettings(projectName, scenarioName))
     if (scenarioSettings.thresholdEnabled) {
       const scenarioMetrics = await db.one(currentScenarioMetrics(projectName, scenarioName, overview.maxVu))
       const thresholdResult = scenarioThresholdsCalc(overview, scenarioMetrics, scenarioSettings)
@@ -63,7 +84,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
 
     await db.tx(async t => {
       await t.none(saveItemStats(itemId, JSON.stringify(labelStats), overview, JSON.stringify(sutOverview)))
-      await t.none(savePlotData(itemId, JSON.stringify(chartData)))
+      await t.none(savePlotData(itemId, JSON.stringify(chartData), JSON.stringify(extraChartData)))
       await t.none(updateItem(itemId, ReportStatus.Ready, overview.startDate))
     })
 
