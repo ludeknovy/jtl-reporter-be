@@ -9,6 +9,7 @@ export const getItemController = async (req: Request, res: Response) => {
   const { projectName, scenarioName, itemId } = req.params
   const {
     plot_data: plot,
+    extra_plot_data: extraPlotData,
     note,
     environment,
     // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -32,7 +33,7 @@ export const getItemController = async (req: Request, res: Response) => {
 
   res.status(StatusCode.Ok).send({
     overview, sutOverview, statistics, status,
-    plot, note, environment, hostname, reportStatus, thresholds, analysisEnabled,
+    plot, extraPlotData, note, environment, hostname, reportStatus, thresholds, analysisEnabled,
     baseId: base_id, isBase: base_id === itemId, zeroErrorToleranceEnabled, topMetricsSettings,
     name,
     monitoring: {

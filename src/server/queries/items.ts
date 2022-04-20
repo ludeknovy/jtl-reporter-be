@@ -12,17 +12,17 @@ export const createNewItem = (scenarioName, startTime, environment, note, status
   }
 }
 
-export const savePlotData = (itemId, data) => {
+export const savePlotData = (itemId, data, extraPlotData) => {
   return {
-    text: "INSERT INTO jtl.charts(item_id, plot_data) VALUES($1, $2)",
-    values: [itemId, data],
+    text: "INSERT INTO jtl.charts(item_id, plot_data, extra_plot_data) VALUES($1, $2, $3)",
+    values: [itemId, data, extraPlotData],
   }
 }
 
 export const findItem = (itemId, projectName, scenarioName) => {
   return {
     // eslint-disable-next-line max-len
-    text: `SELECT charts.plot_data, note, environment, status, hostname, s.analysis_enabled as "analysisEnabled",
+    text: `SELECT charts.plot_data, charts.extra_plot_data, note, environment, status, hostname, s.analysis_enabled as "analysisEnabled",
             s.zero_error_tolerance_enabled as "zeroErrorToleranceEnabled", threshold_result as "thresholds", 
             report_status as "reportStatus", p.item_top_statistics_settings as "topMetricsSettings", items.name,
            (SELECT items.id FROM jtl.items as items
@@ -149,7 +149,7 @@ export const getLabelHistory = (scenarioName, projectName, endpointName, itemId,
   return {
     text: `
     SELECT * FROM (SELECT jsonb_array_elements(stats) as labels, item_id,
-    its.start_time, overview->'maxVu' as max_vu FROM jtl.item_stat as st
+    its.start_time, overview->'maxVu' as max_vu, its.name, its.name FROM jtl.item_stat as st
     LEFT JOIN jtl.items as its ON its.id = st.item_id
     LEFT JOIN jtl.scenario as sc ON sc.id = its.scenario_id
     LEFT JOIN jtl.projects as pr ON pr.id = sc.project_id
@@ -168,7 +168,7 @@ export const getLabelHistoryForVu = (scenarioName, projectName, endpointName, it
   return {
     text: `
     SELECT * FROM (SELECT jsonb_array_elements(stats) as labels, item_id,
-    its.start_time, overview->'maxVu' as max_vu FROM jtl.item_stat as st
+    its.start_time, overview->'maxVu' as max_vu, its.name FROM jtl.item_stat as st
     LEFT JOIN jtl.items as its ON its.id = st.item_id
     LEFT JOIN jtl.scenario as sc ON sc.id = its.scenario_id
     LEFT JOIN jtl.projects as pr ON pr.id = sc.project_id
@@ -297,10 +297,10 @@ export const chartOverviewQuery = (interval, item_id) => {
       EXTRACT(EPOCH FROM (MAX(samples.timestamp) - MIN(samples.timestamp))) as interval,
       (count(*) filter (where samples.success = false)::real / count(*)::real)::real as error_rate,
       AVG(samples.elapsed)::real as avg_response,
-      SUM(samples.sent_bytes)::int as bytes_sent_total,
-      SUM(samples.bytes)::int as bytes_received_total,
+      SUM(samples.sent_bytes)::bigint as bytes_sent_total,
+      SUM(samples.bytes)::bigint as bytes_received_total,
       MAX(samples.all_threads)::int as threads,
-      COUNT(*)::int as total
+      COUNT(*)::bigint as total
     FROM jtl.samples as samples
     WHERE item_id = $2
     GROUP BY time;`,
@@ -322,9 +322,9 @@ export const charLabelQuery = (interval, item_id) => {
       EXTRACT(EPOCH FROM (MAX(samples.timestamp) - MIN(samples.timestamp))) as interval,
       (count(*) filter (where samples.success = false)::real / count(*)::real)::real as error_rate,
       AVG(samples.elapsed)::real as avg_response,
-      SUM(samples.sent_bytes)::int as bytes_sent_total,
-      SUM(samples.bytes)::int as bytes_received_total,
-      COUNT(*)::int as total
+      SUM(samples.sent_bytes)::bigint as bytes_sent_total,
+      SUM(samples.bytes)::bigint as bytes_received_total,
+      COUNT(*)::bigint as total
     FROM jtl.samples as samples
     WHERE item_id = $2
     GROUP BY time, samples.label;`,

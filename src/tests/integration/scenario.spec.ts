@@ -50,6 +50,7 @@ describe("Scenario", () => {
           deleteSamples: false,
           keepTestRunsPeriod: 7,
           generateShareToken: true,
+          extraAggregations: false,
           thresholds: {
             enabled: true,
             percentile: 4.2,
