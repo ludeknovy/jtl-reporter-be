@@ -71,6 +71,7 @@ describe("getItemChartSettingsController", () => {
       item_id: "102312c6-710c-4f93-ab5f-cfebcb690921",
       start_time: new Date("2021-12-30T21:25:57"),
       max_vu: 8,
+      name: "test name",
     },
     {
       labels: {
@@ -94,6 +95,7 @@ describe("getItemChartSettingsController", () => {
       item_id: "305f602f-db7d-442d-8e13-a8b00d278a41",
       start_time: new Date("2021-12-10T21:25:57"),
       max_vu: 8,
+      name: null,
     },
     ])
 
@@ -118,6 +120,7 @@ describe("getItemChartSettingsController", () => {
         avgResponseTime: [5, 1],
         avgLatency: [2, 1],
         avgConnectionTime: [2, 1],
+        name: [null, "test name"],
       },
       chartSettings: chartSettings.label_trend_chart_settings,
     })
