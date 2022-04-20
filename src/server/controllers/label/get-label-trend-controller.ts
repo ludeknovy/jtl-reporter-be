@@ -22,7 +22,7 @@ export const getLabelTrendController = async (req: Request, res: Response) => {
 
   const { timePoints, p90, p95, p99,
     errorRate, throughput, virtualUsers, avgResponseTime,
-    avgConnectionTime, avgLatency } = queryResult.reduce((accumulator, current) => {
+    avgConnectionTime, avgLatency, name } = queryResult.reduce((accumulator, current) => {
     accumulator.timePoints.push(moment(current.start_time).format("DD.MM.YYYY HH:mm:SS"))
     accumulator.p90.push(current.labels.n0)
     accumulator.p95.push(current.labels.n5)
@@ -33,9 +33,10 @@ export const getLabelTrendController = async (req: Request, res: Response) => {
     accumulator.avgResponseTime.push(current.labels.avgResponseTime)
     accumulator.avgConnectionTime.push(current.labels.connect)
     accumulator.avgLatency.push(current.labels.latency)
+    accumulator.name.push(current.name)
     return accumulator
   }, { timePoints: [], p90: [], p95: [], p99: [], errorRate: [], throughput: [], virtualUsers: [], avgResponseTime: [],
-    avgConnectionTime: [], avgLatency: [] })
+    avgConnectionTime: [], avgLatency: [], name: [] })
 
   res.status(StatusCode.Ok).send({
     chartSeries: {
@@ -47,6 +48,7 @@ export const getLabelTrendController = async (req: Request, res: Response) => {
       avgLatency,
       avgConnectionTime,
       avgResponseTime,
+      name,
     },
     chartSettings: scenarioSettings.label_trend_chart_settings,
   })
