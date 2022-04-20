@@ -149,7 +149,7 @@ export const getLabelHistory = (scenarioName, projectName, endpointName, itemId,
   return {
     text: `
     SELECT * FROM (SELECT jsonb_array_elements(stats) as labels, item_id,
-    its.start_time, overview->'maxVu' as max_vu FROM jtl.item_stat as st
+    its.start_time, overview->'maxVu' as max_vu, its.name, its.name FROM jtl.item_stat as st
     LEFT JOIN jtl.items as its ON its.id = st.item_id
     LEFT JOIN jtl.scenario as sc ON sc.id = its.scenario_id
     LEFT JOIN jtl.projects as pr ON pr.id = sc.project_id
@@ -168,7 +168,7 @@ export const getLabelHistoryForVu = (scenarioName, projectName, endpointName, it
   return {
     text: `
     SELECT * FROM (SELECT jsonb_array_elements(stats) as labels, item_id,
-    its.start_time, overview->'maxVu' as max_vu FROM jtl.item_stat as st
+    its.start_time, overview->'maxVu' as max_vu, its.name FROM jtl.item_stat as st
     LEFT JOIN jtl.items as its ON its.id = st.item_id
     LEFT JOIN jtl.scenario as sc ON sc.id = its.scenario_id
     LEFT JOIN jtl.projects as pr ON pr.id = sc.project_id
