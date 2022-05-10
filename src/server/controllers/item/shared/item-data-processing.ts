@@ -50,7 +50,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
 
       // distributed mode
       if (aggOverview?.number_of_hostnames > 1) {
-        distributedThreads = await db.manyOrNone(distributedThreadsQuery(`${defaultInterval} milliseconds`, itemId))
+        distributedThreads = await db.manyOrNone(distributedThreadsQuery(interval, itemId))
       }
 
 
