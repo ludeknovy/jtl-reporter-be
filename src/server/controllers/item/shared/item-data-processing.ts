@@ -46,11 +46,10 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
     const intervals = [`${defaultInterval} milliseconds`, "5 seconds", "10 seconds", "30 seconds",
     "1 minute", "5 minute", "10 minutes", "30 minutes", "1 hour"]
     for (const [index, interval] of Object.entries(intervals)) {
-      console.log(index)
 
       // distributed mode
       if (aggOverview?.number_of_hostnames > 1) {
-        distributedThreads = await db.manyOrNone(distributedThreadsQuery(`${defaultInterval} milliseconds`, itemId))
+        distributedThreads = await db.manyOrNone(distributedThreadsQuery(interval, itemId))
       }
 
 
