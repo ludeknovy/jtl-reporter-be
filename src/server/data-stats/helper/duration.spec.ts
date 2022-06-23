@@ -9,4 +9,11 @@ describe("chartQueryOptionInterval", () => {
     const interval = chartQueryOptionInterval(DURATION)
     expect(interval).toEqual(EXPECTED_INTERVAL)
   })
+  it("should never return zero, but rather to default to 10ms", () => {
+    const DURATION = 0
+    const EXPECTED_INTERVAL = 10
+
+    const interval = chartQueryOptionInterval(DURATION)
+    expect(interval).toEqual(EXPECTED_INTERVAL)
+  })
 })
