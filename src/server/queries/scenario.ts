@@ -186,3 +186,23 @@ export const currentScenarioMetrics = (projectName, scenarioName, vu) => {
   }
 }
 
+export const saveExecutionFile = (scenarioId, fileContent, filename) => {
+  return {
+    text: `INSERT INTO jtl.execution_files(scenario_id, content, filename) VALUES ($1, $2, $3)`,
+    values: [scenarioId, fileContent, filename],
+  }
+}
+
+export const getExecutionFiles = (scenarioId) => {
+  return {
+    text: `SELECT * FROM jtl.execution_files WHERE scenario_id = $1`,
+    values: [scenarioId],
+  }
+}
+
+export const deleteExecutionFiles = (scenarioId) => {
+  return {
+    text: `DELETE FROM jtl.execution_files WHERE scenario_id = $1`,
+    values: [scenarioId],
+  }
+}

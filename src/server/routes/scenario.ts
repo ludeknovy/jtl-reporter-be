@@ -20,6 +20,9 @@ import { updateScenarioController } from "../controllers/scenario/update-scenari
 import { getScenarioController } from "../controllers/scenario/get-scenario-controller"
 import { authenticationMiddleware } from "../middleware/authentication-middleware"
 import { AllowedRoles, authorizationMiddleware } from "../middleware/authorization-middleware"
+import {
+  uploadTestFileScenarioController
+} from "../controllers/scenario/test-files/upload-test-files-scenario-controller";
 
 export class ScenarioRoutes {
 
@@ -88,5 +91,12 @@ export class ScenarioRoutes {
         authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
         wrapAsync( (req: Request, res: Response) => getScenarioTrendsController(req, res)))
+
+    app.route("/api/projects/:projectName/scenarios/:scenarioName/test-files")
+        .post(
+            authenticationMiddleware,
+            authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
+            paramsSchemaValidator(paramsSchema),
+            uploadTestFileScenarioController)
   }
 }
