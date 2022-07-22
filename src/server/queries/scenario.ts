@@ -31,6 +31,15 @@ export const getScenario = (projectName, scenarioName) => {
   }
 }
 
+export const getScenarioExecutionFiles = (projectName, scenarioName) => {
+  return {
+    text: `SELECT ef.id, ef.filename FROM jtl.execution_files as ef
+    LEFT JOIN jtl.scenario as s ON s.id = ef.scenario_id
+    WHERE name = $2 AND project_id = (SELECT id FROM jtl.projects WHERE project_name = $1);`,
+    values: [projectName, scenarioName],
+  }
+}
+
 export const scenarioGenerateToken = (projectName, scenarioName) => {
   return {
     text: `SELECT generate_share_token, label_filter_settings FROM jtl.scenario
