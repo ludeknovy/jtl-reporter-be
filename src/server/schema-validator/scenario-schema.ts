@@ -14,6 +14,11 @@ export const paramSchemaNotification = {
   notificationId: Joi.string().required(),
 }
 
+export const paramSchemaExecutionFile = {
+  ...paramsSchema,
+  fileId: Joi.string().required(),
+}
+
 export const querySchema = {
   limit: Joi.number().integer().min(0).max(MAX_NUMBER),
   offset: Joi.number().integer(),

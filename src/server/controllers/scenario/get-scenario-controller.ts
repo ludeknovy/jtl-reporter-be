@@ -1,12 +1,11 @@
 import { Request, Response } from "express"
 import { db } from "../../../db/db"
-import { getScenario, getScenarioExecutionFiles } from "../../queries/scenario"
+import { getScenario } from "../../queries/scenario"
 import { StatusCode } from "../../utils/status-code"
 
 export const getScenarioController = async (req: Request, res: Response) => {
   const { projectName, scenarioName } = req.params
   const scenario = await db.oneOrNone(getScenario(projectName, scenarioName))
-  const executionFiles = await db.manyOrNone(getScenarioExecutionFiles(projectName, scenarioName))
   res.status(StatusCode.Ok).send({
     id: scenario.id,
     name: scenario.name,
@@ -24,6 +23,5 @@ export const getScenarioController = async (req: Request, res: Response) => {
     },
     labelFilterSettings: scenario.label_filter_settings,
     labelTrendChartSettings: scenario.label_trend_chart_settings,
-    executionFiles,
   })
 }
