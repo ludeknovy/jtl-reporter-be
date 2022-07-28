@@ -37,7 +37,7 @@ interface Notification {
     type: string
 }
 
-const NotificationTemplate = new Map([
+const NotificationTemplate = new Map<string, any>([
     ["ms-teams", msTeamsTemplate],
     ["gchat", gchatTemplate],
 ])
