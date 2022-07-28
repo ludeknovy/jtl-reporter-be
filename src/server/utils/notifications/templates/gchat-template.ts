@@ -5,7 +5,7 @@ export const gchatTemplate = (scenarioName: string, url, overview: Overview) => 
         cards: [{
             header: {
                 title: "JTL Reporter",
-                subtitle: "Performance Scenario: App Login",
+                subtitle: `Performance Report for scenario: ${scenarioName}`,
                 imageUrl: "",
             },
             sections: [{
@@ -48,4 +48,5 @@ export const gchatTemplate = (scenarioName: string, url, overview: Overview) => 
             ],
         })
     }
+    return cardPayload
 }

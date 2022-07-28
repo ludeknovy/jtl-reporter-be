@@ -1,11 +1,11 @@
-import {db} from "../../../db/db"
-import {scenarioNotifications} from "../../queries/scenario"
+import { db } from "../../../db/db"
+import { scenarioNotifications } from "../../queries/scenario"
 import axios from "axios"
-import {msTeamsTemplate} from "./templates/ms-teams-template"
-import {logger} from "../../../logger"
-import {linkUrl} from "./link-url"
-import {Overview} from "../../data-stats/prepare-data"
-import {gchatTemplate} from "./templates/gchat-template";
+import { msTeamsTemplate } from "./templates/ms-teams-template"
+import { logger } from "../../../logger"
+import { linkUrl } from "./link-url"
+import { Overview } from "../../data-stats/prepare-data"
+import { gchatTemplate } from "./templates/gchat-template"
 
 export const sendNotifications = async (projectName, scenarioName, id, overview: Overview) => {
     try {
@@ -18,14 +18,14 @@ export const sendNotifications = async (projectName, scenarioName, id, overview:
                 const payload = messageTemplate(scenarioName, url, overview)
                 await axios.post(notif.url, payload, {
                     headers: {
-                        "content-type": "application/json"
-                    }
+                        "content-type": "application/json",
+                    },
                 })
-            } catch (error) {
+            } catch(error) {
                 logger.error(`error while sending notification: ${error}`)
             }
         })
-    } catch (error) {
+    } catch(error) {
         logger.error(`Error notification processing: ${error}`)
     }
 }
