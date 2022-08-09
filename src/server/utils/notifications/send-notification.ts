@@ -6,6 +6,7 @@ import { logger } from "../../../logger"
 import { linkUrl } from "./link-url"
 import { Overview } from "../../data-stats/prepare-data"
 import { gchatTemplate } from "./templates/gchat-template"
+import { slackTemplate } from "./templates/slack-template"
 
 export const sendNotifications = async (projectName, scenarioName, id, overview: Overview) => {
     try {
@@ -40,5 +41,6 @@ interface Notification {
 const NotificationTemplate = new Map<string, any>([
     ["ms-teams", msTeamsTemplate],
     ["gchat", gchatTemplate],
+    ["slack", slackTemplate],
 ])
 
