@@ -1,30 +1,33 @@
-require('ts-node/register');
-const { App } = require('../../../app');
-const NodeEnvironment = require('jest-environment-node');
+// require('ts-node/register');
+const { App } = require("../../../app")
+const NodeEnvironment = require('jest-environment-node').TestEnvironment
 
-const app = new App();
+const app = new App()
 
 
-class TestEnvironment extends NodeEnvironment {
+class CustomEnvironment extends NodeEnvironment {
   constructor(config, context) {
-    super(config, context);
+    super(config, context)
+    console.log("TADAA==========")
   }
   async setup() {
-    await super.setup();
+    await super.setup()
 
 
-    this.global.__tokenHeaderKey__ = 'x-access-token';
-    this.global.__server__ = app.listen();
+    // @ts-ignore
+    this.global.__tokenHeaderKey__ = "x-access-token"
+    // @ts-ignore
+    this.global.__server__ = app.listen()
   }
 
   async teardown() {
-    await app.close();
-    await super.teardown();
+    await app.close()
+    await super.teardown()
   }
 
   runScript(script) {
-    return super.runScript(script);
+    return super.runScript(script)
   }
 }
 
-module.exports = TestEnvironment;
+module.exports = TestEnvironment
