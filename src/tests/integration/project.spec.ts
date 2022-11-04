@@ -1,5 +1,5 @@
 import * as request from "supertest"
-import { States } from "../contract/states.model"
+import { States } from "./helper/state.model"
 import { stateSetup, userSetup } from "./helper/state"
 import { StatusCode } from "../../server/utils/status-code"
 
