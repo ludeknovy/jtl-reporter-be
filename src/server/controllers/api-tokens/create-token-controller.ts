@@ -1,6 +1,6 @@
 import { Response, NextFunction } from "express"
 import { db } from "../../../db/db"
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid"
 import { createNewApiToken } from "../../queries/api-tokens"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 import { StatusCode } from "../../utils/status-code"
