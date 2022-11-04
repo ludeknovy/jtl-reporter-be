@@ -1,6 +1,6 @@
 import * as request from "supertest"
 import { stateSetup, userSetup, apiTokenSetup } from "./helper/state"
-import { States } from "../contract/states.model"
+import { States } from "./helper/state.model"
 import { ItemStatus } from "../../server/queries/items.model"
 import * as path from "path"
 import { StatusCode } from "../../server/utils/status-code"

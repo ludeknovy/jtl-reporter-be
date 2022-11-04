@@ -3,7 +3,7 @@ import { wrapAsync } from "../errors/error-handler"
 import { Request, Response } from "express"
 import { bodySchemaValidator } from "../schema-validator/schema-validator-middleware"
 import { testDataSchema } from "../schema-validator/test-data-schema"
-import { States } from "../../tests/contract/states.model"
+import { States } from "../../tests/integration/helper/state.model"
 import { db } from "../../db/db"
 import { createNewProject } from "../queries/projects"
 import { createNewScenario } from "../queries/scenario"
@@ -13,7 +13,7 @@ import { createUserInDB } from "../controllers/users/create-new-user-controller"
 import { getUser } from "../queries/auth"
 import { generateToken } from "../controllers/auth/helper/token-generator"
 import { createNewApiToken } from "../queries/api-tokens"
-import * as uuid from "uuid"
+import { v4 as uuidv4 } from "uuid"
 import { ReportStatus } from "../queries/items.model"
 import { StatusCode } from "../utils/status-code"
 import { AllowedRoles } from "../middleware/authorization-middleware"
@@ -90,7 +90,7 @@ export class TestDataSetup {
       .post(
         wrapAsync(async (req: Request, res: Response) => {
           await db.any({ text: "TRUNCATE jtl.api_tokens CASCADE" })
-          const TOKEN = `at-${uuid()}`
+          const TOKEN = `at-${uuidv4()}`
           await createUserInDB("test-user", "test0000", AllowedRoles.Admin)
           const { id } = await db.one(getUser("test-user"))
           await db.any(createNewApiToken(TOKEN, "test-token", id))

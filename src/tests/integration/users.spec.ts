@@ -1,7 +1,7 @@
 import * as request from "supertest"
 import { userSetup } from "./helper/state"
 import { routes } from "./helper/routes"
-import * as uuid from "uuid"
+import { v4 as uuidv4 } from "uuid"
 import { StatusCode } from "../../server/utils/status-code"
 import { AllowedRoles } from "../../server/middleware/authorization-middleware"
 
@@ -80,7 +80,7 @@ describe("Users", () => {
     })
     it("should return 404 when deleting unexisting user", async () => {
       await request(__server__)
-        .delete(routes.users + `/${uuid()}`)
+        .delete(routes.users + `/${uuidv4()}`)
         .set(__tokenHeaderKey__, credentials.token)
         .send()
         .expect(StatusCode.NotFound)

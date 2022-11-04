@@ -9,11 +9,11 @@ import { logger } from "./logger"
 import { Router } from "./server/router"
 import * as swaggerUi from "swagger-ui-express"
 import * as http from "http"
+import { v4 as uuidv4 } from "uuid"
 import { config } from "./server/config"
 import { StatusCode } from "./server/utils/status-code"
 import { NextFunction, Request, Response } from "express"
 import { PgError } from "./server/errors/pgError"
-import * as uuid from "uuid"
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const swaggerDocument = require("../openapi.json")
 
@@ -61,7 +61,7 @@ export class App {
         const { payload: { message } } = error.output
         return res.status(error.output.statusCode).json({ message })
       }
-      const errorId = uuid()
+      const errorId = uuidv4()
       logger.error(`Unexpected error: ${error}, errorId: ${errorId}`)
       return res.status(StatusCode.InternalError).json({ message: `Unexpected error occurred: ${errorId}` })
 
