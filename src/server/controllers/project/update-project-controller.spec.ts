@@ -17,11 +17,11 @@ describe("updateProjectController", () => {
 
     const request = {
       params: { projectName: "project" },
-      body: { projectName: "newProjectName", topMetricsSettings: { errorRate: true } },
+      body: { projectName: "newProjectName", upsertScenario: true, topMetricsSettings: { errorRate: true } },
     }
     await updateProjectController(request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response)
     expect(response.send).toHaveBeenCalledTimes(1)
-    expect(querySpy).toBeCalledWith("project", "newProjectName", { errorRate: true })
+    expect(querySpy).toBeCalledWith("project", "newProjectName", { errorRate: true }, true)
   })
 })

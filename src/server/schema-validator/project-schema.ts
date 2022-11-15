@@ -9,6 +9,7 @@ export const createNewProjectSchema = {
 
 export const updateProjectSchema = {
   projectName: Joi.string().min(MIN_LENGTH).max(MAX_LENGTH).required(),
+  upsertScenario: Joi.boolean().required(),
   topMetricsSettings: Joi.object({
     virtualUsers: Joi.boolean().required(),
     errorRate: Joi.boolean().required(),
