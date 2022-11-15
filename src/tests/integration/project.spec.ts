@@ -44,7 +44,7 @@ describe("Projects", () => {
       await request(__server__)
         .put("/api/projects/test-project")
         .set(__tokenHeaderKey__, credentials.token)
-        .send({ projectName: "test-project" })
+        .send({ projectName: "test-project", upsertScenario: true })
         .set("Accept", "application/json")
         .expect(StatusCode.NoContent)
     })

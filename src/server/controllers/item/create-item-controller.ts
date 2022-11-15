@@ -32,6 +32,7 @@ const upload = multer(
 const SECONDS_DIVISOR = 1000
 
 export const createItemController = (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
+  // eslint-disable-next-line complexity
   upload(req, res, async error => {
     const HOSTNAME_LENGTH = 200
     const { environment, note, status = ItemStatus.None, hostname, name } = req.body
