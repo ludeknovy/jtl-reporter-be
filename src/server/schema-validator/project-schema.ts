@@ -5,6 +5,7 @@ const MAX_LENGTH = 50
 
 export const createNewProjectSchema = {
   projectName: Joi.string().min(MIN_LENGTH).max(MAX_LENGTH).required(),
+  allowedUsers: Joi.array().items(Joi.string().guid()),
 }
 
 export const updateProjectSchema = {
