@@ -12,7 +12,7 @@ import { getProjectStatsController } from "../controllers/project/get-projects-s
 import { getProjectController } from "../controllers/project/get-project-controller"
 import { AllowedRoles, authorizationMiddleware } from "../middleware/authorization-middleware"
 import { authenticationMiddleware } from "../middleware/authentication-middleware"
-import {IGetUserAuthInfoRequest} from "../middleware/request.model";
+import { IGetUserAuthInfoRequest } from "../middleware/request.model"
 
 export class ProjectRoutes {
   routes(app: express.Application): void {
@@ -52,7 +52,7 @@ export class ProjectRoutes {
         authenticationMiddleware,
         authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(projectNameParam),
-        wrapAsync( (req: Request, res: Response) => getProjectController(req, res)))
+        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => getProjectController(req, res)))
 
 
       .put(

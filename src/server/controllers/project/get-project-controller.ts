@@ -1,10 +1,18 @@
-import { Request, Response } from "express"
+import { Response } from "express"
 import { db } from "../../../db/db"
 import { getProject } from "../../queries/projects"
 import { StatusCode } from "../../utils/status-code"
+import { getAllowedUsersForProject } from "../../queries/user-project-access"
+import { AllowedRoles } from "../../middleware/authorization-middleware"
+import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 
-export const getProjectController = async (req: Request, res: Response) => {
+export const getProjectController = async (req: IGetUserAuthInfoRequest, res: Response) => {
   const { projectName } = req.params
+  const projectMembers = []
   const projectSettings = await db.one(getProject(projectName))
-  res.status(StatusCode.Ok).send(projectSettings)
+  if (req.user.role === AllowedRoles.Admin) {
+    const allowedUsers = await db.manyOrNone(getAllowedUsersForProject(projectName))
+    allowedUsers.forEach(user => projectMembers.push(user.user_id))
+  }
+  res.status(StatusCode.Ok).send({ ...projectSettings, projectMembers })
 }

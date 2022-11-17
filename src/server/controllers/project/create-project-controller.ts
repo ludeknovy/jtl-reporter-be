@@ -13,8 +13,7 @@ const pg = pgp()
 
 
 export const createProjectController = async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
-    const { body: { projectName, allowedUsers } } = req
-    console.log({ allowedUsers })
+    const { body: { projectName, projectMembers } } = req
     const { exists } = await db.one(isExistingProject(projectName))
     if (!exists) {
         const project = await db.one(createNewProject(projectName))
@@ -26,16 +25,16 @@ export const createProjectController = async (req: IGetUserAuthInfoRequest, res:
             logger.info(`Granting access current user ${req.user.userId} to project ${projectName}`)
             await db.query(allowProjectForCurrentUser(project.id, req.user.userId))
         }
-        if (req.user.role === AllowedRoles.Admin && allowedUsers?.length > 0) {
+        if (req.user.role === AllowedRoles.Admin && projectMembers?.length > 0) {
             const columnSet = new pg.helpers.ColumnSet([
                 { name: "project_id", prop: "projectId" },
                 { name: "user_id", prop: "userId" }],
                 { table: new pg.helpers.TableName({ table: "user_project_access", schema: "jtl" }) })
-            const dataToBeInserted = allowedUsers.map(user => ({
+            const dataToBeInserted = projectMembers.map(user => ({
                 userId: user,
                 projectId: project.id,
             }))
-            logger.info(`Granting access to following users ${allowedUsers}`)
+            logger.info(`Granting access to following users ${projectMembers}`)
             const query = pg.helpers.insert(dataToBeInserted, columnSet)
             await db.none(query)
 

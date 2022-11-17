@@ -34,3 +34,14 @@ export const isUserAuthorizedForProject = (projectName, userId) => {
         values: [projectName, userId],
     }
 }
+
+export const getAllowedUsersForProject = (projectName) => {
+    return {
+        text: `SELECT user_id FROM jtl.user_project_access upa
+                LEFT JOIN jtl.projects p on p.id = upa.project_id
+                LEFT JOIN jtl.users u on u.id = upa.user_id
+                WHERE p.project_name = $1
+                AND NOT u.role = 'admin'`,
+        values: [projectName],
+    }
+}
