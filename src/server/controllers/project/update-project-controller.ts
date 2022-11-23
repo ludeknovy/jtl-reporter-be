@@ -11,8 +11,6 @@ export const updateProjectController = async (req: Request, res: Response) => {
     const { projectName: newProjectName, topMetricsSettings, upsertScenario, projectMembers } = req.body
     const currentProjectMembers = await db.manyOrNone(getProjectMembers(projectName))
 
-    console.log({ currentProjectMembers })
-
     const newProjectMembers = projectMembers.filter(member =>
         !currentProjectMembers.find(currentMember => currentMember.user_id === member))
     const projectMembersToRemove = currentProjectMembers

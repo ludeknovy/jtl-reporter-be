@@ -29,7 +29,7 @@ describe("getProjectController", () => {
         await getProjectController(request as unknown as IGetUserAuthInfoRequest,
             response as unknown as Response)
         expect(response.send).toHaveBeenCalledTimes(1)
-        expect(response.send).toBeCalledWith({ ...responseStub, projectMembers: [1]})
+        expect(response.send).toBeCalledWith({ ...responseStub, projectMembers: [1] })
     })
     it("should not return project members when user role is not admin", async () => {
         const responseStub = { name: "project" }
@@ -46,6 +46,6 @@ describe("getProjectController", () => {
         await getProjectController(request as unknown as IGetUserAuthInfoRequest,
             response as unknown as Response)
         expect(response.send).toHaveBeenCalledTimes(1)
-        expect(response.send).toBeCalledWith({ ...responseStub, projectMembers: []})
+        expect(response.send).toBeCalledWith({ ...responseStub, projectMembers: [] })
     })
 })
