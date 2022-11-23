@@ -4,7 +4,7 @@ import { db } from "../../../db/db"
 import * as boom from "boom"
 import { hashPassword } from "../auth/helper/passwords"
 import { StatusCode } from "../../utils/status-code"
-import {allowAdminUserForAllProjects} from "../../queries/user-project-access";
+import {asignAdminAsProjectMember} from "../../queries/user-project-access";
 
 
 export const createNewUserController = async (req: Request, res: Response, next: NextFunction) => {
@@ -15,7 +15,7 @@ export const createNewUserController = async (req: Request, res: Response, next:
     console.log({ userId })
     console.log({ role })
     if (role === "admin") {
-      await db.query(allowAdminUserForAllProjects(userId.id))
+      await db.query(asignAdminAsProjectMember(userId.id))
     }
 
     res.status(StatusCode.Created).send()

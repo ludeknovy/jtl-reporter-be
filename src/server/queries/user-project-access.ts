@@ -1,4 +1,4 @@
-export const allowAdminUserForAllProjects = (userId) => {
+export const asignAdminAsProjectMember = (userId) => {
     return {
         text: `INSERT INTO jtl.user_project_access (project_id, user_id)
                SELECT id, $1 as user_id
@@ -7,7 +7,7 @@ export const allowAdminUserForAllProjects = (userId) => {
     }
 }
 
-export const allowProjectForAdmins = (projectId) => {
+export const assignAllAdminsAsProjectMembers = (projectId) => {
     return {
         text: `INSERT INTO jtl.user_project_access (project_id, user_id) 
                 SELECT $1, u.id FROM jtl.users u 
@@ -16,7 +16,7 @@ export const allowProjectForAdmins = (projectId) => {
     }
 }
 
-export const allowProjectForCurrentUser = (projectId, userId) => {
+export const addProjectMember = (projectId, userId) => {
     return {
         text: `INSERT INTO jtl.user_project_access (project_id, user_id) 
                 VALUES ($1, $2)`,
@@ -35,7 +35,7 @@ export const isUserAuthorizedForProject = (projectName, userId) => {
     }
 }
 
-export const getAllowedUsersForProject = (projectName) => {
+export const getProjectMembers = (projectName) => {
     return {
         text: `SELECT user_id FROM jtl.user_project_access upa
                 LEFT JOIN jtl.projects p on p.id = upa.project_id
@@ -46,7 +46,7 @@ export const getAllowedUsersForProject = (projectName) => {
     }
 }
 
-export const removeAllowedUSerFromProject = (projectId, userId) => {
+export const removeProjectMember = (projectId, userId) => {
     return {
         text: `DELETE FROM jtl.user_project_access WHERE project_id = $1 AND user_id = $2`,
         values: [projectId, userId],

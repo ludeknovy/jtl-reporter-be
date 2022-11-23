@@ -1,7 +1,9 @@
 /* eslint-disable camelcase */
 exports.up = pgm => {
     pgm.createTable({ schema: "jtl", name: "user_project_access" }, {
-        id: "id",
+        id: {
+            type: "serial",
+        },
         project_id: {
             type: "uuid",
             notNull: true,
@@ -24,6 +26,10 @@ exports.up = pgm => {
                 },
             }],
         },
+    })
+
+    pgm.addConstraint({ schema: "jtl", name: "user_project_access" }, "user_id_project_id_pk", {
+        primaryKey: ["user_id", "project_id"],
     })
 }
 
