@@ -13,22 +13,35 @@ const mockResponse = () => {
 
 describe("getScenarioTrendsController", function () {
   it("should return data", async function () {
-    (db.any as any).mockResolvedValueOnce([{ overview: { bytesPerSecond: 100, bytesSentPerSecond: 200 }, id: "id1" }])
+    (db.any as any).mockResolvedValueOnce([
+      { overview: { bytesPerSecond: 100, bytesSentPerSecond: 200, startDate: "2022-02-11T08:33:02.920Z" }, id: "id2" },
+      { overview: { bytesPerSecond: 100, bytesSentPerSecond: 200, startDate: "2021-11-29T21:25:57.623Z" }, id: "id1" },
+    ])
 
     const response = mockResponse()
     const request = {
       params: "scenario-name",
-      projectName: "project-nsame",
+      projectName: "project-name",
     }
     await getScenarioTrendsController(
       request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response)
+
     expect(response.send).toBeCalledWith([{
       id: "id1",
       overview: {
         bytesPerSecond: 100,
         bytesSentPerSecond: 200,
         network: 300,
+        startDate: "2021-11-29T21:25:57.623Z",
+      },
+    }, {
+      id: "id2",
+      overview: {
+        bytesPerSecond: 100,
+        bytesSentPerSecond: 200,
+        network: 300,
+        startDate: "2022-02-11T08:33:02.920Z",
       },
     }])
   })
