@@ -11,8 +11,8 @@ export const getProjectController = async (req: IGetUserAuthInfoRequest, res: Re
   const projectMembers = []
   const projectSettings = await db.one(getProject(projectName))
   if (req.user.role === AllowedRoles.Admin) {
-    const allowedUsers = await db.manyOrNone(getProjectMembers(projectName))
-    allowedUsers.forEach(user => projectMembers.push(user.user_id))
+    const pm = await db.manyOrNone(getProjectMembers(projectName))
+    pm.forEach(user => projectMembers.push(user.user_id))
   }
   res.status(StatusCode.Ok).send({ ...projectSettings, projectMembers })
 }
