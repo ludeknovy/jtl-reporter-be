@@ -60,7 +60,7 @@ export const scenarioTrends = (projectName, scenarioName) => {
     WHERE s.name = $2
     AND p.project_name = $1
     AND report_status = 'ready'
-    ORDER BY start_time ASC
+    ORDER BY start_time DESC
     LIMIT 15;`,
     values: [projectName, scenarioName],
   }
