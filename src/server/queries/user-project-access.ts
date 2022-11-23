@@ -45,3 +45,10 @@ export const getAllowedUsersForProject = (projectName) => {
         values: [projectName],
     }
 }
+
+export const removeAllowedUSerFromProject = (projectId, userId) => {
+    return {
+        text: `DELETE FROM jtl.user_project_access WHERE project_id = $1 AND user_id = $2`,
+        values: [projectId, userId],
+    }
+}

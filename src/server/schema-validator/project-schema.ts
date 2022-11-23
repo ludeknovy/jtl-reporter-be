@@ -24,6 +24,7 @@ export const updateProjectSchema = {
     networkReceived: Joi.boolean().required(),
     errorCount: Joi.boolean().required(),
   }),
+  projectMembers: Joi.array().items(Joi.string().guid()),
 }
 
 export const projectNameParam = {
