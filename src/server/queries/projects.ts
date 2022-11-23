@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 export const isExistingProject = projectName => {
   return {
     name: "is-existing-project",
@@ -24,7 +25,6 @@ export const findProjectId = projectName => {
 
 export const findProjects = (userId) => {
   return {
-    // eslint-disable-next-line max-len
     text: `SELECT project_name as "projectName", p.id, count(DISTINCT(s.name))::int as "scenarioCount", count(i.id)::int as "itemCount", MAX(i.start_time) as "latestRun"
     FROM jtl.projects as p
     LEFT JOIN jtl.scenario as s ON s.project_id = p.id
@@ -38,7 +38,6 @@ export const findProjects = (userId) => {
 
 export const latestItems = (userId) => {
   return {
-    // eslint-disable-next-line max-len
     text: `SELECT i.id, s.name, environment, project_name as "projectName", stat.overview, status, s.zero_error_tolerance_enabled as "zeroErrorToleranceEnabled", i.threshold_result as "thresholdPassed" FROM jtl.items as i
     LEFT JOIN jtl.scenario as s ON s.id = i.scenario_id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
@@ -60,7 +59,6 @@ export const deleteProject = (projectName) => {
 
 export const updateProjectName = (currentProjectName, newProjectName, topMetricsSettings, upsertScenario) => {
   return {
-    // eslint-disable-next-line max-len
     text: "UPDATE jtl.projects SET project_name = $2, item_top_statistics_settings = $3, upsert_scenario = $4 WHERE project_name = $1",
     values: [currentProjectName, newProjectName, topMetricsSettings, upsertScenario],
   }
@@ -68,7 +66,6 @@ export const updateProjectName = (currentProjectName, newProjectName, topMetrics
 
 export const getProject = (projectName) => {
   return {
-    // eslint-disable-next-line max-len
     text: "SELECT id, project_name as \"projectName\", item_top_statistics_settings as \"topMetricsSettings\", upsert_scenario as \"upsertScenario\" FROM jtl.projects WHERE project_name = $1",
     values: [projectName],
   }

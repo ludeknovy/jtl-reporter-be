@@ -4,7 +4,7 @@ import { db } from "../../../db/db"
 import * as boom from "boom"
 import { hashPassword } from "../auth/helper/passwords"
 import { StatusCode } from "../../utils/status-code"
-import {asignAdminAsProjectMember} from "../../queries/user-project-access";
+import { asignAdminAsProjectMember } from "../../queries/user-project-access"
 
 
 export const createNewUserController = async (req: Request, res: Response, next: NextFunction) => {

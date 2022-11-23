@@ -22,7 +22,8 @@ export class ProjectRoutes {
         authenticationMiddleware,
         authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
         bodySchemaValidator(createNewProjectSchema),
-        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => createProjectController(req, res, next)))
+        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) =>
+            createProjectController(req, res, next)))
 
       .get(
         authenticationMiddleware,

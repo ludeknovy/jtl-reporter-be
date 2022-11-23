@@ -1,10 +1,9 @@
 import { Request, Response } from "express"
 import { db } from "../../../db/db"
-import {getProject, updateProjectName} from "../../queries/projects"
+import { getProject, updateProjectName } from "../../queries/projects"
 import { StatusCode } from "../../utils/status-code"
-import {addProjectMember, getProjectMembers, removeProjectMember} from "../../queries/user-project-access"
+import { addProjectMember, getProjectMembers, removeProjectMember } from "../../queries/user-project-access"
 import { logger } from "../../../logger"
-import * as pgp from "pg-promise"
 
 
 export const updateProjectController = async (req: Request, res: Response) => {
