@@ -69,7 +69,7 @@ describe("AuthorizationMiddleware", () => {
             params: {
                 projectName: "projectName",
             },
-        };
+        }
         const querySpy = jest.spyOn(require("../queries/user-project-access"), "isUserAuthorizedForProject");
         (db.oneOrNone as any).mockResolvedValueOnce(null)
 

@@ -2,30 +2,32 @@ import { Response } from "express"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 import { updateProjectController } from "./update-project-controller"
 import { db } from "../../../db/db"
+
 jest.mock("../../../db/db")
 const mockResponse = () => {
-  const res: Partial<Response> = {}
-  res.send = jest.fn().mockReturnValue(res)
-  res.status = jest.fn().mockReturnValue(res)
-  return res
+    const res: Partial<Response> = {}
+    res.send = jest.fn().mockReturnValue(res)
+    res.status = jest.fn().mockReturnValue(res)
+    return res
 }
 
 
 describe("updateProjectController", () => {
-  it("should return project settings", async function () {
-    const response = mockResponse()
-    const querySpy = jest.spyOn(require("../../queries/projects"), "updateProjectName")
+    it("should return project settings", async function () {
+        const response = mockResponse()
 
-    const request = {
-      params: { projectName: "project" },
-      body: { projectName: "newProjectName", upsertScenario: true, topMetricsSettings: { errorRate: true } },
-    };
+        const request = {
+            params: { projectName: "project" },
+            body: {
+                projectName: "newProjectName", upsertScenario: true, topMetricsSettings: { errorRate: true },
+                projectMembers: ["123"],
+            },
+        };
 
-    (db.manyOrNone as any).mockResolvedValue([{ userId: "123 " }])
+        (db.manyOrNone as any).mockResolvedValue([{ userId: "123 " }])
 
-    await updateProjectController(request as unknown as IGetUserAuthInfoRequest,
-      response as unknown as Response)
-    expect(response.send).toHaveBeenCalledTimes(1)
-    expect(querySpy).toBeCalledWith("project", "newProjectName", { errorRate: true }, true)
-  })
+        await updateProjectController(request as unknown as IGetUserAuthInfoRequest,
+            response as unknown as Response)
+        expect(response.send).toHaveBeenCalledTimes(1)
+    })
 })
