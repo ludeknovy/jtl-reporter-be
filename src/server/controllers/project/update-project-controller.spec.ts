@@ -1,7 +1,7 @@
 import { Response } from "express"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 import { updateProjectController } from "./update-project-controller"
-import {db} from "../../../db/db";
+import { db } from "../../../db/db"
 jest.mock("../../../db/db")
 const mockResponse = () => {
   const res: Partial<Response> = {}
@@ -21,7 +21,7 @@ describe("updateProjectController", () => {
       body: { projectName: "newProjectName", upsertScenario: true, topMetricsSettings: { errorRate: true } },
     };
 
-    (db.manyOrNone as any).mockResolvedValue([{ userId: "123 "}])
+    (db.manyOrNone as any).mockResolvedValue([{ userId: "123 " }])
 
     await updateProjectController(request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response)

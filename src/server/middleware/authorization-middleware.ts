@@ -13,7 +13,8 @@ export const authorizationMiddleware = (allowedRoles: AllowedRoles[]) => {
       logger.info(`User ${user.userId} with role ${user.role} accessing a resource within ${projectName} project`)
       const userAuthorizedForProject = await db.oneOrNone(isUserAuthorizedForProject(projectName, user.userId))
       if (!userAuthorizedForProject) {
-        next(boom.forbidden(`You dont have permission to access`))
+        logger.info(`User ${user.userId} has no access to project ${projectName}`)
+        return next(boom.forbidden(`You dont have permission to access`))
       }
       // user is authorized, we can proceed
     }
@@ -21,10 +22,10 @@ export const authorizationMiddleware = (allowedRoles: AllowedRoles[]) => {
     // check role authorization
     if (allowedRoles.find((role) => role === request.user.role)) {
       // role is allowed, so continue on the next middleware
-      next()
-    } else {
-      next(boom.forbidden(`Not enough permission to do this`))
+      return next()
     }
+    next(boom.forbidden(`Not enough permission to do this`))
+
   }
 }
 
