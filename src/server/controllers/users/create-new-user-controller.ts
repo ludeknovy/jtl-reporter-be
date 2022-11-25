@@ -4,13 +4,20 @@ import { db } from "../../../db/db"
 import * as boom from "boom"
 import { hashPassword } from "../auth/helper/passwords"
 import { StatusCode } from "../../utils/status-code"
+import { asignAdminAsProjectMember } from "../../queries/user-project-access"
 
 
 export const createNewUserController = async (req: Request, res: Response, next: NextFunction) => {
   const { username, password, role } = req.body
 
   try {
-    await createUserInDB(username, password, role)
+    const userId = await createUserInDB(username, password, role)
+    console.log({ userId })
+    console.log({ role })
+    if (role === "admin") {
+      await db.query(asignAdminAsProjectMember(userId.id))
+    }
+
     res.status(StatusCode.Created).send()
   } catch(error) {
     if (error.routine === "_bt_check_unique") {
@@ -20,7 +27,7 @@ export const createNewUserController = async (req: Request, res: Response, next:
   }
 }
 
-export const createUserInDB = async (username, password, role) => {
+export const createUserInDB = async (username, password, role): Promise<{ id: string }> => {
   const passwordHash = await hashPassword(password)
-  await db.query(createUser(username, passwordHash, role))
+  return db.one(createUser(username, passwordHash, role))
 }

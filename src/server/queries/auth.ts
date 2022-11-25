@@ -21,7 +21,7 @@ export const getUsers = () => {
 
 export const createUser = (username, password, role) => {
   return {
-    text: "INSERT INTO jtl.users(username, password, role) VALUES($1, $2, $3)",
+    text: "INSERT INTO jtl.users(username, password, role) VALUES($1, $2, $3) RETURNING id",
     values: [username, password, role],
   }
 }
