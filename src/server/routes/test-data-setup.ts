@@ -29,51 +29,43 @@ export class TestDataSetup {
                     const { state } = req.body
                     // eslint-disable-next-line max-len
                     await db.any({ text: "TRUNCATE jtl.charts, jtl.projects, jtl.data, jtl.item_stat, jtl.items, jtl.scenario CASCADE" })
-                    switch (state) {
-                        case States.ExistingProject:
-                            await db.any(createNewProject("test-project"))
-                            // eslint-disable-next-line no-case-declarations
-                            const project = await db.one(getProject("test-project"))
-                            await db.any(assignAllAdminsAsProjectMembers(project.id))
-                            res.sendStatus(StatusCode.Created)
-                            break
-                        case States.ExistingScenario:
-                            await db.any(createNewProject("test-project"))
-                            await db.any(createNewScenario("test-project", "test-scenario"))
-                            res.sendStatus(StatusCode.Created)
-                            break
-                        case States.ExistingTestItem:
-                            await db.any(createNewProject("test-project"))
-                            await db.any(createNewScenario("test-project", "test-scenario"))
-                            // eslint-disable-next-line no-case-declarations
-                            const [item] = await db.any(createNewItem("test-scenario",
-                                "2019-09-22 20:20:23.265", "localhost", "test note",
-                                "1", "test-project", "localhost", ReportStatus.Ready, "test-name"))
-                            await db.any(saveItemStats(
-                                item.id, JSON.stringify(testStats),
-                                JSON.stringify(testOverview),
-                                JSON.stringify([])))
-                            res.status(StatusCode.Ok).send({ itemId: item.id })
-                            break
-                        case States.EmptyDb:
-                            res.sendStatus(StatusCode.Created)
-                            break
-                        case States.NoUsers:
-                            await db.any({ text: "TRUNCATE jtl.users CASCADE" })
-                            res.sendStatus(StatusCode.Created)
-                            break
-                        case States.ExistingApiKey:
-                            // eslint-disable-next-line no-case-declarations
-                            const TOKEN = "at-testToken"
-                            await createUserInDB("test-user", "test00010", AllowedRoles.Admin)
-                            // eslint-disable-next-line no-case-declarations
-                            const { id } = await db.one(getUser("test-user"))
-                            await db.any(createNewApiToken(TOKEN, "test-token", id))
-                            res.status(StatusCode.Ok).send({ token: TOKEN })
-                            break
-                        default:
-                            res.sendStatus(StatusCode.BadRequest)
-                            break
+                    if (state === States.ExistingProject) {
+                        await db.any(createNewProject("test-project"))
+                        const project = await db.one(getProject("test-project"))
+                        await db.any(assignAllAdminsAsProjectMembers(project.id))
+                        res.sendStatus(StatusCode.Created)
+                    } else if (state === States.ExistingScenario) {
+                        await db.any(createNewProject("test-project"))
+                        const project = await db.one(getProject("test-project"))
+                        await db.any(assignAllAdminsAsProjectMembers(project.id))
+                        await db.any(createNewScenario("test-project", "test-scenario"))
+                        res.sendStatus(StatusCode.Created)
+                    } else if (state === States.ExistingTestItem) {
+                        await db.any(createNewProject("test-project"))
+                        await db.any(createNewScenario("test-project", "test-scenario"))
+                        // eslint-disable-next-line no-case-declarations
+                        const [item] = await db.any(createNewItem("test-scenario",
+                            "2019-09-22 20:20:23.265", "localhost", "test note",
+                            "1", "test-project", "localhost", ReportStatus.Ready, "test-name"))
+                        await db.any(saveItemStats(
+                            item.id, JSON.stringify(testStats),
+                            JSON.stringify(testOverview),
+                            JSON.stringify([])))
+                        res.status(StatusCode.Ok).send({ itemId: item.id })
+                    } else if (state === States.EmptyDb) {
+                        res.sendStatus(StatusCode.Created)
+                    } else if (state === States.NoUsers) {
+                        await db.any({ text: "TRUNCATE jtl.users CASCADE" })
+                        res.sendStatus(StatusCode.Created)
+                    } else if (state === States.ExistingApiKey) { // eslint-disable-next-line no-case-declarations
+                        const TOKEN = "at-testToken"
+                        await createUserInDB("test-user", "test00010", AllowedRoles.Admin)
+                        // eslint-disable-next-line no-case-declarations
+                        const { id } = await db.one(getUser("test-user"))
+                        await db.any(createNewApiToken(TOKEN, "test-token", id))
+                        res.status(StatusCode.Ok).send({ token: TOKEN })
+                    } else {
+                        res.sendStatus(StatusCode.BadRequest)
                     }
                 }))
         app.route("/api/contract/test-user")
