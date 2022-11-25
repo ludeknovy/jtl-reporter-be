@@ -9,10 +9,10 @@ export const authorizationMiddleware = (allowedRoles: AllowedRoles[]) => {
     logger.info(`User ${user.userId} with role ${user.role} accessing a resource with allowed roles: ${allowedRoles}`)
     // check project authorization
     const { projectName } = request.params
-    if (projectName && user?.userId) {
+    if (projectName && user?.userId && user?.role !== AllowedRoles.Admin) {
       logger.info(`User ${user.userId} with role ${user.role} accessing a resource within ${projectName} project`)
       const userAuthorizedForProject = await db.oneOrNone(isUserAuthorizedForProject(projectName, user.userId))
-      if (!userAuthorizedForProject) {
+      if (!userAuthorizedForProject && user.role) {
         logger.info(`User ${user.userId} has no access to project ${projectName}`)
         return next(boom.forbidden(`You dont have permission to access`))
       }
