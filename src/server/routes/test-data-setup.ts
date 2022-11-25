@@ -42,6 +42,8 @@ export class TestDataSetup {
                         res.sendStatus(StatusCode.Created)
                     } else if (state === States.ExistingTestItem) {
                         await db.any(createNewProject("test-project"))
+                        const project = await db.one(getProject("test-project"))
+                        await db.any(assignAllAdminsAsProjectMembers(project.id))
                         await db.any(createNewScenario("test-project", "test-scenario"))
                         // eslint-disable-next-line no-case-declarations
                         const [item] = await db.any(createNewItem("test-scenario",
