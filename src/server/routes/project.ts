@@ -61,7 +61,7 @@ export class ProjectRoutes {
         authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(projectNameParam),
         bodySchemaValidator(updateProjectSchema),
-        wrapAsync( (req: Request, res: Response) => updateProjectController(req, res)))
+        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => updateProjectController(req, res)))
 
 
     app.route("/api/projects/:projectName/allowed-users")
