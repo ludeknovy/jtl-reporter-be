@@ -62,7 +62,7 @@ export class ItemsRoutes {
         authenticationMiddleware,
         authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
-        wrapAsync( (req: Request, res: Response) => getItemController(req, res)))
+        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => getItemController(req, res)))
 
       .put(
         authenticationMiddleware,

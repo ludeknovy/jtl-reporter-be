@@ -186,3 +186,26 @@ export const currentScenarioMetrics = (projectName, scenarioName, vu) => {
   }
 }
 
+export const getUserScenarioSettings = (projectName, scenarioName, userId) => {
+  return {
+    text: `SELECT request_stats_settings  FROM jtl.user_scenario_settings as rss
+    LEFT JOIN jtl.scenario s ON s.id = rss.scenario_id
+    LEFT JOIN jtl.projects p on p.id = s.project_id                           
+    WHERE p.project_name = $1
+    AND s.name = $2
+    AND rss.user_id = $3`,
+    values: [projectName, scenarioName, userId],
+  }
+}
+
+export const updateUserScenarioSettings = (projectName, scenarioName, userId, requestStats) => {
+  return {
+    text: `INSERT INTO jtl.user_scenario_settings (scenario_id, user_id, request_stats_settings)
+    SELECT s.id, $3, $4 FROM jtl.scenario s
+    LEFT JOIN jtl.projects p on p.id = s.project_id
+    WHERE s.name = $2
+    AND p.project_name = $1
+    ON CONFLICT (user_id, scenario_id) DO UPDATE SET request_stats_settings = $4`,
+    values: [projectName, scenarioName, userId, requestStats],
+  }
+}
