@@ -1,8 +1,8 @@
-import { Request, Response } from "express"
+import { Response } from "express"
 import { db } from "../../../db/db"
-import {updateScenario, updateUserScenarioSettings} from "../../queries/scenario"
+import { updateScenario, updateUserScenarioSettings } from "../../queries/scenario"
 import { StatusCode } from "../../utils/status-code"
-import {IGetUserAuthInfoRequest} from "../../middleware/request.model";
+import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 
 
 export const updateScenarioController = async (req: IGetUserAuthInfoRequest, res: Response) => {
