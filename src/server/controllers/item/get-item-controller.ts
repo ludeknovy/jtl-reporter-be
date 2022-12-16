@@ -1,12 +1,15 @@
-import { Request, Response } from "express"
+import { Response } from "express"
 import { db } from "../../../db/db"
 import { findMinMax } from "../../data-stats/helper/stats-fc"
 import { findItem, findItemStats, getMonitoringData } from "../../queries/items"
 import { StatusCode } from "../../utils/status-code"
+import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
+import { getUserScenarioSettings } from "../../queries/scenario"
 
 
-export const getItemController = async (req: Request, res: Response) => {
+export const getItemController = async (req: IGetUserAuthInfoRequest, res: Response) => {
   const { projectName, scenarioName, itemId } = req.params
+  const { userId } = req.user
   const {
     plot_data: plot,
     extra_plot_data: extraPlotData,
@@ -18,6 +21,8 @@ export const getItemController = async (req: Request, res: Response) => {
     analysisEnabled, zeroErrorToleranceEnabled, topMetricsSettings, name,
   } = await db.one(findItem(itemId, projectName, scenarioName))
   const { stats: statistics, overview, sutOverview } = await db.one(findItemStats(itemId))
+
+  const userSettings = await db.oneOrNone(getUserScenarioSettings(projectName, scenarioName, userId))
 
   const monitoring: MonitoringData[] = await db.manyOrNone(getMonitoringData(itemId))
 
@@ -41,6 +46,9 @@ export const getItemController = async (req: Request, res: Response) => {
         data: monitoringAdjusted,
         max: maxCpu,
       },
+    },
+    userSettings: {
+      requestStats: userSettings?.request_stats_settings,
     },
   })
 }

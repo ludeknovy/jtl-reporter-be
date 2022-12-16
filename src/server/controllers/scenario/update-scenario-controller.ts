@@ -1,11 +1,13 @@
-import { Request, Response } from "express"
+import { Response } from "express"
 import { db } from "../../../db/db"
-import { updateScenario } from "../../queries/scenario"
+import { updateScenario, updateUserScenarioSettings } from "../../queries/scenario"
 import { StatusCode } from "../../utils/status-code"
+import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 
 
-export const updateScenarioController = async (req: Request, res: Response) => {
+export const updateScenarioController = async (req: IGetUserAuthInfoRequest, res: Response) => {
   const { projectName, scenarioName } = req.params
+  const { userId } = req.user
   const {
     thresholds,
     analysisEnabled,
@@ -17,10 +19,17 @@ export const updateScenarioController = async (req: Request, res: Response) => {
     labelFilterSettings,
     labelTrendChartSettings,
     extraAggregations,
+    userSettings,
   } = req.body
+
+
   await db.none(updateScenario(projectName, scenarioName, name, analysisEnabled,
     thresholds, deleteSamples, zeroErrorToleranceEnabled, keepTestRunsPeriod,
     generateShareToken, JSON.stringify(labelFilterSettings), JSON.stringify(labelTrendChartSettings),
     extraAggregations))
+
+  await db.none(updateUserScenarioSettings(projectName, scenarioName, userId,
+      JSON.stringify(userSettings.requestStats)))
+
   res.status(StatusCode.NoContent).send()
 }

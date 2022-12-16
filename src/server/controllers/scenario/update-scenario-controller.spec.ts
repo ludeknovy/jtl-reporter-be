@@ -29,10 +29,18 @@ describe("updateScenariosController", () => {
       labelFilterSettings: [],
       labelTrendChartSettings: {},
       extraAggregations: false,
+      userSettings: {
+        requestStats: {
+
+        },
+      },
     }
     const request = {
       params: { projectName: "project", scenarioName: "test-scenario" },
       body,
+      user: {
+        userId: "123",
+      },
     }
     await updateScenarioController(request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response)

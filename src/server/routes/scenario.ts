@@ -20,6 +20,7 @@ import { updateScenarioController } from "../controllers/scenario/update-scenari
 import { getScenarioController } from "../controllers/scenario/get-scenario-controller"
 import { authenticationMiddleware } from "../middleware/authentication-middleware"
 import { AllowedRoles, authorizationMiddleware } from "../middleware/authorization-middleware"
+import { IGetUserAuthInfoRequest } from "../middleware/request.model"
 
 export class ScenarioRoutes {
 
@@ -44,7 +45,7 @@ export class ScenarioRoutes {
         authenticationMiddleware,
         authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
-        wrapAsync( (req: Request, res: Response) => getScenarioController(req, res))
+        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => getScenarioController(req, res))
       )
 
       .put(
@@ -52,7 +53,7 @@ export class ScenarioRoutes {
         authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
         bodySchemaValidator(updateScenarioSchema),
-        wrapAsync( (req: Request, res: Response) => updateScenarioController(req, res)))
+        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => updateScenarioController(req, res)))
 
       .delete(
         authenticationMiddleware,

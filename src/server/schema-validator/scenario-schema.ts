@@ -57,4 +57,18 @@ export const updateScenarioSchema = {
     p99: Joi.boolean().required(),
     errorRate: Joi.boolean().required(),
   }),
+  userSettings: Joi.object({
+    requestStats: Joi.object({
+      samples: Joi.boolean().required(),
+      avg: Joi.boolean().required(),
+      min: Joi.boolean().required(),
+      max: Joi.boolean().required(),
+      p90: Joi.boolean().required(),
+      p95: Joi.boolean().required(),
+      p99: Joi.boolean().required(),
+      throughput: Joi.boolean().required(),
+      network: Joi.boolean().required(),
+      errorRate: Joi.boolean().required(),
+    }).required(),
+  }).required(),
 }
