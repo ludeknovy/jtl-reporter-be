@@ -2,7 +2,6 @@ import { Response } from "express"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 import { getItemController } from "./get-item-controller"
 import { db } from "../../../db/db"
-import { findItem, findItemStats, getMonitoringData } from "../../queries/items"
 
 jest.mock("../../../db/db")
 const mockResponse = () => {
