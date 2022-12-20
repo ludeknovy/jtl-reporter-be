@@ -13,9 +13,9 @@ import * as pgp from "pg-promise"
 import { processMonitoringCsv } from "./utils/process-monitoring-csv"
 import { StatusCode } from "../../utils/status-code"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
-import { createNewScenario, getScenario, scenarioGenerateToken } from "../../queries/scenario"
+import { scenarioGenerateToken } from "../../queries/scenario"
 import { generateShareToken } from "./utils/generateShareToken"
-import { getProject } from "../../queries/projects"
+import { upsertScenario } from "./shared/upsert-scenario"
 
 const pg = pgp()
 
@@ -63,16 +63,7 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
       const monitoringFileName = monitoring?.[0]?.path
       let tempBuffer = []
 
-      const project = await db.one(getProject(projectName))
-      if (project.upsertScenario) {
-        const scenario = await db.oneOrNone(getScenario(projectName, scenarioName))
-        console.log(scenario)
-        if (!scenario) {
-          logger.info(`Upserting scenario "${scenarioName}" into project "${projectName}"`)
-
-          await db.query(createNewScenario(projectName, scenarioName))
-        }
-      }
+      await upsertScenario(projectName, scenarioName)
 
       const item = await db.one(createNewItem(
         scenarioName,
