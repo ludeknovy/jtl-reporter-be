@@ -27,4 +27,4 @@ jobs:
           ENVIRONMENT: CI
           JWT_TOKEN: 123
           JWT_TOKEN_LOGIN: 456
-     
+          OPT_OUT_ANALYTICS: true
