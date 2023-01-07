@@ -4,12 +4,12 @@
   "description": "",
   "scripts": {
     "build": "tsc",
-    "dev": "ts-node src/server.ts",
+    "dev": "TS_NODE=true ts-node src/server.ts",
     "start": "node ./dist/server.js",
     "migrate": "node-pg-migrate",
     "test:unit": "jest --config=jest-unit.config.js -w=5 --coverage",
     "test:contract": "jest --config=contract.config.js -w=5",
-    "test:integration": "jest --forceExit --config=integration.config.js --runInBand",
+    "test:integration": "TS_NODE=true jest --forceExit --config=integration.config.js --runInBand",
     "lint": "eslint -c .eslintrc --quiet --ext .ts .",
     "lint:fix": "eslint -c .eslintrc --quiet --ext .ts . --fix",
     "ts:check": "tsc --noEmit"
