@@ -1,6 +1,6 @@
 FROM node:18.13.0-alpine3.17 as builder
 
-RUN apk --update add python2 git build-base
+RUN apk --update add git build-base
 
 WORKDIR /src/be
 
