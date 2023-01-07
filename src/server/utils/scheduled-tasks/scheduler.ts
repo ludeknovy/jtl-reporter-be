@@ -9,7 +9,7 @@ export const bree = new Bree({
     defaultExtension: process.env.TS_NODE ? "ts" : "js",
     jobs: [{
         name: "analytics-report",
-        interval: "every 24 hours",
+        interval: "every 6 hours",
     }],
 })
 
