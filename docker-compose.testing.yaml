@@ -5,7 +5,7 @@ services:
     build:
       context: ./src/db/
       dockerfile: Dockerfile
-    environment: 
+    environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -21,9 +21,10 @@ services:
       context: ./
       dockerfile: Dockerfile
     environment:
+        - OPT_OUT_ANALYTICS=true
         - WAIT_HOSTS=db:5432
         - DATABASE_URL=postgres://postgres:password@db/jtl_report
     command: sh -c "/wait && npm run migrate up"
     depends_on:
       - db
-  
+

@@ -14,6 +14,7 @@ import { config } from "./server/config"
 import { StatusCode } from "./server/utils/status-code"
 import { NextFunction, Request, Response } from "express"
 import { PgError } from "./server/errors/pgError"
+import { bree } from "./server/utils/scheduled-tasks/scheduler"
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const swaggerDocument = require("../openapi.json")
 
@@ -87,9 +88,22 @@ export class App {
       logger.error("Please provide JWT_TOKEN and JWT_TOKEN_LOGIN env vars")
       process.exit(1)
     }
-    this.server = this.app.listen(PORT, () => {
-      logger.info("Express server listening on port " + PORT)
-    })
+    this.server = this.app.listen(PORT,
+        () => {
+          logger.info("Express server listening on port " + PORT)
+          bree.start().then(() => {
+            process.env.ANALYTICS_IDENTIFIER = uuidv4()
+            logger.info("Bree scheduler was started")
+            if (process.env.OPT_OUT_ANALYTICS === "true") {
+              bree.stop("analytics-report").then(() => {
+                logger.info("Analytics task was opted-out")
+              })
+            } else {
+              logger.info("By using this app you agree with the use of analytics in this app to help improve" +
+                  " user experience and the overall functionality of the app.")
+            }
+          })
+        })
     return this.server
   }
 
