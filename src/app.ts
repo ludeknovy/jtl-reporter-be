@@ -15,7 +15,7 @@ import { StatusCode } from "./server/utils/status-code"
 import { NextFunction, Request, Response } from "express"
 import { PgError } from "./server/errors/pgError"
 import { bree } from "./server/utils/scheduled-tasks/scheduler"
-import helmet from "helmet";
+import helmet from "helmet"
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const swaggerDocument = require("../openapi.json")
 
