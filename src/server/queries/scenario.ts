@@ -163,7 +163,7 @@ export const deleteScenarioNotification = (projectName, scenarioName, id) => {
 
 export const getScenarioSettings = (projectName, scenarioName) => {
   return {
-    text: `SELECT s.threshold_error_rate as "errorRate", s.threshold_percentile as "percentile", s.threshold_throughput as "throughput", s.threshold_enabled as "thresholdEnabled", s.delete_samples as "deleteSamples", s.extra_aggregations as "extraAggregations"  FROM jtl.scenario as s
+    text: `SELECT s.threshold_error_rate as "errorRate", s.threshold_percentile as "percentile", s.threshold_throughput as "throughput", s.threshold_enabled as "thresholdEnabled", s.delete_samples as "deleteSamples", s.extra_aggregations as "extraAggregations", s.apdex_settings as "apdexSettings"  FROM jtl.scenario as s
     LEFT JOIN jtl.projects p ON p.id = s.project_id
     WHERE p.project_name = $1
     AND s.name = $2`,

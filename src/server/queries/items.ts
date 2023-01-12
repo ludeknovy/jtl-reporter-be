@@ -488,3 +488,15 @@ export const deleteSamples = (itemId) => {
     values: [itemId],
   }
 }
+
+export const calculateApdexValues = (itemId, toleratingThreshold, frustratedThreshold) => {
+  return {
+    text: `SELECT count(*) FILTER (WHERE elapsed > 0 AND elapsed <= $2) AS satisfaction
+     , count(*) FILTER (WHERE elapsed > $2 AND elapsed <= $3) AS toleration
+     , count(*) FILTER (WHERE elapsed > $3) AS frustration
+     , label
+        FROM jtl.samples where item_id = $1
+        GROUP BY label`,
+    values: [itemId, toleratingThreshold, frustratedThreshold],
+  }
+}
