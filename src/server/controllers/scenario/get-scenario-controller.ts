@@ -41,5 +41,6 @@ export const getScenarioController = async (req: IGetUserAuthInfoRequest, res: R
     userSettings: {
       requestStats: userScenarioSettings?.request_stats_settings || defaultRequestStatsSettings,
     },
+    apdexSettings: scenario.apdex_settings,
   })
 }

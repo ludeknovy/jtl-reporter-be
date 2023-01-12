@@ -60,7 +60,7 @@ export const updateScenarioSchema = {
   apdexSettings: Joi.object({
     enabled: Joi.boolean().required(),
     toleratingThreshold: Joi.number().required(),
-    frustratedThreshold: Joi.number().required(),
+    satisfyingThreshold: Joi.number().min(0).required(),
   }),
   userSettings: Joi.object({
     requestStats: Joi.object({
