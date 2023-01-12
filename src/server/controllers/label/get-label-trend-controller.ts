@@ -38,7 +38,7 @@ export const getLabelTrendController = async (req: Request, res: Response) => {
   }, { timePoints: [], p90: [], p95: [], p99: [], errorRate: [], throughput: [], virtualUsers: [], avgResponseTime: [],
     avgConnectionTime: [], avgLatency: [], name: [] })
 
-  res.status(StatusCode.Ok).send({
+  res.status(StatusCode.Ok).json({
     chartSeries: {
       timePoints,
       p90, p95, p99,

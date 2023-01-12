@@ -15,5 +15,5 @@ export const getItemsController = async (req: Request, res: Response) => {
     _.base = !_.base ? false : true
     return _
   })
-  res.status(StatusCode.Ok).send({ name: scenarioName, data: idsBaseUpdate, total: parseInt(total, 10) })
+  res.status(StatusCode.Ok).json({ name: scenarioName, data: idsBaseUpdate, total: parseInt(total, 10) })
 }

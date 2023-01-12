@@ -7,5 +7,5 @@ import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 export const getProjectsController = async (req: IGetUserAuthInfoRequest, res: Response ) => {
   const user = req.user
   const projects = await db.any(findProjects(user.userId))
-  res.status(StatusCode.Ok).send(projects)
+  res.status(StatusCode.Ok).json(projects)
 }

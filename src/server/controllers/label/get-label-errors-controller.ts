@@ -13,5 +13,5 @@ export const getLabelErrorsController = async (req: Request, res: Response) => {
       : acc[rc] = 1
     return acc
   }, {})
-  res.status(StatusCode.Ok).send({ stat })
+  res.status(StatusCode.Ok).json({ stat })
 }

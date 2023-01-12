@@ -12,8 +12,6 @@ export const createNewUserController = async (req: Request, res: Response, next:
 
   try {
     const userId = await createUserInDB(username, password, role)
-    console.log({ userId })
-    console.log({ role })
     if (role === "admin") {
       await db.query(asignAdminAsProjectMember(userId.id))
     }

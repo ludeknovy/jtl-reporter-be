@@ -11,5 +11,5 @@ export const createItemLinkController = async (req: IGetUserAuthInfoRequest, res
   const { note } = req.body
   const token = generateShareToken()
   await db.none(createShareToken(projectName, scenarioName, itemId, token, user.userId, note ))
-  res.status(StatusCode.Created).send({ token })
+  res.status(StatusCode.Created).json({ token })
 }

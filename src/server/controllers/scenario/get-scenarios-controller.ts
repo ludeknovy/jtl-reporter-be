@@ -23,5 +23,5 @@ export const getScenariosController = async (req: Request, res: Response) => {
       groupedData.push({ name: scenario.name, id: scenario.id, data: [] })
     }
   })
-  res.status(StatusCode.Ok).send(groupedData)
+  res.status(StatusCode.Ok).json(groupedData)
 }

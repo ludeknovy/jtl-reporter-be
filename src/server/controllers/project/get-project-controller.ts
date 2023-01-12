@@ -14,5 +14,5 @@ export const getProjectController = async (req: IGetUserAuthInfoRequest, res: Re
     const pm = await db.manyOrNone(getProjectMembers(projectName))
     pm.forEach(user => projectMembers.push(user.user_id))
   }
-  res.status(StatusCode.Ok).send({ ...projectSettings, projectMembers })
+  res.status(StatusCode.Ok).json({ ...projectSettings, projectMembers })
 }
