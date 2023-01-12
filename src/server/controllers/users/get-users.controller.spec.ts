@@ -6,7 +6,7 @@ import { getUsersController } from "./get-users-controller"
 jest.mock("../../../db/db")
 const mockResponse = () => {
   const res: Partial<Response> = {}
-  res.send = jest.fn().mockReturnValue(res)
+  res.json = jest.fn().mockReturnValue(res)
   res.status = jest.fn().mockReturnValue(res)
   return res
 }
@@ -20,7 +20,7 @@ describe("getUsersController", () => {
     await getUsersController(
       request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response)
-    expect(response.send).toBeCalledTimes(1)
-    expect(response.send).toBeCalledWith(users)
+    expect(response.json).toBeCalledTimes(1)
+    expect(response.json).toBeCalledWith(users)
   })
 })

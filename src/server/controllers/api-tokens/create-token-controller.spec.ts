@@ -4,7 +4,7 @@ import { createTokenController } from "./create-token-controller"
 jest.mock("../../../db/db")
 const mockResponse = () => {
   const res: Partial<Response> = {}
-  res.send = jest.fn().mockReturnValue(res)
+  res.json = jest.fn().mockReturnValue(res)
   res.status = jest.fn().mockReturnValue(res)
   return res
 }
@@ -22,6 +22,6 @@ describe("createTokenController", () => {
       request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response, nextFunction)
     expect(querySpy).toHaveBeenCalledTimes(1)
-    expect(response.send).toHaveBeenCalledTimes(1)
+    expect(response.json).toHaveBeenCalledTimes(1)
   })
 })

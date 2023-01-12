@@ -10,7 +10,7 @@ export const getLabelVirtualUsersController = async (req: Request, res: Response
     const result = await db.query(getMaxVuForLabel(
       scenarioName, projectName, label,
       itemId, environment))
-    res.status(StatusCode.Ok).send({ result })
+    res.status(StatusCode.Ok).json({ result })
   } catch(error) {
     return next(error)
   }

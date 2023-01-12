@@ -18,7 +18,7 @@ export const loginController = async (req: Request, res: Response, next: NextFun
       return next(boom.unauthorized("Invalid credentials"))
     }
     const token = generateToken(result[0].id)
-    return res.status(StatusCode.Ok).send({ token, username, role: result[0].role })
+    return res.status(StatusCode.Ok).json({ token, username, role: result[0].role })
   } catch(error) {
     return next(error)
   }

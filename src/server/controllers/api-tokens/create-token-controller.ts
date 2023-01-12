@@ -11,7 +11,7 @@ export const createTokenController = async (req: IGetUserAuthInfoRequest, res: R
   const newToken = `at-${uuidv4()}`
   try {
     await db.query(createNewApiToken(newToken, description, userId))
-    return res.status(StatusCode.Created).send({ token: newToken })
+    return res.status(StatusCode.Created).json({ token: newToken })
   } catch(error) {
     return next(error)
   }

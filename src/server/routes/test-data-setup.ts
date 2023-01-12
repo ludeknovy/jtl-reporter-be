@@ -53,7 +53,7 @@ export class TestDataSetup {
                             item.id, JSON.stringify(testStats),
                             JSON.stringify(testOverview),
                             JSON.stringify([])))
-                        res.status(StatusCode.Ok).send({ itemId: item.id })
+                        res.status(StatusCode.Ok).json({ itemId: item.id })
                     } else if (state === States.EmptyDb) {
                         res.sendStatus(StatusCode.Created)
                     } else if (state === States.NoUsers) {
@@ -65,7 +65,7 @@ export class TestDataSetup {
                         // eslint-disable-next-line no-case-declarations
                         const { id } = await db.one(getUser("test-user"))
                         await db.any(createNewApiToken(TOKEN, "test-token", id))
-                        res.status(StatusCode.Ok).send({ token: TOKEN })
+                        res.status(StatusCode.Ok).json({ token: TOKEN })
                     } else {
                         res.sendStatus(StatusCode.BadRequest)
                     }
@@ -80,7 +80,7 @@ export class TestDataSetup {
                     await createUserInDB(username, password, AllowedRoles.Admin)
                     const { id } = await db.one(getUser(username))
                     const token = generateToken(id)
-                    res.status(StatusCode.Ok).send({ token, username, password, id })
+                    res.status(StatusCode.Ok).json({ token, username, password, id })
                 })
             )
 
@@ -92,7 +92,7 @@ export class TestDataSetup {
                     await createUserInDB("test-user", "test0000", AllowedRoles.Admin)
                     const { id } = await db.one(getUser("test-user"))
                     await db.any(createNewApiToken(TOKEN, "test-token", id))
-                    res.status(StatusCode.Ok).send({ token: TOKEN })
+                    res.status(StatusCode.Ok).json({ token: TOKEN })
                 })
             )
     }

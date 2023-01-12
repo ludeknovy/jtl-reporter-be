@@ -6,7 +6,7 @@ import { getProjectsController } from "./get-projects-controller"
 jest.mock("../../../db/db")
 const mockResponse = () => {
     const res: Partial<Response> = {}
-    res.send = jest.fn().mockReturnValue(res)
+    res.json = jest.fn().mockReturnValue(res)
     res.status = jest.fn().mockReturnValue(res)
     return res
 }
@@ -30,6 +30,6 @@ describe("getProjectsController", function () {
             response as unknown as Response)
         expect(findProjectsSpy).toHaveBeenNthCalledWith(1, request.user.userId)
 
-        expect(response.send).toHaveBeenCalledWith(projects)
+        expect(response.json).toHaveBeenCalledWith(projects)
     })
 })

@@ -5,7 +5,7 @@ import { getTokensController } from "./get-tokens-controller"
 jest.mock("../../../db/db")
 const mockResponse = () => {
   const res: Partial<Response> = {}
-  res.send = jest.fn().mockReturnValue(res)
+  res.json = jest.fn().mockReturnValue(res)
   res.status = jest.fn().mockReturnValue(res)
   return res
 }
@@ -23,7 +23,7 @@ describe("getTokenController", () => {
       request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response)
     expect(querySpy).toHaveBeenCalledTimes(1)
-    expect(response.send).toHaveBeenCalledTimes(1)
+    expect(response.json).toHaveBeenCalledTimes(1)
   })
 
   it("should call getOnlyMyApiTokens query when operator role", async () => {
@@ -38,6 +38,6 @@ describe("getTokenController", () => {
       request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response)
     expect(querySpy).toHaveBeenCalledTimes(1)
-    expect(response.send).toHaveBeenCalledTimes(1)
+    expect(response.json).toHaveBeenCalledTimes(1)
   })
 })

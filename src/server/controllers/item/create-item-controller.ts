@@ -91,7 +91,7 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
 
       const itemId = item.id
 
-      res.status(StatusCode.Ok).send({ itemId, shareToken })
+      res.status(StatusCode.Ok).json({ itemId, shareToken })
 
       const columnSet = new pg.helpers.ColumnSet([
         "elapsed", "success", "bytes", "label",

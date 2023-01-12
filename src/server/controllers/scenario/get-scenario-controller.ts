@@ -22,7 +22,7 @@ export const getScenarioController = async (req: IGetUserAuthInfoRequest, res: R
   const { userId } = req.user
   const scenario = await db.oneOrNone(getScenario(projectName, scenarioName))
   const userScenarioSettings = await db.oneOrNone(getUserScenarioSettings(projectName, scenarioName, userId))
-  res.status(StatusCode.Ok).send({
+  res.status(StatusCode.Ok).json({
     name: scenario.name,
     analysisEnabled: scenario.analysis_enabled,
     zeroErrorToleranceEnabled: scenario.zero_error_tolerance_enabled,
