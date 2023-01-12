@@ -8,7 +8,7 @@ jest.mock("../../../db/db")
 
 const mockResponse = () => {
   const res: Partial<Response> = {}
-  res.send = jest.fn().mockReturnValue(res)
+  res.json = jest.fn().mockReturnValue(res)
   res.status = jest.fn().mockReturnValue(res)
   return res
 }
@@ -26,7 +26,7 @@ describe("getItemChartSettingsController", () => {
     await getLabelTrendController(request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response)
     expect(querySpy).toHaveBeenCalledTimes(1)
-    expect(response.send).toHaveBeenCalledTimes(1)
+    expect(response.json).toHaveBeenCalledTimes(1)
   })
   it("should fetch getLabelHistory from db", async () => {
     const response = mockResponse()
@@ -41,7 +41,7 @@ describe("getItemChartSettingsController", () => {
     await getLabelTrendController(request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response)
     expect(querySpy).toHaveBeenCalledTimes(1)
-    expect(response.send).toHaveBeenCalledTimes(1)
+    expect(response.json).toHaveBeenCalledTimes(1)
   })
   it("should sort query output from oldest to newest", async () => {
     const response = mockResponse()
@@ -108,7 +108,7 @@ describe("getItemChartSettingsController", () => {
 
     await getLabelTrendController(request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response)
-    expect(response.send).toHaveBeenCalledWith({
+    expect(response.json).toHaveBeenCalledWith({
       chartSeries: {
         errorRate: [100, 10],
         p90: [1, 10],

@@ -8,7 +8,7 @@ jest.mock("../../../db/db")
 jest.mock("./helper/passwords")
 const mockResponse = () => {
   const res: Partial<Response> = {}
-  res.send = jest.fn().mockReturnValue(res)
+  res.json = jest.fn().mockReturnValue(res)
   res.status = jest.fn().mockReturnValue(res)
   return res
 }
@@ -72,8 +72,8 @@ describe("loginController", () => {
     await loginController(
       request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response, nextFunction)
-    expect(response.send).toHaveBeenCalledTimes(1)
-    expect(response.send).toBeCalledWith(
+    expect(response.json).toHaveBeenCalledTimes(1)
+    expect(response.json).toBeCalledWith(
       expect.objectContaining({
         token: expect.any(String),
         username: "test",

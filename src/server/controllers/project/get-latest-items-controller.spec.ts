@@ -6,7 +6,7 @@ import { db } from "../../../db/db"
 jest.mock("../../../db/db")
 const mockResponse = () => {
     const res: Partial<Response> = {}
-    res.send = jest.fn().mockReturnValue(res)
+    res.json = jest.fn().mockReturnValue(res)
     res.status = jest.fn().mockReturnValue(res)
     return res
 }
@@ -28,6 +28,6 @@ describe("getLatestItemsController", function () {
             response as unknown as Response)
         expect(latestItemSpy).toHaveBeenNthCalledWith(1, request.user.userId)
 
-        expect(response.send).toHaveBeenCalledWith([])
+        expect(response.json).toHaveBeenCalledWith([])
     })
 })

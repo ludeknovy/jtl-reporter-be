@@ -6,7 +6,7 @@ import { getScenariosController } from "./get-scenarios-controller"
 jest.mock("../../../db/db")
 const mockResponse = () => {
   const res: Partial<Response> = {}
-  res.send = jest.fn().mockReturnValue(res)
+  res.json = jest.fn().mockReturnValue(res)
   res.status = jest.fn().mockReturnValue(res)
   return res
 }
@@ -26,7 +26,7 @@ describe("getScenariosController", () => {
     await getScenariosController(
       request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response)
-    expect(response.send).toBeCalledWith([
+    expect(response.json).toBeCalledWith([
       { name: "scenario1", id: "id1", data: [{ test: 1 }, { test: 2 }] },
       { name: "scenario2", id: "id2", data: [{ test: 2 }] },
     ])
@@ -43,7 +43,7 @@ describe("getScenariosController", () => {
     await getScenariosController(
       request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response)
-    expect(response.send).toBeCalledWith([
+    expect(response.json).toBeCalledWith([
       { name: "scenario1", id: "id1", data: [{ test: 1 }] },
       { name: "scenario2", id: "id2", data: [] },
     ])

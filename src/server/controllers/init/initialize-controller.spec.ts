@@ -6,7 +6,7 @@ import { db } from "../../../db/db"
 jest.mock("../../../db/db")
 const mockResponse = () => {
   const res: Partial<Response> = {}
-  res.send = jest.fn().mockReturnValue(res)
+  res.json = jest.fn().mockReturnValue(res)
   res.status = jest.fn().mockReturnValue(res)
   return res
 }
@@ -21,7 +21,7 @@ describe("getInitController", () => {
     await getInitController(
       request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response, nextFunction)
-    expect(response.send).toBeCalledWith({ initialized: true })
+    expect(response.json).toBeCalledWith({ initialized: true })
   })
   it("should return false if no user exists", async function () {
     (db.manyOrNone as any).mockResolvedValue([])
@@ -31,6 +31,6 @@ describe("getInitController", () => {
     await getInitController(
       request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response, nextFunction)
-    expect(response.send).toBeCalledWith({ initialized: false })
+    expect(response.json).toBeCalledWith({ initialized: false })
   })
 })
