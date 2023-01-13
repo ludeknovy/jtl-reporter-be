@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import {roundNumberTwoDecimals} from "./helper/stats-fc"
+import { roundNumberTwoDecimals } from "./helper/stats-fc"
 import * as moment from "moment"
-import {logger} from "../../logger"
-import {shouldSkipLabel} from "../controllers/item/utils/labelFilter"
+import { logger } from "../../logger"
+import { shouldSkipLabel } from "../controllers/item/utils/labelFilter"
 
 // eslint-disable-next-line max-len
 export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, statusCodeDistr: StatusCodeDistribution[], responseFailures: ResponseMessageFailures[], apdex: Apdex[]):
@@ -26,7 +26,7 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, stat
                 avgConnect: roundNumberTwoDecimals(overviewData.avg_connect),
                 startDate,
                 endDate,
-                duration: roundNumberTwoDecimals((endDate.getTime() - startDate.getTime()) / 1000 / 60)
+                duration: roundNumberTwoDecimals((endDate.getTime() - startDate.getTime()) / 1000 / 60),
             },
             labelStats: labelData.map((_) => {
                 const apdexData = apdex?.find(ap => ap.label === _.label)
@@ -49,17 +49,16 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, stat
                     n0: _.n90,
                     statusCodes: statusCodeDistr
                         .filter((sd) => sd.label === _.label)
-                        .map((sd) => ({statusCode: sd.status_code, count: sd.count})),
+                        .map((sd) => ({ statusCode: sd.status_code, count: sd.count })),
                     responseMessageFailures: responseFailures
                         .filter((rm) => rm.label === _.label)
                         .map((rm) => ({
                             responseMessage: rm.response_message,
                             count: rm.count, statusCode: rm.status_code,
-                            failureMessage: rm.failure_message
+                            failureMessage: rm.failure_message,
                         })),
                     apdex: {
                         toleration: apdexData?.toleration ? Number(apdexData.toleration) : null,
-                        frustration: apdexData?.frustration ? Number(apdexData.frustration) : null,
                         satisfaction: apdexData?.satisfaction ? Number(apdexData.satisfaction) : null,
                     },
                 }
@@ -74,9 +73,9 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, stat
                 bytesSentPerSecond: roundNumberTwoDecimals(_.bytes_sent_total / ((_.end - _.start) / 1000)),
                 avgLatency: roundNumberTwoDecimals(_.avg_latency),
                 avgConnect: roundNumberTwoDecimals(_.avg_connect),
-            }))
+            })),
         }
-    } catch (error) {
+    } catch(error) {
         throw new Error(`Error while processing query results ${error}`)
     }
 }
@@ -91,82 +90,82 @@ export const prepareChartDataForSaving = (
             : overviewData.map((_) => [moment(_.time).valueOf(), _.threads]) as Array<[number, number]>,
         overAllFailRate: {
             data: overviewData.map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.error_rate * 100)]),
-            name: "errors"
+            name: "errors",
         },
         overallTimeResponse: {
             data: overviewData.map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.avg_response)]),
-            name: "response time"
+            name: "response time",
         },
         overallThroughput: {
             data: overviewData.map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.total / intervalSec)]),
-            name: "throughput"
+            name: "throughput",
         },
         overAllNetworkUp: {
             data: overviewData.map((_) => [moment(_.time).valueOf(),
                 roundNumberTwoDecimals(_.bytes_sent_total / intervalSec)]),
-            name: "network up"
+            name: "network up",
         },
         overAllNetworkDown: {
             data: overviewData.map((_) => [moment(_.time).valueOf(),
                 roundNumberTwoDecimals(_.bytes_received_total / intervalSec)]),
-            name: "network down"
+            name: "network down",
         },
         overAllNetworkV2: {
             data: overviewData.map((_) => [moment(_.time).valueOf(),
                 roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / intervalSec)]),
-            name: "network"
+            name: "network",
         },
         throughput: labels.map((label) => ({
             data: labelData.filter((_) => _.label === label)
                 .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.total / intervalSec)]),
-            name: label
+            name: label,
         })),
         responseTime: labels.map((label) => ({
             data: labelData.filter((_) => _.label === label)
                 .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.avg_response)]),
-            name: label
+            name: label,
         })),
         minResponseTime: labels.map((label) => ({
             data: labelData.filter((_) => _.label === label)
                 .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.min_response)]),
-            name: label
+            name: label,
         })),
         maxResponseTime: labels.map((label) => ({
             data: labelData.filter((_) => _.label === label)
                 .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.max_response)]),
-            name: label
+            name: label,
         })),
         networkV2: labels.map((label) => ({
             data: labelData.filter((_) => _.label === label)
                 .map((_) => [moment(_.time).valueOf(),
                     roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / intervalSec)]),
-            name: label
+            name: label,
         })),
         networkUp: labels.map((label) => ({
             data: labelData.filter((_) => _.label === label)
                 .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.bytes_sent_total / intervalSec)]),
-            name: label
+            name: label,
         })),
         networkDown: labels.map((label) => ({
             data: labelData.filter((_) => _.label === label)
                 .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.bytes_received_total / intervalSec)]),
-            name: label
+            name: label,
         })),
         percentile90: labels.map((label) => ({
             data: labelData.filter((_) => _.label === label)
                 .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.n90)]),
-            name: label
+            name: label,
         })),
         percentile95: labels.map((label) => ({
             data: labelData.filter((_) => _.label === label)
                 .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.n95)]),
-            name: label
+            name: label,
         })),
         percentile99: labels.map((label) => ({
             data: labelData.filter((_) => _.label === label)
                 .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.n99)]),
-            name: label
-        }))
+            name: label,
+        })),
     }
 }
 
@@ -214,7 +213,7 @@ export const transformDataForDb = (_, itemId, labelFilterSettings) => {
         _.sutHostname = getHostnameFromUrl(_.URL)
         _.itemId = itemId
         return _
-    } catch (error) {
+    } catch(error) {
         logger.error(`Error while parsing data: ${error}`)
     }
 }
@@ -226,9 +225,9 @@ export const transformMonitoringDataForDb = (row, itemId): MonitoringTransformed
             cpu: stringToNumber(row.cpu, 10),
             mem: stringToNumber(row.mem || 0, 10),
             name: row.name || "localhost",
-            itemId
+            itemId,
         }
-    } catch (error) {
+    } catch(error) {
         logger.error(`Error while parsing monitoring data: ${error}`)
 
     }
@@ -244,7 +243,7 @@ export const getHostnameFromUrl = (url) => {
         if (hostname && hostname.length > 0) {
             return hostname
         }
-    } catch (error) {
+    } catch(error) {
 
     }
 }
