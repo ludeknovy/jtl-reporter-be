@@ -82,6 +82,11 @@ describe("Scenario", () => {
                             errorRate: true,
                         },
                     },
+                    apdexSettings: {
+                        toleratingThreshold: 200,
+                        satisfyingThreshold: 50,
+                        enabled: true,
+                    },
                 })
                 .set("Accept", "application/json")
                 .expect(StatusCode.NoContent)
