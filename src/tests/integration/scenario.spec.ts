@@ -80,6 +80,7 @@ describe("Scenario", () => {
                             throughput: true,
                             network: true,
                             errorRate: true,
+                            apdex: true,
                         },
                     },
                     apdexSettings: {
