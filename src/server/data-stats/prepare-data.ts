@@ -17,11 +17,12 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, stat
                 avgResponseTime: Math.round(overviewData.avg_response),
                 errorRate: roundNumberTwoDecimals((overviewData.number_of_failed / overviewData.total) * 100),
                 errorCount: overviewData.number_of_failed,
-                throughput: roundNumberTwoDecimals(overviewData.total / ((overviewData.end - overviewData.start) / 1000)),
-                bytesPerSecond:
-                    roundNumberTwoDecimals(overviewData.bytes_sent_total / ((overviewData.end - overviewData.start) / 1000)),
-                // eslint-disable-next-line max-len
-                bytesSentPerSecond: roundNumberTwoDecimals(overviewData.bytes_received_total / ((overviewData.end - overviewData.start) / 1000)),
+                throughput: roundNumberTwoDecimals(
+                    overviewData.total / ((overviewData.end - overviewData.start) / 1000)),
+                bytesPerSecond: roundNumberTwoDecimals(
+                    overviewData.bytes_sent_total / ((overviewData.end - overviewData.start) / 1000)),
+                bytesSentPerSecond: roundNumberTwoDecimals(
+                    overviewData.bytes_received_total / ((overviewData.end - overviewData.start) / 1000)),
                 avgLatency: roundNumberTwoDecimals(overviewData.avg_latency),
                 avgConnect: roundNumberTwoDecimals(overviewData.avg_connect),
                 startDate,

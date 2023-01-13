@@ -362,8 +362,6 @@ export const updateItemApdexSettings = (itemId, apdexSettings) => {
   }
 }
 
-
-
 export const findShareToken = (projectName, scenarioName, itemId, token) => {
   return {
     text: `SELECT t.token FROM jtl.share_tokens as t
