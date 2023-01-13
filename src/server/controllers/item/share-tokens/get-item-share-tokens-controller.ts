@@ -10,9 +10,9 @@ export const getItemLinksController = async (req: IGetUserAuthInfoRequest, res: 
   const { projectName, scenarioName, itemId } = req.params
   if ([AllowedRoles.Readonly, AllowedRoles.Operator].includes(role)) {
     const myApiKeys = await db.manyOrNone(selectOnlyMyShareTokens(projectName, scenarioName, itemId, userId))
-    return res.status(StatusCode.Ok).send(myApiKeys)
+    return res.send(StatusCode.Ok).json(myApiKeys)
   }
     const shareTokens = await db.manyOrNone(selectShareTokens(projectName, scenarioName, itemId))
-    res.status(StatusCode.Ok).send(shareTokens)
+    res.status(StatusCode.Ok).json(shareTokens)
 
 }

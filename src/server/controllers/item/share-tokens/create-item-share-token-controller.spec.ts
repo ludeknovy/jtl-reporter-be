@@ -4,7 +4,7 @@ import { createItemLinkController } from "./create-item-share-token-controller"
 jest.mock("../../../../db/db")
 const mockResponse = () => {
   const res: Partial<Response> = {}
-  res.send = jest.fn().mockReturnValue(res)
+  res.json = jest.fn().mockReturnValue(res)
   res.status = jest.fn().mockReturnValue(res)
   return res
 }
@@ -24,7 +24,7 @@ describe("createItemLinkController", () => {
     }
     await createItemLinkController(request as unknown as IGetUserAuthInfoRequest, response as unknown as Response)
     expect(querySpy).toHaveBeenCalledWith("project", "scenario", "id", "token", "userId", "note")
-    expect(response.send).toHaveBeenCalledTimes(1)
+    expect(response.json).toHaveBeenCalledTimes(1)
     expect(generateTokenSpy).toHaveBeenCalledTimes(1)
   })
 })

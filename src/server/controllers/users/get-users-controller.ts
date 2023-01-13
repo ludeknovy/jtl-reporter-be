@@ -6,5 +6,5 @@ import { StatusCode } from "../../utils/status-code"
 
 export const getUsersController = async (req: Request, res: Response) => {
   const result = await db.query(getUsers)
-  res.status(StatusCode.Ok).send(result)
+  res.status(StatusCode.Ok).json(result)
 }

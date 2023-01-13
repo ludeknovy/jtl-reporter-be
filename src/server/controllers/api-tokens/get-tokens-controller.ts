@@ -9,9 +9,9 @@ export const getTokensController = async (req: IGetUserAuthInfoRequest, res: Res
   const { role, userId } = req.user
   if (role === AllowedRoles.Operator) {
     const myApiKeys = await db.manyOrNone(getOnlyMyApiTokens(userId))
-    return res.status(StatusCode.Ok).send(myApiKeys)
+    return res.status(StatusCode.Ok).json(myApiKeys)
   }
 
   const result = await db.manyOrNone(getApiTokens())
-  res.status(StatusCode.Ok).send(result)
+  res.status(StatusCode.Ok).json(result)
 }

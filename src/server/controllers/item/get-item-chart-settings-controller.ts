@@ -12,5 +12,5 @@ export const getItemChartSettingsController = async (
   const { userId } = req.user
 
   const chartSettings = await db.oneOrNone(getItemChartSettings(itemId, userId))
-  res.status(StatusCode.Ok).send(chartSettings?.settings || [])
+  res.status(StatusCode.Ok).json(chartSettings?.settings || [])
 }

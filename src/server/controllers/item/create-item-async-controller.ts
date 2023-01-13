@@ -40,9 +40,9 @@ export const createItemAsyncController = async (req: IGetUserAuthInfoRequest, re
 
         const itemId = item.id
         logger.info(`New item for scenario: ${scenarioName} created with id: ${itemId}`)
-        res.status(StatusCode.Created).send({ itemId, shareToken })
+        res.status(StatusCode.Created).json({ itemId, shareToken })
     } catch(e) {
         logger.error(`Creating new async item failed ${e}`)
-        res.status(StatusCode.InternalError).send()
+        res.status(StatusCode.InternalError).json()
     }
 }

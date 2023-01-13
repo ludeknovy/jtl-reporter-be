@@ -6,7 +6,7 @@ import { getScenarioTrendsController } from "./get-scenario-trends-controller"
 jest.mock("../../../../db/db")
 const mockResponse = () => {
   const res: Partial<Response> = {}
-  res.send = jest.fn().mockReturnValue(res)
+  res.json = jest.fn().mockReturnValue(res)
   res.status = jest.fn().mockReturnValue(res)
   return res
 }
@@ -27,7 +27,7 @@ describe("getScenarioTrendsController", function () {
       request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response)
 
-    expect(response.send).toBeCalledWith([{
+    expect(response.json).toBeCalledWith([{
       id: "id1",
       overview: {
         bytesPerSecond: 100,

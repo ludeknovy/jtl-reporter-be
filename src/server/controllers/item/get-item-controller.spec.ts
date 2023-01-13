@@ -6,7 +6,7 @@ import { db } from "../../../db/db"
 jest.mock("../../../db/db")
 const mockResponse = () => {
     const res: Partial<Response> = {}
-    res.send = jest.fn().mockReturnValue(res)
+    res.json = jest.fn().mockReturnValue(res)
     res.status = jest.fn().mockReturnValue(res)
     return res
 }
@@ -43,8 +43,8 @@ describe("getItemController", () => {
         expect(findItemQuerySpy).toHaveBeenCalledTimes(1)
         expect(findItemStatsQuerySpy).toHaveBeenCalledTimes(1)
         expect(getMonitoringDataQuerySpy).toHaveBeenCalledTimes(1)
-        expect(response.send).toHaveBeenCalledTimes(1)
-        expect(response.send).toHaveBeenLastCalledWith({
+        expect(response.json).toHaveBeenCalledTimes(1)
+        expect(response.json).toHaveBeenLastCalledWith({
             analysisEnabled: true,
             baseId: null,
             environment: "environment",

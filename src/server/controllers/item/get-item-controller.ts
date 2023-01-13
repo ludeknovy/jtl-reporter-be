@@ -36,7 +36,7 @@ export const getItemController = async (req: IGetUserAuthInfoRequest, res: Respo
 
   const maxCpu = findMinMax(monitoring.map(_ => _.avgCpu)).max
 
-  res.status(StatusCode.Ok).send({
+  res.status(StatusCode.Ok).json({
     overview, sutOverview, statistics, status, apdexSettings,
     plot, extraPlotData, note, environment, hostname, reportStatus, thresholds, analysisEnabled,
     baseId: base_id, isBase: base_id === itemId, zeroErrorToleranceEnabled, topMetricsSettings,

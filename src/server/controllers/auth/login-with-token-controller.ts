@@ -12,7 +12,7 @@ export const loginWithTokenController = async (req: Request, res: Response, next
     const [tokenData] = await db.query(getApiToken(token))
     const { created_by } = tokenData
     const jwtToken = generateTokenFromToken(created_by)
-    return res.status(StatusCode.Ok).send({ jwtToken })
+    return res.status(StatusCode.Ok).json({ jwtToken })
   } catch(error) {
     logger.error(error)
     return next(boom.unauthorized())

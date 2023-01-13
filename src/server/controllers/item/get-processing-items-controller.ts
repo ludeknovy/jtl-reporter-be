@@ -10,5 +10,5 @@ export const getProcessingItemsController = async (req: Request, res: Response) 
   const processingItems = await db.any(getProcessingItems(projectName, scenarioName))
   const inprogress = processingItems.filter((_) => _.reportStatus === ReportStatus.InProgress)
   const failed = processingItems.filter((_) => _.reportStatus === ReportStatus.Error)
-  res.status(StatusCode.Ok).send({ failed, inprogress })
+  res.status(StatusCode.Ok).json({ failed, inprogress })
 }

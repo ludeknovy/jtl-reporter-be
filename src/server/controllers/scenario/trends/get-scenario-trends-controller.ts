@@ -18,5 +18,5 @@ export const getScenarioTrendsController = async (req: Request, res: Response) =
     }
   }).sort((a, b) =>
       new Date(a.overview.startDate).getTime() - new Date(b.overview.startDate).getTime())
-  res.status(StatusCode.Ok).send(networkAdjustedData)
+  res.status(StatusCode.Ok).json(networkAdjustedData)
 }
