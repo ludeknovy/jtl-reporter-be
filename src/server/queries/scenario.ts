@@ -40,14 +40,14 @@ export const scenarioGenerateToken = (projectName, scenarioName) => {
 }
 
 
-export const updateScenario = (projectName, scenarioName, name, analysisEnabled, thresholds, deleteSamples, zeroErrorToleranceEnabled, keepTestRunPeriod, generateShareToken, labelFilterSettings, labelTrendChartSettings, extraAggregations) => {
+export const updateScenario = (projectName, scenarioName, name, analysisEnabled, thresholds, deleteSamples, zeroErrorToleranceEnabled, keepTestRunPeriod, generateShareToken, labelFilterSettings, labelTrendChartSettings, extraAggregations, apdexSettings) => {
   return {
     text: `
     UPDATE jtl.scenario as s
-    SET name = $3, analysis_enabled=$4, threshold_enabled = $5, threshold_percentile = $6, threshold_throughput = $7, threshold_error_rate = $8, delete_samples = $9, zero_error_tolerance_enabled = $10, keep_test_runs_period = $11, generate_share_token = $12, label_filter_settings = $13, label_trend_chart_settings = $14, extra_aggregations = $15
+    SET name = $3, analysis_enabled=$4, threshold_enabled = $5, threshold_percentile = $6, threshold_throughput = $7, threshold_error_rate = $8, delete_samples = $9, zero_error_tolerance_enabled = $10, keep_test_runs_period = $11, generate_share_token = $12, label_filter_settings = $13, label_trend_chart_settings = $14, extra_aggregations = $15, apdex_settings = $16
     WHERE s.name = $2
     AND s.project_id = (SELECT id FROM jtl.projects WHERE project_name = $1)`,
-    values: [projectName, scenarioName, name, analysisEnabled, thresholds.enabled, thresholds.percentile, thresholds.throughput, thresholds.errorRate, deleteSamples, zeroErrorToleranceEnabled, keepTestRunPeriod, generateShareToken, labelFilterSettings, labelTrendChartSettings, extraAggregations],
+    values: [projectName, scenarioName, name, analysisEnabled, thresholds.enabled, thresholds.percentile, thresholds.throughput, thresholds.errorRate, deleteSamples, zeroErrorToleranceEnabled, keepTestRunPeriod, generateShareToken, labelFilterSettings, labelTrendChartSettings, extraAggregations, apdexSettings],
   }
 }
 
@@ -163,7 +163,7 @@ export const deleteScenarioNotification = (projectName, scenarioName, id) => {
 
 export const getScenarioSettings = (projectName, scenarioName) => {
   return {
-    text: `SELECT s.threshold_error_rate as "errorRate", s.threshold_percentile as "percentile", s.threshold_throughput as "throughput", s.threshold_enabled as "thresholdEnabled", s.delete_samples as "deleteSamples", s.extra_aggregations as "extraAggregations"  FROM jtl.scenario as s
+    text: `SELECT s.threshold_error_rate as "errorRate", s.threshold_percentile as "percentile", s.threshold_throughput as "throughput", s.threshold_enabled as "thresholdEnabled", s.delete_samples as "deleteSamples", s.extra_aggregations as "extraAggregations", s.apdex_settings as "apdexSettings"  FROM jtl.scenario as s
     LEFT JOIN jtl.projects p ON p.id = s.project_id
     WHERE p.project_name = $1
     AND s.name = $2`,

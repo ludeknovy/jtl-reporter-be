@@ -18,7 +18,7 @@ export const getItemController = async (req: IGetUserAuthInfoRequest, res: Respo
     // eslint-disable-next-line @typescript-eslint/naming-convention
     base_id,
     status, hostname, reportStatus, thresholds,
-    analysisEnabled, zeroErrorToleranceEnabled, topMetricsSettings, name,
+    analysisEnabled, zeroErrorToleranceEnabled, topMetricsSettings, name, apdexSettings,
   } = await db.one(findItem(itemId, projectName, scenarioName))
   const { stats: statistics, overview, sutOverview } = await db.one(findItemStats(itemId))
 
@@ -37,7 +37,7 @@ export const getItemController = async (req: IGetUserAuthInfoRequest, res: Respo
   const maxCpu = findMinMax(monitoring.map(_ => _.avgCpu)).max
 
   res.status(StatusCode.Ok).json({
-    overview, sutOverview, statistics, status,
+    overview, sutOverview, statistics, status, apdexSettings,
     plot, extraPlotData, note, environment, hostname, reportStatus, thresholds, analysisEnabled,
     baseId: base_id, isBase: base_id === itemId, zeroErrorToleranceEnabled, topMetricsSettings,
     name,

@@ -34,6 +34,11 @@ describe("updateScenariosController", () => {
 
         },
       },
+      apdexSettings: {
+        toleratingThreshold: 40,
+        satisfyingThreshold: 10,
+        enabled: true,
+      },
     }
     const request = {
       params: { projectName: "project", scenarioName: "test-scenario" },
@@ -48,7 +53,7 @@ describe("updateScenariosController", () => {
     expect(querySpy).toBeCalledWith("project", "test-scenario", "test-scenario",
       body.analysisEnabled, body.thresholds, body.deleteSamples, body.zeroErrorToleranceEnabled,
       body.keepTestRunsPeriod, body.generateShareToken, JSON.stringify(body.labelFilterSettings),
-      JSON.stringify(body.labelTrendChartSettings), body.extraAggregations)
+      JSON.stringify(body.labelTrendChartSettings), body.extraAggregations, body.apdexSettings)
     expect(response.send).toHaveBeenCalledTimes(1)
   })
 })

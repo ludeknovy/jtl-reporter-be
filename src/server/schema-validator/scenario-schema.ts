@@ -57,6 +57,11 @@ export const updateScenarioSchema = {
     p99: Joi.boolean().required(),
     errorRate: Joi.boolean().required(),
   }),
+  apdexSettings: Joi.object({
+    enabled: Joi.boolean().required(),
+    toleratingThreshold: Joi.number().required(),
+    satisfyingThreshold: Joi.number().min(0).required(),
+  }),
   userSettings: Joi.object({
     requestStats: Joi.object({
       samples: Joi.boolean().required(),
@@ -69,6 +74,7 @@ export const updateScenarioSchema = {
       throughput: Joi.boolean().required(),
       network: Joi.boolean().required(),
       errorRate: Joi.boolean().required(),
+      apdex: Joi.boolean().required(),
     }).required(),
   }).required(),
 }

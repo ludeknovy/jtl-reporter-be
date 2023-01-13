@@ -269,8 +269,11 @@ describe("prepare data", () => {
         { label: "label1", response_message: "failure", count: 31, status_code: "100", failure_message: "failure" },
         { label: "label2", response_message: "failure2", count: 1, status_code: "101", failure_message: "failure1" },
       ]
+      const apdex = [
+          { label: "label1", toleration: "40", satisfaction: "200" },
+          { label: "label2", toleration: "30", satisfaction: "100" }]
       const { overview, labelStats } = prepareDataForSavingToDb(overviewData, labelsData, [],
-        statusCodes, responseFailures)
+        statusCodes, responseFailures, apdex)
       expect(overview).toEqual({
         percentil: 271,
         maxVu: undefined,
@@ -306,6 +309,10 @@ describe("prepare data", () => {
           responseMessageFailures: [{
             count: 31, responseMessage: "failure", statusCode: "100", failureMessage: "failure",
           }],
+          apdex: {
+            satisfaction: 200,
+            toleration: 40,
+          },
         },
         {
           label: "label2",
@@ -326,6 +333,10 @@ describe("prepare data", () => {
           responseMessageFailures: [{
             count: 1, responseMessage: "failure2", statusCode: "101", failureMessage: "failure1",
           }],
+          apdex: {
+            toleration: 30,
+            satisfaction: 100,
+            },
         }])
     })
   })

@@ -25,6 +25,7 @@ export const findItem = (itemId, projectName, scenarioName) => {
     text: `SELECT charts.plot_data, charts.extra_plot_data, note, environment, status, hostname, s.analysis_enabled as "analysisEnabled",
             s.zero_error_tolerance_enabled as "zeroErrorToleranceEnabled", threshold_result as "thresholds", 
             report_status as "reportStatus", p.item_top_statistics_settings as "topMetricsSettings", items.name,
+            items.apdex_settings as "apdexSettings",
            (SELECT items.id FROM jtl.items as items
       LEFT JOIN jtl.charts as charts ON charts.item_id = items.id
       LEFT JOIN jtl.scenario as s ON s.id = items.scenario_id
@@ -354,6 +355,12 @@ export const updateItem = (itemId, reportStatus, startTime) => {
   }
 }
 
+export const updateItemApdexSettings = (itemId, apdexSettings) => {
+  return {
+    text: "UPDATE jtl.items SET apdex_settings = $2 WHERE id = $1;",
+    values: [itemId, apdexSettings],
+  }
+}
 
 export const findShareToken = (projectName, scenarioName, itemId, token) => {
   return {
@@ -486,5 +493,17 @@ export const deleteSamples = (itemId) => {
   return {
     text: "DELETE FROM jtl.samples samples WHERE samples.item_id = $1;",
     values: [itemId],
+  }
+}
+
+export const calculateApdexValues = (itemId, satisfyingThreshold, toleratingThreshold) => {
+  return {
+    text: `SELECT 
+       count(*) FILTER (WHERE elapsed > 0 AND elapsed <= $2) AS satisfaction
+     , count(*) FILTER (WHERE elapsed > $2 AND elapsed <= $3) AS toleration
+     , label
+        FROM jtl.samples where item_id = $1
+        GROUP BY label`,
+    values: [itemId, satisfyingThreshold, toleratingThreshold],
   }
 }
