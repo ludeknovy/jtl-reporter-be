@@ -372,5 +372,4 @@ interface Apdex {
     label: string
     satisfaction: string
     toleration: string
-    frustration: string
 }
