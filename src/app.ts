@@ -19,7 +19,8 @@ import helmet from "helmet"
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const swaggerDocument = require("../openapi.json")
 
-const PORT = 5000
+const DEFAULT_PORT = 5000
+const PORT = process.env.PORT || DEFAULT_PORT
 
 export class App {
   app: express.Application
