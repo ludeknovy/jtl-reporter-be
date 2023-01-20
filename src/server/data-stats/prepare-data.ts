@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable @typescript-eslint/no-magic-numbers,max-lines */
 import { roundNumberTwoDecimals } from "./helper/stats-fc"
 import * as moment from "moment"
 import { logger } from "../../logger"
@@ -82,9 +82,16 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, stat
 }
 
 export const prepareChartDataForSaving = (
-    overviewData: ChartOverviewData[], labelData: ChartLabelData[], interval: number, distributedThreads?: []) => {
+    {
+        overviewData,
+        labelData,
+        interval,
+        distributedThreads,
+        statusCodeData,
+    }: PrepareChartsData) => {
     const intervalSec = interval / 1000
     const labels = [...new Set(labelData.map((_) => _.label))]
+    const statusCodes = [...new Set(statusCodeData.map(row => row.statusCode))]
     return {
         threads: distributedThreads?.length > 0
             ? calculateDistributedThreads(distributedThreads)
@@ -116,6 +123,11 @@ export const prepareChartDataForSaving = (
                 roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / intervalSec)]),
             name: "network",
         },
+        statusCodes: statusCodes.map((statusCode) => ({
+            data: statusCodeData.filter(row => row.statusCode === statusCode)
+                .map(row => [moment(row.time).valueOf(), row.count]),
+            name: statusCode,
+        })),
         throughput: labels.map((label) => ({
             data: labelData.filter((_) => _.label === label)
                 .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.total / intervalSec)]),
@@ -372,4 +384,19 @@ interface Apdex {
     label: string
     satisfaction: string
     toleration: string
+}
+
+interface StatuCodesData {
+    time: string
+    statusCode: string
+    count: number
+
+}
+
+interface PrepareChartsData {
+    distributedThreads?: []
+    interval: number
+    labelData: ChartLabelData[]
+    overviewData: ChartOverviewData[]
+    statusCodeData: StatuCodesData[]
 }
