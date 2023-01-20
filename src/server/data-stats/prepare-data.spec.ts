@@ -412,7 +412,7 @@ describe("prepare data", () => {
         n95: 251,
         n99: 300.3,
       }]
-      const chartData = prepareChartDataForSaving({overviewData: overviewData, labelData: labelData, interval: 450})
+      const chartData = prepareChartDataForSaving({ overviewData, labelData, interval: 450 })
       expect(chartData).toEqual({
         maxResponseTime: [{
           data: [[1555399218000, 1233.1]],

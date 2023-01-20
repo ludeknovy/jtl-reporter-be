@@ -10,7 +10,7 @@ import {
     saveThresholdsResult, saveItemStats, savePlotData, updateItem,
     aggOverviewQuery, aggLabelQuery, chartOverviewQuery,
     charLabelQuery, sutOverviewQuery, distributedThreadsQuery, responseCodeDistribution, responseMessageFailures,
-    deleteSamples, calculateApdexValues, updateItemApdexSettings, chartOverviewStatusCodesQuery
+    deleteSamples, calculateApdexValues, updateItemApdexSettings, chartOverviewStatusCodesQuery,
 } from "../../../queries/items"
 import { ReportStatus } from "../../../queries/items.model"
 import { getScenarioSettings, currentScenarioMetrics } from "../../../queries/scenario"
