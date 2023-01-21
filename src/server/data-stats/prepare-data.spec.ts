@@ -412,7 +412,12 @@ describe("prepare data", () => {
         n95: 251,
         n99: 300.3,
       }]
-      const chartData = prepareChartDataForSaving({ overviewData, labelData, interval: 450 })
+      const statusCodeData = [{
+        time: new Date("2019-04-16T07:20:18.000Z").toString(),
+        statusCode: "200",
+        count: 10,
+      }]
+      const chartData = prepareChartDataForSaving({ overviewData, labelData, interval: 450, statusCodeData })
       expect(chartData).toEqual({
         maxResponseTime: [{
           data: [[1555399218000, 1233.1]],
@@ -478,6 +483,10 @@ describe("prepare data", () => {
         throughput: [{
           data: [[1555399218000, 444.44]],
           name: "test-label",
+        }],
+        statusCodes: [{
+          data: [[1555399218000, 10]],
+          name: "200",
         }],
       })
     })
