@@ -309,6 +309,22 @@ export const chartOverviewQuery = (interval, item_id) => {
   }
 }
 
+export const chartOverviewStatusCodesQuery = (interval, itemId) => {
+  return {
+    text: `SELECT
+      time_bucket($1, timestamp) as time,
+      samples.status_code as "statusCode",
+      count(samples.status_code)::int
+    FROM jtl.samples as samples
+    WHERE item_id = $2
+    AND status_code != '0'
+    AND status_code != ''
+    GROUP BY time, samples.status_code
+    ORDER BY time`,
+    values: [interval, itemId],
+  }
+}
+
 export const charLabelQuery = (interval, item_id) => {
   return {
     text: `

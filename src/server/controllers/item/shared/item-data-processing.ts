@@ -10,7 +10,7 @@ import {
     saveThresholdsResult, saveItemStats, savePlotData, updateItem,
     aggOverviewQuery, aggLabelQuery, chartOverviewQuery,
     charLabelQuery, sutOverviewQuery, distributedThreadsQuery, responseCodeDistribution, responseMessageFailures,
-    deleteSamples, calculateApdexValues, updateItemApdexSettings,
+    deleteSamples, calculateApdexValues, updateItemApdexSettings, chartOverviewStatusCodesQuery,
 } from "../../../queries/items"
 import { ReportStatus } from "../../../queries/items.model"
 import { getScenarioSettings, currentScenarioMetrics } from "../../../queries/scenario"
@@ -69,12 +69,25 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
 
             const labelChart = await db.many(charLabelQuery(interval, itemId))
             const overviewChart = await db.many(chartOverviewQuery(interval, itemId))
+            const statusCodeChart = await db.many(chartOverviewStatusCodesQuery(interval, itemId))
             if (parseInt(index, 10) === 0) { // default interval
                 chartData = prepareChartDataForSaving(
-                    overviewChart, labelChart, defaultInterval, distributedThreads)
+                    {
+                        overviewData: overviewChart,
+                        labelData: labelChart,
+                        interval: defaultInterval,
+                        distributedThreads,
+                        statusCodeData: statusCodeChart,
+                    })
             } else if (overviewChart.length > 1 && labelChart.length < MAX_LABEL_CHART_LENGTH) {
                 const extraChart = prepareChartDataForSaving(
-                    overviewChart, labelChart, defaultInterval, distributedThreads)
+                    {
+                        overviewData: overviewChart,
+                        labelData: labelChart,
+                        interval: defaultInterval,
+                        distributedThreads,
+                        statusCodeData: statusCodeChart,
+                    })
                 extraChartData.push({ interval, data: extraChart })
             }
 
