@@ -110,17 +110,17 @@ export const prepareChartDataForSaving = (
         },
         overAllNetworkUp: {
             data: overviewData.map((_) => [moment(_.time).valueOf(),
-                roundNumberTwoDecimals(_.bytes_sent_total / intervalSec)]),
+                roundNumberTwoDecimals(Number(_.bytes_sent_total) / intervalSec)]),
             name: "network up",
         },
         overAllNetworkDown: {
             data: overviewData.map((_) => [moment(_.time).valueOf(),
-                roundNumberTwoDecimals(_.bytes_received_total / intervalSec)]),
+                roundNumberTwoDecimals(Number(_.bytes_received_total) / intervalSec)]),
             name: "network down",
         },
         overAllNetworkV2: {
             data: overviewData.map((_) => [moment(_.time).valueOf(),
-                roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / intervalSec)]),
+                roundNumberTwoDecimals((Number(_.bytes_received_total) + (Number(_.bytes_sent_total))) / intervalSec)]),
             name: "network",
         },
         statusCodes: statusCodes.map((statusCode) => ({
@@ -151,17 +151,20 @@ export const prepareChartDataForSaving = (
         networkV2: labels.map((label) => ({
             data: labelData.filter((_) => _.label === label)
                 .map((_) => [moment(_.time).valueOf(),
-                    roundNumberTwoDecimals((_.bytes_received_total + _.bytes_sent_total) / intervalSec)]),
+                    roundNumberTwoDecimals((Number(_.bytes_received_total)
+                        + Number(_.bytes_sent_total)) / intervalSec)]),
             name: label,
         })),
         networkUp: labels.map((label) => ({
             data: labelData.filter((_) => _.label === label)
-                .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.bytes_sent_total / intervalSec)]),
+                .map((_) => [moment(_.time).valueOf(),
+                    roundNumberTwoDecimals(Number(_.bytes_sent_total) / intervalSec)]),
             name: label,
         })),
         networkDown: labels.map((label) => ({
             data: labelData.filter((_) => _.label === label)
-                .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.bytes_received_total / intervalSec)]),
+                .map((_) => [moment(_.time).valueOf(),
+                    roundNumberTwoDecimals(Number(_.bytes_received_total) / intervalSec)]),
             name: label,
         })),
         percentile90: labels.map((label) => ({
