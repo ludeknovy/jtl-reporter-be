@@ -57,6 +57,17 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         let chartData
         const extraChartData = []
 
+        const extraIntervalMilliseconds = new Map([
+            ["5 seconds", 5000],
+            ["10 seconds", 10000],
+            ["30 seconds", 30000],
+            ["1 minute", 60000],
+            ["5 minute", 300000],
+            ["10 minutes", 600000],
+            ["30 minutes", 1800000],
+            ["1 hour", 3600000]
+        ])
+
         const intervals = [`${defaultInterval} milliseconds`, "5 seconds", "10 seconds", "30 seconds",
             "1 minute", "5 minute", "10 minutes", "30 minutes", "1 hour"]
         for (const [index, interval] of Object.entries(intervals)) {
@@ -71,6 +82,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
             const overviewChart = await db.many(chartOverviewQuery(interval, itemId))
             const statusCodeChart = await db.many(chartOverviewStatusCodesQuery(interval, itemId))
             if (parseInt(index, 10) === 0) { // default interval
+                console.log(overviewChart)
                 chartData = prepareChartDataForSaving(
                     {
                         overviewData: overviewChart,
@@ -84,7 +96,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
                     {
                         overviewData: overviewChart,
                         labelData: labelChart,
-                        interval: defaultInterval,
+                        interval: extraIntervalMilliseconds.get(interval),
                         distributedThreads,
                         statusCodeData: statusCodeChart,
                     })
