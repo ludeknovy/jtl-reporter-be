@@ -16,6 +16,7 @@ import { ReportStatus } from "../../../queries/items.model"
 import { getScenarioSettings, currentScenarioMetrics } from "../../../queries/scenario"
 import { sendNotifications } from "../../../utils/notifications/send-notification"
 import { scenarioThresholdsCalc } from "../utils/scenario-thresholds-calc"
+import { extraIntervalMilliseconds } from "./extra-intervals-mapping"
 
 export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) => {
     const MAX_LABEL_CHART_LENGTH = 100000
@@ -56,17 +57,6 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         const defaultInterval = chartQueryOptionInterval(duration)
         let chartData
         const extraChartData = []
-
-        const extraIntervalMilliseconds = new Map([
-            ["5 seconds", 5000],
-            ["10 seconds", 10000],
-            ["30 seconds", 30000],
-            ["1 minute", 60000],
-            ["5 minute", 300000],
-            ["10 minutes", 600000],
-            ["30 minutes", 1800000],
-            ["1 hour", 3600000]
-        ])
 
         const intervals = [`${defaultInterval} milliseconds`, "5 seconds", "10 seconds", "30 seconds",
             "1 minute", "5 minute", "10 minutes", "30 minutes", "1 hour"]
