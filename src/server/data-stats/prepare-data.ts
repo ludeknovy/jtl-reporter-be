@@ -182,6 +182,11 @@ export const prepareChartDataForSaving = (
                 .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.n99)]),
             name: label,
         })),
+        errorRate: labels.map((label) => ({
+            data: labelData.filter((data) => data.label === label)
+                .map((data) => [moment(data.time).valueOf(), roundNumberTwoDecimals(data.error_rate * 100)]),
+            name: label,
+        })),
     }
 }
 
@@ -337,6 +342,7 @@ interface ChartLabelData {
     n90: number
     n95: number
     n99: number
+    error_rate: number
 }
 
 export interface Overview {
