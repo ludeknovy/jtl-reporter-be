@@ -411,6 +411,7 @@ describe("prepare data", () => {
         n90: 120.1,
         n95: 251,
         n99: 300.3,
+        error_rate: 0.02,
       }]
       const statusCodeData = [{
         time: new Date("2019-04-16T07:20:18.000Z").toString(),
@@ -487,6 +488,10 @@ describe("prepare data", () => {
         statusCodes: [{
           data: [[1555399218000, 10]],
           name: "200",
+        }],
+        errorRate: [{
+          data: [[1555399218000, 2]],
+          name: "test-label",
         }],
       })
     })
