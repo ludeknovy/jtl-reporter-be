@@ -16,6 +16,7 @@ import { ReportStatus } from "../../../queries/items.model"
 import { getScenarioSettings, currentScenarioMetrics } from "../../../queries/scenario"
 import { sendNotifications } from "../../../utils/notifications/send-notification"
 import { scenarioThresholdsCalc } from "../utils/scenario-thresholds-calc"
+import { extraIntervalMilliseconds } from "./extra-intervals-mapping"
 
 export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) => {
     const MAX_LABEL_CHART_LENGTH = 100000
@@ -71,6 +72,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
             const overviewChart = await db.many(chartOverviewQuery(interval, itemId))
             const statusCodeChart = await db.many(chartOverviewStatusCodesQuery(interval, itemId))
             if (parseInt(index, 10) === 0) { // default interval
+                console.log(overviewChart)
                 chartData = prepareChartDataForSaving(
                     {
                         overviewData: overviewChart,
@@ -84,7 +86,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
                     {
                         overviewData: overviewChart,
                         labelData: labelChart,
-                        interval: defaultInterval,
+                        interval: extraIntervalMilliseconds.get(interval),
                         distributedThreads,
                         statusCodeData: statusCodeChart,
                     })
