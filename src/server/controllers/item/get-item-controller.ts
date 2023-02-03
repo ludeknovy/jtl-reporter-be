@@ -13,6 +13,7 @@ export const getItemController = async (req: IGetUserAuthInfoRequest, res: Respo
   const {
     plot_data: plot,
     extra_plot_data: extraPlotData,
+    histogram_plot_data: histogramPlotData,
     note,
     environment,
     // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -40,6 +41,7 @@ export const getItemController = async (req: IGetUserAuthInfoRequest, res: Respo
     overview, sutOverview, statistics, status, apdexSettings,
     plot, extraPlotData, note, environment, hostname, reportStatus, thresholds, analysisEnabled,
     baseId: base_id, isBase: base_id === itemId, zeroErrorToleranceEnabled, topMetricsSettings,
+    histogramPlotData,
     name,
     monitoring: {
       cpu: {

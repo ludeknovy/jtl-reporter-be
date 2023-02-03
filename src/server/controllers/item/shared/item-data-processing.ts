@@ -3,14 +3,27 @@ import { db } from "../../../../db/db"
 import { logger } from "../../../../logger"
 import {
     prepareDataForSavingToDb,
-    prepareChartDataForSaving,
+    prepareChartDataForSaving, prepareHistogramDataForSaving,
 } from "../../../data-stats/prepare-data"
 import { chartQueryOptionInterval } from "../../../data-stats/helper/duration"
 import {
-    saveThresholdsResult, saveItemStats, savePlotData, updateItem,
-    aggOverviewQuery, aggLabelQuery, chartOverviewQuery,
-    charLabelQuery, sutOverviewQuery, distributedThreadsQuery, responseCodeDistribution, responseMessageFailures,
-    deleteSamples, calculateApdexValues, updateItemApdexSettings, chartOverviewStatusCodesQuery,
+    saveThresholdsResult,
+    saveItemStats,
+    savePlotData,
+    updateItem,
+    aggOverviewQuery,
+    aggLabelQuery,
+    chartOverviewQuery,
+    charLabelQuery,
+    sutOverviewQuery,
+    distributedThreadsQuery,
+    responseCodeDistribution,
+    responseMessageFailures,
+    deleteSamples,
+    calculateApdexValues,
+    updateItemApdexSettings,
+    chartOverviewStatusCodesQuery,
+    responseTimePerLabelHistogram,
 } from "../../../queries/items"
 import { ReportStatus } from "../../../queries/items.model"
 import { getScenarioSettings, currentScenarioMetrics } from "../../../queries/scenario"
@@ -28,9 +41,11 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         const aggOverview = await db.one(aggOverviewQuery(itemId))
         const aggLabel = await db.many(aggLabelQuery(itemId))
         const statusCodeDistribution = await db.manyOrNone(responseCodeDistribution(itemId))
+        const responseTimePerLabelDistribution = await db.manyOrNone(responseTimePerLabelHistogram(itemId))
         const responseFailures = await db.manyOrNone(responseMessageFailures(itemId))
         const scenarioSettings = await db.one(getScenarioSettings(projectName, scenarioName))
 
+        console.log({ responseTimePerLabelDistribution })
 
         if (aggOverview.number_of_sut_hostnames > 1) {
             sutMetrics = await db.many(sutOverviewQuery(itemId))
@@ -54,6 +69,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
             labelStats, sutOverview,
         } = prepareDataForSavingToDb(aggOverview, aggLabel, sutMetrics,
             statusCodeDistribution, responseFailures, apdex)
+        const responseTimeHistogram = prepareHistogramDataForSaving(responseTimePerLabelDistribution)
         const defaultInterval = chartQueryOptionInterval(duration)
         let chartData
         const extraChartData = []
@@ -72,7 +88,6 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
             const overviewChart = await db.many(chartOverviewQuery(interval, itemId))
             const statusCodeChart = await db.many(chartOverviewStatusCodesQuery(interval, itemId))
             if (parseInt(index, 10) === 0) { // default interval
-                console.log(overviewChart)
                 chartData = prepareChartDataForSaving(
                     {
                         overviewData: overviewChart,
@@ -112,7 +127,8 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
 
         await db.tx(async t => {
             await t.none(saveItemStats(itemId, JSON.stringify(labelStats), overview, JSON.stringify(sutOverview)))
-            await t.none(savePlotData(itemId, JSON.stringify(chartData), JSON.stringify(extraChartData)))
+            await t.none(savePlotData(itemId, JSON.stringify(chartData), JSON.stringify(extraChartData),
+                JSON.stringify(responseTimeHistogram)))
             await t.none(updateItem(itemId, ReportStatus.Ready, overview.startDate))
         })
 

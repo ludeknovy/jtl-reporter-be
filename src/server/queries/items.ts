@@ -12,17 +12,17 @@ export const createNewItem = (scenarioName, startTime, environment, note, status
   }
 }
 
-export const savePlotData = (itemId, data, extraPlotData) => {
+export const savePlotData = (itemId, data, extraPlotData, histogramData) => {
   return {
-    text: "INSERT INTO jtl.charts(item_id, plot_data, extra_plot_data) VALUES($1, $2, $3)",
-    values: [itemId, data, extraPlotData],
+    text: "INSERT INTO jtl.charts(item_id, plot_data, extra_plot_data, histogram_plot_data) VALUES($1, $2, $3, $4)",
+    values: [itemId, data, extraPlotData, histogramData],
   }
 }
 
 export const findItem = (itemId, projectName, scenarioName) => {
   return {
     // eslint-disable-next-line max-len
-    text: `SELECT charts.plot_data, charts.extra_plot_data, note, environment, status, hostname, s.analysis_enabled as "analysisEnabled",
+    text: `SELECT charts.plot_data, charts.extra_plot_data, charts.histogram_plot_data, note, environment, status, hostname, s.analysis_enabled as "analysisEnabled",
             s.zero_error_tolerance_enabled as "zeroErrorToleranceEnabled", threshold_result as "thresholds", 
             report_status as "reportStatus", p.item_top_statistics_settings as "topMetricsSettings", items.name,
             items.apdex_settings as "apdexSettings",
@@ -521,5 +521,22 @@ export const calculateApdexValues = (itemId, satisfyingThreshold, toleratingThre
         FROM jtl.samples where item_id = $1
         GROUP BY label`,
     values: [itemId, satisfyingThreshold, toleratingThreshold],
+  }
+}
+
+export const responseTimePerLabelHistogram = (itemId) => {
+  return {
+    text: `
+        SELECT label, histogram(t_elapsed, 0, x.max + 1, x.buckets | 1)
+        FROM (SELECT label,
+                     ceil(max(elapsed) / 100)::integer as buckets,
+                     array_agg(elapsed)                as elapsed,
+                     max(elapsed)                      as max
+              FROM jtl.samples
+              WHERE item_id = $1
+              GROUP BY label) x,
+             LATERAL unnest(x.elapsed) as t_elapsed
+        GROUP BY x.label;`,
+    values: [itemId],
   }
 }

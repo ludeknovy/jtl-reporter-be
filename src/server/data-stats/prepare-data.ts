@@ -81,6 +81,16 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, stat
     }
 }
 
+export const prepareHistogramDataForSaving = (responseTimePerLabelDistribution: ResponseTimeHistogram[]) => {
+    // removing first and last numbers, see https://docs.timescale.com/api/latest/hyperfunctions/histogram/
+    return {
+        responseTimePerLabelDistribution: responseTimePerLabelDistribution.map(data => ({
+            label: data.label,
+            values: data.histogram.slice(1, data.histogram.length - 1),
+        })),
+    }
+}
+
 export const prepareChartDataForSaving = (
     {
         overviewData,
@@ -408,4 +418,9 @@ interface PrepareChartsData {
     labelData: ChartLabelData[]
     overviewData: ChartOverviewData[]
     statusCodeData: StatuCodesData[]
+}
+
+interface ResponseTimeHistogram {
+    histogram: number[]
+    label: string
 }
