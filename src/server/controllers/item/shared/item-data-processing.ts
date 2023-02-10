@@ -17,6 +17,7 @@ import { getScenarioSettings, currentScenarioMetrics } from "../../../queries/sc
 import { sendNotifications } from "../../../utils/notifications/send-notification"
 import { scenarioThresholdsCalc } from "../utils/scenario-thresholds-calc"
 import { extraIntervalMilliseconds } from "./extra-intervals-mapping"
+import { AnalyticsEvent } from "../../../utils/analytics/anyltics-event"
 
 export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) => {
     const MAX_LABEL_CHART_LENGTH = 100000
@@ -72,7 +73,6 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
             const overviewChart = await db.many(chartOverviewQuery(interval, itemId))
             const statusCodeChart = await db.many(chartOverviewStatusCodesQuery(interval, itemId))
             if (parseInt(index, 10) === 0) { // default interval
-                console.log(overviewChart)
                 chartData = prepareChartDataForSaving(
                     {
                         overviewData: overviewChart,
@@ -117,6 +117,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         })
 
         logger.info(`Item: ${itemId} processing finished`)
+        AnalyticsEvent.reportProcessingFinished()
 
         if (scenarioSettings.deleteSamples) {
             logger.info(`Item: ${itemId} deleting samples data`)
