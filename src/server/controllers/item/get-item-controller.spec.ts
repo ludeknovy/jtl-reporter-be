@@ -27,6 +27,7 @@ describe("getItemController", () => {
         (db.one as any).mockResolvedValueOnce({
             plot_data: {},
             extra_plot_data: {},
+            histogram_plot_data: {},
             note: "my note",
             environment: "environment",
             // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -49,6 +50,7 @@ describe("getItemController", () => {
             baseId: null,
             environment: "environment",
             extraPlotData: {},
+            histogramPlotData: {},
             hostname: null,
             isBase: false,
             monitoring: {
