@@ -1,13 +1,14 @@
 import { Request, Response } from "express"
 import { db } from "../../../db/db"
 import { logger } from "../../../logger"
-import { updateItem } from "../../queries/items"
+import { updateItem, updateItemStatus } from "../../queries/items"
 import { ReportStatus } from "../../queries/items.model"
 import { itemDataProcessing } from "./shared/item-data-processing"
 import { StatusCode } from "../../utils/status-code"
 
 export const stopItemAsyncController = async (req: Request, res: Response) => {
   const { projectName, scenarioName, itemId } = req.params
+  const { status } = req.body
   res.status(StatusCode.Ok).send()
 
   logger.info(`Stopping async item: ${itemId}`)
@@ -20,6 +21,9 @@ export const stopItemAsyncController = async (req: Request, res: Response) => {
       return
     }
     await itemDataProcessing({ itemId, projectName, scenarioName })
+    if (status) {
+      await db.none(updateItemStatus(itemId, status))
+    }
   } catch(e) {
     logger.error(`Processing of item ${itemId} failed ${e}`)
     await db.none(updateItem(itemId, ReportStatus.Error, null))

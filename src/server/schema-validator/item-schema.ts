@@ -51,10 +51,6 @@ export const newAsyncItemStartBodySchema = Joi.object().keys({
   note,
 })
 
-export const stopAsyncItemBody = Joi.object().keys({
-  itemId,
-})
-
 export const newItemParamSchema = Joi.object().keys({
   projectName,
   scenarioName,
@@ -64,3 +60,7 @@ export const upsertUserItemChartSettings = Joi.array().items(Joi.object().keys({
   name: Joi.string().required(),
   metric: Joi.string().required(),
 })).required()
+
+export const stopItemAsyncBodySchema = Joi.object().keys({
+  status: Joi.string().regex(/^(10|[0-3])$/),
+})
