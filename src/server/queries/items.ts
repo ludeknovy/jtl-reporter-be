@@ -212,7 +212,7 @@ export const getErrorsForLabel = (itemId, labelName) => {
   }
 }
 
-export const updateItemStatus = (itemId, reportStatus) => {
+export const updateItemReportStatus = (itemId, reportStatus) => {
   return {
     text: "UPDATE jtl.items SET report_status = $2 WHERE id = $1;",
     values: [itemId, reportStatus],
@@ -538,5 +538,12 @@ export const responseTimePerLabelHistogram = (itemId) => {
              LATERAL unnest(x.elapsed) as t_elapsed
         GROUP BY x.label;`,
     values: [itemId],
+  }
+}
+
+export const updateItemStatus = (itemId, status) => {
+  return {
+    text: `UPDATE jtl.items SET status = $2 WHERE id = $1`,
+    values: [itemId, status],
   }
 }

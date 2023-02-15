@@ -6,9 +6,9 @@ import {
   queryParamsValidator,
 } from "../schema-validator/schema-validator-middleware"
 import {
-  paramsSchema, updateItemBodySchema,
-  newItemParamSchema,
-  newAsyncItemStartBodySchema, shareTokenSchema, upsertUserItemChartSettings,
+    paramsSchema, updateItemBodySchema,
+    newItemParamSchema,
+    newAsyncItemStartBodySchema, shareTokenSchema, upsertUserItemChartSettings, stopItemAsyncBodySchema,
 } from "../schema-validator/item-schema"
 import { paramsSchema as scenarioParamsSchema, querySchema } from "../schema-validator/scenario-schema"
 import { getItemsController } from "../controllers/item/get-items-controller"
@@ -89,8 +89,9 @@ export class ItemsRoutes {
       .post(
         authenticationMiddleware,
         authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
-        paramsSchemaValidator(paramsSchema),
-        stopItemAsyncController)
+          paramsSchemaValidator(paramsSchema),
+          bodySchemaValidator(stopItemAsyncBodySchema),
+        wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => stopItemAsyncController(req, res)))
 
     app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/share-tokens")
       .get(
