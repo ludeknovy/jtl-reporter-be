@@ -477,6 +477,10 @@ describe("prepare data", () => {
                     data: [[1555399218000, 30.2]],
                     name: "response time",
                 },
+                percentile50: [{
+                    data: [[1555399218000, 60]],
+                    name: "test-label",
+                }],
                 percentile90: [{
                     data: [[1555399218000, 120.1]],
                     name: "test-label",
