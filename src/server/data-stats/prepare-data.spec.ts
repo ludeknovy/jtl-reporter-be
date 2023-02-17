@@ -420,6 +420,7 @@ describe("prepare data", () => {
                 max_response: 1233.1,
                 bytes_received_total: 32423123,
                 bytes_sent_total: 56456546546,
+                n50: 60,
                 n90: 120.1,
                 n95: 251,
                 n99: 300.3,

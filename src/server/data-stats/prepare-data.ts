@@ -36,6 +36,7 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, stat
                     label: _.label,
                     samples: _.total_samples,
                     avgResponseTime: Math.round(_.avg_response),
+                    medianResponseTime: _.n50,
                     latency: roundNumberTwoDecimals(_.latency),
                     connect: roundNumberTwoDecimals(_.connect),
                     minResponseTime: _.min_response,
@@ -175,6 +176,11 @@ export const prepareChartDataForSaving = (
             data: labelData.filter((_) => _.label === label)
                 .map((_) => [moment(_.time).valueOf(),
                     roundNumberTwoDecimals(Number(_.bytes_received_total) / intervalSec)]),
+            name: label,
+        })),
+        percentile50: labels.map((label) => ({
+            data: labelData.filter((_) => _.label === label)
+                .map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.n50)]),
             name: label,
         })),
         percentile90: labels.map((label) => ({
@@ -349,6 +355,7 @@ interface ChartLabelData {
     max_response: number
     bytes_received_total: number
     bytes_sent_total: number
+    n50: number
     n90: number
     n95: number
     n99: number
