@@ -420,6 +420,7 @@ describe("prepare data", () => {
                 max_response: 1233.1,
                 bytes_received_total: 32423123,
                 bytes_sent_total: 56456546546,
+                n50: 60,
                 n90: 120.1,
                 n95: 251,
                 n99: 300.3,
@@ -476,6 +477,10 @@ describe("prepare data", () => {
                     data: [[1555399218000, 30.2]],
                     name: "response time",
                 },
+                percentile50: [{
+                    data: [[1555399218000, 60]],
+                    name: "test-label",
+                }],
                 percentile90: [{
                     data: [[1555399218000, 120.1]],
                     name: "test-label",
