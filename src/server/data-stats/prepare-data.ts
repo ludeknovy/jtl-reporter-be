@@ -91,6 +91,11 @@ export const prepareHistogramDataForSaving = (responseTimePerLabelDistribution: 
     }
 }
 
+export const prepareScatterDataForSaving = (scatterResponseTimeData: Array<{ time: string, value: number }>) => {
+    return scatterResponseTimeData.map(data =>[moment(data.time).valueOf(), data.value])
+
+}
+
 export const prepareChartDataForSaving = (
     {
         overviewData,

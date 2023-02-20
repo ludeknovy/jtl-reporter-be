@@ -14,6 +14,7 @@ export const getItemController = async (req: IGetUserAuthInfoRequest, res: Respo
     plot_data: plot,
     extra_plot_data: extraPlotData,
     histogram_plot_data: histogramPlotData,
+    scatter_plot_data: scatterPlotData,
     note,
     environment,
     // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -39,7 +40,8 @@ export const getItemController = async (req: IGetUserAuthInfoRequest, res: Respo
 
   res.status(StatusCode.Ok).json({
     overview, sutOverview, statistics, status, apdexSettings,
-    plot, extraPlotData, note, environment, hostname, reportStatus, thresholds, analysisEnabled,
+    plot: Object.assign({}, plot, { scatterPlotData }),
+    extraPlotData, note, environment, hostname, reportStatus, thresholds, analysisEnabled,
     baseId: base_id, isBase: base_id === itemId, zeroErrorToleranceEnabled, topMetricsSettings,
     histogramPlotData,
     name,

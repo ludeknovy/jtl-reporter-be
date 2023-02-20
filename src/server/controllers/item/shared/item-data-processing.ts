@@ -3,7 +3,7 @@ import { db } from "../../../../db/db"
 import { logger } from "../../../../logger"
 import {
     prepareDataForSavingToDb,
-    prepareChartDataForSaving, prepareHistogramDataForSaving,
+    prepareChartDataForSaving, prepareHistogramDataForSaving, prepareScatterDataForSaving
 } from "../../../data-stats/prepare-data"
 import { chartQueryOptionInterval } from "../../../data-stats/helper/duration"
 import {
@@ -23,7 +23,7 @@ import {
     calculateApdexValues,
     updateItemApdexSettings,
     chartOverviewStatusCodesQuery,
-    responseTimePerLabelHistogram,
+    responseTimePerLabelHistogram, findItemRawDawnsampledData,
 } from "../../../queries/items"
 import { ReportStatus } from "../../../queries/items.model"
 import { getScenarioSettings, currentScenarioMetrics } from "../../../queries/scenario"
@@ -46,7 +46,8 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         const responseFailures = await db.manyOrNone(responseMessageFailures(itemId))
         const scenarioSettings = await db.one(getScenarioSettings(projectName, scenarioName))
 
-        console.log({ responseTimePerLabelDistribution })
+        const scatterResponseTimeRawData = await db.manyOrNone(findItemRawDawnsampledData(itemId))
+
 
         if (aggOverview.number_of_sut_hostnames > 1) {
             sutMetrics = await db.many(sutOverviewQuery(itemId))
@@ -71,6 +72,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         } = prepareDataForSavingToDb(aggOverview, aggLabel, sutMetrics,
             statusCodeDistribution, responseFailures, apdex)
         const responseTimeHistogram = prepareHistogramDataForSaving(responseTimePerLabelDistribution)
+        const scatterResponseTime = prepareScatterDataForSaving(scatterResponseTimeRawData)
         const defaultInterval = chartQueryOptionInterval(duration)
         let chartData
         const extraChartData = []
@@ -129,7 +131,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         await db.tx(async t => {
             await t.none(saveItemStats(itemId, JSON.stringify(labelStats), overview, JSON.stringify(sutOverview)))
             await t.none(savePlotData(itemId, JSON.stringify(chartData), JSON.stringify(extraChartData),
-                JSON.stringify(responseTimeHistogram)))
+                JSON.stringify(responseTimeHistogram), JSON.stringify(scatterResponseTime)))
             await t.none(updateItem(itemId, ReportStatus.Ready, overview.startDate))
         })
 
