@@ -51,9 +51,24 @@ export const updateScenario = (projectName, scenarioName, name, analysisEnabled,
   }
 }
 
-export const scenarioTrends = (projectName, scenarioName) => {
+export const scenarioAggregatedTrends = (projectName, scenarioName) => {
   return {
     text: `SELECT overview, it.id FROM jtl.item_stat as st
+    LEFT JOIN jtl.items as it ON it.id = st.item_id
+    LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
+    LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE s.name = $2
+    AND p.project_name = $1
+    AND report_status = 'ready'
+    ORDER BY start_time DESC
+    LIMIT 15;`,
+    values: [projectName, scenarioName],
+  }
+}
+
+export const scenarioLabelTrends = (projectName, scenarioName) => {
+  return {
+    text :`SELECT st.stats, it.id, st.overview -> 'startDate' as "startDate" FROM jtl.item_stat as st
     LEFT JOIN jtl.items as it ON it.id = st.item_id
     LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
