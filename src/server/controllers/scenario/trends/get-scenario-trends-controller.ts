@@ -46,16 +46,16 @@ export const getScenarioTrendsController = async (req: IGetUserAuthInfoRequest, 
             },
         }
     })
-    console.log(scenarioSettings?.scenario_trends_settings?.aggregatedTrends)
     res.status(StatusCode.Ok).json({
         aggregatedTrends: networkAdjustedData.sort(sortByDateAsc),
         labelTrends: adjusted,
         userSettings: {
             aggregatedTrends:
-                Object.keys(scenarioSettings?.scenario_trends_settings).length > 0
+                scenarioSettings?.scenario_trends_settings
+                && Object.keys(scenarioSettings.scenario_trends_settings)?.length > 0
                     ? scenarioSettings?.scenario_trends_settings?.aggregatedTrends
                     : true,
-            metrics: scenarioSettings?.scenario_trends_settings?.metrics,
+            labelMetrics: scenarioSettings?.scenario_trends_settings?.labelMetrics || {},
         },
     })
 }
