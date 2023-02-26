@@ -78,3 +78,8 @@ export const updateScenarioSchema = {
     }).required(),
   }).required(),
 }
+
+
+export const scenarioTrendsSettings = Joi.object({
+  aggregatedTrends: Joi.boolean().required(),
+})

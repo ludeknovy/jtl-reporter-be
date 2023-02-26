@@ -1,12 +1,18 @@
 import { Request, Response } from "express"
 import { db } from "../../../../db/db"
-import { scenarioAggregatedTrends, scenarioLabelTrends } from "../../../queries/scenario"
+import {
+    getUserScenarioSettings,
+    scenarioAggregatedTrends,
+    scenarioLabelTrends,
+} from "../../../queries/scenario"
 import { StatusCode } from "../../../utils/status-code"
+import { IGetUserAuthInfoRequest } from "../../../middleware/request.model"
 
-export const getScenarioTrendsController = async (req: Request, res: Response) => {
+export const getScenarioTrendsController = async (req: IGetUserAuthInfoRequest, res: Response) => {
     const { projectName, scenarioName } = req.params
     const aggregatedData = await db.any(scenarioAggregatedTrends(projectName, scenarioName))
     const labelData = await db.manyOrNone(scenarioLabelTrends(projectName, scenarioName))
+    const scenarioSettings = await db.oneOrNone(getUserScenarioSettings(projectName, scenarioName, req.user.userId))
 
     const labelTrends = labelData.map(data => data.stats.map(value => ({
         percentile90: [data.startDate, value.n0],
@@ -15,7 +21,6 @@ export const getScenarioTrendsController = async (req: Request, res: Response) =
         label: value.label,
     })))
 
-    console.log(JSON.stringify(labelTrends))
 
     const adjusted = {}
 
@@ -41,9 +46,17 @@ export const getScenarioTrendsController = async (req: Request, res: Response) =
             },
         }
     })
+    console.log(scenarioSettings?.scenario_trends_settings?.aggregatedTrends)
     res.status(StatusCode.Ok).json({
         aggregatedTrends: networkAdjustedData.sort(sortByDateAsc),
         labelTrends: adjusted,
+        userSettings: {
+            aggregatedTrends:
+                Object.keys(scenarioSettings?.scenario_trends_settings).length > 0
+                    ? scenarioSettings?.scenario_trends_settings?.aggregatedTrends
+                    : true,
+            metrics: scenarioSettings?.scenario_trends_settings?.metrics,
+        },
     })
 }
 
