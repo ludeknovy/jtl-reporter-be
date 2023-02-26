@@ -101,7 +101,7 @@ describe("Scenario", () => {
                 .set(__tokenHeaderKey__, credentials.token)
                 .set("Accept", "application/json")
                 .send({
-                    aggregationTrends: true,
+                    aggregatedTrends: true,
                     labelMetrics: {
                         errorRate: true,
                         throughput: true,
