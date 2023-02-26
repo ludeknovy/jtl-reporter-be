@@ -105,7 +105,7 @@ describe("Scenario", () => {
                     labelMetrics: {
                         errorRate: true,
                         throughput: true,
-                        percentile90: true,
+                        percentile90: false,
                     },
                 })
                 .expect(StatusCode.NoContent)
