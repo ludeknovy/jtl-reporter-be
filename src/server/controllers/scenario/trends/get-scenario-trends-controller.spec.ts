@@ -28,8 +28,10 @@ describe("getScenarioTrendsController", function () {
 
         const response = mockResponse()
         const request = {
-            params: "scenario-name",
-            projectName: "project-name",
+            params: {
+                scenarioName: "scenario-name",
+                projectName: "project-name",
+            },
             user: { userId: "userId" },
         }
         await getScenarioTrendsController(
@@ -73,8 +75,10 @@ describe("getScenarioTrendsController", function () {
         }])
         const response = mockResponse()
         const request = {
-            params: "scenario-name",
-            projectName: "project-name",
+            params: {
+                scenarioName:  "scenario-name",
+                projectName: "project-name",
+            },
             user: { userId: "userId" },
         }
         await getScenarioTrendsController(
@@ -143,8 +147,10 @@ describe("getScenarioTrendsController", function () {
         })
         const response = mockResponse()
         const request = {
-            params: "scenario-name",
-            projectName: "project-name",
+            params: {
+                scenarioName:  "scenario-name",
+                projectName: "project-name",
+            },
             user: { userId: "userId" },
         }
         await getScenarioTrendsController(
