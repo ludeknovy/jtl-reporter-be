@@ -4,7 +4,7 @@ import { wrapAsync } from "../errors/error-handler"
 import { paramsSchemaValidator, bodySchemaValidator } from "../schema-validator/schema-validator-middleware"
 import {
   paramSchemaNotification, paramsSchema,
-  scenarioNotificationBodySchema, updateScenarioSchema,
+  scenarioNotificationBodySchema, scenarioTrendsSettings, updateScenarioSchema,
 } from "../schema-validator/scenario-schema"
 import { projectNameParam, scenarioSchema } from "../schema-validator/project-schema"
 import { getScenariosController } from "../controllers/scenario/get-scenarios-controller"
@@ -21,6 +21,7 @@ import { getScenarioController } from "../controllers/scenario/get-scenario-cont
 import { authenticationMiddleware } from "../middleware/authentication-middleware"
 import { AllowedRoles, authorizationMiddleware } from "../middleware/authorization-middleware"
 import { IGetUserAuthInfoRequest } from "../middleware/request.model"
+import { postScenarioTrendsSettings } from "../controllers/scenario/trends/update-scenario-trends-settings-controller"
 
 export class ScenarioRoutes {
 
@@ -88,6 +89,14 @@ export class ScenarioRoutes {
         authenticationMiddleware,
         authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
         paramsSchemaValidator(paramsSchema),
-        wrapAsync( (req: Request, res: Response) => getScenarioTrendsController(req, res)))
+        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => getScenarioTrendsController(req, res)))
+
+    app.route("/api/projects/:projectName/scenarios/:scenarioName/trends/settings")
+        .post(
+            authenticationMiddleware,
+            authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
+            paramsSchemaValidator(paramsSchema),
+            bodySchemaValidator(scenarioTrendsSettings),
+            wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => postScenarioTrendsSettings(req, res)))
   }
 }
