@@ -15,9 +15,9 @@ export const getScenarioTrendsController = async (req: IGetUserAuthInfoRequest, 
     const scenarioSettings = await db.oneOrNone(getUserScenarioSettings(projectName, scenarioName, req.user.userId))
 
     const labelTrends = labelData.map(data => data.stats.map(value => ({
-        percentile90: [data.startDate, value.n0],
-        errorRate: [data.startDate, value.errorRate],
-        throughput: [data.startDate, value.throughput],
+        percentile90: [data.startDate, value.n0, data.id],
+        errorRate: [data.startDate, value.errorRate, data.id],
+        throughput: [data.startDate, value.throughput, data.id],
         label: value.label,
     })))
 
