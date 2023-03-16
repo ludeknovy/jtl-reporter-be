@@ -18,6 +18,7 @@ module.exports = {
     "!**/src/server/schema-validator/**/*.ts",
     "!**/src/server/queries/**/*.ts",
     "!**/db/**",
+    "!**/src/server/utils/lttb.ts",
     "!**/node_modules/**",
   ],
   coverageReporters: ["lcov", "text"],
