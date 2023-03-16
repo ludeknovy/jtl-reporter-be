@@ -17,6 +17,7 @@ function largestTriangleThreeBuckets(data, threshold) {
     let sampledIndex = 0
 
     // Bucket size. Leave room for start and end data points
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     const every = (dataLength - 2) / (threshold - 2)
 
     let a = 0, // Initially a is the first point in the triangle
@@ -27,12 +28,14 @@ function largestTriangleThreeBuckets(data, threshold) {
 
     sampled[sampledIndex++] = data[a] // Always add the first point
 
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     for (let i = 0; i < threshold - 2; i++) {
 
         // Calculate point average for next bucket (containing c)
         let avgX = 0,
             avgY = 0,
             avgRangeStart = floor( ( i + 1 ) * every ) + 1,
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             avgRangeEnd = floor( ( i + 2 ) * every ) + 1
         avgRangeEnd = avgRangeEnd < dataLength ? avgRangeEnd : dataLength
 
@@ -59,6 +62,7 @@ function largestTriangleThreeBuckets(data, threshold) {
             // Calculate triangle area over three buckets
             area = abs( ( pointAX - avgX ) * ( data[rangeOffs][1] - pointAY ) -
                 ( pointAX - data[rangeOffs][0] ) * ( avgY - pointAY )
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             ) * 0.5
             if ( area > maxArea ) {
                 maxArea = area

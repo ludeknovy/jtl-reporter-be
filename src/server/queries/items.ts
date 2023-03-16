@@ -14,6 +14,7 @@ export const createNewItem = (scenarioName, startTime, environment, note, status
 
 export const savePlotData = (itemId, data, extraPlotData, histogramData, scatterPlotData) => {
   return {
+    // eslint-disable-next-line max-len
     text: "INSERT INTO jtl.charts(item_id, plot_data, extra_plot_data, histogram_plot_data, scatter_plot_data) VALUES($1, $2, $3, $4, $5)",
     values: [itemId, data, extraPlotData, histogramData, scatterPlotData],
   }
