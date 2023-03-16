@@ -51,12 +51,10 @@ export const findItemStats = (testItem) => {
   }
 }
 
-export const findItemRawDawnsampledData = (itemId) => {
+export const findRawData = (itemId) => {
   return {
-    text: `SELECT time, value
-        FROM unnest((
-            SELECT lttb(timestamp, cast(elapsed as double precision), 10000)
-            FROM jtl.samples WHERE item_id = $1));`,
+    text: `SELECT timestamp, elapsed
+            FROM jtl.samples WHERE item_id = $1`,
     values: [itemId],
   }
 }
