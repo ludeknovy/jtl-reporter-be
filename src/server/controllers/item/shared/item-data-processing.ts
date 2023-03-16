@@ -3,7 +3,7 @@ import { db } from "../../../../db/db"
 import { logger } from "../../../../logger"
 import {
     prepareDataForSavingToDb,
-    prepareChartDataForSaving, prepareHistogramDataForSaving, prepareScatterDataForSaving,
+    prepareChartDataForSaving, prepareHistogramDataForSaving,
 } from "../../../data-stats/prepare-data"
 import { chartQueryOptionInterval } from "../../../data-stats/helper/duration"
 import {
