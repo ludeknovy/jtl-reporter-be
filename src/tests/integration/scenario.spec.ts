@@ -93,6 +93,24 @@ describe("Scenario", () => {
                 .expect(StatusCode.NoContent)
         })
     })
+    describe("POST /projects/{projectName}/scenarios/{scenarioName}/trends/settings", () => {
+        it("should be able to update scenario trends settings", async () => {
+            await stateSetup(States.ExistingScenario)
+            await request(__server__)
+                .post("/api/projects/test-project/scenarios/test-scenario/trends/settings")
+                .set(__tokenHeaderKey__, credentials.token)
+                .set("Accept", "application/json")
+                .send({
+                    aggregatedTrends: true,
+                    labelMetrics: {
+                        errorRate: true,
+                        throughput: true,
+                        percentile90: false,
+                    },
+                })
+                .expect(StatusCode.NoContent)
+        })
+    })
     describe("DELETE /projects/{projectName}/scenarios/{scenarioName}", () => {
         it("should be able to delete scenario", async () => {
             await stateSetup(States.ExistingScenario)
