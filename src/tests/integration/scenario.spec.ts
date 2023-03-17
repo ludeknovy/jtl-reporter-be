@@ -81,6 +81,7 @@ describe("Scenario", () => {
                             network: true,
                             errorRate: true,
                             apdex: true,
+                            standardDeviation: true,
                         },
                     },
                     apdexSettings: {
