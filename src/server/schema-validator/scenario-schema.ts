@@ -66,6 +66,7 @@ export const updateScenarioSchema = {
     requestStats: Joi.object({
       samples: Joi.boolean().required(),
       avg: Joi.boolean().required(),
+      standardDeviation: Joi.boolean().required(),
       min: Joi.boolean().required(),
       max: Joi.boolean().required(),
       p90: Joi.boolean().required(),

@@ -39,6 +39,7 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, stat
                     medianResponseTime: _.n50,
                     latency: roundNumberTwoDecimals(_.latency),
                     connect: roundNumberTwoDecimals(_.connect),
+                    standardDeviation: _.standard_deviation,
                     minResponseTime: _.min_response,
                     maxResponseTime: _.max_response,
                     errorRate: roundNumberTwoDecimals(_.number_of_failed / _.total_samples * 100),
