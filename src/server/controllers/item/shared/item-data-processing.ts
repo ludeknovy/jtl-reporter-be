@@ -23,7 +23,7 @@ import {
     calculateApdexValues,
     updateItemApdexSettings,
     chartOverviewStatusCodesQuery,
-    responseTimePerLabelHistogram,
+    responseTimePerLabelHistogram, findRawData,
 } from "../../../queries/items"
 import { ReportStatus } from "../../../queries/items.model"
 import { getScenarioSettings, currentScenarioMetrics } from "../../../queries/scenario"
@@ -31,9 +31,12 @@ import { sendNotifications } from "../../../utils/notifications/send-notificatio
 import { scenarioThresholdsCalc } from "../utils/scenario-thresholds-calc"
 import { extraIntervalMilliseconds } from "./extra-intervals-mapping"
 import { AnalyticsEvent } from "../../../utils/analytics/anyltics-event"
+import { downsampleData } from "../../../utils/lttb"
+import moment = require("moment");
 
 export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) => {
     const MAX_LABEL_CHART_LENGTH = 100000
+    const MAX_SCATTER_CHART_POINTS = 10000
     let distributedThreads = null
     let sutMetrics = []
     let apdex = []
@@ -46,7 +49,9 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         const responseFailures = await db.manyOrNone(responseMessageFailures(itemId))
         const scenarioSettings = await db.one(getScenarioSettings(projectName, scenarioName))
 
-        console.log({ responseTimePerLabelDistribution })
+        const rawData = await db.manyOrNone(findRawData(itemId))
+        const rawDataArray = rawData?.map(row => [moment(row.timestamp).valueOf(), row.elapsed])
+        const rawDataDownSampled = downsampleData(rawDataArray, MAX_SCATTER_CHART_POINTS)
 
         if (aggOverview.number_of_sut_hostnames > 1) {
             sutMetrics = await db.many(sutOverviewQuery(itemId))
@@ -129,7 +134,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         await db.tx(async t => {
             await t.none(saveItemStats(itemId, JSON.stringify(labelStats), overview, JSON.stringify(sutOverview)))
             await t.none(savePlotData(itemId, JSON.stringify(chartData), JSON.stringify(extraChartData),
-                JSON.stringify(responseTimeHistogram)))
+                JSON.stringify(responseTimeHistogram), JSON.stringify(rawDataDownSampled)))
             await t.none(updateItem(itemId, ReportStatus.Ready, overview.startDate))
         })
 

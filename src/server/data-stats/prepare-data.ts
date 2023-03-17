@@ -92,6 +92,7 @@ export const prepareHistogramDataForSaving = (responseTimePerLabelDistribution: 
     }
 }
 
+
 export const prepareChartDataForSaving = (
     {
         overviewData,

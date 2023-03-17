@@ -12,17 +12,18 @@ export const createNewItem = (scenarioName, startTime, environment, note, status
   }
 }
 
-export const savePlotData = (itemId, data, extraPlotData, histogramData) => {
+export const savePlotData = (itemId, data, extraPlotData, histogramData, scatterPlotData) => {
   return {
-    text: "INSERT INTO jtl.charts(item_id, plot_data, extra_plot_data, histogram_plot_data) VALUES($1, $2, $3, $4)",
-    values: [itemId, data, extraPlotData, histogramData],
+    // eslint-disable-next-line max-len
+    text: "INSERT INTO jtl.charts(item_id, plot_data, extra_plot_data, histogram_plot_data, scatter_plot_data) VALUES($1, $2, $3, $4, $5)",
+    values: [itemId, data, extraPlotData, histogramData, scatterPlotData],
   }
 }
 
 export const findItem = (itemId, projectName, scenarioName) => {
   return {
     // eslint-disable-next-line max-len
-    text: `SELECT charts.plot_data, charts.extra_plot_data, charts.histogram_plot_data, note, environment, status, hostname, s.analysis_enabled as "analysisEnabled",
+    text: `SELECT charts.plot_data, charts.extra_plot_data, charts.histogram_plot_data, charts.scatter_plot_data, note, environment, status, hostname, s.analysis_enabled as "analysisEnabled",
             s.zero_error_tolerance_enabled as "zeroErrorToleranceEnabled", threshold_result as "thresholds", 
             report_status as "reportStatus", p.item_top_statistics_settings as "topMetricsSettings", items.name,
             items.apdex_settings as "apdexSettings",
@@ -48,6 +49,14 @@ export const findItemStats = (testItem) => {
   return {
     text: "SELECT stats, overview, sut as \"sutOverview\" FROM jtl.item_stat WHERE item_id = $1",
     values: [testItem],
+  }
+}
+
+export const findRawData = (itemId) => {
+  return {
+    text: `SELECT timestamp, elapsed
+            FROM jtl.samples WHERE item_id = $1`,
+    values: [itemId],
   }
 }
 

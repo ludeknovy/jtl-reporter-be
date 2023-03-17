@@ -34,6 +34,8 @@ describe("getItemController", () => {
             base_id: null,
             status: "1", hostname: null, reportStatus: "Ready", thresholds: {},
             analysisEnabled: true, zeroErrorToleranceEnabled: true, topMetricsSettings: {}, name: null,
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            scatter_plot_data: [[1679035520, 30], [1679035688, 20]],
         });
 
         (db.one as any).mockResolvedValueOnce({ stats: {}, overview: {}, sutOverview: {} });
@@ -62,7 +64,10 @@ describe("getItemController", () => {
             name: null,
             note: "my note",
             overview: {},
-            plot: {},
+            plot: {
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                scatterPlotData: [[1679035520, 30], [1679035688, 20]],
+            },
             reportStatus: "Ready",
             statistics: {},
             status: "1",
