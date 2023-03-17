@@ -66,7 +66,7 @@ describe("getItemController", () => {
             overview: {},
             plot: {
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                scatterPlotData: [[1679035520, 30], [1679035688, 20]]
+                scatterPlotData: [[1679035520, 30], [1679035688, 20]],
             },
             reportStatus: "Ready",
             statistics: {},
