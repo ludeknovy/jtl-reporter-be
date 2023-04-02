@@ -6,7 +6,7 @@ import { shouldSkipLabel } from "../controllers/item/utils/labelFilter"
 
 // eslint-disable-next-line max-len
 export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, statusCodeDistr: StatusCodeDistribution[], responseFailures: ResponseMessageFailures[], apdex: Apdex[]):
-    { overview: Overview; labelStats; sutOverview: Array<Record<string, unknown>> } => {
+    { overview: Overview; labelStats: LabelStats[]; sutOverview: Array<Record<string, unknown>> } => {
     try {
         const startDate = new Date(overviewData.start)
         const endDate = new Date(overviewData.end)
@@ -432,4 +432,34 @@ interface PrepareChartsData {
 interface ResponseTimeHistogram {
     histogram: number[]
     label: string
+}
+
+export interface LabelStats {
+    label: string
+    samples: number
+    avgResponseTime: number
+    medianResponseTime: number
+    latency: number
+    connect: number
+    standardDeviation: number
+    minResponseTime: number
+    maxResponseTime: number
+    errorRate: number
+    bytesPerSecond: number
+    bytesSentPerSecond: number
+    throughput: number
+    n9: number
+    n5: number
+    n0: number
+    statusCodes: [{ statusCode: string; count: number }]
+    responseMessageFailures: [{
+        responseMessage: string
+        count: number
+        statusCode: string
+        failureMessage: string
+    }]
+    apdex: {
+        toleration?: number
+        satisfaction?: number
+    }
 }
