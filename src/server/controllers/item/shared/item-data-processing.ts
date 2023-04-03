@@ -23,7 +23,7 @@ import {
     calculateApdexValues,
     updateItemApdexSettings,
     chartOverviewStatusCodesQuery,
-    responseTimePerLabelHistogram, findRawData, getBaselineItem, getBaselineItemWithStats
+    responseTimePerLabelHistogram, findRawData, getBaselineItemWithStats
 } from "../../../queries/items"
 import { ReportStatus } from "../../../queries/items.model"
 import { getScenarioSettings } from "../../../queries/scenario"
@@ -122,10 +122,13 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         overview.maxVu = Math.max(...chartData.threads.map(([, vu]) => vu))
 
         if (scenarioSettings.thresholdEnabled) {
+            logger.info("threshold comparison enabled, fetching baseline report")
             const baselineReport = await db.oneOrNone(getBaselineItemWithStats(projectName, scenarioName))
-            const thresholdResult = scenarioThresholdsCalc(labelStats, baselineReport.stats, scenarioSettings)
-            if (thresholdResult) {
-                await db.none(saveThresholdsResult(projectName, scenarioName, itemId, thresholdResult))
+            if (baselineReport) {
+                const thresholdResult = scenarioThresholdsCalc(labelStats, baselineReport.stats, scenarioSettings)
+                if (thresholdResult) {
+                    await db.none(saveThresholdsResult(projectName, scenarioName, itemId, thresholdResult))
+                }
             }
         }
 
