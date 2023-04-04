@@ -1,4 +1,4 @@
-import { LabelStats, } from "../../../data-stats/prepare-data"
+import { LabelStats } from "../../../data-stats/prepare-data"
 import { divide } from "mathjs"
 
 const PERC = 100
@@ -41,7 +41,7 @@ export const scenarioThresholdsCalc = (labelStats: LabelStats[], baselineReportS
             })
         } else {
             results.push({
-                passed: null,
+                passed: true,
                 label: value.label,
                 result: {
                     percentile: {

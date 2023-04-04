@@ -585,3 +585,15 @@ export const getBaselineItemWithStats = (projectName, scenarioName) => {
     values: [projectName, scenarioName],
   }
 }
+
+export const findItemsWithThresholds = (projectName, scenarioName) => {
+  return {
+    text: `SELECT it.id FROM jtl.items as it
+        LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
+        LEFT JOIN jtl.projects as p ON p.id = s.project_id
+        WHERE p.project_name = $1
+        AND s.name = $2
+        AND it.threshold_result is not null`,
+    values: [projectName, scenarioName],
+  }
+}
