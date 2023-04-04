@@ -23,7 +23,7 @@ import {
     calculateApdexValues,
     updateItemApdexSettings,
     chartOverviewStatusCodesQuery,
-    responseTimePerLabelHistogram, findRawData, getBaselineItemWithStats
+    responseTimePerLabelHistogram, findRawData, getBaselineItemWithStats,
 } from "../../../queries/items"
 import { ReportStatus } from "../../../queries/items.model"
 import { getScenarioSettings } from "../../../queries/scenario"

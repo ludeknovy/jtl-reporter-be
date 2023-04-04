@@ -3,8 +3,7 @@ import {
     updateTestItemInfo,
     removeCurrentBaseFlag,
     setBaseFlag,
-    getBaselineItemWithStats,
-    findItemStats, saveThresholdsResult, findItemsWithThresholds
+    findItemStats, saveThresholdsResult, findItemsWithThresholds,
 } from "../../queries/items"
 import { db } from "../../../db/db"
 import { StatusCode } from "../../utils/status-code"
