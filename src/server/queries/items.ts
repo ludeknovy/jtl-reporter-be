@@ -346,6 +346,7 @@ export const charLabelQuery = (interval, item_id) => {
       percentile_cont(0.95) within group (order by (samples.elapsed))::real as n95,
       percentile_cont(0.90) within group (order by (samples.elapsed))::real as n90,
       percentile_cont(0.50) within group (order by (samples.elapsed))::real as n50,
+      ROUND(STDDEV(samples.elapsed), 2)::real AS standard_deviation,
       MIN(samples.elapsed)::real as min_response,
       MAX(samples.elapsed)::real as max_response,
       EXTRACT(EPOCH FROM (MAX(samples.timestamp) - MIN(samples.timestamp))) as interval,
@@ -557,5 +558,42 @@ export const updateItemStatus = (itemId, status) => {
   return {
     text: `UPDATE jtl.items SET status = $2 WHERE id = $1`,
     values: [itemId, status],
+  }
+}
+
+export const getBaselineItem = (projectName, scenarioName) => {
+  return {
+    text: `SELECT it.id FROM jtl.items as it
+    LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
+    LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE s.name = $2
+    AND p.project_name = $1
+    AND it.base is true`,
+    values: [projectName, scenarioName],
+  }
+}
+
+export const getBaselineItemWithStats = (projectName, scenarioName) => {
+  return {
+    text: `SELECT st.stats FROM jtl.items as it
+    LEFT JOIN jtl.item_stat as st ON it.id = st.item_id
+    LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
+    LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE s.name = $2
+    AND p.project_name = $1
+    AND it.base is true`,
+    values: [projectName, scenarioName],
+  }
+}
+
+export const findItemsWithThresholds = (projectName, scenarioName) => {
+  return {
+    text: `SELECT it.id FROM jtl.items as it
+        LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
+        LEFT JOIN jtl.projects as p ON p.id = s.project_id
+        WHERE p.project_name = $1
+        AND s.name = $2
+        AND it.threshold_result is not null`,
+    values: [projectName, scenarioName],
   }
 }

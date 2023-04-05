@@ -23,10 +23,10 @@ import {
     calculateApdexValues,
     updateItemApdexSettings,
     chartOverviewStatusCodesQuery,
-    responseTimePerLabelHistogram, findRawData,
+    responseTimePerLabelHistogram, findRawData, getBaselineItemWithStats,
 } from "../../../queries/items"
 import { ReportStatus } from "../../../queries/items.model"
-import { getScenarioSettings, currentScenarioMetrics } from "../../../queries/scenario"
+import { getScenarioSettings } from "../../../queries/scenario"
 import { sendNotifications } from "../../../utils/notifications/send-notification"
 import { scenarioThresholdsCalc } from "../utils/scenario-thresholds-calc"
 import { extraIntervalMilliseconds } from "./extra-intervals-mapping"
@@ -122,10 +122,13 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         overview.maxVu = Math.max(...chartData.threads.map(([, vu]) => vu))
 
         if (scenarioSettings.thresholdEnabled) {
-            const scenarioMetrics = await db.one(currentScenarioMetrics(projectName, scenarioName, overview.maxVu))
-            const thresholdResult = scenarioThresholdsCalc(overview, scenarioMetrics, scenarioSettings)
-            if (thresholdResult) {
-                await db.none(saveThresholdsResult(projectName, scenarioName, itemId, thresholdResult))
+            logger.info("threshold comparison enabled, fetching baseline report")
+            const baselineReport = await db.oneOrNone(getBaselineItemWithStats(projectName, scenarioName))
+            if (baselineReport) {
+                const thresholdResult = scenarioThresholdsCalc(labelStats, baselineReport.stats, scenarioSettings)
+                if (thresholdResult) {
+                    await db.none(saveThresholdsResult(projectName, scenarioName, itemId, thresholdResult))
+                }
             }
         }
 

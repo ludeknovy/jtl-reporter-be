@@ -1,107 +1,238 @@
 import { scenarioThresholdsCalc } from "./scenario-thresholds-calc"
+import { LabelStats } from "../../../data-stats/prepare-data"
 
 describe("scenarioThresholdsCalc", () => {
-  const SCENARIO_AVERAGE = {
-    percentile: "35.33",
-    throughput: "462.39",
-    errorRate: "0.0",
-  }
-  it("should return false, when response time threshold exceeded", () => {
-    const output = scenarioThresholdsCalc({
-      percentil: 40,
-      errorRate: 0.0,
-      throughput: 462.39,
-    } as any, SCENARIO_AVERAGE, {
-      errorRate: "5", percentile: "5", throughput: "5",
-    })
-    expect(output.passed).toBe(false)
-    expect(output.result.percentile.passed).toBe(false)
-  })
-  it("should return true, when response time threshold not exceeded", () => {
-    const output = scenarioThresholdsCalc({
-      percentil: 36,
-      errorRate: 0.0,
-      throughput: 462.39,
-    } as any, SCENARIO_AVERAGE, {
-      errorRate: "5", percentile: "5", throughput: "5",
-    })
-    expect(output.passed).toBe(true)
-    expect(output.result.percentile.passed).toBe(true)
-
-  })
-  it("should return false, when throughput threshold exceeded", () => {
-    const output = scenarioThresholdsCalc({
-      percentil: 35,
-      errorRate: 0.0,
-      throughput: 435,
-    } as any, SCENARIO_AVERAGE, {
-      errorRate: "5", percentile: "5", throughput: "5",
-    })
-    expect(output.passed).toBe(false)
-    expect(output.result.throughput.passed).toBe(false)
-  })
-  it("should return true, when throughput threshold not exceeded", () => {
-    const output = scenarioThresholdsCalc({
-      percentil: 35,
-      errorRate: 0.0,
-      throughput: 450,
-    } as any, SCENARIO_AVERAGE, {
-      errorRate: "5", percentile: "5", throughput: "5",
-    })
-    expect(output.passed).toBe(true)
-    expect(output.result.throughput.passed).toBe(true)
-
-  })
-  it("should return false, when errorRate threshold exceeded and scenario average is zero", () => {
-    const output = scenarioThresholdsCalc({
-      percentil: 35,
-      errorRate: 10.0,
-      throughput: 462.39,
-    } as any, SCENARIO_AVERAGE, {
-      errorRate: "5", percentile: "5", throughput: "5",
-    })
-    expect(output.passed).toBe(false)
-    expect(output.result.errorRate.passed).toBe(false)
-  })
-  it("should return false, when errorRate threshold exceeded and scenario average is not zero", () => {
-    const output = scenarioThresholdsCalc({
-      percentil: 35,
-      errorRate: 10.0,
-      throughput: 462.39,
-    } as any, {
-      percentile: "35.33",
-      throughput: "462.39",
-      errorRate: "1.0",
+    const BASELINE_REPORT_STATS: LabelStats[] = [{
+        label: "label1",
+        n0: 70,
+        n5: 100,
+        n9: 100,
+        samples: 100,
+        latency: 2,
+        connect: 4,
+        standardDeviation: 3.3,
+        bytesPerSecond: 100,
+        bytesSentPerSecond: 100,
+        statusCodes: [{ statusCode: "200", count: 100 }],
+        throughput: 200,
+        errorRate: 0.0,
+        avgResponseTime: 100,
+        minResponseTime: 1,
+        maxResponseTime: 100,
+        medianResponseTime: 40,
+        responseMessageFailures: null,
+        apdex: {},
     }, {
-      errorRate: "5", percentile: "5", throughput: "5",
-    })
-    expect(output.passed).toBe(false)
-    expect(output.result.errorRate.passed).toBe(false)
-  })
-  it("should return true, when errorRate threshold not exceeded and scenario average is zero", () => {
-    const output = scenarioThresholdsCalc({
-      percentil: 35,
-      errorRate: 4.0,
-      throughput: 462.39,
-    } as any, SCENARIO_AVERAGE, {
-      errorRate: "5", percentile: "5", throughput: "5",
-    })
-    expect(output.passed).toBe(true)
-    expect(output.result.errorRate.passed).toBe(true)
-  })
-  it("should return true, when errorRate threshold not exceeded and scenario average is not zero", () => {
-    const output = scenarioThresholdsCalc({
-      percentil: 35,
-      errorRate: 0.0,
-      throughput: 462.39,
-    } as any, {
-      percentile: "35.33",
-      throughput: "462.39",
-      errorRate: "1.0",
+        label: "label2",
+        n0: 30,
+        n5: 100,
+        n9: 88,
+        samples: 100,
+        latency: 2,
+        connect: 4,
+        standardDeviation: 3.3,
+        bytesPerSecond: 100,
+        bytesSentPerSecond: 100,
+        statusCodes: [{ statusCode: "200", count: 100 }],
+        throughput: 200,
+        errorRate: 10.0,
+        avgResponseTime: 100,
+        minResponseTime: 1,
+        maxResponseTime: 100,
+        medianResponseTime: 40,
+        responseMessageFailures: null,
+        apdex: {},
     }, {
-      errorRate: "5", percentile: "5", throughput: "5",
+        label: "label3",
+        n0: 100,
+        n5: 100,
+        n9: 88,
+        samples: 100,
+        latency: 2,
+        connect: 4,
+        standardDeviation: 3.3,
+        bytesPerSecond: 100,
+        bytesSentPerSecond: 100,
+        statusCodes: [{ statusCode: "200", count: 100 }],
+        throughput: 100,
+        errorRate: 0.0,
+        avgResponseTime: 100,
+        minResponseTime: 1,
+        maxResponseTime: 100,
+        medianResponseTime: 40,
+        responseMessageFailures: null,
+        apdex: {},
+    },
+    ]
+    it("should return correct values for thresholds", () => {
+        const labelData: LabelStats[] = [{
+            label: "label1",
+            n0: 100,
+            n5: 100,
+            n9: 100,
+            samples: 100,
+            latency: 2,
+            connect: 4,
+            standardDeviation: 3.3,
+            bytesPerSecond: 100,
+            bytesSentPerSecond: 100,
+            statusCodes: [{ statusCode: "200", count: 100 }],
+            throughput: 100,
+            errorRate: 10.0,
+            avgResponseTime: 100,
+            minResponseTime: 1,
+            maxResponseTime: 100,
+            medianResponseTime: 40,
+            responseMessageFailures: null,
+            apdex: {},
+        }, {
+            label: "label2",
+            n0: 100,
+            n5: 100,
+            n9: 88,
+            samples: 100,
+            latency: 2,
+            connect: 4,
+            standardDeviation: 3.3,
+            bytesPerSecond: 100,
+            bytesSentPerSecond: 100,
+            statusCodes: [{ statusCode: "200", count: 100 }],
+            throughput: 88,
+            errorRate: 5.0,
+            avgResponseTime: 100,
+            minResponseTime: 1,
+            maxResponseTime: 100,
+            medianResponseTime: 40,
+            responseMessageFailures: null,
+            apdex: {},
+        }, {
+            label: "label3",
+            n0: 95,
+            n5: 100,
+            n9: 88,
+            samples: 100,
+            latency: 2,
+            connect: 4,
+            standardDeviation: 3.3,
+            bytesPerSecond: 100,
+            bytesSentPerSecond: 100,
+            statusCodes: [{ statusCode: "200", count: 100 }],
+            throughput: 100,
+            errorRate: 0.0,
+            avgResponseTime: 100,
+            minResponseTime: 1,
+            maxResponseTime: 100,
+            medianResponseTime: 40,
+            responseMessageFailures: null,
+            apdex: {},
+        }]
+        const output = scenarioThresholdsCalc(labelData, BASELINE_REPORT_STATS, {
+            errorRate: "5", percentile: "5", throughput: "5",
+        })
+        expect(output.passed).toBe(false)
+        expect(output.results).toEqual([{
+            label: "label1", passed: false, result: {
+                errorRate: { passed: false, diffValue: 110 },
+                percentile: { passed: false, diffValue: 142.85714285714286 },
+                throughput: { passed: false, diffValue: 50 },
+            },
+        }, {
+            label: "label2", passed: false, result: {
+                errorRate: { passed: true, diffValue: 50 },
+                percentile: { passed: false, diffValue: 333.33333333333337 },
+                throughput: { passed: false, diffValue: 44 },
+            },
+        }, {
+            label: "label3", passed: true, result: {
+                errorRate: { passed: true, diffValue: 100 },
+                percentile: { passed: true, diffValue: 95 },
+                throughput: { passed: true, diffValue: 100 },
+            },
+        },
+        ])
     })
-    expect(output.passed).toBe(true)
-    expect(output.result.errorRate.passed).toBe(true)
-  })
+    it("should return undefined when no scenario settings provided", function () {
+        const labelData: LabelStats[] = [{
+            label: "label1",
+            n0: 100,
+            n5: 100,
+            n9: 100,
+            samples: 100,
+            latency: 2,
+            connect: 4,
+            standardDeviation: 3.3,
+            bytesPerSecond: 100,
+            bytesSentPerSecond: 100,
+            statusCodes: [{ statusCode: "200", count: 100 }],
+            throughput: 100,
+            errorRate: 10.0,
+            avgResponseTime: 100,
+            minResponseTime: 1,
+            maxResponseTime: 100,
+            medianResponseTime: 40,
+            responseMessageFailures: null,
+            apdex: {},
+        }, {
+            label: "label2",
+            n0: 100,
+            n5: 100,
+            n9: 88,
+            samples: 100,
+            latency: 2,
+            connect: 4,
+            standardDeviation: 3.3,
+            bytesPerSecond: 100,
+            bytesSentPerSecond: 100,
+            statusCodes: [{ statusCode: "200", count: 100 }],
+            throughput: 88,
+            errorRate: 0.0,
+            avgResponseTime: 100,
+            minResponseTime: 1,
+            maxResponseTime: 100,
+            medianResponseTime: 40,
+            responseMessageFailures: null,
+            apdex: {},
+        }]
+        const output = scenarioThresholdsCalc(labelData, BASELINE_REPORT_STATS, {})
+        expect(output).not.toBeDefined()
+    })
+    it("should return default values when label not found it baseline report", function () {
+        const labelData: LabelStats[] = [{
+            label: "labelNotFound",
+            n0: 100,
+            n5: 100,
+            n9: 100,
+            samples: 100,
+            latency: 2,
+            connect: 4,
+            standardDeviation: 3.3,
+            bytesPerSecond: 100,
+            bytesSentPerSecond: 100,
+            statusCodes: [{ statusCode: "200", count: 100 }],
+            throughput: 100,
+            errorRate: 10.0,
+            avgResponseTime: 100,
+            minResponseTime: 1,
+            maxResponseTime: 100,
+            medianResponseTime: 40,
+            responseMessageFailures: null,
+            apdex: {},
+        }]
+        const output = scenarioThresholdsCalc(labelData, BASELINE_REPORT_STATS, {
+            errorRate: "5", percentile: "5", throughput: "5",
+        })
+        expect(output).toEqual({
+                passed: true,
+                results: [{
+                    label: "labelNotFound", passed: true, result: {
+                        errorRate: { diffValue: null, passed: null },
+                        percentile: { diffValue: null, passed: null },
+                        throughput: { diffValue: null, passed: null },
+                    },
+                }],
+                thresholds: { errorRate: "5", percentile: "5", throughput: "5" },
+            }
+        )
+
+    })
 })

@@ -1,47 +1,73 @@
-import { Overview } from "../../../data-stats/prepare-data"
+import { LabelStats } from "../../../data-stats/prepare-data"
 import { divide } from "mathjs"
 
 const PERC = 100
 
 // eslint-disable-next-line max-len
-export const scenarioThresholdsCalc = (overviewData: Overview, scenarioMetrics: Thresholds<string>, thresholds: Thresholds<string>) => {
-  if (!scenarioMetrics.errorRate || !scenarioMetrics.percentile || !scenarioMetrics.throughput) {
-    return undefined
-  }
-  const percentileDiff = (overviewData.percentil / parseFloat(scenarioMetrics.percentile)) * PERC
-  const throughputDiff = (overviewData.throughput / parseFloat(scenarioMetrics.throughput)) * PERC
-  const errorRateDiff = parseFloat(scenarioMetrics.errorRate) === 0
-    ? PERC + overviewData.errorRate
-    : divide(overviewData.errorRate, scenarioMetrics.errorRate as unknown as number) * PERC
+export const scenarioThresholdsCalc = (labelStats: LabelStats[], baselineReportStats: LabelStats[], scenarioSettings) => {
+    const results = []
+    if (!scenarioSettings.errorRate || !scenarioSettings.percentile || !scenarioSettings.throughput) {
+        return undefined
+    }
 
-  const percentilePass = percentileDiff < (PERC + parseFloat(thresholds.percentile))
-  const errorRatePass = errorRateDiff < (PERC + parseFloat(thresholds.errorRate))
-  const throughputPass = throughputDiff >= (PERC - parseFloat(thresholds.throughput))
-
-  return {
-    passed: percentilePass && throughputPass && errorRatePass,
-    result: {
-      percentile: {
-        passed: percentilePass,
-        diffValue: percentileDiff,
-      },
-      throughput: {
-        passed: throughputPass,
-        diffValue: throughputDiff,
-      },
-      errorRate: {
-        passed: errorRatePass,
-        diffValue: errorRateDiff,
-      },
-    },
-    scenarioMetrics,
-    thresholds,
-  }
+    labelStats.forEach(value => {
+        const baselineLabelStats = baselineReportStats.find(baselineValue => baselineValue.label === value.label)
+        if (baselineLabelStats) {
+            const percentileDiff = (value.n0 / baselineLabelStats.n0) * PERC
+            const throughputDiff = (value.throughput / baselineLabelStats.throughput) * PERC
+            const errorRateDiff = baselineLabelStats.errorRate === 0
+                ? PERC + value.errorRate
+                : divide(value.errorRate, baselineLabelStats.errorRate as unknown as number) * PERC
+            const percentilePass = percentileDiff < (PERC + parseFloat(scenarioSettings.percentile))
+            const errorRatePass = errorRateDiff < (PERC + parseFloat(scenarioSettings.errorRate))
+            const throughputPass = throughputDiff >= (PERC - parseFloat(scenarioSettings.throughput))
+            results.push({
+                passed: percentilePass && throughputPass && errorRatePass,
+                label: value.label,
+                result: {
+                    percentile: {
+                        passed: percentilePass,
+                        diffValue: percentileDiff,
+                    },
+                    throughput: {
+                        passed: throughputPass,
+                        diffValue: throughputDiff,
+                    },
+                    errorRate: {
+                        passed: errorRatePass,
+                        diffValue: errorRateDiff,
+                    },
+                },
+            })
+        } else {
+            results.push({
+                passed: true,
+                label: value.label,
+                result: {
+                    percentile: {
+                        passed: null,
+                        diffValue: null,
+                    },
+                    throughput: {
+                        passed: null,
+                        diffValue: null,
+                    },
+                    errorRate: {
+                        passed: null,
+                        diffValue: null,
+                    },
+                },
+            })
+        }
+    })
+    return {
+        passed: results.every(result => result.passed),
+        results,
+        thresholds: {
+            errorRate: scenarioSettings.errorRate,
+            throughput: scenarioSettings.throughput,
+            percentile: scenarioSettings.percentile,
+        },
+    }
 }
 
-
-interface Thresholds<T> {
-  percentile: T
-  throughput: T
-  errorRate: T
-}
