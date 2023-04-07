@@ -1,14 +1,15 @@
 /* eslint-disable max-lines */
 // eslint-disable-next-line max-len
-export const createNewItem = (scenarioName, startTime, environment, note, status, projectName, hostname, reportStatus, name) => {
+export const createNewItem = (scenarioName, startTime, environment, note, status, projectName, hostname, reportStatus, name, resourcesLink) => {
   return {
     // eslint-disable-next-line max-len
-    text: `INSERT INTO jtl.items(scenario_id, start_time, environment, note, status, hostname, report_status, name) VALUES(
+    text: `INSERT INTO jtl.items(scenario_id, start_time, environment, note, status, hostname, report_status, name, resources_link) VALUES(
       (SELECT sc.id FROM jtl.scenario as sc
         LEFT JOIN jtl.projects as p ON p.id = sc.project_id
         WHERE sc.name = $1
-        AND p.project_name = $6), $2, $3, $4, $5, $7, $8, $9) RETURNING id`,
-    values: [scenarioName, startTime, environment, note, status, projectName, hostname, reportStatus, name],
+        AND p.project_name = $6), $2, $3, $4, $5, $7, $8, $9, $10) RETURNING id`,
+    values: [scenarioName, startTime, environment, note, status,
+      projectName, hostname, reportStatus, name, resourcesLink],
   }
 }
 
@@ -26,7 +27,7 @@ export const findItem = (itemId, projectName, scenarioName) => {
     text: `SELECT charts.plot_data, charts.extra_plot_data, charts.histogram_plot_data, charts.scatter_plot_data, note, environment, status, hostname, s.analysis_enabled as "analysisEnabled",
             s.zero_error_tolerance_enabled as "zeroErrorToleranceEnabled", threshold_result as "thresholds", 
             report_status as "reportStatus", p.item_top_statistics_settings as "topMetricsSettings", items.name,
-            items.apdex_settings as "apdexSettings",
+            items.apdex_settings as "apdexSettings", items.resources_link as "resourcesLink",
            (SELECT items.id FROM jtl.items as items
       LEFT JOIN jtl.charts as charts ON charts.item_id = items.id
       LEFT JOIN jtl.scenario as s ON s.id = items.scenario_id
@@ -74,15 +75,15 @@ export const saveItemStats = (itemId, stats, overview, sutOverview) => {
   }
 }
 
-export const updateTestItemInfo = (itemId, scenarioName, projectName, note, environment, hostname, name) => {
+export const updateTestItemInfo = (itemId, scenarioName, projectName, note, environment, hostname, name, resourcesLink) => {
   return {
     text: `UPDATE jtl.items as it
-    SET note = $3, environment = $4, hostname = $6, name = $7
+    SET note = $3, environment = $4, hostname = $6, name = $7, resources_link = $8
     FROM jtl.scenario as s
     WHERE it.id = $1
     AND s.project_id = (SELECT id FROM jtl.projects WHERE project_name = $2)
     AND s.name = $5`,
-    values: [itemId, projectName, note, environment, scenarioName, hostname, name],
+    values: [itemId, projectName, note, environment, scenarioName, hostname, name, resourcesLink],
   }
 }
 
