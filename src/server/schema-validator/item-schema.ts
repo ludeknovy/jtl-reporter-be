@@ -4,6 +4,7 @@ const NOTE_MAX_LENGTH = 250
 const HOSTNAME_MAX_LENGTH = 200
 const ENVIRONMENT_MAX_LENGTH = 50
 const TEST_NAME_MAX_LENGTH = 200
+const RESOURCES_LINK_MAX_LENGTH = 350
 
 const projectName = Joi.string().required()
 const environment = Joi.string().min(1).max(ENVIRONMENT_MAX_LENGTH).required()
@@ -11,6 +12,8 @@ const scenarioName = Joi.string().required()
 const hostname = Joi.string().max(HOSTNAME_MAX_LENGTH).allow("").allow(null)
 const note = Joi.string().max(NOTE_MAX_LENGTH).allow("").allow(null)
 const itemId = Joi.string().uuid().required()
+const resourcesLink = Joi.string().max(RESOURCES_LINK_MAX_LENGTH).allow("").allow(null)
+
 
 export const labelParamSchema = {
   projectName,
@@ -43,12 +46,14 @@ export const updateItemBodySchema = Joi.object().keys({
   hostname,
   environment,
   name: Joi.string().max(TEST_NAME_MAX_LENGTH).allow("").allow(null),
+  resourcesLink,
 })
 
 export const newAsyncItemStartBodySchema = Joi.object().keys({
   environment,
   hostname,
   note,
+  resourcesLink,
 })
 
 export const newItemParamSchema = Joi.object().keys({

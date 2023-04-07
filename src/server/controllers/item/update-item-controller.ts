@@ -14,10 +14,11 @@ import { logger } from "../../../logger"
 
 export const updateItemController = async (req: Request, res: Response, next: NextFunction) => {
     const { projectName, scenarioName, itemId } = req.params
-    const { note, environment, hostname, base, name } = req.body
+    const { note, environment, hostname, base, name, resourcesLink } = req.body
     try {
         await db.query("BEGIN")
-        await db.none(updateTestItemInfo(itemId, scenarioName, projectName, note, environment, hostname, name))
+        await db.none(updateTestItemInfo(itemId, scenarioName, projectName,
+            note, environment, hostname, name, resourcesLink))
         if (base) {
             await db.none(removeCurrentBaseFlag(scenarioName, projectName))
             await db.none(setBaseFlag(itemId, scenarioName, projectName))

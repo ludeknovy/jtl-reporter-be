@@ -10,7 +10,7 @@ import { generateShareToken } from "./utils/generateShareToken"
 import { upsertScenario } from "./shared/upsert-scenario"
 
 export const createItemAsyncController = async (req: IGetUserAuthInfoRequest, res: Response) => {
-    const { environment, note, status = ItemStatus.None, hostname, name } = req.body
+    const { environment, note, status = ItemStatus.None, hostname, name, resourcesLink } = req.body
     const { scenarioName, projectName } = req.params
 
     logger.info(`Creating new item for scenario: ${scenarioName}`)
@@ -26,7 +26,7 @@ export const createItemAsyncController = async (req: IGetUserAuthInfoRequest, re
             projectName,
             hostname,
             ReportStatus.InProgress,
-            name
+            name, resourcesLink
         ))
 
         const { generate_share_token: shouldGenerateToken } = await db.one(

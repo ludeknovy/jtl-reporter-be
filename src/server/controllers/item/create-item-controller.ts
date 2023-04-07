@@ -35,7 +35,7 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
   // eslint-disable-next-line complexity
   upload(req, res, async error => {
     const HOSTNAME_LENGTH = 200
-    const { environment, note, status = ItemStatus.None, hostname, name } = req.body
+    const { environment, note, status = ItemStatus.None, hostname, name, resourcesLink } = req.body
     if (!req.files) {
       return next(boom.badRequest())
     }
@@ -74,7 +74,7 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
         projectName,
         hostname,
         ReportStatus.InProgress,
-        name
+        name, resourcesLink
       ))
 
       const {

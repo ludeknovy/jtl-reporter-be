@@ -18,7 +18,7 @@ export const getItemController = async (req: IGetUserAuthInfoRequest, res: Respo
     note,
     environment,
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    base_id,
+    base_id, resourcesLink,
     status, hostname, reportStatus, thresholds,
     analysisEnabled, zeroErrorToleranceEnabled, topMetricsSettings, name, apdexSettings,
   } = await db.one(findItem(itemId, projectName, scenarioName))
@@ -44,7 +44,7 @@ export const getItemController = async (req: IGetUserAuthInfoRequest, res: Respo
     extraPlotData, note, environment, hostname, reportStatus, thresholds, analysisEnabled,
     baseId: base_id, isBase: base_id === itemId, zeroErrorToleranceEnabled, topMetricsSettings,
     histogramPlotData,
-    name,
+    name, resourcesLink,
     monitoring: {
       cpu: {
         data: monitoringAdjusted,

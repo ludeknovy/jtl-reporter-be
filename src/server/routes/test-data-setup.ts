@@ -48,7 +48,8 @@ export class TestDataSetup {
                         // eslint-disable-next-line no-case-declarations
                         const [item] = await db.any(createNewItem("test-scenario",
                             "2019-09-22 20:20:23.265", "localhost", "test note",
-                            "1", "test-project", "localhost", ReportStatus.Ready, "test-name"))
+                            "1", "test-project", "localhost", ReportStatus.Ready,
+                            "test-name", "resourcesLink"))
                         await db.any(saveItemStats(
                             item.id, JSON.stringify(testStats),
                             JSON.stringify(testOverview),
