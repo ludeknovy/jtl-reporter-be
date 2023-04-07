@@ -75,7 +75,8 @@ export const saveItemStats = (itemId, stats, overview, sutOverview) => {
   }
 }
 
-export const updateTestItemInfo = (itemId, scenarioName, projectName, note, environment, hostname, name, resourcesLink) => {
+export const updateTestItemInfo = (itemId, scenarioName, projectName, note,
+                                   environment, hostname, name, resourcesLink) => {
   return {
     text: `UPDATE jtl.items as it
     SET note = $3, environment = $4, hostname = $6, name = $7, resources_link = $8
