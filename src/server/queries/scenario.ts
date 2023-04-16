@@ -236,3 +236,21 @@ export const updateUserScenarioTrendsSettings = (projectName, scenarioName, user
     values: [projectName, scenarioName, userId, trendsSettings],
   }
 }
+
+export const searchResponseTimeDegradation = (projectName, scenarioName) => {
+  return {
+    text: `SELECT jsonb_agg(jsonb_build_object(data.label,data.percentile_cont) order by data.label) as data, "maxVu" FROM (
+    select overview -> 'maxVu' as "maxVu", x.label,percentile_cont(0.90) within group (order by (x.n0)) from (
+        jtl.item_stat as its LEFT JOIN jtl.items as it ON it.id = its.item_id
+        LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
+        LEFT JOIN jtl.projects as p ON p.id = s.project_id
+        )
+    , jsonb_to_recordset((its.stats)) as x(label text, n0 double precision)
+    WHERE p.project_name = $1
+    AND s.name = $2
+    GROUP BY "maxVu", x.label
+    ) as data
+    GROUP BY "maxVu";`,
+    values: [projectName, scenarioName],
+  }
+}
