@@ -8,10 +8,19 @@ export class AnalyticsEvent {
 
     static reportProcessingFinished() {
         if (this.isAnalyticEnabled()) {
-            console.log(process.env.ANALYTICS_IDENTIFIER)
             analytics.track("reportProcessingFinished", {
                 // eslint-disable-next-line camelcase
                 distinct_id: process.env.ANALYTICS_IDENTIFIER,
+            })
+        }
+    }
+
+    static reportLabelCount(labelCount) {
+        if (this.isAnalyticEnabled()) {
+            analytics.track("reportInformation", {
+                // eslint-disable-next-line camelcase
+                distinct_id: process.env.ANALYTICS_IDENTIFIER,
+                labelCount,
             })
         }
     }
