@@ -542,9 +542,9 @@ export const calculateApdexValues = (itemId, satisfyingThreshold, toleratingThre
 export const responseTimePerLabelHistogram = (itemId) => {
   return {
     text: `
-        SELECT label, histogram(t_elapsed, 0, x.max + 1, x.buckets | 1)
+        SELECT label, histogram(t_elapsed, 0, (x.buckets * 100) + 1, COALESCE(NULLIF(x.buckets,0), 1))
         FROM (SELECT label,
-                     ceil(max(elapsed) / 100)::integer as buckets,
+                     ceil(max(elapsed)::numeric / 100)::integer as buckets,
                      array_agg(elapsed)                as elapsed,
                      max(elapsed)                      as max
               FROM jtl.samples
