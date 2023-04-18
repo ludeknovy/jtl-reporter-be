@@ -544,7 +544,7 @@ export const responseTimePerLabelHistogram = (itemId) => {
     text: `
         SELECT label, histogram(t_elapsed, 0, x.max + 1, x.buckets | 1)
         FROM (SELECT label,
-                     ceil(max(elapsed) / 100)::integer as buckets,
+                     ceil(max(elapsed)::numeric / 100)::integer as buckets,
                      array_agg(elapsed)                as elapsed,
                      max(elapsed)                      as max
               FROM jtl.samples
