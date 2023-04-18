@@ -5,6 +5,12 @@ jest.mock("../analytics")
 
 
 describe("AnalyticEvents", () => {
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+
     describe("isAnalyticEnabled", () => {
         it("should return true when OPT_OUT_ANALYTICS not set", function () {
             const isEnabled = AnalyticsEvent.isAnalyticEnabled()
@@ -34,6 +40,22 @@ describe("AnalyticEvents", () => {
             process.env.OPT_OUT_ANALYTICS = "false"
             const trackMock = (analytics.track as any).mockResolvedValueOnce(undefined)
             AnalyticsEvent.reportProcessingFinished()
+            expect(trackMock).toHaveBeenCalled()
+        })
+    })
+
+    describe("reportLabelCount", () => {
+        it("should not track the event when analytics disabled", function () {
+            process.env.OPT_OUT_ANALYTICS = "true"
+            const trackMock = (analytics.track as any).mockResolvedValueOnce(undefined)
+            AnalyticsEvent.reportLabelCount(1)
+            expect(trackMock).not.toHaveBeenCalled()
+
+        })
+        it("should track the even only when analytics enabled", function () {
+            process.env.OPT_OUT_ANALYTICS = "false"
+            const trackMock = (analytics.track as any).mockResolvedValueOnce(undefined)
+            AnalyticsEvent.reportLabelCount(1)
             expect(trackMock).toHaveBeenCalled()
         })
     })
