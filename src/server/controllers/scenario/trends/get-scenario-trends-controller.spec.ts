@@ -24,7 +24,11 @@ describe("getScenarioTrendsController", function () {
                 id: "id1",
             },
         ]);
-        (db.manyOrNone as any).mockResolvedValueOnce([])
+        (db.manyOrNone as any).mockResolvedValueOnce([]);
+        (db.manyOrNone as any).mockResolvedValueOnce([
+            { data: [{ label1: 90 }, { label2: 30 }], maxVu: 10 },
+            { data: [{ label1: 150 }, { label2: 80 }], maxVu: 100 },
+        ])
 
         const response = mockResponse()
         const request = {
@@ -55,7 +59,11 @@ describe("getScenarioTrendsController", function () {
                     network: 300,
                     startDate: "2022-02-11T08:33:02.920Z",
                 },
-            }], labelTrends: {}, responseTimeDegradationCurve: [],
+            }], labelTrends: {}, responseTimeDegradationCurve: [{
+                data: [[10, 90], [100, 150]], name: "label1",
+            }, {
+                data: [[10, 30], [100, 80]], name: "label2",
+            }],
             userSettings: { aggregatedTrends: true, labelMetrics: {} },
         })
     })
