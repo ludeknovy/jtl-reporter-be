@@ -3,7 +3,7 @@ import { db } from "../../../../db/db"
 import {
     getUserScenarioSettings,
     scenarioAggregatedTrends,
-    scenarioLabelTrends,
+    scenarioLabelTrends, searchResponseTimeDegradation,
 } from "../../../queries/scenario"
 import { StatusCode } from "../../../utils/status-code"
 import { IGetUserAuthInfoRequest } from "../../../middleware/request.model"
@@ -13,6 +13,7 @@ export const getScenarioTrendsController = async (req: IGetUserAuthInfoRequest, 
     const aggregatedData = await db.any(scenarioAggregatedTrends(projectName, scenarioName))
     const labelData = await db.manyOrNone(scenarioLabelTrends(projectName, scenarioName))
     const scenarioSettings = await db.oneOrNone(getUserScenarioSettings(projectName, scenarioName, req.user.userId))
+    const responseTimeDegradationCurve = await db.manyOrNone(searchResponseTimeDegradation(projectName, scenarioName))
 
     const labelTrends = labelData.map(data => data.stats.map(value => ({
         percentile90: [data.startDate, value.n0, data.id],
@@ -46,8 +47,24 @@ export const getScenarioTrendsController = async (req: IGetUserAuthInfoRequest, 
             },
         }
     })
+
+    const responseTimeDegradationCurveSeries = []
+    responseTimeDegradationCurve?.forEach(value => {
+        const { data, maxVu } = value
+        data.forEach(degradationCurveLabelData => {
+            const [[label, percentile]] = Object.entries(degradationCurveLabelData)
+            const labelSeries = responseTimeDegradationCurveSeries.find(series => series.name === label)
+            if (!labelSeries) {
+                responseTimeDegradationCurveSeries.push({ name: label, data: [[maxVu, percentile]] })
+            } else {
+                labelSeries.data.push([maxVu, percentile])
+            }
+        })
+    })
+
     res.status(StatusCode.Ok).json({
         aggregatedTrends: networkAdjustedData.sort(sortByDateAsc),
+        responseTimeDegradationCurve: responseTimeDegradationCurveSeries,
         labelTrends: adjusted,
         userSettings: {
             aggregatedTrends:
