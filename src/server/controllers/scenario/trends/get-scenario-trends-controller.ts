@@ -49,7 +49,7 @@ export const getScenarioTrendsController = async (req: IGetUserAuthInfoRequest, 
     })
 
     const responseTimeDegradationCurveSeries = []
-    responseTimeDegradationCurve.forEach(value => {
+    responseTimeDegradationCurve?.forEach(value => {
         const { data, maxVu } = value
         data.forEach(degradationCurveLabelData => {
             const [[label, percentile]] = Object.entries(degradationCurveLabelData)

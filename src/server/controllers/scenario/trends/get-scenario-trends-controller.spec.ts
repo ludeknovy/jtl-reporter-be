@@ -55,7 +55,8 @@ describe("getScenarioTrendsController", function () {
                     network: 300,
                     startDate: "2022-02-11T08:33:02.920Z",
                 },
-            }], labelTrends: {}, userSettings: { aggregatedTrends: true, labelMetrics: {} },
+            }], labelTrends: {}, responseTimeDegradationCurve: [],
+            userSettings: { aggregatedTrends: true, labelMetrics: {} },
         })
     })
     it("should return data with label trends when found", async function () {
@@ -76,7 +77,7 @@ describe("getScenarioTrendsController", function () {
         const response = mockResponse()
         const request = {
             params: {
-                scenarioName:  "scenario-name",
+                scenarioName: "scenario-name",
                 projectName: "project-name",
             },
             user: { userId: "userId" },
@@ -118,7 +119,9 @@ describe("getScenarioTrendsController", function () {
                         1.2,
                     ]],
                 },
-            }, userSettings: {
+            },
+            responseTimeDegradationCurve: [],
+            userSettings: {
                 aggregatedTrends: true,
                 labelMetrics: {},
             },
@@ -148,7 +151,7 @@ describe("getScenarioTrendsController", function () {
         const response = mockResponse()
         const request = {
             params: {
-                scenarioName:  "scenario-name",
+                scenarioName: "scenario-name",
                 projectName: "project-name",
             },
             user: { userId: "userId" },
@@ -174,7 +177,9 @@ describe("getScenarioTrendsController", function () {
                     network: 300,
                     startDate: "2022-02-11T08:33:02.920Z",
                 },
-            }], labelTrends: {}, userSettings: {
+            }], labelTrends: {},
+            responseTimeDegradationCurve: [],
+            userSettings: {
                 aggregatedTrends: true,
                 labelMetrics: {
                     errorRate: true,
