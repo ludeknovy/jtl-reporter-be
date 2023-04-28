@@ -254,3 +254,14 @@ export const searchResponseTimeDegradation = (projectName, scenarioName) => {
     values: [projectName, scenarioName],
   }
 }
+
+export const searchEnvironments = (projectName, scenarioName) => {
+  return {
+    text: `SELECT DISTINCT(it.environment) FROM jtl.items as it
+    LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
+    LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE s.name = $2
+    AND p.project_name = $1`,
+    values: [projectName, scenarioName],
+  }
+}

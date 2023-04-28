@@ -22,6 +22,7 @@ import { authenticationMiddleware } from "../middleware/authentication-middlewar
 import { AllowedRoles, authorizationMiddleware } from "../middleware/authorization-middleware"
 import { IGetUserAuthInfoRequest } from "../middleware/request.model"
 import { postScenarioTrendsSettings } from "../controllers/scenario/trends/update-scenario-trends-settings-controller"
+import {getScenarioEnvironmentController} from "../controllers/scenario/get-scenario-environment-controller";
 
 export class ScenarioRoutes {
 
@@ -98,5 +99,12 @@ export class ScenarioRoutes {
             paramsSchemaValidator(paramsSchema),
             bodySchemaValidator(scenarioTrendsSettings),
             wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => postScenarioTrendsSettings(req, res)))
+
+    app.route("/api/projects/:projectName/scenarios/:scenarioName/environment")
+        .get(
+            authenticationMiddleware,
+            authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+            paramsSchemaValidator(paramsSchema),
+            wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => getScenarioEnvironmentController(req, res)))
   }
 }
