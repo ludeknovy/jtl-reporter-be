@@ -16,6 +16,13 @@ import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 import { scenarioGenerateToken } from "../../queries/scenario"
 import { generateShareToken } from "./utils/generateShareToken"
 import { upsertScenario } from "./shared/upsert-scenario"
+import {
+  ENVIRONMENT_MAX_LENGTH,
+  HOSTNAME_MAX_LENGTH,
+  NOTE_MAX_LENGTH,
+  RESOURCES_LINK_MAX_LENGTH,
+  TEST_NAME_MAX_LENGTH,
+} from "./create-item-const"
 
 const pg = pgp()
 
@@ -34,7 +41,6 @@ const SECONDS_DIVISOR = 1000
 export const createItemController = (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
   // eslint-disable-next-line complexity
   upload(req, res, async error => {
-    const HOSTNAME_LENGTH = 200
     const { environment, note, status = ItemStatus.None, hostname, name, resourcesLink } = req.body
     if (!req.files) {
       return next(boom.badRequest())
@@ -53,9 +59,18 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
     if (!Object.values(ItemStatus).some(_ => _ === status)) {
       return next(boom.badRequest("invalid status type"))
     }
-    if (hostname && hostname.lenght > HOSTNAME_LENGTH) {
-      return next(boom.badRequest("too long hostname. max length is 200."))
+    const failedValidations = checkFieldsLength([
+        { name: "environment", value: environment, maxLength: ENVIRONMENT_MAX_LENGTH },
+        { name: "name", value: name, maxLength: TEST_NAME_MAX_LENGTH },
+        { name: "resourcesLink", value: resourcesLink, maxLength: RESOURCES_LINK_MAX_LENGTH },
+        { name: "note", value: note, maxLength: NOTE_MAX_LENGTH },
+        { name: "hostname", value: hostname, maxLength: HOSTNAME_MAX_LENGTH },
+    ])
+    if (failedValidations?.length > 0) {
+      return next(boom.badRequest(`The following fields are too long: ${failedValidations.join(", ")}`))
     }
+
+
     logger.info(`Starting new item processing for scenario: ${scenarioName}`)
     try {
 
@@ -197,3 +212,12 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
   })
 }
 
+const checkFieldsLength = (properties: Array<{ name: string; value: any; maxLength: number }>): string[] => {
+  const failedValidations = []
+  properties.forEach(property => {
+    if (property.value && property.value.length > property.maxLength) {
+      failedValidations.push(JSON.stringify({ fieldName: property.name, maxLength: property.maxLength }))
+    }
+  })
+  return failedValidations
+}

@@ -1,0 +1,6 @@
+export const NOTE_MAX_LENGTH = 150
+export const HOSTNAME_MAX_LENGTH = 200
+
+export const ENVIRONMENT_MAX_LENGTH = 50
+export const TEST_NAME_MAX_LENGTH = 200
+export const RESOURCES_LINK_MAX_LENGTH = 350
