@@ -11,29 +11,30 @@ import { authenticationMiddleware } from "../middleware/authentication-middlewar
 
 export class LabelRoutes {
 
-  routes(app: express.Application): void {
+    routes(app: express.Application): void {
 
-    app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label/:label/trend")
-      .get(
-        authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
-        paramsSchemaValidator(labelParamSchema),
-        queryParamsValidator(labelQuerySchema),
-        wrapAsync( (req: Request, res: Response) => getLabelTrendController(req, res)))
+        app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label/:label/trend")
+            .get(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(labelParamSchema),
+                queryParamsValidator(labelQuerySchema),
+                wrapAsync((req: Request, res: Response) => getLabelTrendController(req, res)))
 
-    app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label/:label/virtual-users")
-      .get(
-        authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
-        paramsSchemaValidator(labelParamSchema),
-        queryParamsValidator(labelQuerySchema),
-        wrapAsync( (req: Request, res: Response, next: NextFunction) => getLabelVirtualUsersController(req, res, next)))
+        app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label/:label/virtual-users")
+            .get(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(labelParamSchema),
+                queryParamsValidator(labelQuerySchema),
+                wrapAsync((req: Request, res: Response, next: NextFunction) =>
+                    getLabelVirtualUsersController(req, res, next)))
 
-    app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label/:label/errors")
-      .get(
-        authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
-        paramsSchemaValidator(labelParamSchema),
-        wrapAsync( (req: Request, res: Response) => getLabelErrorsController(req, res)))
-  }
+        app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label/:label/errors")
+            .get(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(labelParamSchema),
+                wrapAsync((req: Request, res: Response) => getLabelErrorsController(req, res)))
+    }
 }

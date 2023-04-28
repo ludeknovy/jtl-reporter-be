@@ -1,25 +1,27 @@
 /* eslint-disable max-len */
-export const findItemsForScenario = (projectName, scenarioName, limit, offset) => {
+export const findItemsForScenario = (projectName, scenarioName, environment, limit, offset) => {
   return {
     text: `SELECT it.id, environment, upload_time as "uploadTime", base, status, st.overview->>'startDate' as "startTime", note, hostname, it.name, threshold_result->'passed' as "thresholdPassed", overview FROM jtl.items as it
     LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
     LEFT JOIN jtl.item_stat as st ON st.item_id = it.id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
     WHERE s.name = $2 AND p.project_name = $1 AND it.report_status = 'ready'
+    AND ($5::text is null or it.environment = $5)
     ORDER BY start_time DESC
     LIMIT $3 OFFSET $4`,
-    values: [projectName, scenarioName, limit, offset],
+    values: [projectName, scenarioName, limit, offset, environment],
   }
 }
 
-export const itemsForScenarioCount = (projectName, scenarioName) => {
+export const itemsForScenarioCount = (projectName, scenarioName, environment) => {
   return {
     text: `SELECT count(*) as total FROM jtl.items as it
     LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
     LEFT JOIN jtl.item_stat as st ON st.item_id = it.id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
-    WHERE s.name = $2 AND p.project_name = $1 AND report_status = 'ready';`,
-    values: [projectName, scenarioName],
+    WHERE s.name = $2 AND p.project_name = $1 AND report_status = 'ready'
+    AND ($3::text is null or it.environment = $3);`,
+    values: [projectName, scenarioName, environment],
   }
 }
 
@@ -51,7 +53,7 @@ export const updateScenario = (projectName, scenarioName, name, analysisEnabled,
   }
 }
 
-export const scenarioAggregatedTrends = (projectName, scenarioName) => {
+export const scenarioAggregatedTrends = (projectName, scenarioName, environment?) => {
   return {
     text: `SELECT overview, it.id FROM jtl.item_stat as st
     LEFT JOIN jtl.items as it ON it.id = st.item_id
@@ -60,13 +62,14 @@ export const scenarioAggregatedTrends = (projectName, scenarioName) => {
     WHERE s.name = $2
     AND p.project_name = $1
     AND report_status = 'ready'
+    AND ($3::text is null or it.environment = $3)
     ORDER BY start_time DESC
     LIMIT 15;`,
-    values: [projectName, scenarioName],
+    values: [projectName, scenarioName, environment],
   }
 }
 
-export const scenarioLabelTrends = (projectName, scenarioName) => {
+export const scenarioLabelTrends = (projectName, scenarioName, environment) => {
   return {
     text :`SELECT st.stats, it.id, st.overview -> 'startDate' as "startDate" FROM jtl.item_stat as st
     LEFT JOIN jtl.items as it ON it.id = st.item_id
@@ -75,9 +78,10 @@ export const scenarioLabelTrends = (projectName, scenarioName) => {
     WHERE s.name = $2
     AND p.project_name = $1
     AND report_status = 'ready'
+    AND ($3::text is null or it.environment = $3)
     ORDER BY start_time DESC
     LIMIT 15;`,
-    values: [projectName, scenarioName],
+    values: [projectName, scenarioName, environment],
   }
 }
 
@@ -237,7 +241,7 @@ export const updateUserScenarioTrendsSettings = (projectName, scenarioName, user
   }
 }
 
-export const searchResponseTimeDegradation = (projectName, scenarioName) => {
+export const searchResponseTimeDegradation = (projectName, scenarioName, environment?) => {
   return {
     text: `SELECT jsonb_agg(jsonb_build_object(data.label,data.percentile_cont) order by data.label) as data, "maxVu" FROM (
     select overview -> 'maxVu' as "maxVu", x.label,percentile_cont(0.90) within group (order by (x.n0)) from (
@@ -248,10 +252,11 @@ export const searchResponseTimeDegradation = (projectName, scenarioName) => {
     , jsonb_to_recordset((its.stats)) as x(label text, n0 double precision)
     WHERE p.project_name = $1
     AND s.name = $2
+    AND ($3::text is null or it.environment = $3)
     GROUP BY "maxVu", x.label
     ) as data
     GROUP BY "maxVu";`,
-    values: [projectName, scenarioName],
+    values: [projectName, scenarioName, environment],
   }
 }
 

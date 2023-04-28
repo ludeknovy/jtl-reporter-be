@@ -10,27 +10,27 @@ import { deleteUserController } from "../controllers/users/delete-user-controlle
 import { authorizationMiddleware, AllowedRoles } from "../middleware/authorization-middleware"
 
 export class UsersRoutes {
-  routes(app: express.Application): void {
-    app.route("/api/users")
-      .post(
-        authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Admin]),
-        bodySchemaValidator(newUserSchema),
-        // eslint-disable-next-line max-len
-        wrapAsync( (req: Request, res: Response, next: NextFunction) => createNewUserController(req, res, next)))
+    routes(app: express.Application): void {
+        app.route("/api/users")
+            .post(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Admin]),
+                bodySchemaValidator(newUserSchema),
+                // eslint-disable-next-line max-len
+                wrapAsync((req: Request, res: Response, next: NextFunction) => createNewUserController(req, res, next)))
 
-      .get(
-        authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Admin]),
-        wrapAsync( (req: Request, res: Response) => getUsersController(req, res))
-      )
+            .get(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Admin]),
+                wrapAsync((req: Request, res: Response) => getUsersController(req, res))
+            )
 
-    app.route("/api/users/:userId")
-      .delete(
-        authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Admin]),
-        paramsSchemaValidator(userSchema),
-        wrapAsync( (req: Request, res: Response) => deleteUserController(req, res))
-      )
-  }
+        app.route("/api/users/:userId")
+            .delete(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Admin]),
+                paramsSchemaValidator(userSchema),
+                wrapAsync((req: Request, res: Response) => deleteUserController(req, res))
+            )
+    }
 }

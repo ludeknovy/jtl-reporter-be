@@ -2,8 +2,8 @@ import { Request, Response, NextFunction } from "express"
 import * as express from "express"
 import { wrapAsync } from "../errors/error-handler"
 import {
-  bodySchemaValidator, paramsSchemaValidator,
-  queryParamsValidator,
+    bodySchemaValidator, paramsSchemaValidator,
+    queryParamsValidator,
 } from "../schema-validator/schema-validator-middleware"
 import {
     paramsSchema, updateItemBodySchema,
@@ -32,106 +32,106 @@ import { getRequestStatsExportController } from "../controllers/item/get-request
 
 export class ItemsRoutes {
 
-  routes(app: express.Application): void {
+    routes(app: express.Application): void {
 
-    app.route("/api/projects/:projectName/scenarios/:scenarioName/items")
-      .get(
-        authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
-        paramsSchemaValidator(scenarioParamsSchema),
-        queryParamsValidator(querySchema),
-        wrapAsync( (req: Request, res: Response) => getItemsController(req, res)))
+        app.route("/api/projects/:projectName/scenarios/:scenarioName/items")
+            .get(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(scenarioParamsSchema),
+                queryParamsValidator(querySchema),
+                wrapAsync((req: Request, res: Response) => getItemsController(req, res)))
 
-      .post(
-        authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
-        paramsSchemaValidator(newItemParamSchema),
-        createItemController)
+            .post(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(newItemParamSchema),
+                createItemController)
 
-    app.route("/api/projects/:projectName/scenarios/:scenarioName/items/start-async")
-      .post(
-        authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
-        bodySchemaValidator(newAsyncItemStartBodySchema),
-        paramsSchemaValidator(newItemParamSchema),
-        createItemAsyncController)
+        app.route("/api/projects/:projectName/scenarios/:scenarioName/items/start-async")
+            .post(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
+                bodySchemaValidator(newAsyncItemStartBodySchema),
+                paramsSchemaValidator(newItemParamSchema),
+                createItemAsyncController)
 
-    app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId")
-      .get(
-        allowQueryTokenAuth,
-        authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
-        paramsSchemaValidator(paramsSchema),
-        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => getItemController(req, res)))
+        app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId")
+            .get(
+                allowQueryTokenAuth,
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(paramsSchema),
+                wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => getItemController(req, res)))
 
-      .put(
-        authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
-        paramsSchemaValidator(paramsSchema),
-        bodySchemaValidator(updateItemBodySchema),
-        wrapAsync( (req: Request, res: Response, next: NextFunction) => updateItemController(req, res, next)))
+            .put(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(paramsSchema),
+                bodySchemaValidator(updateItemBodySchema),
+                wrapAsync((req: Request, res: Response, next: NextFunction) => updateItemController(req, res, next)))
 
-      .delete(
-        authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
-        paramsSchemaValidator(paramsSchema),
-        wrapAsync( (req: Request, res: Response) => deleteItemController(req, res)))
+            .delete(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(paramsSchema),
+                wrapAsync((req: Request, res: Response) => deleteItemController(req, res)))
 
-    app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/request-stats-export")
-        .get(
-          authenticationMiddleware,
-          authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
-          paramsSchemaValidator(paramsSchema),
-          wrapAsync( (req: Request, res: Response) => getRequestStatsExportController(req, res)))
+        app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/request-stats-export")
+            .get(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(paramsSchema),
+                wrapAsync((req: Request, res: Response) => getRequestStatsExportController(req, res)))
 
 
-    app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/stop-async")
-      .post(
-        authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
-          paramsSchemaValidator(paramsSchema),
-          bodySchemaValidator(stopItemAsyncBodySchema),
-        wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => stopItemAsyncController(req, res)))
+        app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/stop-async")
+            .post(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(paramsSchema),
+                bodySchemaValidator(stopItemAsyncBodySchema),
+                wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => stopItemAsyncController(req, res)))
 
-    app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/share-tokens")
-      .get(
-        authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
-        paramsSchemaValidator(paramsSchema),
-        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => getItemLinksController(req, res)))
+        app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/share-tokens")
+            .get(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(paramsSchema),
+                wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => getItemLinksController(req, res)))
 
-      .post(
-        authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
-        paramsSchemaValidator(paramsSchema),
-        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => createItemLinkController(req, res)))
+            .post(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(paramsSchema),
+                wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => createItemLinkController(req, res)))
 
-    app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/share-tokens/:tokenId")
-      .delete(
-        authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
-        paramsSchemaValidator(shareTokenSchema),
-        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => deleteItemShareTokenController(req, res)))
+        app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/share-tokens/:tokenId")
+            .delete(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(shareTokenSchema),
+                wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => deleteItemShareTokenController(req, res)))
 
-    app.route("/api/projects/:projectName/scenarios/:scenarioName/processing-items")
-      .get(
-        authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
-        paramsSchemaValidator(scenarioParamsSchema),
-        wrapAsync( (req: Request, res: Response) => getProcessingItemsController(req, res)))
+        app.route("/api/projects/:projectName/scenarios/:scenarioName/processing-items")
+            .get(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(scenarioParamsSchema),
+                wrapAsync((req: Request, res: Response) => getProcessingItemsController(req, res)))
 
-    app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/custom-chart-settings")
-      .post(
-        authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
-        paramsSchemaValidator(paramsSchema),
-        bodySchemaValidator(upsertUserItemChartSettings),
-        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => upsertItemChartSettingsController(req, res))
-      )
-      .get(
-        authenticationMiddleware,
-        authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
-        paramsSchemaValidator(paramsSchema),
-        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response) => getItemChartSettingsController(req, res)))
-  }
+        app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/custom-chart-settings")
+            .post(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(paramsSchema),
+                bodySchemaValidator(upsertUserItemChartSettings),
+                wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => upsertItemChartSettingsController(req, res))
+            )
+            .get(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(paramsSchema),
+                wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => getItemChartSettingsController(req, res)))
+    }
 }
