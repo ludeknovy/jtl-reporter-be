@@ -10,7 +10,11 @@ import {
     newItemParamSchema,
     newAsyncItemStartBodySchema, shareTokenSchema, upsertUserItemChartSettings, stopItemAsyncBodySchema,
 } from "../schema-validator/item-schema"
-import { paramsSchema as scenarioParamsSchema, querySchema } from "../schema-validator/scenario-schema"
+import {
+    environmentQuerySchema,
+    paramsSchema as scenarioParamsSchema,
+    querySchema
+} from "../schema-validator/scenario-schema"
 import { getItemsController } from "../controllers/item/get-items-controller"
 import { getItemController } from "../controllers/item/get-item-controller"
 import { updateItemController } from "../controllers/item/update-item-controller"
@@ -118,6 +122,7 @@ export class ItemsRoutes {
                 authenticationMiddleware,
                 authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(scenarioParamsSchema),
+                queryParamsValidator(environmentQuerySchema),
                 wrapAsync((req: Request, res: Response) => getProcessingItemsController(req, res)))
 
         app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/custom-chart-settings")

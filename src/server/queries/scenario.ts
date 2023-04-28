@@ -137,14 +137,15 @@ export const isExistingScenario = (scenarioName, projectName) => {
   }
 }
 
-export const getProcessingItems = (projectName, scenarioName) => {
+export const getProcessingItems = (projectName, scenarioName, environment) => {
   return {
     text: `SELECT it.id, it.report_status as "reportStatus", it.upload_time as "uploadTime" FROM jtl.items as it
     LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
     LEFT JOIN jtl.item_stat as st ON st.item_id = it.id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
-    WHERE s.name = $1 AND p.project_name = $2 AND it.report_status != 'ready';`,
-    values: [scenarioName, projectName],
+    WHERE s.name = $1 AND p.project_name = $2 AND it.report_status != 'ready'
+    AND ($3::text is null or it.environment = $3);`,
+    values: [scenarioName, projectName, environment],
   }
 }
 
