@@ -12,27 +12,28 @@ import { initUserController } from "../controllers/auth/init-user-controller"
 import { initUserScheam } from "../schema-validator/users-schema"
 
 export class AuthRoutes {
-  routes(app: express.Application): void {
+    routes(app: express.Application): void {
 
-    app.route("/api/auth/login")
-      .post(bodySchemaValidator(authQuerySchema),
-        wrapAsync( (req: Request, res: Response, next: NextFunction) => loginController(req, res, next)))
+        app.route("/api/auth/login")
+            .post(bodySchemaValidator(authQuerySchema),
+                wrapAsync((req: Request, res: Response, next: NextFunction) => loginController(req, res, next)))
 
-    app.route("/api/auth/login-with-token")
-      .post(bodySchemaValidator(authWithTokenSchema),
-        wrapAsync( (req: Request, res: Response, next: NextFunction) => loginWithTokenController(req, res, next)))
+        app.route("/api/auth/login-with-token")
+            .post(bodySchemaValidator(authWithTokenSchema),
+                wrapAsync((req: Request, res: Response, next: NextFunction) =>
+                    loginWithTokenController(req, res, next)))
 
-    app.route("/api/auth/change-password")
-      .post(
-        authenticationMiddleware,
-        bodySchemaValidator(changePasswordSchema),
-        // eslint-disable-next-line max-len
-        wrapAsync( (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => changePasswordController(req, res, next)))
+        app.route("/api/auth/change-password")
+            .post(
+                authenticationMiddleware,
+                bodySchemaValidator(changePasswordSchema),
+                // eslint-disable-next-line max-len
+                wrapAsync((req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => changePasswordController(req, res, next)))
 
-    app.route("/api/auth/initialize-user")
-      .post(
-        bodySchemaValidator(initUserScheam),
-        wrapAsync( (req: Request, res: Response, next: NextFunction) =>
-           initUserController(req, res, next)))
-  }
+        app.route("/api/auth/initialize-user")
+            .post(
+                bodySchemaValidator(initUserScheam),
+                wrapAsync((req: Request, res: Response, next: NextFunction) =>
+                    initUserController(req, res, next)))
+    }
 }

@@ -1,5 +1,6 @@
 import { scenarioSchema } from "./project-schema"
 import * as Joi from "joi"
+import { ENVIRONMENT_MAX_LENGTH } from "../controllers/item/create-item-const"
 
 const MAX_NUMBER = 100
 const URL_MAX_LENGTH = 400
@@ -7,6 +8,10 @@ const URL_MAX_LENGTH = 400
 export const paramsSchema = {
   projectName: Joi.string().required(),
   scenarioName: Joi.string().required(),
+}
+
+export const environmentQuerySchema = {
+  environment: Joi.string().max(ENVIRONMENT_MAX_LENGTH).allow(""),
 }
 
 export const paramSchemaNotification = {
@@ -17,6 +22,7 @@ export const paramSchemaNotification = {
 export const querySchema = {
   limit: Joi.number().integer().min(0).max(MAX_NUMBER),
   offset: Joi.number().integer(),
+  environment: environmentQuerySchema.environment,
 }
 
 export const scenarioNotificationBodySchema = {
