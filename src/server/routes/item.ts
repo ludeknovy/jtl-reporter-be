@@ -13,7 +13,7 @@ import {
 import {
     environmentQuerySchema,
     paramsSchema as scenarioParamsSchema,
-    querySchema
+    querySchema,
 } from "../schema-validator/scenario-schema"
 import { getItemsController } from "../controllers/item/get-items-controller"
 import { getItemController } from "../controllers/item/get-item-controller"
