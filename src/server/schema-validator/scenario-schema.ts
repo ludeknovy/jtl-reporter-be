@@ -81,6 +81,7 @@ export const updateScenarioSchema = {
       throughput: Joi.boolean().required(),
       network: Joi.boolean().required(),
       errorRate: Joi.boolean().required(),
+      failures: Joi.boolean().required(),
       apdex: Joi.boolean().required(),
     }).required(),
   }).required(),
