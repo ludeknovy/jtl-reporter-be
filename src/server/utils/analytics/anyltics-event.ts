@@ -15,12 +15,13 @@ export class AnalyticsEvent {
         }
     }
 
-    static reportLabelCount(labelCount) {
+    static reportDetails(labelCount, duration) {
         if (this.isAnalyticEnabled()) {
             analytics.track("reportInformation", {
                 // eslint-disable-next-line camelcase
                 distinct_id: process.env.ANALYTICS_IDENTIFIER,
                 labelCount,
+                duration,
             })
         }
     }

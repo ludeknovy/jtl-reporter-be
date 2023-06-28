@@ -48,14 +48,14 @@ describe("AnalyticEvents", () => {
         it("should not track the event when analytics disabled", function () {
             process.env.OPT_OUT_ANALYTICS = "true"
             const trackMock = (analytics.track as any).mockResolvedValueOnce(undefined)
-            AnalyticsEvent.reportLabelCount(1)
+            AnalyticsEvent.reportDetails(1, 1)
             expect(trackMock).not.toHaveBeenCalled()
 
         })
         it("should track the even only when analytics enabled", function () {
             process.env.OPT_OUT_ANALYTICS = "false"
             const trackMock = (analytics.track as any).mockResolvedValueOnce(undefined)
-            AnalyticsEvent.reportLabelCount(1)
+            AnalyticsEvent.reportDetails(1, 1)
             expect(trackMock).toHaveBeenCalled()
         })
     })
