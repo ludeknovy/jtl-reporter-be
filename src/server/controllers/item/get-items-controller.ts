@@ -8,9 +8,10 @@ const LIMIT = 15
 
 export const getItemsController = async (req: Request, res: Response) => {
   const { projectName, scenarioName } = req.params
-  const { limit = LIMIT, offset = 0 } = req.query
-  const { total } = await db.one(itemsForScenarioCount(projectName, scenarioName))
-  const ids = await db.any(findItemsForScenario(projectName, scenarioName, limit, offset))
+  const { limit = LIMIT, offset = 0, environment } = req.query
+  const nullableEnv = environment === "" ? null : environment
+  const { total } = await db.one(itemsForScenarioCount(projectName, scenarioName, nullableEnv))
+  const ids = await db.any(findItemsForScenario(projectName, scenarioName, nullableEnv, limit, offset))
   const idsBaseUpdate = ids.map(_ => {
     _.base = !_.base ? false : true
     return _

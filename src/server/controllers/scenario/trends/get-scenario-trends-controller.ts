@@ -10,10 +10,13 @@ import { IGetUserAuthInfoRequest } from "../../../middleware/request.model"
 
 export const getScenarioTrendsController = async (req: IGetUserAuthInfoRequest, res: Response) => {
     const { projectName, scenarioName } = req.params
-    const aggregatedData = await db.any(scenarioAggregatedTrends(projectName, scenarioName))
-    const labelData = await db.manyOrNone(scenarioLabelTrends(projectName, scenarioName))
+    const { environment } = req.query
+    const envChecked = environment === "" ? null : environment
+    const aggregatedData = await db.any(scenarioAggregatedTrends(projectName, scenarioName, envChecked))
+    const labelData = await db.manyOrNone(scenarioLabelTrends(projectName, scenarioName, envChecked))
     const scenarioSettings = await db.oneOrNone(getUserScenarioSettings(projectName, scenarioName, req.user.userId))
-    const responseTimeDegradationCurve = await db.manyOrNone(searchResponseTimeDegradation(projectName, scenarioName))
+    const responseTimeDegradationCurve = await db.manyOrNone(
+        searchResponseTimeDegradation(projectName, scenarioName, envChecked))
 
     const labelTrends = labelData.map(data => data.stats.map(value => ({
         percentile90: [data.startDate, value.n0, data.id],

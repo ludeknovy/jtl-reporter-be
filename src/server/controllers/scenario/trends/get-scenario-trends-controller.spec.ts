@@ -36,6 +36,9 @@ describe("getScenarioTrendsController", function () {
                 scenarioName: "scenario-name",
                 projectName: "project-name",
             },
+            query: {
+                environment: null,
+            },
             user: { userId: "userId" },
         }
         await getScenarioTrendsController(
@@ -87,6 +90,9 @@ describe("getScenarioTrendsController", function () {
             params: {
                 scenarioName: "scenario-name",
                 projectName: "project-name",
+            },
+            query: {
+                environment: null,
             },
             user: { userId: "userId" },
         }
@@ -161,6 +167,9 @@ describe("getScenarioTrendsController", function () {
             params: {
                 scenarioName: "scenario-name",
                 projectName: "project-name",
+            },
+            query: {
+                environment: null,
             },
             user: { userId: "userId" },
         }

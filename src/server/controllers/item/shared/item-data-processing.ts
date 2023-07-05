@@ -143,7 +143,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
 
         logger.info(`Item: ${itemId} processing finished`)
         AnalyticsEvent.reportProcessingFinished()
-        AnalyticsEvent.reportLabelCount(labelStats.length)
+        AnalyticsEvent.reportDetails(labelStats.length, overview.duration)
 
         if (scenarioSettings.deleteSamples) {
             logger.info(`Item: ${itemId} deleting samples data`)
