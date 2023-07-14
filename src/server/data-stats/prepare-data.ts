@@ -305,7 +305,6 @@ const processErrors = (groupedErrors: GroupedErrors[], top5Errors: Top5ErrorsRaw
 // eslint-disable-next-line max-len
 const formatGroupedLabelErrors = (groupedLabelErrors: Record<string, LabelError[]>): Top5Errors[] => {
     const formattedLabelErrors: Top5Errors[] = []
-    console.log(groupedLabelErrors)
     for (const [key, value] of Object.entries(groupedLabelErrors)) {
         const errors = value.map((errElement )=> {
             return errElement
