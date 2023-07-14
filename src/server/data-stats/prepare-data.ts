@@ -521,7 +521,7 @@ export interface LabelStats {
     }
 }
 
-interface GroupedErrors {
+export interface GroupedErrors {
     statusCode: string
     responseMessage: string
     failureMessage: string
@@ -540,7 +540,7 @@ interface Errors {
     failureMessage: string
 }
 
-interface Top5ErrorsRaw {
+export interface Top5ErrorsRaw {
     label: string
     status_code: string
     response_message: string
