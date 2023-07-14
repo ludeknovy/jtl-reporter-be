@@ -2,10 +2,10 @@
 
 
 import {
-    calculateDistributedThreads,
+    calculateDistributedThreads, GroupedErrors,
     prepareChartDataForSaving,
     prepareDataForSavingToDb, prepareHistogramDataForSaving,
-    stringToNumber, transformDataForDb, transformMonitoringDataForDb,
+    stringToNumber, Top5ErrorsRaw, transformDataForDb, transformMonitoringDataForDb,
 } from "./prepare-data"
 
 describe("prepare data", () => {
@@ -284,8 +284,24 @@ describe("prepare data", () => {
             const apdex = [
                 { label: "label1", toleration: "40", satisfaction: "200" },
                 { label: "label2", toleration: "30", satisfaction: "100" }]
+            const groupedErrors: GroupedErrors[] = [
+                {
+                    count: "1", failureMessage: "failure message",
+                    responseMessage: "response message", statusCode: "500",
+                }]
+            const labelErrors: Top5ErrorsRaw[] = [
+                {
+                    status_code: "500", row_n: "1", cnt: "4", label: "label1", response_message: "failure message",
+                    failure_message: "failure message",
+                },
+                {
+                    status_code: "500", row_n: "2", cnt: "1", label: "label1", response_message: "failure message",
+                    failure_message: "",
+                },
+            ]
+
             const { overview, labelStats } = prepareDataForSavingToDb(overviewData, labelsData, [],
-                statusCodes, responseFailures, apdex)
+                statusCodes, responseFailures, apdex, groupedErrors, labelErrors)
             expect(overview).toEqual({
                 percentil: 271,
                 maxVu: undefined,

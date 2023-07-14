@@ -48,7 +48,7 @@ export const findItem = (itemId, projectName, scenarioName) => {
 
 export const findItemStats = (testItem) => {
   return {
-    text: "SELECT stats, overview, sut as \"sutOverview\" FROM jtl.item_stat WHERE item_id = $1",
+    text: "SELECT stats, overview, sut as \"sutOverview\", errors FROM jtl.item_stat WHERE item_id = $1",
     values: [testItem],
   }
 }
@@ -68,10 +68,10 @@ export const findRequestStats = (itemId) => {
   }
 }
 
-export const saveItemStats = (itemId, stats, overview, sutOverview) => {
+export const saveItemStats = (itemId, stats, overview, sutOverview, errors) => {
   return {
-    text: "INSERT INTO jtl.item_stat(item_id, stats, overview, sut) VALUES($1, $2, $3, $4);",
-    values: [itemId, stats, overview, sutOverview],
+    text: "INSERT INTO jtl.item_stat(item_id, stats, overview, sut, errors) VALUES($1, $2, $3, $4, $5);",
+    values: [itemId, stats, overview, sutOverview, errors],
   }
 }
 
@@ -597,5 +597,31 @@ export const findItemsWithThresholds = (projectName, scenarioName) => {
         AND s.name = $2
         AND it.threshold_result is not null`,
     values: [projectName, scenarioName],
+  }
+}
+
+export const findGroupedErrors = (itemId) => {
+  return {
+    // eslint-disable-next-line max-len
+    text: `SELECT status_code as "statusCode", response_message as "responseMessage", failure_message as "failureMessage", count(*) FROM jtl.samples
+         WHERE item_id = $1
+         AND success is false
+         AND (nullif(trim(status_code),'') is not null OR nullif(trim(failure_message),'')  is not null)
+        GROUP BY failure_message, response_message, status_code;`,
+    values: [itemId],
+  }
+}
+
+export const findTop5ErrorsByLabel = (itemId) => {
+  return {
+    // eslint-disable-next-line max-len
+    text: `SELECT * FROM(SELECT *, row_number () OVER (partition by label ORDER BY e.cnt DESC) as row_n FROM (SELECT label, status_code, response_message, failure_message, count(*) as cnt
+FROM jtl.samples s
+WHERE item_id = $1
+  AND success is false
+  AND (nullif(trim(status_code),'')  is not null OR nullif(trim(failure_message),'')  is not null)
+GROUP BY label, status_code, response_message, failure_message) e) ae
+WHERE row_n <= 5;`,
+    values: [itemId],
   }
 }
