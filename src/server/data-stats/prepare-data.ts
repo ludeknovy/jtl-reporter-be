@@ -4,9 +4,16 @@ import * as moment from "moment"
 import { logger } from "../../logger"
 import { shouldSkipLabel } from "../controllers/item/utils/labelFilter"
 
-// eslint-disable-next-line max-len
-export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, statusCodeDistr: StatusCodeDistribution[], responseFailures: ResponseMessageFailures[], apdex: Apdex[]):
-    { overview: Overview; labelStats: LabelStats[]; sutOverview: Array<Record<string, unknown>> } => {
+export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, statusCodeDistr: StatusCodeDistribution[],
+                                         responseFailures: ResponseMessageFailures[], apdex: Apdex[],
+                                         groupedErrors: GroupedErrors[], top5Errors: Top5ErrorsRaw[]):
+    // eslint-disable-next-line max-len
+    {
+        overview: Overview
+        labelStats: LabelStats[]
+        sutOverview: Array<Record<string, unknown>>
+        errors: ErrorSummary
+    } => {
     try {
         const startDate = new Date(overviewData.start)
         const endDate = new Date(overviewData.end)
@@ -77,6 +84,7 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, stat
                 avgLatency: roundNumberTwoDecimals(_.avg_latency),
                 avgConnect: roundNumberTwoDecimals(_.avg_connect),
             })),
+            errors: processErrors(groupedErrors, top5Errors),
         }
     } catch(error) {
         throw new Error(`Error while processing query results ${error}`)
@@ -287,6 +295,55 @@ export const getHostnameFromUrl = (url) => {
     }
 }
 
+const processErrors = (groupedErrors: GroupedErrors[], top5Errors: Top5ErrorsRaw[]): ErrorSummary => {
+    return {
+        groupedErrors: groupedErrors.map(err => ({ ...err, count: Number(err.count) })),
+        topErrorsByLabel: formatGroupedLabelErrors(groupErrorsByLabel(top5Errors)),
+    }
+}
+
+// eslint-disable-next-line max-len
+const formatGroupedLabelErrors = (groupedLabelErrors: Record<string, LabelError[]>): Top5Errors[] => {
+    const formattedLabelErrors: Top5Errors[] = []
+    for (const [key, value] of Object.entries(groupedLabelErrors)) {
+        const errors = value.map((errElement )=> {
+            return errElement
+        })
+        const [error1, error2, error3, error4, error5] = errors
+        formattedLabelErrors.push({
+            label: key,
+            error1,
+            error2,
+            error3,
+            error4,
+            error5,
+        })
+    }
+
+
+    return formattedLabelErrors
+}
+
+const groupErrorsByLabel = (top5Errors: Top5ErrorsRaw[]): Record<string, Array<{ count: number; error: string }>> => {
+    return top5Errors.reduce((acc, curr) => {
+        const label = curr.label
+        if (label && !acc[label]) {
+            acc[label] = []
+        }
+        const error = getError(curr)
+        acc[label].push({ error, count: curr.cnt })
+        return acc
+    }, {})
+}
+
+const getError = (line: Top5ErrorsRaw) => {
+    if (!line.failure_message || line.failure_message.length === 0) {
+        return `${line.status_code}/${line.response_message}`
+    }
+    return line.failure_message
+
+}
+
 export interface ItemDbData {
     itemStats: any
     overview: any
@@ -463,3 +520,42 @@ export interface LabelStats {
         satisfaction?: number
     }
 }
+
+export interface GroupedErrors {
+    statusCode: string
+    responseMessage: string
+    failureMessage: string
+    count: string
+}
+
+interface ErrorSummary {
+    groupedErrors: Errors[]
+    topErrorsByLabel: Top5Errors[]
+}
+
+interface Errors {
+    count: number
+    statusCode: string
+    responseMessage: string
+    failureMessage: string
+}
+
+export interface Top5ErrorsRaw {
+    label: string
+    status_code: string
+    response_message: string
+    failure_message: string
+    cnt: string
+    row_n: string
+}
+
+interface Top5Errors {
+    label: string
+    error1: LabelError
+    error2: LabelError
+    error3: LabelError
+    error4: LabelError
+    error5: LabelError
+}
+
+interface LabelError { count: number; error: string }
