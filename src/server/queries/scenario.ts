@@ -192,6 +192,7 @@ export const getScenarioSettings = (projectName, scenarioName) => {
 }
 
 
+
 export const currentScenarioMetrics = (projectName, scenarioName, vu) => {
   return {
     text: `SELECT avg((st.overview->>'percentil')::numeric) as "percentile", avg((st.overview->>'throughput')::numeric) as "throughput", avg((st.overview->>'errorRate')::numeric) as "errorRate" FROM jtl.item_stat as st

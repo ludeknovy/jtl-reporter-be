@@ -23,7 +23,7 @@ import {
     calculateApdexValues,
     updateItemApdexSettings,
     chartOverviewStatusCodesQuery,
-    responseTimePerLabelHistogram, findRawData, getBaselineItemWithStats,
+    responseTimePerLabelHistogram, findRawData, getBaselineItemWithStats, findGroupedErrors, findTop5ErrorsByLabel
 } from "../../../queries/items"
 import { ReportStatus } from "../../../queries/items.model"
 import { getScenarioSettings } from "../../../queries/scenario"
@@ -52,6 +52,8 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         const rawData = await db.manyOrNone(findRawData(itemId))
         const rawDataArray = rawData?.map(row => [moment(row.timestamp).valueOf(), row.elapsed])
         const rawDataDownSampled = downsampleData(rawDataArray, MAX_SCATTER_CHART_POINTS)
+        const groupedErrors = await db.manyOrNone(findGroupedErrors(itemId))
+        const top5ErrorsByLabel = await db.manyOrNone(findTop5ErrorsByLabel(itemId))
 
         if (aggOverview.number_of_sut_hostnames > 1) {
             sutMetrics = await db.many(sutOverviewQuery(itemId))
@@ -72,9 +74,9 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         const {
             overview,
             overview: { duration },
-            labelStats, sutOverview,
+            labelStats, sutOverview, errors,
         } = prepareDataForSavingToDb(aggOverview, aggLabel, sutMetrics,
-            statusCodeDistribution, responseFailures, apdex)
+            statusCodeDistribution, responseFailures, apdex, groupedErrors, top5ErrorsByLabel)
         const responseTimeHistogram = prepareHistogramDataForSaving(responseTimePerLabelDistribution)
         const defaultInterval = chartQueryOptionInterval(duration)
         let chartData
@@ -135,7 +137,8 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         await sendNotifications(projectName, scenarioName, itemId, overview)
 
         await db.tx(async t => {
-            await t.none(saveItemStats(itemId, JSON.stringify(labelStats), overview, JSON.stringify(sutOverview)))
+            await t.none(saveItemStats(itemId, JSON.stringify(labelStats),
+                overview, JSON.stringify(sutOverview), JSON.stringify(errors)))
             await t.none(savePlotData(itemId, JSON.stringify(chartData), JSON.stringify(extraChartData),
                 JSON.stringify(responseTimeHistogram), JSON.stringify(rawDataDownSampled)))
             await t.none(updateItem(itemId, ReportStatus.Ready, overview.startDate))
