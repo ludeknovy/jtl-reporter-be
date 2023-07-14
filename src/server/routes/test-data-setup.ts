@@ -53,6 +53,7 @@ export class TestDataSetup {
                         await db.any(saveItemStats(
                             item.id, JSON.stringify(testStats),
                             JSON.stringify(testOverview),
+                            JSON.stringify([]),
                             JSON.stringify([])))
                         res.status(StatusCode.Ok).json({ itemId: item.id })
                     } else if (state === States.EmptyDb) {
