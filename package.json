@@ -39,7 +39,7 @@
     "node-pg-migrate": "^6.2.2",
     "pg": "^8.11.0",
     "pg-promise": "^10.15.4",
-    "swagger-ui-express": "^4.5.0",
+    "swagger-ui-express": "^4.6.3",
     "uuid": "^9.0.0",
     "winston": "^3.8.2",
     "xlsx": "^0.18.5"
