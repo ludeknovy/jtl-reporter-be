@@ -22,7 +22,7 @@ export const getItemController = async (req: IGetUserAuthInfoRequest, res: Respo
     status, hostname, reportStatus, thresholds,
     analysisEnabled, zeroErrorToleranceEnabled, topMetricsSettings, name, apdexSettings,
   } = await db.one(findItem(itemId, projectName, scenarioName))
-  const { stats: statistics, overview, sutOverview } = await db.one(findItemStats(itemId))
+  const { stats: statistics, overview, sutOverview, errors } = await db.one(findItemStats(itemId))
 
   const userSettings = await db.oneOrNone(getUserScenarioSettings(projectName, scenarioName, userId))
 
@@ -54,6 +54,7 @@ export const getItemController = async (req: IGetUserAuthInfoRequest, res: Respo
     userSettings: {
       requestStats: userSettings?.request_stats_settings,
     },
+    errorSummary: errors,
   })
 }
 
