@@ -447,7 +447,20 @@ describe("prepare data", () => {
                 statusCode: "200",
                 count: 10,
             }]
-            const chartData = prepareChartDataForSaving({ overviewData, labelData, interval: 450, statusCodeData })
+            const threadsPerThreadGroup = [
+                {
+                    time: new Date("2019-04-16T07:20:18.000Z").toString(),
+                    thread_name: "thread name",
+                    threads: "1",
+                },
+                {
+                    time: new Date("2019-04-16T07:20:19.000Z").toString(),
+                    thread_name: "thread name",
+                    threads: "2",
+                },
+            ]
+            const chartData = prepareChartDataForSaving(
+                { overviewData, labelData, interval: 450, statusCodeData, threadsPerThreadGroup })
             expect(chartData).toEqual({
                 maxResponseTime: [{
                     data: [[1555399218000, 1233.1]],
