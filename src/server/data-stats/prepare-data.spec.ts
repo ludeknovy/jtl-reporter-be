@@ -54,7 +54,7 @@ describe("prepare data", () => {
                 timeStamp: "1555399218911",
                 allThreads: "1",
                 grpThreads: "1",
-                threadName: "Thread 1-1",
+                threadName: "Thread name 1-1",
                 responseCode: "200",
                 responseMessage: "",
             }
@@ -75,7 +75,7 @@ describe("prepare data", () => {
                 allThreads: 1,
                 grpThreads: 1,
                 itemId: "itemId",
-                threadName: "Thread 1-1",
+                threadName: "Thread name",
                 responseCode: "200",
                 responseMessage: "",
                 sutHostname: undefined,
@@ -447,7 +447,20 @@ describe("prepare data", () => {
                 statusCode: "200",
                 count: 10,
             }]
-            const chartData = prepareChartDataForSaving({ overviewData, labelData, interval: 450, statusCodeData })
+            const threadsPerThreadGroup = [
+                {
+                    time: new Date("2019-04-16T07:20:18.000Z").toString(),
+                    thread_name: "thread name",
+                    threads: "1",
+                },
+                {
+                    time: new Date("2019-04-16T07:20:19.000Z").toString(),
+                    thread_name: "thread name",
+                    threads: "2",
+                },
+            ]
+            const chartData = prepareChartDataForSaving(
+                { overviewData, labelData, interval: 450, statusCodeData, threadsPerThreadGroup })
             expect(chartData).toEqual({
                 maxResponseTime: [{
                     data: [[1555399218000, 1233.1]],
@@ -525,6 +538,10 @@ describe("prepare data", () => {
                 errorRate: [{
                     data: [[1555399218000, 2]],
                     name: "test-label",
+                }],
+                threadsPerThreadGroup: [{
+                    data: [[1555399218000, 1], [1555399219000, 2]],
+                    name: "thread name",
                 }],
             })
         })

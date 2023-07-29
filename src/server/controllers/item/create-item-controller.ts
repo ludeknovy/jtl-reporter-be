@@ -158,6 +158,11 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
           prop: "failureMessage",
           def: null,
         },
+        {
+          name: "thread_name",
+          prop: "threadName",
+          def: null,
+        },
       ], { table: new pg.helpers.TableName({ table: "samples", schema: "jtl" }) })
 
 
