@@ -109,6 +109,7 @@ export const prepareChartDataForSaving = (
         interval,
         distributedThreads,
         statusCodeData,
+        threadsPerThreadGroup,
     }: PrepareChartsData) => {
     const intervalSec = interval / 1000
     const labels = [...new Set(labelData.map((_) => _.label))]
@@ -117,6 +118,7 @@ export const prepareChartDataForSaving = (
         threads: distributedThreads?.length > 0
             ? calculateDistributedThreads(distributedThreads)
             : overviewData.map((_) => [moment(_.time).valueOf(), _.threads]) as Array<[number, number]>,
+        threadsPerThreadGroup: calculateThreadsPerGroup(threadsPerThreadGroup),
         overAllFailRate: {
             data: overviewData.map((_) => [moment(_.time).valueOf(), roundNumberTwoDecimals(_.error_rate * 100)]),
             name: "errors",
@@ -259,6 +261,7 @@ export const transformDataForDb = (_, itemId, labelFilterSettings) => {
         _.success = _.success === "true"
         _.sutHostname = getHostnameFromUrl(_.URL)
         _.itemId = itemId
+        _.threadName = getThreadNameWithoutActiveThreadNumbers(_.threadName)
         return _
     } catch(error) {
         logger.error(`Error while parsing data: ${error}`)
@@ -306,7 +309,7 @@ const processErrors = (groupedErrors: GroupedErrors[], top5Errors: Top5ErrorsRaw
 const formatGroupedLabelErrors = (groupedLabelErrors: Record<string, LabelError[]>): Top5Errors[] => {
     const formattedLabelErrors: Top5Errors[] = []
     for (const [key, value] of Object.entries(groupedLabelErrors)) {
-        const errors = value.map((errElement )=> {
+        const errors = value.map((errElement) => {
             return errElement
         })
         const [error1, error2, error3, error4, error5] = errors
@@ -341,7 +344,23 @@ const getError = (line: Top5ErrorsRaw) => {
         return `${line.status_code}/${line.response_message}`
     }
     return line.failure_message
+}
 
+const getThreadNameWithoutActiveThreadNumbers = (threadName: string) => {
+    if (!threadName || threadName.length === 0) {
+        return
+    }
+    return threadName.replace(/\d+-\d+$/, "").trim()
+}
+
+const calculateThreadsPerGroup = (threadsPerThreadGroup: ThreadsPerThreadGroup[]) => {
+    const threadGroupNames = [...new Set(threadsPerThreadGroup.map(row => row.thread_name))]
+    return threadGroupNames.map(threadGroupName => ({
+        data: threadsPerThreadGroup
+            .filter(row => row.thread_name === threadGroupName)
+            .map((row) => [moment(row.time).valueOf(), stringToNumber(row.threads, 10)]),
+        name: threadGroupName,
+    }))
 }
 
 export interface ItemDbData {
@@ -471,11 +490,16 @@ interface Apdex {
     toleration: string
 }
 
-interface StatuCodesData {
+interface StatusCodesData {
     time: string
     statusCode: string
     count: number
+}
 
+interface ThreadsPerThreadGroup {
+    time: string
+    thread_name: string
+    threads: string
 }
 
 interface PrepareChartsData {
@@ -483,7 +507,8 @@ interface PrepareChartsData {
     interval: number
     labelData: ChartLabelData[]
     overviewData: ChartOverviewData[]
-    statusCodeData: StatuCodesData[]
+    statusCodeData: StatusCodesData[]
+    threadsPerThreadGroup: ThreadsPerThreadGroup[]
 }
 
 interface ResponseTimeHistogram {
@@ -558,4 +583,7 @@ interface Top5Errors {
     error5: LabelError
 }
 
-interface LabelError { count: number; error: string }
+interface LabelError {
+    count: number
+    error: string
+}
