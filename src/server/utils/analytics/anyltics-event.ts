@@ -6,6 +6,15 @@ export class AnalyticsEvent {
         return !(process.env.OPT_OUT_ANALYTICS === "true")
     }
 
+    static reportProcessingStarted() {
+        if (this.isAnalyticEnabled()) {
+            analytics.track("reportProcessingStarted", {
+                // eslint-disable-next-line camelcase
+                distinct_id: process.env.ANALYTICS_IDENTIFIER,
+            })
+        }
+    }
+
     static reportProcessingFinished() {
         if (this.isAnalyticEnabled()) {
             analytics.track("reportProcessingFinished", {

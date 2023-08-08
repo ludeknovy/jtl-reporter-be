@@ -23,6 +23,7 @@ import {
   RESOURCES_LINK_MAX_LENGTH,
   TEST_NAME_MAX_LENGTH,
 } from "./create-item-const"
+import { AnalyticsEvent } from "../../utils/analytics/anyltics-event"
 
 const pg = pgp()
 
@@ -70,7 +71,7 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
       return next(boom.badRequest(`The following fields are too long: ${failedValidations.join(", ")}`))
     }
 
-
+    AnalyticsEvent.reportProcessingStarted()
     logger.info(`Starting new item processing for scenario: ${scenarioName}`)
     try {
 
