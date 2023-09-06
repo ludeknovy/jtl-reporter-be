@@ -28,6 +28,7 @@ import { AllowedRoles, authorizationMiddleware } from "../middleware/authorizati
 import { IGetUserAuthInfoRequest } from "../middleware/request.model"
 import { postScenarioTrendsSettings } from "../controllers/scenario/trends/update-scenario-trends-settings-controller"
 import { getScenarioEnvironmentController } from "../controllers/scenario/get-scenario-environment-controller"
+import { projectExistsMiddleware } from "../middleware/project-exists-middleware"
 
 export class ScenarioRoutes {
 
@@ -38,6 +39,7 @@ export class ScenarioRoutes {
                 authenticationMiddleware,
                 authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(projectNameParam),
+                projectExistsMiddleware,
                 wrapAsync((req: Request, res: Response) => getScenariosController(req, res)))
 
             .post(
@@ -45,6 +47,7 @@ export class ScenarioRoutes {
                 authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(projectNameParam),
                 bodySchemaValidator(scenarioSchema),
+                projectExistsMiddleware,
                 wrapAsync((req: Request, res: Response, next: NextFunction) =>
                     createScenarioController(req, res, next)))
 
@@ -53,6 +56,7 @@ export class ScenarioRoutes {
                 authenticationMiddleware,
                 authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(paramsSchema),
+                projectExistsMiddleware,
                 wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => getScenarioController(req, res))
             )
 
@@ -61,12 +65,14 @@ export class ScenarioRoutes {
                 authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(paramsSchema),
                 bodySchemaValidator(updateScenarioSchema),
+                projectExistsMiddleware,
                 wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => updateScenarioController(req, res)))
 
             .delete(
                 authenticationMiddleware,
                 authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(paramsSchema),
+                projectExistsMiddleware,
                 wrapAsync((req: Request, res: Response) => deleteScenarioController(req, res)))
 
         app.route("/api/projects/:projectName/scenarios/:scenarioName/notifications")
@@ -74,6 +80,7 @@ export class ScenarioRoutes {
                 authenticationMiddleware,
                 authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(paramsSchema),
+                projectExistsMiddleware,
                 wrapAsync((req: Request, res: Response) => getScenarioNotificationsController(req, res)))
 
             .post(
@@ -81,6 +88,7 @@ export class ScenarioRoutes {
                 authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(paramsSchema),
                 bodySchemaValidator(scenarioNotificationBodySchema),
+                projectExistsMiddleware,
                 wrapAsync((req: Request, res: Response) => createScenarioNotificationController(req, res)))
 
 
@@ -89,6 +97,7 @@ export class ScenarioRoutes {
                 authenticationMiddleware,
                 authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(paramSchemaNotification),
+                projectExistsMiddleware,
                 wrapAsync((req: Request, res: Response) => deleteScenarioNotificationController(req, res)))
 
         app.route("/api/projects/:projectName/scenarios/:scenarioName/trends")
@@ -97,6 +106,7 @@ export class ScenarioRoutes {
                 authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(paramsSchema),
                 queryParamsValidator(environmentQuerySchema),
+                projectExistsMiddleware,
                 wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => getScenarioTrendsController(req, res)))
 
         app.route("/api/projects/:projectName/scenarios/:scenarioName/trends/settings")
@@ -105,6 +115,7 @@ export class ScenarioRoutes {
                 authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(paramsSchema),
                 bodySchemaValidator(scenarioTrendsSettings),
+                projectExistsMiddleware,
                 wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => postScenarioTrendsSettings(req, res)))
 
         app.route("/api/projects/:projectName/scenarios/:scenarioName/environment")
@@ -112,6 +123,7 @@ export class ScenarioRoutes {
                 authenticationMiddleware,
                 authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(paramsSchema),
+                projectExistsMiddleware,
                 wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => getScenarioEnvironmentController(req, res)))
     }
 }

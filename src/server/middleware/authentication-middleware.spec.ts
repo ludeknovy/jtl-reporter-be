@@ -25,7 +25,7 @@ describe("AuthenticationMiddleware", () => {
   })
 
   describe("Query token", () => {
-    it("should return unathorized when invalid query token provided", async () => {
+    it("should return unauthorized when invalid query token provided", async () => {
       await authenticationMiddleware({
         headers: {},
         query: { token: "123" },

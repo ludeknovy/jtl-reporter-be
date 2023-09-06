@@ -18,7 +18,7 @@ export const createNewProject = projectName => {
 export const findProjectId = projectName => {
   return {
     name: "find-project-id",
-    text: "SELECT id FROM jtl.projects WHERE project_name = $1 AND",
+    text: "SELECT id FROM jtl.projects WHERE project_name = $1",
     values: [projectName],
   }
 }

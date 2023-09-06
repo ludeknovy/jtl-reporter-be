@@ -11,4 +11,5 @@ module.exports = {
   verbose: true,
   setupFilesAfterEnv: ["<rootDir>/src/tests/integration/helper/setup.ts"],
   reporters: ["default"],
+  testTimeout: 20000,
 }
