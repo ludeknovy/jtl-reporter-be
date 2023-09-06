@@ -50,7 +50,7 @@ describe("Items", () => {
           .post(`/api/projects/test-project/scenarios/test-scenario/items/${itemId}/stop-async`)
           .set(__tokenHeaderKey__, token)
           .set("Accept", "application/json")
-          .send({ environment: "test" })
+          .send({ status: "1" })
           .expect(StatusCode.Ok)
     })
     it("should return 404 when project does not exist", async () => {
