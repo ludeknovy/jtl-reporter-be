@@ -59,7 +59,7 @@ describe("Items", () => {
           .post(`/api/projects/test-project-1/scenarios/test-scenario/items/${itemId}/stop-async`)
           .set(__tokenHeaderKey__, token)
           .set("Accept", "application/json")
-          .send({ environment: "test" })
+          .send({ status: "1" })
           .expect(StatusCode.NotFound)
     })
   })
