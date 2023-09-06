@@ -15,7 +15,10 @@ export const createItemAsyncController = async (req: IGetUserAuthInfoRequest, re
 
     logger.info(`Creating new item for scenario: ${scenarioName}`)
     try {
-        await upsertScenario(projectName, scenarioName)
+        const scenarioExists = await upsertScenario(projectName, scenarioName)
+        if (!scenarioExists) {
+            return res.status(StatusCode.NotFound).json({ message: "scenario not found" })
+        }
 
         const item = await db.one(createNewItem(
             scenarioName,
