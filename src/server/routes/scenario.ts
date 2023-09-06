@@ -28,7 +28,7 @@ import { AllowedRoles, authorizationMiddleware } from "../middleware/authorizati
 import { IGetUserAuthInfoRequest } from "../middleware/request.model"
 import { postScenarioTrendsSettings } from "../controllers/scenario/trends/update-scenario-trends-settings-controller"
 import { getScenarioEnvironmentController } from "../controllers/scenario/get-scenario-environment-controller"
-import { projectExistsMiddleware } from "../middleware/project-scenario-exists"
+import { projectExistsMiddleware } from "../middleware/project-exists-middleware"
 
 export class ScenarioRoutes {
 

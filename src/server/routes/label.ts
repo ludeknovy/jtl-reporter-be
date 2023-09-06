@@ -8,7 +8,7 @@ import { getLabelVirtualUsersController } from "../controllers/label/get-label-v
 import { getLabelErrorsController } from "../controllers/label/get-label-errors-controller"
 import { AllowedRoles, authorizationMiddleware } from "../middleware/authorization-middleware"
 import { authenticationMiddleware } from "../middleware/authentication-middleware"
-import { projectExistsMiddleware } from "../middleware/project-scenario-exists"
+import { projectExistsMiddleware } from "../middleware/project-exists-middleware"
 
 export class LabelRoutes {
 
