@@ -11,4 +11,5 @@ export const projectExistsMiddleware = async (req: IGetUserAuthInfoRequest, res:
     if (!project) {
         return next(boom.notFound("Project not found"))
     }
+    next()
 }

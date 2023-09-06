@@ -13,6 +13,7 @@ import { getProjectController } from "../controllers/project/get-project-control
 import { AllowedRoles, authorizationMiddleware } from "../middleware/authorization-middleware"
 import { authenticationMiddleware } from "../middleware/authentication-middleware"
 import { IGetUserAuthInfoRequest } from "../middleware/request.model"
+import { projectExistsMiddleware } from "../middleware/project-exists-middleware"
 
 export class ProjectRoutes {
     routes(app: express.Application): void {
@@ -47,12 +48,14 @@ export class ProjectRoutes {
                 authenticationMiddleware,
                 authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(projectNameParam),
+                projectExistsMiddleware,
                 wrapAsync((req: Request, res: Response) => deleteProjectController(req, res)))
 
             .get(
                 authenticationMiddleware,
                 authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(projectNameParam),
+                projectExistsMiddleware,
                 wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => getProjectController(req, res)))
 
 
@@ -61,11 +64,9 @@ export class ProjectRoutes {
                 authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(projectNameParam),
                 bodySchemaValidator(updateProjectSchema),
+                projectExistsMiddleware,
                 wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => updateProjectController(req, res)))
 
-
-        app.route("/api/projects/:projectName/allowed-users")
-            .get()
     }
 
 }
