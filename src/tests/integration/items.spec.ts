@@ -43,6 +43,26 @@ describe("Items", () => {
           .expect(StatusCode.NotFound)
     })
   })
+  describe("POST /api/projects/:projectName/scenarios/:scenarioName/items/{itemId}/stop-async", () => {
+    it("should be able to stop async item", async () => {
+      const { data: { itemId } } = await stateSetup(States.ExistingTestItem)
+      await request(__server__)
+          .post(`/api/projects/test-project/scenarios/test-scenario/items/${itemId}/stop-async`)
+          .set(__tokenHeaderKey__, token)
+          .set("Accept", "application/json")
+          .send({ environment: "test" })
+          .expect(StatusCode.Ok)
+    })
+    it("should return 404 when project does not exist", async () => {
+      const { data: { itemId } } = await stateSetup(States.ExistingTestItem)
+      await request(__server__)
+          .post(`/api/projects/test-project-1/scenarios/test-scenario/items/${itemId}/stop-async`)
+          .set(__tokenHeaderKey__, token)
+          .set("Accept", "application/json")
+          .send({ environment: "test" })
+          .expect(StatusCode.NotFound)
+    })
+  })
   describe("PUT /projects/{projectName}/scenarios/{scenarioName}/items/{itemId}", () => {
     it("should be able to update test item", async () => {
       const { data: { itemId } } = await stateSetup(States.ExistingTestItem)
