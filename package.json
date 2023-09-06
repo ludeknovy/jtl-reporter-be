@@ -20,7 +20,7 @@
   "dependencies": {
     "@breejs/ts-worker": "^2.0.0",
     "axios": "^0.27.2",
-    "bcrypt": "^5.1.0",
+    "bcrypt": "^5.1.1",
     "body-parser": "^1.20.1",
     "boom": "^7.2.0",
     "bree": "^9.1.3",
