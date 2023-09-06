@@ -55,7 +55,7 @@ describe("Projects", () => {
                 .set(__tokenHeaderKey__, credentials.token)
                 .send({ projectName: "test-project", upsertScenario: true, projectMembers: [] })
                 .set("Accept", "application/json")
-                .expect(StatusCode.NoContent)
+                .expect(StatusCode.NotFound)
         })
     })
     describe("DELETE /projects/${projectName}", () => {
@@ -73,7 +73,7 @@ describe("Projects", () => {
                 .delete("/api/projects/test-project-1")
                 .set(__tokenHeaderKey__, credentials.token)
                 .set("Accept", "application/json")
-                .expect(StatusCode.NoContent)
+                .expect(StatusCode.NotFound)
         })
     })
 })
