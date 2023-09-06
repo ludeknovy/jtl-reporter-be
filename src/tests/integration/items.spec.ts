@@ -33,6 +33,15 @@ describe("Items", () => {
         .send({ environment: "test" })
         .expect(StatusCode.Created)
     })
+    it("should return 404 when project does not exist", async () => {
+      await stateSetup(States.ExistingScenario)
+      await request(__server__)
+          .post("/api/projects/test-project-1/scenarios/test-scenario/items/start-async")
+          .set(__tokenHeaderKey__, token)
+          .set("Accept", "application/json")
+          .send({ environment: "test" })
+          .expect(StatusCode.NotFound)
+    })
   })
   describe("PUT /projects/{projectName}/scenarios/{scenarioName}/items/{itemId}", () => {
     it("should be able to update test item", async () => {
@@ -47,6 +56,19 @@ describe("Items", () => {
           base: true,
         })
         .expect(StatusCode.NoContent)
+    })
+    it("should return 404 when project does not exist", async () => {
+      const { data: { itemId } } = await stateSetup(States.ExistingTestItem)
+      await request(__server__)
+          .put(`/api/projects/test-project-1/scenarios/test-scenario/items/${itemId}`)
+          .set(__tokenHeaderKey__, credentials.token)
+          .set("Accept", "application/json")
+          .send({
+            environment: "new-test-environment",
+            note: "new-test-note",
+            base: true,
+          })
+          .expect(StatusCode.NotFound)
     })
   })
   describe("DELETE /projects/{projectName}/scenarios/{scenarioName}/items/{itemId}", () => {
@@ -63,6 +85,19 @@ describe("Items", () => {
         })
         .expect(StatusCode.NoContent)
     })
+    it("should return 404 when project does not exist", async () => {
+      const { data: { itemId } } = await stateSetup(States.ExistingTestItem)
+      await request(__server__)
+          .delete(`/api/projects/test-project-1/scenarios/test-scenario/items/${itemId}`)
+          .set(__tokenHeaderKey__, credentials.token)
+          .set("Accept", "application/json")
+          .send({
+            environment: "new-test-environment",
+            note: "new-test-note",
+            base: true,
+          })
+          .expect(StatusCode.NotFound)
+    })
   })
   describe("POST /projects/{projectName}/scenarios/{scenarioName}/items/{itemId}/share-tokens", () => {
     it("should be able to create new share token", async () => {
@@ -76,6 +111,17 @@ describe("Items", () => {
         })
         .expect(StatusCode.Created)
     })
+    it("should return 404 when project does not exist", async () => {
+      const { data: { itemId } } = await stateSetup(States.ExistingTestItem)
+      await request(__server__)
+          .post(`/api/projects/test-project-1/scenarios/test-scenario/items/${itemId}/share-tokens`)
+          .set(__tokenHeaderKey__, credentials.token)
+          .set("Accept", "application/json")
+          .send({
+            name: "test-token",
+          })
+          .expect(StatusCode.NotFound)
+    })
   })
   describe("POST /projects/{projectName}/scenarios/{scenarioName}/items/{itemId}/custom-chart-settings", () => {
     it("should be able to upsert chart settings", async () => {
@@ -87,6 +133,15 @@ describe("Items", () => {
         .send([{ name: "test", metric: "test" }])
         .expect(StatusCode.Ok)
     })
+    it("should return 404 when project does not exist", async () => {
+      const { data: { itemId } } = await stateSetup(States.ExistingTestItem)
+      await request(__server__)
+          .post(`/api/projects/test-project-1/scenarios/test-scenario/items/${itemId}/custom-chart-settings`)
+          .set(__tokenHeaderKey__, credentials.token)
+          .set("Accept", "application/json")
+          .send([{ name: "test", metric: "test" }])
+          .expect(StatusCode.NotFound)
+    })
   })
   describe("GET /projects/{projectName}/scenarios/{scenarioName}/items/{itemId}/custom-chart-settings", () => {
     it("should be able to upsert chart settings", async () => {
@@ -96,6 +151,14 @@ describe("Items", () => {
         .set(__tokenHeaderKey__, credentials.token)
         .set("Accept", "application/json")
         .expect(StatusCode.Ok)
+    })
+    it("should return 404 when project does not exist", async () => {
+      const { data: { itemId } } = await stateSetup(States.ExistingTestItem)
+      await request(__server__)
+          .get(`/api/projects/test-project-1/scenarios/test-scenario/items/${itemId}/custom-chart-settings`)
+          .set(__tokenHeaderKey__, credentials.token)
+          .set("Accept", "application/json")
+          .expect(StatusCode.NotFound)
     })
   })
   describe("POST /projects/{projectName}/scenarios/{scenarioName}/items", () => {
@@ -134,6 +197,18 @@ describe("Items", () => {
         .field("status", ItemStatus.Passed)
         .field("hostname", "localhost")
         .expect(StatusCode.Ok)
+    })
+    it("should return 404 when project does not exist", async () => {
+      await stateSetup(States.ExistingScenario)
+      await request(__server__)
+          .post("/api/projects/test-project-1/scenarios/test-scenario/items")
+          .set(__tokenHeaderKey__, credentials.token)
+          .attach("kpi", path.join(__dirname, "./test-data/kpi.jtl"), "kpi.jtl")
+          .field("environment", "test-environment")
+          .field("note", "test-note")
+          .field("status", ItemStatus.Passed)
+          .field("hostname", "localhost")
+          .expect(StatusCode.NotFound)
     })
   })
 })
