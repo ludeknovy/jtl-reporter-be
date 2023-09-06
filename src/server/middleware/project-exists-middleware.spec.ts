@@ -6,7 +6,7 @@ import Boom = require("boom")
 
 jest.mock("../../db/db")
 
-describe.only("projectExistsMiddleware", () => {
+describe("projectExistsMiddleware", () => {
     const nextFunction: NextFunction = jest.fn()
 
     beforeEach(() => {
