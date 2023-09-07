@@ -57,6 +57,7 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, stat
                     n9: _.n99,
                     n5: _.n95,
                     n0: _.n90,
+                    n50: _.n50,
                     statusCodes: statusCodeDistr
                         .filter((sd) => sd.label === _.label)
                         .map((sd) => ({ statusCode: sd.status_code, count: sd.count })),
