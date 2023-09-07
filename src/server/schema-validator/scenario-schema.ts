@@ -75,6 +75,7 @@ export const updateScenarioSchema = {
       standardDeviation: Joi.boolean().required(),
       min: Joi.boolean().required(),
       max: Joi.boolean().required(),
+      p50: Joi.boolean().required(),
       p90: Joi.boolean().required(),
       p95: Joi.boolean().required(),
       p99: Joi.boolean().required(),
