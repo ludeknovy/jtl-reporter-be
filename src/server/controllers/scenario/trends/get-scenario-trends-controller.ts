@@ -18,13 +18,16 @@ export const getScenarioTrendsController = async (req: IGetUserAuthInfoRequest, 
     const responseTimeDegradationCurve = await db.manyOrNone(
         searchResponseTimeDegradation(projectName, scenarioName, envChecked))
 
-    const labelTrends = labelData.map(data => data.stats.map(value => ({
-        percentile90: [data.startDate, value.n0, data.id],
-        errorRate: [data.startDate, value.errorRate, data.id],
-        throughput: [data.startDate, value.throughput, data.id],
-        label: value.label,
-    })))
+    labelData.sort(sortByDateAsc)
 
+    const labelTrends = labelData.map(data => data.stats.map(value => {
+        return {
+            percentile90: [data.startDate, value.n0, data.id],
+            errorRate: [data.startDate, value.errorRate, data.id],
+            throughput: [data.startDate, value.throughput, data.id],
+            label: value.label,
+        }
+    }))
 
     const adjusted = {}
 
@@ -38,6 +41,7 @@ export const getScenarioTrendsController = async (req: IGetUserAuthInfoRequest, 
             adjusted[value.label].throughput.push(value.throughput)
         })
     })
+
 
     const networkAdjustedData = aggregatedData.map((_) => {
         const { bytesPerSecond, bytesSentPerSecond } = _.overview
@@ -66,7 +70,7 @@ export const getScenarioTrendsController = async (req: IGetUserAuthInfoRequest, 
     })
 
     res.status(StatusCode.Ok).json({
-        aggregatedTrends: networkAdjustedData.sort(sortByDateAsc),
+        aggregatedTrends: networkAdjustedData.sort(sortAggDataByDateAsc),
         responseTimeDegradationCurve: responseTimeDegradationCurveSeries,
         labelTrends: adjusted,
         userSettings: {
@@ -80,7 +84,12 @@ export const getScenarioTrendsController = async (req: IGetUserAuthInfoRequest, 
     })
 }
 
-const sortByDateAsc = (a, b): number => {
+const sortAggDataByDateAsc = (a, b): number => {
     return new Date(a.overview.startDate).getTime() - new Date(b.overview.startDate).getTime()
+}
+
+const sortByDateAsc = (a, b): number => {
+    return new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+
 }
 
