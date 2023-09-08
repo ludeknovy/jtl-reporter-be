@@ -140,6 +140,7 @@ describe("Scenario", () => {
                             avg: true,
                             min: true,
                             max: true,
+                            p50: true,
                             p90: true,
                             p95: true,
                             p99: true,
