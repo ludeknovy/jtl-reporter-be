@@ -6,7 +6,7 @@ import { StatusCode } from "../../utils/status-code"
 
 export const updateGlobalSettingsController = async (req: IGetUserAuthInfoRequest, res: Response) => {
     const updatedSettings = req.body
-    await db.none(updateGlobalSettings(updatedSettings.projectAutoprovisioning))
+    await db.none(updateGlobalSettings(updatedSettings.projectAutoProvisioning))
     return res.status(StatusCode.NoContent).send()
 
 }

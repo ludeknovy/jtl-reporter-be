@@ -6,8 +6,8 @@ import { IGetUserAuthInfoRequest } from "../middleware/request.model"
 import { Response } from "express"
 import { getGlobalSettingsController } from "../controllers/global-settings/get-global-settings-controller"
 import { updateGlobalSettingsController } from "../controllers/global-settings/update-global-settings-controller"
-import {bodySchemaValidator} from "../schema-validator/schema-validator-middleware";
-import {globalSettingsBodySchema} from "../schema-validator/global-settings";
+import { bodySchemaValidator } from "../schema-validator/schema-validator-middleware"
+import { globalSettingsBodySchema } from "../schema-validator/global-settings"
 
 export class GlobalSettings {
     routes(app: express.Application): void {

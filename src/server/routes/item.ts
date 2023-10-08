@@ -33,7 +33,7 @@ import { getItemChartSettingsController } from "../controllers/item/get-item-cha
 import { AllowedRoles, authorizationMiddleware } from "../middleware/authorization-middleware"
 import { authenticationMiddleware } from "../middleware/authentication-middleware"
 import { getRequestStatsExportController } from "../controllers/item/get-request-stats-export-controller"
-import { projectExistsMiddleware } from "../middleware/project-exists-middleware"
+import {projectAutoProvisioningMiddleware, projectExistsMiddleware} from "../middleware/project-exists-middleware"
 
 export class ItemsRoutes {
 
@@ -52,7 +52,7 @@ export class ItemsRoutes {
                 authenticationMiddleware,
                 authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(newItemParamSchema),
-                projectExistsMiddleware,
+                projectAutoProvisioningMiddleware,
                 createItemController)
 
         app.route("/api/projects/:projectName/scenarios/:scenarioName/items/start-async")

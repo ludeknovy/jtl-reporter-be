@@ -6,5 +6,7 @@ import { StatusCode } from "../../utils/status-code"
 
 export const getGlobalSettingsController = async (req: IGetUserAuthInfoRequest, res: Response) => {
     const globalSettings = await db.one(getGlobalSettings())
-    res.sendStatus(StatusCode.Ok).json(globalSettings)
+    res.status(StatusCode.Ok).json({
+        projectAutoProvisioning: globalSettings.project_auto_provisioning,
+    })
 }

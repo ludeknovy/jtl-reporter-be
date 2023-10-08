@@ -7,11 +7,11 @@ export const isExistingProject = projectName => {
   }
 }
 
-export const createNewProject = projectName => {
+export const createNewProject = (projectName, upsertScenario = false) => {
   return {
     name: "create-new-project",
-    text: "INSERT INTO jtl.projects(project_name) VALUES($1) RETURNING id",
-    values: [projectName],
+    text: "INSERT INTO jtl.projects(project_name, upsert_scenario) VALUES($1, $2) RETURNING id",
+    values: [projectName, upsertScenario],
   }
 }
 

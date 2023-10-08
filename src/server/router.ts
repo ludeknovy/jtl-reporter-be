@@ -7,6 +7,7 @@ import { AuthRoutes } from "./routes/auth"
 import { ApiTokensRoutes } from "./routes/api-token"
 import { UsersRoutes } from "./routes/users"
 import { InitRoutes } from "./routes/init"
+import { GlobalSettings } from "./routes/global-settings"
 const env = process.env.ENVIRONMENT
 
 export class Router {
@@ -19,6 +20,7 @@ export class Router {
   private userRoutes: UsersRoutes
   private testDataSetup: TestDataSetup
   private initRoutes: InitRoutes
+  private globalSettings: GlobalSettings
   constructor() {
     this.projectRoutes = new ProjectRoutes()
     this.scenarioRoutes = new ScenarioRoutes()
@@ -29,6 +31,7 @@ export class Router {
     this.userRoutes = new UsersRoutes()
     this.testDataSetup = new TestDataSetup()
     this.initRoutes = new InitRoutes()
+    this.globalSettings = new GlobalSettings()
   }
 
   getRoutes(app) {
@@ -43,5 +46,6 @@ export class Router {
       this.testDataSetup.routes(app)
     }
     this.initRoutes.routes(app)
+    this.globalSettings.routes(app)
   }
 }
