@@ -4,7 +4,7 @@ import { db } from "../../db/db"
 import * as boom from "boom"
 import { createNewProject, findProjectId } from "../queries/projects"
 import { getGlobalSettings } from "../queries/global-settings"
-import {logger} from "../../logger";
+import { logger } from "../../logger"
 
 export const projectExistsMiddleware = async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
 
@@ -23,7 +23,7 @@ export const projectAutoProvisioningMiddleware = async (
     if (project) {
         return next()
     }
-    const globalSettings = await db.one(getGlobalSettings)
+    const globalSettings = await db.one(getGlobalSettings())
     if (globalSettings.project_auto_provisioning === true) {
         logger.info(`Project auto-provisioning is enabled, creating a new project ${projectName}`)
         await db.one(createNewProject(projectName, true))
