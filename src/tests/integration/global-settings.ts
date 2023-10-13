@@ -1,4 +1,4 @@
-import {apiTokenSetup, userSetup} from "./helper/state"
+import { userSetup } from "./helper/state"
 import * as request from "supertest"
 import { routes } from "./helper/routes"
 import { StatusCode } from "../../server/utils/status-code"
