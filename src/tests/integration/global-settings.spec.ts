@@ -13,7 +13,6 @@ describe("global settings", () => {
         }
     })
     it("should return the global settings", async () => {
-        await userSetup()
         await request(__server__)
             .get(routes.globalSettings)
             .set(__tokenHeaderKey__, credentials.token)
@@ -22,7 +21,6 @@ describe("global settings", () => {
             .expect(StatusCode.Ok, { projectAutoProvisioning: false })
     })
     it("should be able to change the global settings", async () => {
-        await userSetup()
         await request(__server__)
             .put(routes.globalSettings)
             .set(__tokenHeaderKey__, credentials.token)
