@@ -7,4 +7,5 @@ export const routes = {
   apiTokens: "/api/api-tokens",
   users: "/api/users",
   init: "/api/info",
+  globalSettings: "/api/global-settings",
 }
