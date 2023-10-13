@@ -24,12 +24,12 @@ describe("global settings", () => {
     it("should be able to change the global settings", async () => {
         await userSetup()
         await request(__server__)
-            .post(routes.globalSettings)
+            .put(routes.globalSettings)
             .set(__tokenHeaderKey__, credentials.token)
             .set("Accept", "application/json")
             .send({
                 projectAutoProvisioning: true,
             })
-            .expect(StatusCode.NotFound)
+            .expect(StatusCode.NoContent)
     })
 })
