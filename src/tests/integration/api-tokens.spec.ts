@@ -45,7 +45,7 @@ describe("Api tokens", () => {
   })
 
   describe("GET /api-tokens", () => {
-    it("should not be able to get api tokens as unathorized user", async () => {
+    it("should not be able to get api tokens as unauthorized user", async () => {
       await request(__server__)
         .get(routes.apiTokens)
         .send()
@@ -71,7 +71,7 @@ describe("Api tokens", () => {
           tokenId = body[0].id
         })
     })
-    it("should not be able to delete api token as uanthorized user", async () => {
+    it("should not be able to delete api token as unauthorized user", async () => {
       await request(__server__)
         .delete(routes.apiTokens)
         .send()
