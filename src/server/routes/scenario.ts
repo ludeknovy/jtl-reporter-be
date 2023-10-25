@@ -9,7 +9,7 @@ import {
 import {
     environmentQuerySchema,
     paramSchemaNotification, paramsSchema,
-    scenarioNotificationBodySchema, scenarioTrendsSettings, updateScenarioSchema,
+    scenarioNotificationBodySchema, scenarioShareToken, scenarioTrendsSettings, updateScenarioSchema,
 } from "../schema-validator/scenario-schema"
 import { projectNameParam, scenarioSchema } from "../schema-validator/project-schema"
 import { getScenariosController } from "../controllers/scenario/get-scenarios-controller"
@@ -29,7 +29,9 @@ import { IGetUserAuthInfoRequest } from "../middleware/request.model"
 import { postScenarioTrendsSettings } from "../controllers/scenario/trends/update-scenario-trends-settings-controller"
 import { getScenarioEnvironmentController } from "../controllers/scenario/get-scenario-environment-controller"
 import { projectExistsMiddleware } from "../middleware/project-exists-middleware"
-import {allowScenarioQueryTokenAuth} from "../middleware/allow-scenario-query-token-auth";
+import { allowScenarioQueryTokenAuth } from "../middleware/allow-scenario-query-token-auth"
+import { getScenarioShareTokenController } from "../controllers/scenario/share-token/get-scenario-share-token-controller"
+import { createScenarioShareTokenController } from "../controllers/scenario/share-token/create-scenario-share-token-controller"
 
 export class ScenarioRoutes {
 
@@ -122,10 +124,29 @@ export class ScenarioRoutes {
 
         app.route("/api/projects/:projectName/scenarios/:scenarioName/environment")
             .get(
+                allowScenarioQueryTokenAuth,
                 authenticationMiddleware,
                 authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(paramsSchema),
                 projectExistsMiddleware,
                 wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => getScenarioEnvironmentController(req, res)))
+
+        app.route("/api/projects/:projectName/scenarios/:scenarioName/share-token")
+            .get(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(paramsSchema),
+                projectExistsMiddleware,
+                wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => getScenarioShareTokenController(req, res)))
+
+            .post(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(paramsSchema),
+                bodySchemaValidator(scenarioShareToken),
+                projectExistsMiddleware,
+                wrapAsync((req: IGetUserAuthInfoRequest, res: Response) =>
+                    createScenarioShareTokenController(req, res)))
+
     }
 }

@@ -100,7 +100,7 @@ const scenarioQueryTokenHandler = async (
         }
         return next(boom.unauthorized(UNAUTHORIZED_MSG))
     } catch(error) {
-        logger.error("Error while checking share link token " + error)
+        logger.error("Error while checking scenario share link token " + error)
         return next(boom.internal())
     }
 }
