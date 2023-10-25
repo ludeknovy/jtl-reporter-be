@@ -270,3 +270,16 @@ export const searchEnvironments = (projectName, scenarioName) => {
     values: [projectName, scenarioName],
   }
 }
+
+export const findScenarioShareToken = (projectName: string, scenarioName: string, token: string) => {
+  return {
+    text: `SELECT t.token FROM jtl.share_tokens as t
+    LEFT JOIN jtl.scenario as s ON s.id = it.scenario_id
+    LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE p.project_name = $1
+    AND s.name = $2
+    AND it.id = $3
+    AND t.token = $4;`,
+    values: [projectName, scenarioName, token],
+  }
+}

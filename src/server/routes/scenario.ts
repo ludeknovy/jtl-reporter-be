@@ -29,6 +29,7 @@ import { IGetUserAuthInfoRequest } from "../middleware/request.model"
 import { postScenarioTrendsSettings } from "../controllers/scenario/trends/update-scenario-trends-settings-controller"
 import { getScenarioEnvironmentController } from "../controllers/scenario/get-scenario-environment-controller"
 import { projectExistsMiddleware } from "../middleware/project-exists-middleware"
+import {allowScenarioQueryTokenAuth} from "../middleware/allow-scenario-query-token-auth";
 
 export class ScenarioRoutes {
 
@@ -102,6 +103,7 @@ export class ScenarioRoutes {
 
         app.route("/api/projects/:projectName/scenarios/:scenarioName/trends")
             .get(
+                allowScenarioQueryTokenAuth,
                 authenticationMiddleware,
                 authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(paramsSchema),

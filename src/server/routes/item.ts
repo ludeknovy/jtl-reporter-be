@@ -23,7 +23,7 @@ import { createItemController } from "../controllers/item/create-item-controller
 import { getProcessingItemsController } from "../controllers/item/get-processing-items-controller"
 import { createItemAsyncController } from "../controllers/item/create-item-async-controller"
 import { stopItemAsyncController } from "../controllers/item/stop-item-async-controller"
-import { allowQueryTokenAuth } from "../middleware/allow-query-token-auth"
+import { allowItemQueryTokenAuth } from "../middleware/allow-item-query-token-auth"
 import { getItemLinksController } from "../controllers/item/share-tokens/get-item-share-tokens-controller"
 import { createItemLinkController } from "../controllers/item/share-tokens/create-item-share-token-controller"
 import { deleteItemShareTokenController } from "../controllers/item/share-tokens/delete-item-share-token-cronroller"
@@ -66,7 +66,7 @@ export class ItemsRoutes {
 
         app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId")
             .get(
-                allowQueryTokenAuth,
+                allowItemQueryTokenAuth,
                 authenticationMiddleware,
                 authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(paramsSchema),
