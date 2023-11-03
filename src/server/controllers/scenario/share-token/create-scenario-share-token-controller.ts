@@ -10,7 +10,6 @@ export const createScenarioShareTokenController = async (req: IGetUserAuthInfoRe
     const { user } = req
     const { note } = req.body
     const token = generateShareToken()
-    console.log(projectName, scenarioName)
     await db.none(createScenarioShareToken(projectName, scenarioName, token, user.userId, note))
     res.status(StatusCode.Created).json({ token })
 }

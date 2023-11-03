@@ -8,7 +8,7 @@ import { StatusCode } from "../../../utils/status-code"
 export const getItemLinksController = async (req: IGetUserAuthInfoRequest, res: Response) => {
     const { role, userId } = req.user
     const { projectName, scenarioName, itemId } = req.params
-    if ([AllowedRoles.Readonly, AllowedRoles.Operator].includes(role)) {
+    if ([AllowedRoles.Operator].includes(role)) {
         const myApiKeys = await db.manyOrNone(selectOnlyMyShareTokens(projectName, scenarioName, itemId, userId))
         return res.send(StatusCode.Ok).json(myApiKeys)
     }

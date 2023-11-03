@@ -26,7 +26,7 @@ import { stopItemAsyncController } from "../controllers/item/stop-item-async-con
 import { allowItemQueryTokenAuth } from "../middleware/allow-item-query-token-auth"
 import { getItemLinksController } from "../controllers/item/share-tokens/get-item-share-tokens-controller"
 import { createItemLinkController } from "../controllers/item/share-tokens/create-item-share-token-controller"
-import { deleteItemShareTokenController } from "../controllers/item/share-tokens/delete-item-share-token-cronroller"
+import { deleteItemShareTokenController } from "../controllers/item/share-tokens/delete-item-share-token-controller"
 import { IGetUserAuthInfoRequest } from "../middleware/request.model"
 import { upsertItemChartSettingsController } from "../controllers/item/upsert-item-chart-settings-controller"
 import { getItemChartSettingsController } from "../controllers/item/get-item-chart-settings-controller"

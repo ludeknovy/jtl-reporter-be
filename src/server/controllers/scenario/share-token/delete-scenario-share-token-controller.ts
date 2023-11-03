@@ -8,7 +8,7 @@ import { deleteMyScenarioShareToken, deleteScenarioShareToken } from "../../../q
 export const deleteScenarioShareTokenController = async (req: IGetUserAuthInfoRequest, res: Response) => {
     const { user } = req
     const { projectName, scenarioName, shareTokenId } = req.params
-    if ([AllowedRoles.Readonly, AllowedRoles.Operator].includes(user.role)) {
+    if ([AllowedRoles.Operator].includes(user.role)) {
         await db.none(deleteMyScenarioShareToken(projectName, scenarioName, shareTokenId, user.userId))
         res.status(StatusCode.Ok).send()
 
