@@ -9,7 +9,7 @@ import { IGetUserAuthInfoRequest } from "./request.model"
 import { logger } from "../../logger"
 import { findShareToken } from "../queries/items"
 import { AllowedRoles } from "./authorization-middleware"
-import {findScenarioShareToken} from "../queries/scenario";
+import { findScenarioShareToken } from "../queries/scenario"
 
 const UNAUTHORIZED_MSG = "The token you provided is invalid"
 

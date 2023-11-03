@@ -35,9 +35,12 @@ import { postScenarioTrendsSettings } from "../controllers/scenario/trends/updat
 import { getScenarioEnvironmentController } from "../controllers/scenario/get-scenario-environment-controller"
 import { projectExistsMiddleware } from "../middleware/project-exists-middleware"
 import { allowScenarioQueryTokenAuth } from "../middleware/allow-scenario-query-token-auth"
-import { getScenarioShareTokenController } from "../controllers/scenario/share-token/get-scenario-share-token-controller"
-import { createScenarioShareTokenController } from "../controllers/scenario/share-token/create-scenario-share-token-controller"
-import { deleteScenarioShareTokenController } from "../controllers/scenario/share-token/delete-scenario-share-token-controller"
+import { getScenarioShareTokenController }
+    from "../controllers/scenario/share-token/get-scenario-share-token-controller"
+import { createScenarioShareTokenController }
+    from "../controllers/scenario/share-token/create-scenario-share-token-controller"
+import { deleteScenarioShareTokenController }
+    from "../controllers/scenario/share-token/delete-scenario-share-token-controller"
 
 export class ScenarioRoutes {
 
