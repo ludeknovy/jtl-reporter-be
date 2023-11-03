@@ -16,5 +16,4 @@ export const deleteItemShareTokenController = async (req: IGetUserAuthInfoReques
     await db.none(deleteShareToken(projectName, scenarioName, itemId, tokenId))
     res.status(StatusCode.Ok).send()
   }
-
 }

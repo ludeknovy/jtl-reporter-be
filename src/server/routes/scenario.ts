@@ -8,8 +8,13 @@ import {
 } from "../schema-validator/schema-validator-middleware"
 import {
     environmentQuerySchema,
-    paramSchemaNotification, paramsSchema,
-    scenarioNotificationBodySchema, scenarioShareToken, scenarioTrendsSettings, updateScenarioSchema,
+    paramSchemaNotification,
+    paramsSchema,
+    scenarioNotificationBodySchema,
+    scenarioShareToken,
+    scenarioShareTokenParamsSchema,
+    scenarioTrendsSettings,
+    updateScenarioSchema,
 } from "../schema-validator/scenario-schema"
 import { projectNameParam, scenarioSchema } from "../schema-validator/project-schema"
 import { getScenariosController } from "../controllers/scenario/get-scenarios-controller"
@@ -32,6 +37,7 @@ import { projectExistsMiddleware } from "../middleware/project-exists-middleware
 import { allowScenarioQueryTokenAuth } from "../middleware/allow-scenario-query-token-auth"
 import { getScenarioShareTokenController } from "../controllers/scenario/share-token/get-scenario-share-token-controller"
 import { createScenarioShareTokenController } from "../controllers/scenario/share-token/create-scenario-share-token-controller"
+import { deleteScenarioShareTokenController } from "../controllers/scenario/share-token/delete-scenario-share-token-controller"
 
 export class ScenarioRoutes {
 
@@ -147,6 +153,17 @@ export class ScenarioRoutes {
                 projectExistsMiddleware,
                 wrapAsync((req: IGetUserAuthInfoRequest, res: Response) =>
                     createScenarioShareTokenController(req, res)))
+
+
+        app.route("/api/projects/:projectName/scenarios/:scenarioName/share-token/:shareTokenId")
+            .delete(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(scenarioShareTokenParamsSchema),
+                projectExistsMiddleware,
+                wrapAsync((req: IGetUserAuthInfoRequest, res: Response) =>
+                    deleteScenarioShareTokenController(req, res)))
+
 
     }
 }

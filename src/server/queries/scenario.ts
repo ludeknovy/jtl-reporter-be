@@ -318,3 +318,28 @@ export const createScenarioShareToken =
             values: [projectName, scenarioName, token, note, userId],
         }
     }
+
+export const deleteScenarioShareToken = (projectName, scenarioName, id) => {
+    return {
+        text: `DELETE FROM jtl.scenario_share_tokens as sst
+    USING jtl.scenario as sc
+    WHERE sst.id = $3
+    AND sc.name = $2
+    And sst.scenario_id = sc.id
+    AND sc.project_id = (SELECT id FROM jtl.projects WHERE project_name = $1)`,
+        values: [projectName, scenarioName, id],
+    }
+}
+
+export const deleteMyScenarioShareToken = (projectName, scenarioName, id, userId) => {
+    return {
+        text: `DELETE FROM jtl.scenario_share_tokens as sst
+    USING jtl.scenario as sc
+    WHERE sst.id = $3
+    AND sst.created_by = $3
+    AND sst.scenario_id = sc.id
+    AND sc.name = $2
+    AND sc.project_id = (SELECT id FROM jtl.projects WHERE project_name = $1)`,
+        values: [projectName, scenarioName, id, userId],
+    }
+}

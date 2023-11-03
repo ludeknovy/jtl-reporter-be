@@ -11,6 +11,11 @@ export const paramsSchema = {
   scenarioName: Joi.string().required(),
 }
 
+export const scenarioShareTokenParamsSchema = {
+  ...paramsSchema,
+  shareTokenId: Joi.string().required(),
+}
+
 export const environmentQuerySchema = {
   environment: Joi.string().max(ENVIRONMENT_MAX_LENGTH).allow(""),
   token: Joi.string(),
