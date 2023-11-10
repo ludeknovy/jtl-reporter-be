@@ -18,6 +18,7 @@ import { ReportStatus } from "../queries/items.model"
 import { StatusCode } from "../utils/status-code"
 import { AllowedRoles } from "../middleware/authorization-middleware"
 import { assignAllAdminsAsProjectMembers } from "../queries/user-project-access"
+
 export class TestDataSetup {
 
     routes(app: express.Application): void {
@@ -73,7 +74,7 @@ export class TestDataSetup {
                         const project = await db.one(getProject("test-project"))
                         await db.any(assignAllAdminsAsProjectMembers(project.id))
                         await db.any(createNewScenario("test-project", "test-scenario"))
-                        await db.none(createScenarioShareToken("test-project", "test-scenario", token, uuidv4() ))
+                        await db.none(createScenarioShareToken("test-project", "test-scenario", token, uuidv4(), "note"))
                         res.status(StatusCode.Ok).json({ token })
                     } else {
                         res.sendStatus(StatusCode.BadRequest)

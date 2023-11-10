@@ -308,7 +308,7 @@ export const selectOnlyMyScenarioShareTokens = (projectName: string, scenarioNam
 }
 
 export const createScenarioShareToken =
-    (projectName: string, scenarioName: string, token: string, userId: string, note = null) => {
+    (projectName: string, scenarioName: string, token: string, userId: string, note: string) => {
         return {
             text: `INSERT INTO jtl.scenario_share_tokens (scenario_id, token, note, created_by) VALUES (
       (SELECT sc.id FROM jtl.scenario as sc

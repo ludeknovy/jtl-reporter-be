@@ -225,11 +225,11 @@ describe("Scenario", () => {
                 .send({
                     note: "my token note",
                 })
-                .expect(StatusCode.Ok)
+                .expect(StatusCode.Created)
         })
     })
     describe(`GET /projects/{projectName}/scenarios/{scenarioName}/share-token`, () => {
-        it("should be able to create new token", async() => {
+        it("should be able to get tokens", async() => {
             await stateSetup(States.ExistingScenario)
             await request(__server__)
                 .get("/api/projects/test-project/scenarios/test-scenario/share-token")
