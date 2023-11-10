@@ -6,13 +6,12 @@ import { selectOnlyMyShareTokens, selectShareTokens } from "../../../queries/ite
 import { StatusCode } from "../../../utils/status-code"
 
 export const getItemLinksController = async (req: IGetUserAuthInfoRequest, res: Response) => {
-  const { role, userId } = req.user
-  const { projectName, scenarioName, itemId } = req.params
-  if ([AllowedRoles.Readonly, AllowedRoles.Operator].includes(role)) {
-    const myApiKeys = await db.manyOrNone(selectOnlyMyShareTokens(projectName, scenarioName, itemId, userId))
-    return res.send(StatusCode.Ok).json(myApiKeys)
-  }
+    const { role, userId } = req.user
+    const { projectName, scenarioName, itemId } = req.params
+    if ([AllowedRoles.Operator].includes(role)) {
+        const myApiKeys = await db.manyOrNone(selectOnlyMyShareTokens(projectName, scenarioName, itemId, userId))
+        return res.send(StatusCode.Ok).json(myApiKeys)
+    }
     const shareTokens = await db.manyOrNone(selectShareTokens(projectName, scenarioName, itemId))
     res.status(StatusCode.Ok).json(shareTokens)
-
 }

@@ -8,7 +8,7 @@ import { StatusCode } from "../../../utils/status-code"
 export const deleteItemShareTokenController = async (req: IGetUserAuthInfoRequest, res: Response) => {
   const { user } = req
   const { projectName, scenarioName, itemId, tokenId } = req.params
-  if ([AllowedRoles.Readonly, AllowedRoles.Operator].includes(user.role)) {
+  if ([AllowedRoles.Operator].includes(user.role)) {
     await db.none(deleteMyShareToken(projectName, scenarioName, itemId, tokenId, user.userId))
     res.status(StatusCode.Ok).send()
 
@@ -16,5 +16,4 @@ export const deleteItemShareTokenController = async (req: IGetUserAuthInfoReques
     await db.none(deleteShareToken(projectName, scenarioName, itemId, tokenId))
     res.status(StatusCode.Ok).send()
   }
-
 }

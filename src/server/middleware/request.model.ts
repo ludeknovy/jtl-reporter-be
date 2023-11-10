@@ -6,5 +6,6 @@ export interface IGetUserAuthInfoRequest extends Request {
     userId?: string
     role: AllowedRoles
   }
-  allowQueryAuth?: boolean
+  allowQueryAuthItem?: boolean
+  allowQueryAuthScenario?: boolean
 }
