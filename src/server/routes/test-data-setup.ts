@@ -74,7 +74,8 @@ export class TestDataSetup {
                         const project = await db.one(getProject("test-project"))
                         await db.any(assignAllAdminsAsProjectMembers(project.id))
                         await db.any(createNewScenario("test-project", "test-scenario"))
-                        await db.none(createScenarioShareToken("test-project", "test-scenario", token, uuidv4(), "note"))
+                        await db.none(createScenarioShareToken("test-project", "test-scenario",
+                            token, uuidv4(), "note"))
                         res.status(StatusCode.Ok).json({ token })
                     } else {
                         res.sendStatus(StatusCode.BadRequest)
