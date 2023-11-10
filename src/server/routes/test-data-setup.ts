@@ -6,7 +6,7 @@ import { testDataSchema } from "../schema-validator/test-data-schema"
 import { States } from "../../tests/integration/helper/state.model"
 import { db } from "../../db/db"
 import { createNewProject, getProject } from "../queries/projects"
-import { createNewScenario } from "../queries/scenario"
+import {createNewScenario, createScenarioShareToken} from "../queries/scenario"
 import { createNewItem, saveItemStats } from "../queries/items"
 import { testStats, testOverview } from "../../test-data/test-stats"
 import { createUserInDB } from "../controllers/users/create-new-user-controller"
@@ -18,7 +18,6 @@ import { ReportStatus } from "../queries/items.model"
 import { StatusCode } from "../utils/status-code"
 import { AllowedRoles } from "../middleware/authorization-middleware"
 import { assignAllAdminsAsProjectMembers } from "../queries/user-project-access"
-
 export class TestDataSetup {
 
     routes(app: express.Application): void {
@@ -68,6 +67,14 @@ export class TestDataSetup {
                         const { id } = await db.one(getUser("test-user"))
                         await db.any(createNewApiToken(TOKEN, "test-token", id))
                         res.status(StatusCode.Ok).json({ token: TOKEN })
+                    } else if (state === States.ExistingScenarioShareToken) {
+                        const token = uuidv4()
+                        await db.any(createNewProject("test-project"))
+                        const project = await db.one(getProject("test-project"))
+                        await db.any(assignAllAdminsAsProjectMembers(project.id))
+                        await db.any(createNewScenario("test-project", "test-scenario"))
+                        await db.none(createScenarioShareToken("test-project", "test-scenario", token, uuidv4() ))
+                        res.status(StatusCode.Ok).json({ token })
                     } else {
                         res.sendStatus(StatusCode.BadRequest)
                     }
