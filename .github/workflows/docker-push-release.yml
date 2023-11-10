@@ -30,5 +30,6 @@ jobs:
         with:
           context: .
           push: true
+          platforms: linux/amd64,linux/arm64
           labels: novyl/jtl-reporter-be:${{ github.event.release.tag_name }}
           tags: novyl/jtl-reporter-be:${{ github.event.release.tag_name }}
