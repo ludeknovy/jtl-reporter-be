@@ -1,14 +1,14 @@
-import { allowQueryTokenAuth } from "./allow-query-token-auth"
+import { allowItemQueryTokenAuth } from "./allow-item-query-token-auth"
 import { IGetUserAuthInfoRequest } from "./request.model"
 import { Response, NextFunction } from "express"
 
-describe("allowQueryTokenAuth", () => {
+describe("allowItemQueryTokenAuth", () => {
   const nextFunction: NextFunction = jest.fn()
   const request: any = {}
-  it("sets allowQueryAuth to true", async () => {
-    await allowQueryTokenAuth(request as unknown as IGetUserAuthInfoRequest,
+  it("sets allowQueryAuthItem to true", async () => {
+    await allowItemQueryTokenAuth(request as unknown as IGetUserAuthInfoRequest,
       {} as unknown as Response, nextFunction)
-    expect(request.allowQueryAuth).toEqual(true)
+    expect(request.allowQueryAuthItem).toEqual(true)
     expect(nextFunction).toHaveBeenCalledTimes(1)
   })
 

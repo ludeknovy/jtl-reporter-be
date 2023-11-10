@@ -2,6 +2,7 @@ import * as request from "supertest"
 import { stateSetup, userSetup } from "./helper/state"
 import { StatusCode } from "../../server/utils/status-code"
 import { States } from "./helper/state.model"
+import { v4 as uuidv4 } from "uuid"
 
 describe("Scenario", () => {
     let credentials
@@ -209,6 +210,40 @@ describe("Scenario", () => {
             await stateSetup(States.ExistingScenario)
             await request(__server__)
                 .delete("/api/projects/test-project-1/scenarios/test-scenario")
+                .set(__tokenHeaderKey__, credentials.token)
+                .set("Accept", "application/json")
+                .expect(StatusCode.NotFound)
+        })
+    })
+    describe(`POST /projects/{projectName}/scenarios/{scenarioName}/share-token`, () => {
+        it("should be able to create new token", async() => {
+            await stateSetup(States.ExistingScenario)
+            await request(__server__)
+                .post("/api/projects/test-project/scenarios/test-scenario/share-token")
+                .set(__tokenHeaderKey__, credentials.token)
+                .set("Accept", "application/json")
+                .send({
+                    note: "my token note",
+                })
+                .expect(StatusCode.Created)
+        })
+    })
+    describe(`GET /projects/{projectName}/scenarios/{scenarioName}/share-token`, () => {
+        it("should be able to get tokens", async() => {
+            await stateSetup(States.ExistingScenario)
+            await request(__server__)
+                .get("/api/projects/test-project/scenarios/test-scenario/share-token")
+                .set(__tokenHeaderKey__, credentials.token)
+                .set("Accept", "application/json")
+                .expect(StatusCode.Ok)
+        })
+    })
+
+    describe(`DELETE /projects/{projectName}/scenarios/{scenarioName}/share-token/{tokenId}`, () => {
+        it("should return 404 when token not found", async() => {
+            await stateSetup(States.ExistingScenario)
+            await request(__server__)
+                .delete(`/api/projects/test-project/scenarios/test-scenario/share-token/${uuidv4()}`)
                 .set(__tokenHeaderKey__, credentials.token)
                 .set("Accept", "application/json")
                 .expect(StatusCode.NotFound)

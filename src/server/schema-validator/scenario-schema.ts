@@ -4,14 +4,21 @@ import { ENVIRONMENT_MAX_LENGTH } from "../controllers/item/create-item-const"
 
 const MAX_NUMBER = 100
 const URL_MAX_LENGTH = 400
+const MAX_NOTE_LENGTH = 200
 
 export const paramsSchema = {
   projectName: Joi.string().required(),
   scenarioName: Joi.string().required(),
 }
 
+export const scenarioShareTokenParamsSchema = {
+  ...paramsSchema,
+  shareTokenId: Joi.string().required(),
+}
+
 export const environmentQuerySchema = {
   environment: Joi.string().max(ENVIRONMENT_MAX_LENGTH).allow(""),
+  token: Joi.string(),
 }
 
 export const paramSchemaNotification = {
@@ -96,4 +103,8 @@ export const scenarioTrendsSettings = Joi.object({
     throughput: Joi.boolean().required(),
     percentile90: Joi.boolean().required(),
   }),
+})
+
+export const scenarioShareToken = Joi.object({
+  note: Joi.string().max(MAX_NOTE_LENGTH),
 })
