@@ -26,6 +26,7 @@ describe("deleteScenarioShareTokenController", () => {
             params: { projectName: "project", scenarioName: "scenario", shareTokenId: "my-share-token" },
             user: { role: AllowedRoles.Operator, userId: uuidv4() },
         };
+        (db.oneOrNone as any).mockReturnValueOnce({} ); // dummy token search response
         (db.none as any).mockReturnValueOnce()
 
         await deleteScenarioShareTokenController(
@@ -50,6 +51,7 @@ describe("deleteScenarioShareTokenController", () => {
             params: { projectName: "project", scenarioName: "scenario", shareTokenId: "my-share-token" },
             user: { role: AllowedRoles.Admin, userId: uuidv4() },
         };
+        (db.oneOrNone as any).mockReturnValueOnce({} ); // dummy token search response
         (db.none as any).mockReturnValueOnce()
 
         await deleteScenarioShareTokenController(

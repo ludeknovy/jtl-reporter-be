@@ -3,17 +3,32 @@ import { Response } from "express"
 import { AllowedRoles } from "../../../middleware/authorization-middleware"
 import { db } from "../../../../db/db"
 import { StatusCode } from "../../../utils/status-code"
-import { deleteMyScenarioShareToken, deleteScenarioShareToken } from "../../../queries/scenario"
+import {
+    deleteMyScenarioShareToken,
+    deleteScenarioShareToken,
+    findMyScenarioShareToken,
+    findScenarioShareToken,
+} from "../../../queries/scenario"
 
 export const deleteScenarioShareTokenController = async (req: IGetUserAuthInfoRequest, res: Response) => {
     const { user } = req
     const { projectName, scenarioName, shareTokenId } = req.params
     if ([AllowedRoles.Operator].includes(user.role)) {
-        await db.none(deleteMyScenarioShareToken(projectName, scenarioName, shareTokenId, user.userId))
-        res.status(StatusCode.Ok).send()
-
+        const shareToken = await db.oneOrNone(
+            findMyScenarioShareToken(projectName, scenarioName, shareTokenId, user.userId))
+        if (shareToken) {
+            await db.none(deleteMyScenarioShareToken(projectName, scenarioName, shareTokenId, user.userId))
+            return res.status(StatusCode.Ok).send()
+        }
+        res.status(StatusCode.NotFound).send()
     } else {
-        await db.none(deleteScenarioShareToken(projectName, scenarioName, shareTokenId))
-        res.status(StatusCode.Ok).send()
+        const shareToken = await db.oneOrNone(
+            findScenarioShareToken(projectName, scenarioName, shareTokenId))
+        if (shareToken) {
+            await db.none(deleteScenarioShareToken(projectName, scenarioName, shareTokenId))
+            return res.status(StatusCode.Ok).send()
+        }
+        res.status(StatusCode.NotFound).send()
+
     }
 }
