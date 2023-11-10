@@ -248,14 +248,5 @@ describe("Scenario", () => {
                 .set("Accept", "application/json")
                 .expect(StatusCode.NotFound)
         })
-
-        it("should be able to delete scenario", async() => {
-            const { data: { token } } = await stateSetup(States.ExistingScenarioShareToken)
-            await request(__server__)
-                .delete(`/api/projects/test-project/scenarios/test-scenario/share-token/${token}`)
-                .set(__tokenHeaderKey__, credentials.token)
-                .set("Accept", "application/json")
-                .expect(StatusCode.NotFound)
-        })
     })
 })

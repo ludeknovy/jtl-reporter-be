@@ -68,15 +68,6 @@ export class TestDataSetup {
                         const { id } = await db.one(getUser("test-user"))
                         await db.any(createNewApiToken(TOKEN, "test-token", id))
                         res.status(StatusCode.Ok).json({ token: TOKEN })
-                    } else if (state === States.ExistingScenarioShareToken) {
-                        const token = uuidv4()
-                        await db.any(createNewProject("test-project"))
-                        const project = await db.one(getProject("test-project"))
-                        await db.any(assignAllAdminsAsProjectMembers(project.id))
-                        await db.any(createNewScenario("test-project", "test-scenario"))
-                        await db.none(createScenarioShareToken("test-project", "test-scenario",
-                            token, uuidv4(), "note"))
-                        res.status(StatusCode.Ok).json({ token })
                     } else {
                         res.sendStatus(StatusCode.BadRequest)
                     }
