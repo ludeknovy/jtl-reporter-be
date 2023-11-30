@@ -93,12 +93,12 @@ export const deleteScenario = (projectName, scenarioName) => {
     }
 }
 
-export const createNewScenario = (projectName, scenarioName) => {
+export const createNewScenario = (projectName, scenarioName, keepTestRunsPeriod = 0) => {
     return {
-        text: `INSERT INTO jtl.scenario(name, project_id, analysis_enabled) VALUES($2, (
+        text: `INSERT INTO jtl.scenario(name, project_id, analysis_enabled, keep_test_runs_period) VALUES($2, (
       SELECT id FROM jtl.projects WHERE project_name = $1
-    ), $3)`,
-        values: [projectName, scenarioName, true],
+    ), $3, $4)`,
+        values: [projectName, scenarioName, true, keepTestRunsPeriod],
     }
 }
 
