@@ -24,7 +24,7 @@ import {
   TEST_NAME_MAX_LENGTH,
 } from "./create-item-const"
 import { AnalyticsEvent } from "../../utils/analytics/anyltics-event"
-import {ALLOWED_PERDIOD} from "./shared/constants";
+import { ALLOWED_PERIOD } from "./shared/constants"
 
 const pg = pgp()
 
@@ -241,9 +241,9 @@ export const checkKeepTestRunsPeriod = (keepTestRunsPeriod): boom => {
     if (isNaN(keepTestRunsPeriodNumber)) {
       return boom.badRequest("keepTestRunsPeriod - only numbers are allowed")
     }
-    const allowedValue = ALLOWED_PERDIOD.find(val => val === keepTestRunsPeriodNumber)
+    const allowedValue = ALLOWED_PERIOD.find(val => val === keepTestRunsPeriodNumber)
     if (!allowedValue) {
-      return boom.badRequest(`invalid value, allowed values are: ${ALLOWED_PERDIOD}`)
+      return boom.badRequest(`invalid value, allowed values are: ${ALLOWED_PERIOD}`)
     }
     return
   } catch(e) {

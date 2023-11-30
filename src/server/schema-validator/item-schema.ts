@@ -5,7 +5,7 @@ import {
     NOTE_MAX_LENGTH,
     RESOURCES_LINK_MAX_LENGTH, TEST_NAME_MAX_LENGTH,
 } from "../controllers/item/create-item-const"
-import {ALLOWED_PERDIOD} from "../controllers/item/shared/constants";
+import { ALLOWED_PERIOD } from "../controllers/item/shared/constants"
 
 
 const projectName = Joi.string().required()
@@ -56,7 +56,7 @@ export const newAsyncItemStartBodySchema = Joi.object().keys({
     hostname,
     note,
     resourcesLink,
-    keepTestRunsPeriod: Joi.number().valid(ALLOWED_PERDIOD),
+    keepTestRunsPeriod: Joi.number().valid(ALLOWED_PERIOD),
 })
 
 export const newItemParamSchema = Joi.object().keys({
