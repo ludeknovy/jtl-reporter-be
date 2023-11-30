@@ -14,7 +14,7 @@ describe("upsertScenario", () => {
         const spy = jest.spyOn(require("../../../queries/scenario"), "createNewScenario")
         await upsertScenario("projectName", "scenarioNAme", 0)
         expect(spy).toHaveBeenCalledTimes(1)
-        expect(spy).toHaveBeenCalledWith("projectName", "scenarioNAme")
+        expect(spy).toHaveBeenCalledWith("projectName", "scenarioNAme", 0)
     })
     it("should not create scenario if it already exists and allowed by settings", async () => {
         (db.one as any).mockResolvedValueOnce({ upsertScenario: true });
