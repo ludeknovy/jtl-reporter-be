@@ -24,6 +24,7 @@ import {
   TEST_NAME_MAX_LENGTH,
 } from "./create-item-const"
 import { AnalyticsEvent } from "../../utils/analytics/anyltics-event"
+import { ALLOWED_PERIOD } from "./shared/constants"
 
 const pg = pgp()
 
@@ -42,7 +43,7 @@ const SECONDS_DIVISOR = 1000
 export const createItemController = (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
   // eslint-disable-next-line complexity
   upload(req, res, async error => {
-    const { environment, note, status = ItemStatus.None, hostname, name, resourcesLink } = req.body
+    const { environment, note, status = ItemStatus.None, hostname, name, resourcesLink, keepTestRunsPeriod } = req.body
     if (!req.files) {
       return next(boom.badRequest())
     }
@@ -59,6 +60,12 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
     }
     if (!Object.values(ItemStatus).some(_ => _ === status)) {
       return next(boom.badRequest("invalid status type"))
+    }
+    if (keepTestRunsPeriod) {
+      const keepTestRunsPeriodError = checkKeepTestRunsPeriod(keepTestRunsPeriod)
+      if (keepTestRunsPeriodError) {
+        return next(keepTestRunsPeriodError)
+      }
     }
     const failedValidations = checkFieldsLength([
         { name: "environment", value: environment, maxLength: ENVIRONMENT_MAX_LENGTH },
@@ -79,7 +86,7 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
       const monitoringFileName = monitoring?.[0]?.path
       let tempBuffer = []
 
-      await upsertScenario(projectName, scenarioName)
+      await upsertScenario(projectName, scenarioName, keepTestRunsPeriod)
 
       const item = await db.one(createNewItem(
         scenarioName,
@@ -226,4 +233,20 @@ const checkFieldsLength = (properties: Array<{ name: string; value: any; maxLeng
     }
   })
   return failedValidations
+}
+
+export const checkKeepTestRunsPeriod = (keepTestRunsPeriod): boom => {
+  try {
+    const keepTestRunsPeriodNumber = parseInt(keepTestRunsPeriod, 10)
+    if (isNaN(keepTestRunsPeriodNumber)) {
+      return boom.badRequest("keepTestRunsPeriod - only numbers are allowed")
+    }
+    const allowedValue = ALLOWED_PERIOD.find(val => val === keepTestRunsPeriodNumber)
+    if (!allowedValue) {
+      return boom.badRequest(`invalid value, allowed values are: ${ALLOWED_PERIOD}`)
+    }
+    return
+  } catch(e) {
+    return boom.badRequest("keepTestRunsPeriod - only numbers are allowed")
+  }
 }
