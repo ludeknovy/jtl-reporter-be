@@ -1,4 +1,4 @@
-import {ALLOWED_PERIOD} from "./constants";
+import { ALLOWED_PERIOD } from "./constants"
 
 describe("ALLOWED_PERIOD", () => {
     it("contains expected values", () => {
