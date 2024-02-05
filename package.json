@@ -19,7 +19,7 @@
   "license": "ISC",
   "dependencies": {
     "@breejs/ts-worker": "^2.0.0",
-    "axios": "^0.27.2",
+    "axios": "^1.6.5",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.1",
     "boom": "^7.2.0",
@@ -42,7 +42,7 @@
     "swagger-ui-express": "^4.6.3",
     "uuid": "^9.0.1",
     "winston": "^3.10.0",
-    "xlsx": "^0.18.5"
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.1/xlsx-0.20.1.tgz"
   },
   "devDependencies": {
     "@types/boom": "^7.2.0",

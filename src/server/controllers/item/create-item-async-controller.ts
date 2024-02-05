@@ -10,12 +10,12 @@ import { generateShareToken } from "./utils/generateShareToken"
 import { upsertScenario } from "./shared/upsert-scenario"
 
 export const createItemAsyncController = async (req: IGetUserAuthInfoRequest, res: Response) => {
-    const { environment, note, status = ItemStatus.None, hostname, name, resourcesLink } = req.body
+    const { environment, note, status = ItemStatus.None, hostname, name, resourcesLink, keepTestRunsPeriod } = req.body
     const { scenarioName, projectName } = req.params
 
     logger.info(`Creating new item for scenario: ${scenarioName}`)
     try {
-        const scenarioExists = await upsertScenario(projectName, scenarioName)
+        const scenarioExists = await upsertScenario(projectName, scenarioName, keepTestRunsPeriod)
         if (!scenarioExists) {
             return res.status(StatusCode.NotFound).json({ message: "scenario not found" })
         }
