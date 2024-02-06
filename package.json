@@ -23,7 +23,7 @@
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.1",
     "boom": "^7.2.0",
-    "bree": "^9.1.3",
+    "bree": "^9.2.2",
     "compression": "^1.7.4",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
