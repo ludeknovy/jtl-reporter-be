@@ -38,6 +38,7 @@ import { extraIntervalMilliseconds } from "./extra-intervals-mapping"
 import { AnalyticsEvent } from "../../../utils/analytics/anyltics-event"
 import { downsampleData } from "../../../utils/lttb"
 import moment = require("moment");
+import { DataProcessingException } from "../../../errors/data-processing-exceptions"
 
 export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) => {
     const MAX_LABEL_CHART_LENGTH = 100000
@@ -164,7 +165,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         }
 
     } catch(error) {
-        console.log(error)
-        throw new Error(`Error while processing dataId: ${itemId} for item: ${itemId}, error: ${error}`)
+        throw new DataProcessingException(
+            `Error while processing dataId: ${itemId} for item: ${itemId}, error: ${error}`)
     }
 }

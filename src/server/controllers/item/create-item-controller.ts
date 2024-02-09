@@ -2,7 +2,9 @@ import { Response, NextFunction } from "express"
 import { ItemStatus, ReportStatus } from "../../queries/items.model"
 import { transformDataForDb } from "../../data-stats/prepare-data"
 import { db } from "../../../db/db"
-import { createNewItem, createShareToken, updateItem } from "../../queries/items"
+import {
+ createNewItem, createShareToken, samplesColumnSet, updateItem,
+} from "../../queries/items"
 import * as multer from "multer"
 import * as boom from "boom"
 import * as fs from "fs"
@@ -25,6 +27,10 @@ import {
 } from "./create-item-const"
 import { AnalyticsEvent } from "../../utils/analytics/anyltics-event"
 import { ALLOWED_PERIOD } from "./shared/constants"
+import { DataProcessingException } from "../../errors/data-processing-exceptions"
+import { UnlinkingFileException } from "../../errors/unlinking-file-exception"
+import { DataStreamingToDatabaseException } from "../../errors/data-streaming-to-database-exception"
+import { DataParsingException } from "../../errors/data-parsing-exception"
 
 const pg = pgp()
 
@@ -110,69 +116,8 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
         await db.none(createShareToken(projectName, scenarioName, item.id,
           shareToken, req.user.userId, "automatically generated token"))
       }
-
-
       const itemId = item.id
-
       res.status(StatusCode.Ok).json({ itemId, shareToken })
-
-      const columnSet = new pg.helpers.ColumnSet([
-        "elapsed", "success", "bytes", "label",
-        {
-          name: "timestamp",
-          prop: "timeStamp",
-        },
-        {
-          name: "sent_bytes",
-          prop: "sentBytes",
-        },
-        {
-          name: "connect",
-          prop: "Connect",
-        }, {
-          name: "hostname",
-          prop: "Hostname",
-          def: null,
-        }, {
-          name: "status_code",
-          prop: "responseCode",
-        },
-        {
-          name: "all_threads",
-          prop: "allThreads",
-        },
-        {
-          name: "grp_threads",
-          prop: "grpThreads",
-        }, {
-          name: "latency",
-          prop: "Latency",
-        },
-        {
-          name: "response_message",
-          prop: "responseMessage",
-        },
-        {
-          name: "item_id",
-          prop: "itemId",
-        },
-        {
-          name: "sut_hostname",
-          prop: "sutHostname",
-          def: null,
-        },
-        {
-          name: "failure_message",
-          prop: "failureMessage",
-          def: null,
-        },
-        {
-          name: "thread_name",
-          prop: "threadName",
-          def: null,
-        },
-      ], { table: new pg.helpers.TableName({ table: "samples", schema: "jtl" }) })
-
 
       logger.info(`Starting KPI file streaming and saving to db, item_id: ${itemId}`)
       const parsingStart = Date.now()
@@ -185,9 +130,7 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
           try {
             if (tempBuffer.length === BUFFER_SIZE) {
               csvStream.pause()
-              const query = pg.helpers.insert(tempBuffer, columnSet)
-              await db.none(query)
-
+              await injectDataIntoDatabase(tempBuffer)
               tempBuffer = []
               csvStream.resume()
             }
@@ -195,21 +138,18 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
             if (data) {
               return tempBuffer.push(data)
             }
-          } catch(processingDataError) {
-            // eslint-disable-next-line max-len
-            logger.error(`Error occurred during data parsing and saving into database: ${processingDataError}, item_id: ${itemId}`)
-            csvStream.destroy()
-            logger.info(`File processing was aborted, item_id: ${itemId}`)
+          } catch(dataProcessingError) {
+            if (dataProcessingError instanceof DataStreamingToDatabaseException) {
+              csvStream.destroy(dataProcessingError)
+            } else {
+              csvStream.destroy(new DataParsingException(dataProcessingError))
+            }
           }
-
-
         })
         .on("end", async (rowCount: number) => {
           try {
-            await db.none(pg.helpers.insert(tempBuffer, columnSet))
-
-            fs.unlinkSync(kpiFilename)
-
+            await injectDataIntoDatabase(tempBuffer)
+            removeUploadedFile(kpiFilename)
             logger.info(`Parsed ${rowCount} records in ${(Date.now() - parsingStart) / SECONDS_DIVISOR } seconds`)
             await itemDataProcessing({
               itemId,
@@ -218,13 +158,12 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
             logger.info(`Done ${rowCount} in ${(Date.now() - parsingStart) / SECONDS_DIVISOR } seconds`)
 
           } catch(onEndError) {
-            await db.none(updateItem(itemId, ReportStatus.Error, null))
-            logger.error(`Error while processing item: ${itemId}: ${onEndError}`)
+            await handleError(itemId, kpiFilename, onEndError)
           }
         })
-        .on("error", async (onErrorError) => {
-          await db.none(updateItem(itemId, ReportStatus.Error, null))
-          logger.error(`Not valid csv file provided: ${onErrorError}`)
+        .on("error", async (processingError) => {
+          logger.info(`File processing was aborted because of an error, item_id: ${itemId}`)
+          await handleError(itemId, kpiFilename, processingError)
         })
     } catch(e) {
       logger.error(e)
@@ -256,5 +195,56 @@ export const checkKeepTestRunsPeriod = (keepTestRunsPeriod): boom => {
     return
   } catch(e) {
     return boom.badRequest("keepTestRunsPeriod - only numbers are allowed")
+  }
+}
+
+const removeUploadedFile = (filename: string) => {
+  try {
+    logger.info(`Deleting file: ${filename}`)
+    fs.unlinkSync(filename)
+  } catch(e) {
+    throw new UnlinkingFileException(e)
+  }
+
+}
+
+const injectDataIntoDatabase = async (data: any[]) => {
+  try {
+    const query = pg.helpers.insert(data, samplesColumnSet)
+    await db.none(query)
+  } catch(e) {
+    throw new DataStreamingToDatabaseException(e)
+  }
+}
+
+const handleError = async (itemId: string, kpiFilename: string, processingError: Error) => {
+  if (processingError instanceof DataStreamingToDatabaseException) {
+    // eslint-disable-next-line max-len
+    logger.error(`Error occurred during data parsing and saving into database: ${processingError.message}, item_id: ${itemId}`)
+  } else if (processingError instanceof DataParsingException) {
+    // eslint-disable-next-line max-len
+    logger.error(`Error occurred during data parsing or manipulation: ${processingError.message}, item_id: ${itemId}`)
+  } else if (processingError instanceof DataProcessingException) {
+    // eslint-disable-next-line max-len
+    logger.error(`Error occurred during samples aggregation in database: ${processingError.message}, item_id: ${itemId}`)
+  } else if (processingError instanceof UnlinkingFileException) {
+    // eslint-disable-next-line max-len
+    logger.error(`Error occurred during deleting of uploaded file: ${processingError.message}, item_id: ${itemId}`)
+  } else {
+    logger.error(`Unexpected error occurred: ${processingError.message}, item_id: ${itemId}`)
+  }
+
+
+  try {
+    logger.info(`Trying to set item: ${itemId} to error state.`)
+    await db.none(updateItem(itemId, ReportStatus.Error, null))
+  } catch(e) {
+    logger.error(`It was not possible to set item ${itemId} to error state: ${e}`)
+  } finally {
+    try {
+      removeUploadedFile(kpiFilename)
+    } catch(e) {
+      logger.error(`File ${kpiFilename} does not exist anymore`)
+    }
   }
 }
