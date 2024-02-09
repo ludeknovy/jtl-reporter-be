@@ -1,10 +1,10 @@
 /* eslint-disable max-lines */
 // eslint-disable-next-line max-len
 
-// eslint-disable-next-line max-len
 import * as pgp from "pg-promise"
 const pg = pgp()
 
+// eslint-disable-next-line max-len
 export const createNewItem = (scenarioName, startTime, environment, note, status, projectName, hostname, reportStatus, name, resourcesLink) => {
     return {
         // eslint-disable-next-line max-len
