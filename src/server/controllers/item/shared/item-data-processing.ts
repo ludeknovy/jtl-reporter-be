@@ -157,10 +157,10 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         AnalyticsEvent.reportDetails(labelStats.length, overview.duration)
 
         if (scenarioSettings.deleteSamples) {
-            logger.info(`Item: ${itemId} deleting samples data`)
+            logger.info(`Purging samples data, item_id: ${itemId}`)
             await db.none(deleteSamples(itemId))
-            await db.none("VACUUM FULL jtl.samples")
-            logger.info(`Item: ${itemId} samples data deletion done`)
+            await db.none("VACUUM jtl.samples")
+            logger.info(`Samples purge completed, item_id: ${itemId} `)
         }
 
     } catch(error) {
