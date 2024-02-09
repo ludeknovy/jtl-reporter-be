@@ -182,18 +182,26 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
       const csvStream = fs.createReadStream(kpiFilename)
         .pipe(csv.parse({ headers: true }))
         .on("data", async row => {
-          if (tempBuffer.length === BUFFER_SIZE) {
-            csvStream.pause()
-            const query = pg.helpers.insert(tempBuffer, columnSet)
-            await db.none(query)
+          try {
+            if (tempBuffer.length === BUFFER_SIZE) {
+              csvStream.pause()
+              const query = pg.helpers.insert(tempBuffer, columnSet)
+              await db.none(query)
 
-            tempBuffer = []
-            csvStream.resume()
+              tempBuffer = []
+              csvStream.resume()
+            }
+            const data = transformDataForDb(row, itemId, labelFilterSettings)
+            if (data) {
+              return tempBuffer.push(data)
+            }
+          } catch(processingDataError) {
+            // eslint-disable-next-line max-len
+            logger.error(`Error occurred during data parsing and saving into database: ${processingDataError}, item_id: ${itemId}`)
+            csvStream.destroy()
+            logger.info(`File processing was aborted, item_id: ${itemId}`)
           }
-          const data = transformDataForDb(row, itemId, labelFilterSettings)
-          if (data) {
-            return tempBuffer.push(data)
-          }
+
 
         })
         .on("end", async (rowCount: number) => {
