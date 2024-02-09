@@ -159,7 +159,6 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         if (scenarioSettings.deleteSamples) {
             logger.info(`Purging samples data, item_id: ${itemId}`)
             await db.none(deleteSamples(itemId))
-            await db.none("VACUUM jtl.samples")
             logger.info(`Samples purge completed, item_id: ${itemId} `)
         }
 
