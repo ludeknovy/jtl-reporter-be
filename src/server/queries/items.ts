@@ -1,6 +1,9 @@
 /* eslint-disable max-lines */
 // eslint-disable-next-line max-len
 
+import * as pgp from "pg-promise"
+const pg = pgp()
+
 // eslint-disable-next-line max-len
 export const createNewItem = (scenarioName, startTime, environment, note, status, projectName, hostname, reportStatus, name, resourcesLink) => {
     return {
@@ -644,3 +647,61 @@ WHERE row_n <= 5;`,
         values: [itemId],
     }
 }
+
+
+export const samplesColumnSet = new pg.helpers.ColumnSet([
+    "elapsed", "success", "bytes", "label",
+    {
+        name: "timestamp",
+        prop: "timeStamp",
+    },
+    {
+        name: "sent_bytes",
+        prop: "sentBytes",
+    },
+    {
+        name: "connect",
+        prop: "Connect",
+    }, {
+        name: "hostname",
+        prop: "Hostname",
+        def: null,
+    }, {
+        name: "status_code",
+        prop: "responseCode",
+    },
+    {
+        name: "all_threads",
+        prop: "allThreads",
+    },
+    {
+        name: "grp_threads",
+        prop: "grpThreads",
+    }, {
+        name: "latency",
+        prop: "Latency",
+    },
+    {
+        name: "response_message",
+        prop: "responseMessage",
+    },
+    {
+        name: "item_id",
+        prop: "itemId",
+    },
+    {
+        name: "sut_hostname",
+        prop: "sutHostname",
+        def: null,
+    },
+    {
+        name: "failure_message",
+        prop: "failureMessage",
+        def: null,
+    },
+    {
+        name: "thread_name",
+        prop: "threadName",
+        def: null,
+    },
+], { table: new pg.helpers.TableName({ table: "samples", schema: "jtl" }) })
