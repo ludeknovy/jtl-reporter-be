@@ -9,7 +9,7 @@ describe("itemErrorHandler", () => {
         jest.resetAllMocks()
     })
     it("should try set the item to error state", () => {
-        (db.none as any).mockResolvedValueOnce(null);
+        (db.none as any).mockResolvedValueOnce(null)
         const spy = jest.spyOn(require("../../../queries/items"), "updateItem")
         itemErrorHandler("item_id", Error("Test Error"))
         expect(spy).toHaveBeenCalledTimes(1)
