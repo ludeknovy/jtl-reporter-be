@@ -5,6 +5,7 @@ import { updateItem, updateItemStatus } from "../../queries/items"
 import { ReportStatus } from "../../queries/items.model"
 import { itemDataProcessing } from "./shared/item-data-processing"
 import { StatusCode } from "../../utils/status-code"
+import {itemErrorHandler} from "./shared/item-error-handler";
 
 export const stopItemAsyncController = async (req: Request, res: Response) => {
   const { projectName, scenarioName, itemId } = req.params
@@ -26,6 +27,6 @@ export const stopItemAsyncController = async (req: Request, res: Response) => {
     }
   } catch(e) {
     logger.error(`Processing of item ${itemId} failed ${e}`)
-    await db.none(updateItem(itemId, ReportStatus.Error, null))
+    await itemErrorHandler(itemId, e)
   }
 }
