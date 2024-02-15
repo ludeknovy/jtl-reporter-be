@@ -158,6 +158,7 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
                         removeUploadedFile(kpiFilename)
                         // eslint-disable-next-line max-len
                         logger.info(`Parsed ${rowCount} records in ${(Date.now() - parsingStart) / SECONDS_DIVISOR} seconds`)
+                        tempBuffer = null
                         await itemDataProcessing({
                             itemId,
                             projectName, scenarioName,
@@ -170,6 +171,7 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
                 })
                 .on("error", async (processingError) => {
                     logger.info(`File processing was aborted because of an error, item_id: ${itemId}`)
+                    tempBuffer = null
                     await handleError(itemId, kpiFilename, processingError)
                 })
         } catch(e) {
