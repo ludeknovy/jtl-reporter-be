@@ -19,7 +19,7 @@
   "license": "ISC",
   "dependencies": {
     "@breejs/ts-worker": "^2.0.0",
-    "axios": "^1.6.6",
+    "axios": "^1.6.7",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.1",
     "boom": "^7.2.0",
