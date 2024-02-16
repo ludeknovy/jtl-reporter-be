@@ -84,7 +84,7 @@ export const updateTestItemInfo = (itemId, scenarioName, projectName, note,
                                    environment, hostname, name, resourcesLink, status) => {
     return {
         text: `UPDATE jtl.items as it
-    SET note = $3, environment = $4, hostname = $6, name = $7, resources_link = $8, status = $9
+    SET note = $3, environment = $4, hostname = $6, name = $7, resources_link = $8, status = COALESCE($9, it.status)
     FROM jtl.scenario as s
     WHERE it.id = $1
     AND s.project_id = (SELECT id FROM jtl.projects WHERE project_name = $2)
