@@ -15,7 +15,7 @@ const hostname = Joi.string().max(HOSTNAME_MAX_LENGTH).allow("").allow(null)
 const note = Joi.string().max(NOTE_MAX_LENGTH).allow("").allow(null)
 const itemId = Joi.string().uuid().required()
 const resourcesLink = Joi.string().max(RESOURCES_LINK_MAX_LENGTH).allow("").allow(null)
-
+const status = Joi.string().regex(/^(10|[0-3])$/)
 
 export const labelParamSchema = {
     projectName,
@@ -49,6 +49,7 @@ export const updateItemBodySchema = Joi.object().keys({
     environment,
     name: Joi.string().max(TEST_NAME_MAX_LENGTH).allow("").allow(null),
     resourcesLink,
+    status,
 })
 
 export const newAsyncItemStartBodySchema = Joi.object().keys({
@@ -70,5 +71,5 @@ export const upsertUserItemChartSettings = Joi.array().items(Joi.object().keys({
 })).required()
 
 export const stopItemAsyncBodySchema = Joi.object().keys({
-    status: Joi.string().regex(/^(10|[0-3])$/),
+    status,
 })

@@ -81,15 +81,15 @@ export const saveItemStats = (itemId, stats, overview, sutOverview, errors) => {
 }
 
 export const updateTestItemInfo = (itemId, scenarioName, projectName, note,
-                                   environment, hostname, name, resourcesLink) => {
+                                   environment, hostname, name, resourcesLink, status) => {
     return {
         text: `UPDATE jtl.items as it
-    SET note = $3, environment = $4, hostname = $6, name = $7, resources_link = $8
+    SET note = $3, environment = $4, hostname = $6, name = $7, resources_link = $8, status = $9
     FROM jtl.scenario as s
     WHERE it.id = $1
     AND s.project_id = (SELECT id FROM jtl.projects WHERE project_name = $2)
     AND s.name = $5`,
-        values: [itemId, projectName, note, environment, scenarioName, hostname, name, resourcesLink],
+        values: [itemId, projectName, note, environment, scenarioName, hostname, name, resourcesLink, status],
     }
 }
 
