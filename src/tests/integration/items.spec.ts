@@ -74,7 +74,7 @@ describe("Items", () => {
           environment: "new-test-environment",
           note: "new-test-note",
           base: true,
-          status: 10,
+          status: "10",
         })
         .expect(StatusCode.NoContent)
     })
@@ -88,7 +88,7 @@ describe("Items", () => {
             environment: "new-test-environment",
             note: "new-test-note",
             base: true,
-            status: 10,
+            status: "10",
           })
           .expect(StatusCode.NotFound)
     })
