@@ -7,7 +7,6 @@ import * as compression from "compression"
 import * as expressWinston from "express-winston"
 import { logger } from "./logger"
 import { Router } from "./server/router"
-import * as swaggerUi from "swagger-ui-express"
 import * as http from "http"
 import { v4 as uuidv4 } from "uuid"
 import { config } from "./server/config"
@@ -16,8 +15,6 @@ import { NextFunction, Request, Response } from "express"
 import { PgError } from "./server/errors/pgError"
 import { bree } from "./server/utils/scheduled-tasks/scheduler"
 import helmet from "helmet"
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const swaggerDocument = require("../openapi.json")
 
 const DEFAULT_PORT = 5000
 const PORT = process.env.PORT || DEFAULT_PORT
@@ -48,8 +45,6 @@ export class App {
       colorize: false,
     }))
     this.app.use(helmet())
-
-    this.app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
     this.app.use((req, res, next) => {
       res.header("Access-Control-Allow-Origin", "*")

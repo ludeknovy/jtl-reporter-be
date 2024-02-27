@@ -39,7 +39,6 @@
     "node-pg-migrate": "^6.2.2",
     "pg": "^8.11.3",
     "pg-promise": "^10.15.4",
-    "swagger-ui-express": "^4.6.3",
     "uuid": "^9.0.1",
     "winston": "^3.11.0",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.1/xlsx-0.20.1.tgz"
