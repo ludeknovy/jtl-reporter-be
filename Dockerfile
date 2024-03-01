@@ -8,7 +8,7 @@ COPY package.json package-lock.json  ./
 
 RUN npm install
 
-COPY tsconfig.json custom-typings.d.ts openapi.json ./
+COPY tsconfig.json custom-typings.d.ts ./
 
 COPY /migrations ./migrations
 
