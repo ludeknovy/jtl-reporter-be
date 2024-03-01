@@ -128,7 +128,7 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
             logger.info(`Starting KPI file streaming and saving to db, item_id: ${itemId}`)
             const parsingStart = Date.now()
 
-            await processMonitoringCsv(monitoringFileName, itemId)
+            processMonitoringCsv(monitoringFileName, itemId)
             const BUFFER_SIZE = 10000
             const csvStream = fs.createReadStream(kpiFilename)
                 .pipe(csv.parse({ headers: true }))
@@ -167,12 +167,15 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
 
                     } catch(onEndError) {
                         await handleError(itemId, kpiFilename, onEndError)
+                    } finally {
+                        csvStream.removeAllListeners()
                     }
                 })
                 .on("error", async (processingError) => {
                     logger.info(`File processing was aborted because of an error, item_id: ${itemId}`)
                     tempBuffer = null
                     await handleError(itemId, kpiFilename, processingError)
+                    csvStream.removeAllListeners()
                 })
         } catch(e) {
             logger.error(e)
