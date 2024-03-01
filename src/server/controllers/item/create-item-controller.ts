@@ -237,3 +237,4 @@ const handleError = async (itemId: string, kpiFilename: string, processingError:
         logger.error(`File ${kpiFilename} does not exist anymore`)
     }
 }
+

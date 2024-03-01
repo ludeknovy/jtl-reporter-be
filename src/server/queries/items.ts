@@ -30,9 +30,10 @@ export const findItem = (itemId, projectName, scenarioName) => {
     return {
         // eslint-disable-next-line max-len
         text: `SELECT charts.plot_data, charts.extra_plot_data, charts.histogram_plot_data, charts.scatter_plot_data, note, environment, status, hostname, s.analysis_enabled as "analysisEnabled",
-            s.zero_error_tolerance_enabled as "zeroErrorToleranceEnabled", threshold_result as "thresholds", 
+            s.zero_error_tolerance_enabled as "zeroErrorToleranceEnabled", threshold_result as "thresholds",
             report_status as "reportStatus", p.item_top_statistics_settings as "topMetricsSettings", items.name,
             items.apdex_settings as "apdexSettings", items.resources_link as "resourcesLink",
+            s.min_test_duration as "minTestDuration",
            (SELECT items.id FROM jtl.items as items
       LEFT JOIN jtl.charts as charts ON charts.item_id = items.id
       LEFT JOIN jtl.scenario as s ON s.id = items.scenario_id

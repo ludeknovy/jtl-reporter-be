@@ -28,6 +28,7 @@ export const getScenarioController = async (req: IGetUserAuthInfoRequest, res: R
         name: scenario.name,
         analysisEnabled: scenario.analysis_enabled,
         zeroErrorToleranceEnabled: scenario.zero_error_tolerance_enabled,
+        minTestDuration: scenario.min_test_duration,
         deleteSamples: scenario.delete_samples,
         keepTestRunsPeriod: scenario.keep_test_runs_period,
         generateShareToken: scenario.generate_share_token,
