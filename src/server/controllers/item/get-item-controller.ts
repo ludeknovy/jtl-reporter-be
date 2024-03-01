@@ -20,7 +20,7 @@ export const getItemController = async (req: IGetUserAuthInfoRequest, res: Respo
     // eslint-disable-next-line @typescript-eslint/naming-convention
     base_id, resourcesLink,
     status, hostname, reportStatus, thresholds,
-    analysisEnabled, zeroErrorToleranceEnabled, topMetricsSettings, name, apdexSettings, minTestDuration
+    analysisEnabled, zeroErrorToleranceEnabled, topMetricsSettings, name, apdexSettings, minTestDuration,
   } = await db.one(findItem(itemId, projectName, scenarioName))
   const { stats: statistics, overview, sutOverview, errors } = await db.one(findItemStats(itemId))
 
