@@ -41,15 +41,19 @@ export const processMonitoringCsv = (filename: string, itemId: string) => {
     .on("end", async (rowCount: number) => {
       try {
         await db.none(pg.helpers.insert(tempBuffer, columnSet))
+        tempBuffer = null
 
         fs.unlinkSync(filename)
 
         logger.info(`Parsed ${rowCount} monitoring records`)
       } catch(error) {
         logger.error(`Error while processing monitoring data, itemId - ${itemId}: ${error}`)
+      } finally {
+        csvStream.removeAllListeners()
       }
     })
     .on("error", (error) => {
       logger.error(`Not valid monitoring csv file provided: ${error}`)
+      csvStream.removeAllListeners()
     })
 }
