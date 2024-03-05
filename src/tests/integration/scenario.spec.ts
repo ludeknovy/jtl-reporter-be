@@ -59,6 +59,7 @@ describe("Scenario", () => {
                     zeroErrorToleranceEnabled: true,
                     deleteSamples: false,
                     keepTestRunsPeriod: 7,
+                    minTestDuration: 5,
                     generateShareToken: true,
                     extraAggregations: false,
                     thresholds: {
@@ -115,6 +116,7 @@ describe("Scenario", () => {
                     analysisEnabled: false,
                     zeroErrorToleranceEnabled: true,
                     deleteSamples: false,
+                    minTestDuration: 5,
                     keepTestRunsPeriod: 7,
                     generateShareToken: true,
                     extraAggregations: false,

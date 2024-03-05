@@ -38,7 +38,7 @@ export const findProjects = (userId) => {
 
 export const latestItems = (userId) => {
   return {
-    text: `SELECT i.id, s.name, environment, project_name as "projectName", stat.overview, status, s.zero_error_tolerance_enabled as "zeroErrorToleranceEnabled", i.threshold_result as "thresholdPassed" FROM jtl.items as i
+    text: `SELECT i.id, s.name, environment, project_name as "projectName", stat.overview, status, s.zero_error_tolerance_enabled as "zeroErrorToleranceEnabled", s.min_test_duration as "minTestDuration", i.threshold_result as "thresholdPassed" FROM jtl.items as i
     LEFT JOIN jtl.scenario as s ON s.id = i.scenario_id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
     LEFT JOIN jtl.item_stat as stat ON stat.item_id = i.id                                                                                                                                                                                          

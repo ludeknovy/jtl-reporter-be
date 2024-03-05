@@ -20,7 +20,7 @@ export const getItemController = async (req: IGetUserAuthInfoRequest, res: Respo
     // eslint-disable-next-line @typescript-eslint/naming-convention
     base_id, resourcesLink,
     status, hostname, reportStatus, thresholds,
-    analysisEnabled, zeroErrorToleranceEnabled, topMetricsSettings, name, apdexSettings,
+    analysisEnabled, zeroErrorToleranceEnabled, topMetricsSettings, name, apdexSettings, minTestDuration,
   } = await db.one(findItem(itemId, projectName, scenarioName))
   const { stats: statistics, overview, sutOverview, errors } = await db.one(findItemStats(itemId))
 
@@ -43,7 +43,7 @@ export const getItemController = async (req: IGetUserAuthInfoRequest, res: Respo
     plot: Object.assign({}, plot, { scatterPlotData }),
     extraPlotData, note, environment, hostname, reportStatus, thresholds, analysisEnabled,
     baseId: base_id, isBase: base_id === itemId, zeroErrorToleranceEnabled, topMetricsSettings,
-    histogramPlotData,
+    histogramPlotData, minTestDuration,
     name, resourcesLink,
     monitoring: {
       cpu: {

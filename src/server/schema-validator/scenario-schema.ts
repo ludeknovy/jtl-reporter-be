@@ -5,6 +5,7 @@ import { ENVIRONMENT_MAX_LENGTH } from "../controllers/item/create-item-const"
 const MAX_NUMBER = 100
 const URL_MAX_LENGTH = 400
 const MAX_NOTE_LENGTH = 200
+const MAX_MIN_TEST_DURATION = 1000
 
 export const paramsSchema = {
   projectName: Joi.string().required(),
@@ -43,6 +44,7 @@ export const updateScenarioSchema = {
   ...scenarioSchema,
   analysisEnabled: Joi.boolean().required(),
   zeroErrorToleranceEnabled: Joi.boolean().required(),
+  minTestDuration: Joi.number().min(0).max(MAX_MIN_TEST_DURATION).required(),
   deleteSamples: Joi.boolean().required(),
   keepTestRunsPeriod: Joi.number().required(),
   generateShareToken: Joi.boolean().required(),

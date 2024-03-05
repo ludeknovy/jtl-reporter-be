@@ -19,13 +19,13 @@
   "license": "ISC",
   "dependencies": {
     "@breejs/ts-worker": "^2.0.0",
-    "axios": "^1.6.5",
+    "axios": "^1.6.7",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.1",
     "boom": "^7.2.0",
     "bree": "^9.2.2",
     "compression": "^1.7.4",
-    "dotenv": "^16.3.1",
+    "dotenv": "^16.4.2",
     "express": "^4.18.2",
     "express-winston": "^4.2.0",
     "fast-csv": "^4.3.6",
@@ -39,7 +39,6 @@
     "node-pg-migrate": "^6.2.2",
     "pg": "^8.11.3",
     "pg-promise": "^10.15.4",
-    "swagger-ui-express": "^4.6.3",
     "uuid": "^9.0.1",
     "winston": "^3.11.0",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.1/xlsx-0.20.1.tgz"
