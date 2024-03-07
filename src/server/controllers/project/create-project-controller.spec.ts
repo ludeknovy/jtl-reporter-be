@@ -70,7 +70,8 @@ describe("createProjectController", function () {
 
             (db.one as any).mockResolvedValueOnce({ exists: false });
             (db.one as any).mockResolvedValueOnce({ id: "123" })
-            const dbNoneMock = (db.none as any).mockImplementationOnce(() => jest.fn())
+            const dbNoneMock = (db.none as any).mockImplementationOnce(() => jest.fn());
+            (db.manyOrNone as any).mockResolvedValueOnce([{ id: 831, role: "operator" }])
 
             await createProjectController(request as unknown as IGetUserAuthInfoRequest,
                 response as unknown as Response, next)
