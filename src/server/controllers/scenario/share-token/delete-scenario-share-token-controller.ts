@@ -7,8 +7,9 @@ import {
     deleteMyScenarioShareToken,
     deleteScenarioShareToken,
     findMyScenarioShareToken,
-    findScenarioShareToken,
+    findScenarioShareTokenById,
 } from "../../../queries/scenario"
+import { logger } from "../../../../logger"
 
 export const deleteScenarioShareTokenController = async (req: IGetUserAuthInfoRequest, res: Response) => {
     const { user } = req
@@ -23,11 +24,12 @@ export const deleteScenarioShareTokenController = async (req: IGetUserAuthInfoRe
         res.status(StatusCode.NotFound).send()
     } else {
         const shareToken = await db.oneOrNone(
-            findScenarioShareToken(projectName, scenarioName, shareTokenId))
+            findScenarioShareTokenById(projectName, scenarioName, shareTokenId))
         if (shareToken) {
             await db.none(deleteScenarioShareToken(projectName, scenarioName, shareTokenId))
             return res.status(StatusCode.Ok).send()
         }
+        logger.info(`Scenario token ${shareTokenId} not found. Cannot delete it.`)
         res.status(StatusCode.NotFound).send()
 
     }

@@ -283,16 +283,28 @@ export const findScenarioShareToken = (projectName: string, scenarioName: string
     }
 }
 
-export const findMyScenarioShareToken = (projectName: string, scenarioName: string, token: string, userId: string) => {
+export const findScenarioShareTokenById = (projectName: string, scenarioName: string, id: string) => {
     return {
         text: `SELECT t.token FROM jtl.scenario_share_tokens as t
     LEFT JOIN jtl.scenario as s ON s.id = t.scenario_id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
     WHERE p.project_name = $1
     AND s.name = $2
-    AND t.token = $3
+    AND t.id = $3;`,
+        values: [projectName, scenarioName, id],
+    }
+}
+
+export const findMyScenarioShareToken = (projectName: string, scenarioName: string, tokenId: string, userId: string) => {
+    return {
+        text: `SELECT t.token FROM jtl.scenario_share_tokens as t
+    LEFT JOIN jtl.scenario as s ON s.id = t.scenario_id
+    LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE p.project_name = $1
+    AND s.name = $2
+    AND t.id = $3
     AND t.created_by = $4;`,
-        values: [projectName, scenarioName, token, userId],
+        values: [projectName, scenarioName, tokenId, userId],
     }
 }
 
@@ -349,7 +361,7 @@ export const deleteMyScenarioShareToken = (projectName, scenarioName, id, userId
         text: `DELETE FROM jtl.scenario_share_tokens as sst
     USING jtl.scenario as sc
     WHERE sst.id = $3
-    AND sst.created_by = $3
+    AND sst.created_by = $4
     AND sst.scenario_id = sc.id
     AND sc.name = $2
     AND sc.project_id = (SELECT id FROM jtl.projects WHERE project_name = $1)`,
