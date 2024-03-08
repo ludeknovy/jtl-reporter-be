@@ -43,7 +43,7 @@ export const sendDegradationNotifications = async (projectName, scenarioName, id
         notifications.map(async (notif) => {
             const messageTemplate = NotificationDegradationTemplate.get(notif.channel)
             try {
-                logger.info(`sending notification to: ${notif.channel}`)
+                logger.info(`sending degradation notification to: ${notif.channel}`)
                 const payload = messageTemplate(scenarioName, url)
                 await axios.post(notif.url, payload, {
                     headers: {
