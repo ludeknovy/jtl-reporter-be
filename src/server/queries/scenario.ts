@@ -151,11 +151,21 @@ export const getProcessingItems = (projectName, scenarioName, environment) => {
 
 export const scenarioNotifications = (projectName, scenarioName) => {
     return {
-        text: `SELECT notif.id, url, type, notif.name FROM jtl.notifications as notif
+        text: `SELECT notif.id, url, channel, notification_type as "type", notif.name FROM jtl.notifications as notif
     LEFT JOIN jtl.scenario as s ON s.id = notif.scenario_id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
     WHERE s.name = $2 AND p.project_name = $1`,
         values: [projectName, scenarioName],
+    }
+}
+
+export const scenarioNotificationsByType = (projectName, scenarioName, type) => {
+    return {
+        text: `SELECT notif.id, url, channel, notif.name FROM jtl.notifications as notif
+    LEFT JOIN jtl.scenario as s ON s.id = notif.scenario_id
+    LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE s.name = $2 AND p.project_name = $1 AND notification_type = $3`,
+        values: [projectName, scenarioName, type],
     }
 }
 

@@ -4,7 +4,7 @@ import { divide } from "mathjs"
 const PERC = 100
 
 // eslint-disable-next-line max-len
-export const scenarioThresholdsCalc = (labelStats: LabelStats[], baselineReportStats: LabelStats[], scenarioSettings) => {
+export const scenarioThresholdsCalc = (labelStats: LabelStats[], baselineReportStats: LabelStats[], scenarioSettings): ThresholdValidation => {
     const results = []
     if (!scenarioSettings.errorRate || !scenarioSettings.percentile || !scenarioSettings.throughput) {
         return undefined
@@ -71,3 +71,27 @@ export const scenarioThresholdsCalc = (labelStats: LabelStats[], baselineReportS
     }
 }
 
+export interface ThresholdValidation {
+    passed: boolean
+    results: ThresholdResultExtended[]
+    thresholds: {
+        errorRate: number
+        throughput: number
+        percentile: number
+    }
+}
+
+interface ThresholdResultExtended {
+    passed: boolean
+    label: string
+    result: {
+        percentile: ThresholdResult
+        throughput: ThresholdValidation
+        errorRate: ThresholdResult
+    }
+}
+
+interface ThresholdResult {
+    passed: boolean
+    diffValue: boolean
+}

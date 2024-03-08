@@ -1,4 +1,4 @@
-import { Overview } from "../../../data-stats/prepare-data"
+import { Overview } from "../../../../data-stats/prepare-data"
 
 export const msTeamsTemplate = (scenarioName: string, url, overview: Overview) => {
   const cardPayload = {
