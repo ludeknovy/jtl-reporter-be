@@ -7,4 +7,5 @@ exports.up = (pgm) => {
             notNull: true,
         },
     })
+    pgm.renameColumn({ schema: "jtl", name: "notifications" }, "type", "channel")
 }
