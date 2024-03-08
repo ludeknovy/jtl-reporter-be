@@ -32,7 +32,7 @@ import {
 } from "../../../queries/items"
 import { ReportStatus } from "../../../queries/items.model"
 import { getScenarioSettings } from "../../../queries/scenario"
-import { sendNotifications } from "../../../utils/notifications/send-notification"
+import { sendDegradationNotifications, sendReportNotifications } from "../../../utils/notifications/send-notification"
 import { scenarioThresholdsCalc } from "../utils/scenario-thresholds-calc"
 import { extraIntervalMilliseconds } from "./extra-intervals-mapping"
 import { AnalyticsEvent } from "../../../utils/analytics/anyltics-event"
@@ -139,11 +139,14 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
                 const thresholdResult = scenarioThresholdsCalc(labelStats, baselineReport.stats, scenarioSettings)
                 if (thresholdResult) {
                     await db.none(saveThresholdsResult(projectName, scenarioName, itemId, thresholdResult))
+                    if (!thresholdResult.passed) {
+                        await sendDegradationNotifications(projectName, scenarioName, itemId)
+                    }
                 }
             }
         }
 
-        await sendNotifications(projectName, scenarioName, itemId, overview)
+        await sendReportNotifications(projectName, scenarioName, itemId, overview)
 
         await db.tx(async t => {
             await t.none(saveItemStats(itemId, JSON.stringify(labelStats),

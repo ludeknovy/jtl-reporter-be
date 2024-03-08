@@ -5,7 +5,7 @@ import { StatusCode } from "../../../utils/status-code"
 
 export const createScenarioNotificationController = async (req: Request, res: Response) => {
   const { projectName, scenarioName } = req.params
-  const { type, url, name } = req.body
-  await db.none(createScenarioNotification(projectName, scenarioName, type, url, name))
+  const { type, url, name, channel } = req.body
+  await db.none(createScenarioNotification(projectName, scenarioName, channel, url, name, type))
   res.status(StatusCode.Created).send()
 }

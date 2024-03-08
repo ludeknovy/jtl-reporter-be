@@ -1,4 +1,4 @@
-import { Overview } from "../../../data-stats/prepare-data"
+import { Overview } from "../../../../data-stats/prepare-data"
 
 export const slackTemplate = (scenarioName: string, url, overview: Overview) => {
     const card = {

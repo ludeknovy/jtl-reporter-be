@@ -151,7 +151,7 @@ export const getProcessingItems = (projectName, scenarioName, environment) => {
 
 export const scenarioNotifications = (projectName, scenarioName) => {
     return {
-        text: `SELECT notif.id, url, type, notif.name FROM jtl.notifications as notif
+        text: `SELECT notif.id, url, channel, notification_type as "type", notif.name FROM jtl.notifications as notif
     LEFT JOIN jtl.scenario as s ON s.id = notif.scenario_id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
     WHERE s.name = $2 AND p.project_name = $1`,
@@ -159,14 +159,24 @@ export const scenarioNotifications = (projectName, scenarioName) => {
     }
 }
 
-export const createScenarioNotification = (projectName, scenarioName, type, url, name) => {
+export const scenarioNotificationsByType = (projectName, scenarioName, type) => {
     return {
-        text: `INSERT INTO jtl.notifications(scenario_id, type, url, name) VALUES((
+        text: `SELECT notif.id, url, channel, notif.name FROM jtl.notifications as notif
+    LEFT JOIN jtl.scenario as s ON s.id = notif.scenario_id
+    LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE s.name = $2 AND p.project_name = $1 AND notification_type = $3`,
+        values: [projectName, scenarioName, type],
+    }
+}
+
+export const createScenarioNotification = (projectName, scenarioName, channel, url, name, type) => {
+    return {
+        text: `INSERT INTO jtl.notifications(scenario_id, channel, url, name, notification_type) VALUES((
       SELECT s.id FROM jtl.scenario as s
       LEFT JOIN jtl.projects as p ON p.id = s.project_id
       WHERE s.name = $2 AND p.project_name = $1 
-    ), $3, $4, $5)`,
-        values: [projectName, scenarioName, type, url, name],
+    ), $3, $4, $5, $6)`,
+        values: [projectName, scenarioName, channel, url, name, type],
     }
 }
 
