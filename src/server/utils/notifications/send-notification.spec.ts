@@ -3,11 +3,11 @@ import { sendReportNotifications } from "./send-notification"
 const linkUrl = require("./link-url")
 import axios from "axios"
 const scenarioNotifications = require("../../queries/scenario")
-const msTeamsTemplate = require("./templates/ms-teams-template")
+const msTeamsTemplate = require("./templates/report/ms-teams-template")
 
 
 jest.mock("axios")
-jest.mock("./templates/ms-teams-template")
+jest.mock("./templates/report/ms-teams-template")
 jest.mock("../../../db/db")
 
 const OVERVIEW = {
@@ -33,7 +33,7 @@ describe("sendNotification", () => {
     expect(spy).toHaveBeenCalledTimes(1)
   })
   it("should trigger `scenarioNotifications` query", async () => {
-    const spy = jest.spyOn(scenarioNotifications, "scenarioNotifications")
+    const spy = jest.spyOn(scenarioNotifications, "scenarioNotificationsByType")
     await sendReportNotifications("test", "test", "id", OVERVIEW)
     expect(spy).toHaveBeenCalledTimes(1)
   })
@@ -45,7 +45,7 @@ describe("sendNotification", () => {
   it("should try to send notification request when found in db", async () => {
     const spy = jest.spyOn(msTeamsTemplate, "msTeamsTemplate")
     db.manyOrNone = jest.fn().mockImplementation(() =>
-      Promise.resolve([{ url: "test", name: "test-name", type: "ms-teams" }]))
+      Promise.resolve([{ url: "test", name: "test-name", channel: "ms-teams" }]))
     const post = axios.post = jest.fn().mockImplementation(() => Promise.resolve({}))
     await sendReportNotifications("test", "test", "id", OVERVIEW)
     expect(spy).toHaveBeenCalledTimes(1)
@@ -53,7 +53,7 @@ describe("sendNotification", () => {
   })
   it("should not throw an error when request failed", () => {
     db.manyOrNone = jest.fn().mockImplementation(() =>
-      Promise.resolve([{ url: "test", name: "test-name", type: "ms-teams" }]))
+      Promise.resolve([{ url: "test", name: "test-name", channel: "ms-teams" }]))
     axios.post = jest.fn().mockImplementation(() => Promise.reject(new Error("failed")))
     expect(async () => {
       await sendReportNotifications("test", "test", "id", OVERVIEW)

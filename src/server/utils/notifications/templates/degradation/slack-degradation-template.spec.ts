@@ -7,12 +7,12 @@ describe("Slack Degradation template", () => {
         expect(template).toEqual({
                 blocks: [
                     { type: "header", text: { type: "plain_text", text: "JTL Reporter" } },
-                    { type: "header", text: { type: "plain_text",
-                            text: "Performance Report for scenario: scenarioName" } },
-                    { type: "divider" }, { type: "section", fields: [{ type: "mrkdwn", text: "*Error Rate*\n0%" }] },
-                    { type: "section", fields: [{ type: "mrkdwn", text: "*90% percentile*\n10 ms" }] },
-                    { type: "section", fields: [{ type: "mrkdwn", text: "*Throughput*\n10 reqs/s" }] },
-                    { type: "section", fields: [{ type: "mrkdwn", text: "*Duration*\n1 min" }] },
+                    {
+                        type: "header", text: {
+                            type: "plain_text",
+                            text: "Performance Degradation Detected for scenario: scenarioName",
+                        },
+                    },
                     {
                         type: "section",
                         fields: {
@@ -32,11 +32,10 @@ describe("Slack Degradation template", () => {
         expect(template).toEqual({
             blocks: [
                 { type: "header", text: { type: "plain_text", text: "JTL Reporter" } },
-                { type: "header", text: { type: "plain_text", text: "Performance Report for scenario: scenarioName" } },
-                { type: "divider" }, { type: "section", fields: [{ type: "mrkdwn", text: "*Error Rate*\n0%" }] },
-                { type: "section", fields: [{ type: "mrkdwn", text: "*90% percentile*\n10 ms" }] },
-                { type: "section", fields: [{ type: "mrkdwn", text: "*Throughput*\n10 reqs/s" }] },
-                { type: "section", fields: [{ type: "mrkdwn", text: "*Duration*\n1 min" }] }],
+                {
+                    type: "header",
+                    text: { type: "plain_text", text: "Performance Degradation Detected for scenario: scenarioName" },
+                }],
         })
     })
 })

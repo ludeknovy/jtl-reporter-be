@@ -16,16 +16,9 @@ describe("MS Teams Degradation template", () => {
                 type: "TextBlock",
                 size: "Medium",
                 weight: "Bolder",
-                text: "Performance Report for scenario: scenarioName",
+                text: "Performance Degradation Detected for scenario: scenarioName",
               },
-              {
-                type: "FactSet",
-                facts: [
-                  { title: "Error Rate", value: "0 %" },
-                  { title: "90% percentile", value: "10 ms" },
-                  { title: "Throughput", value: "10 reqs/s" },
-                  { title: "Duration", value: "1 min" }],
-              }],
+            ],
             actions: [
               { type: "Action.OpenUrl", title: "View", url: "http://localhost" }],
             $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
@@ -49,16 +42,9 @@ describe("MS Teams Degradation template", () => {
                 type: "TextBlock",
                 size: "Medium",
                 weight: "Bolder",
-                text: "Performance Report for scenario: scenarioName",
+                text: "Performance Degradation Detected for scenario: scenarioName",
               },
-              {
-                type: "FactSet",
-                facts: [
-                  { title: "Error Rate", value: "0 %" },
-                  { title: "90% percentile", value: "10 ms" },
-                  { title: "Throughput", value: "10 reqs/s" },
-                  { title: "Duration", value: "1 min" }],
-              }],
+            ],
             actions: [],
             $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
             version: "1.2",

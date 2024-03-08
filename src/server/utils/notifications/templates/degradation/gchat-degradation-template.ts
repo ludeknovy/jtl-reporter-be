@@ -7,9 +7,7 @@ export const gchatDegradationTemplate = (scenarioName: string, url) => {
                 subtitle: `Performance Degradation Detected for scenario: ${scenarioName}`,
                 imageUrl: "",
             },
-            sections: [{
-                widgets: [],
-            }],
+            sections: [],
         }],
     }
 

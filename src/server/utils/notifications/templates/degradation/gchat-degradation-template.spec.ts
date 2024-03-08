@@ -8,38 +8,10 @@ describe("GChat Degradation template", () => {
                     {
                         header:  {
                             imageUrl: "",
-                            subtitle: "Performance Report for scenario: scenarioName",
+                            subtitle: "Performance Degradation Detected for scenario: scenarioName",
                             title: "JTL Reporter",
                         },
                         sections:  [
-                            {
-                                widgets:  [
-                                    {
-                                        keyValue:  {
-                                            content: "0 %",
-                                            topLabel: "Error Rate",
-                                        },
-                                    },
-                                    {
-                                        keyValue:  {
-                                            content: "10 ms",
-                                            topLabel: "90% percentile",
-                                        },
-                                    },
-                                    {
-                                        keyValue:  {
-                                            content: "10 reqs/s",
-                                            topLabel: "Throughput",
-                                        },
-                                    },
-                                    {
-                                        keyValue:  {
-                                            content: "1 min",
-                                            topLabel: "Duration",
-                                        },
-                                    },
-                                ],
-                            },
                             {
                                 widgets:  [
                                     {
@@ -71,39 +43,10 @@ describe("GChat Degradation template", () => {
                     {
                         header:  {
                             imageUrl: "",
-                            subtitle: "Performance Report for scenario: scenarioName",
+                            subtitle: "Performance Degradation Detected for scenario: scenarioName",
                             title: "JTL Reporter",
                         },
-                        sections:  [
-                            {
-                                widgets:  [
-                                    {
-                                        keyValue:  {
-                                            content: "0 %",
-                                            topLabel: "Error Rate",
-                                        },
-                                    },
-                                    {
-                                        keyValue:  {
-                                            content: "10 ms",
-                                            topLabel: "90% percentile",
-                                        },
-                                    },
-                                    {
-                                        keyValue:  {
-                                            content: "10 reqs/s",
-                                            topLabel: "Throughput",
-                                        },
-                                    },
-                                    {
-                                        keyValue:  {
-                                            content: "1 min",
-                                            topLabel: "Duration",
-                                        },
-                                    },
-                                ],
-                            },
-                        ],
+                        sections:  [],
                     },
                 ],
             }
