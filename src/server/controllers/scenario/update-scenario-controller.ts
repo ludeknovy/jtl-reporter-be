@@ -21,12 +21,13 @@ export const updateScenarioController = async (req: IGetUserAuthInfoRequest, res
         extraAggregations,
         userSettings,
         apdexSettings,
+        minTestDuration,
     } = req.body
 
     await db.none(updateScenario(projectName, scenarioName, name, analysisEnabled,
         thresholds, deleteSamples, zeroErrorToleranceEnabled, keepTestRunsPeriod,
         generateShareToken, JSON.stringify(labelFilterSettings), JSON.stringify(labelTrendChartSettings),
-        extraAggregations, apdexSettings))
+        extraAggregations, apdexSettings, minTestDuration))
 
     await db.none(updateUserScenarioSettings(projectName, scenarioName, userId,
         JSON.stringify(userSettings.requestStats)))

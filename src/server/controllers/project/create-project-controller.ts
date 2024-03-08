@@ -26,18 +26,24 @@ export const createProjectController = async (req: IGetUserAuthInfoRequest, res:
             await db.query(addProjectMember(project.id, req.user.userId))
         }
         if (req.user.role === AllowedRoles.Admin && projectMembers?.length > 0) {
-            const columnSet = new pg.helpers.ColumnSet([
-                { name: "project_id", prop: "projectId" },
-                { name: "user_id", prop: "userId" }],
-                { table: new pg.helpers.TableName({ table: "user_project_access", schema: "jtl" }) })
-            const dataToBeInserted = projectMembers.map(user => ({
-                userId: user,
-                projectId: project.id,
-            }))
-            logger.info(`Granting access to following users ${projectMembers}`)
-            const query = pg.helpers.insert(dataToBeInserted, columnSet)
-            await db.none(query)
-
+            logger.info(`Checking users roles, ${projectMembers}`)
+            const usersWithRoles = await db.manyOrNone(
+                "SELECT users.role, users.id FROM jtl.users users WHERE users.id IN ($1:list)",
+                [projectMembers])
+            if (usersWithRoles && usersWithRoles.length > 0) {
+                const nonAdminUsers = usersWithRoles.filter(user => user.role !== AllowedRoles.Admin)
+                const columnSet = new pg.helpers.ColumnSet([
+                        { name: "project_id", prop: "projectId" },
+                        { name: "user_id", prop: "userId" }],
+                    { table: new pg.helpers.TableName({ table: "user_project_access", schema: "jtl" }) })
+                const dataToBeInserted = nonAdminUsers.map(user => ({
+                    userId: user.id,
+                    projectId: project.id,
+                }))
+                logger.info(`Granting access to following users ${nonAdminUsers.map(user => user.id)}`)
+                const query = pg.helpers.insert(dataToBeInserted, columnSet)
+                await db.none(query)
+            }
         }
     } else {
         return next(boom.conflict("Project already exists"))

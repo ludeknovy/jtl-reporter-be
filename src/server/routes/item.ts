@@ -88,6 +88,7 @@ export class ItemsRoutes {
                 projectExistsMiddleware,
                 wrapAsync((req: Request, res: Response) => deleteItemController(req, res)))
 
+        // https://github.com/ludeknovy/jtl-reporter/issues/159
         app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/request-stats-export")
             .get(
                 authenticationMiddleware,

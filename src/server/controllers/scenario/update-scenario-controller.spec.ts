@@ -22,6 +22,7 @@ describe("updateScenariosController", () => {
       },
       analysisEnabled: true,
       scenarioName: "test-scenario",
+      minTestDuration: 3,
       deleteSamples: false,
       zeroErrorToleranceEnabled: false,
       keepTestRunsPeriod: 7,
@@ -53,7 +54,7 @@ describe("updateScenariosController", () => {
     expect(querySpy).toBeCalledWith("project", "test-scenario", "test-scenario",
       body.analysisEnabled, body.thresholds, body.deleteSamples, body.zeroErrorToleranceEnabled,
       body.keepTestRunsPeriod, body.generateShareToken, JSON.stringify(body.labelFilterSettings),
-      JSON.stringify(body.labelTrendChartSettings), body.extraAggregations, body.apdexSettings)
+      JSON.stringify(body.labelTrendChartSettings), body.extraAggregations, body.apdexSettings, body.minTestDuration)
     expect(response.send).toHaveBeenCalledTimes(1)
   })
 })
