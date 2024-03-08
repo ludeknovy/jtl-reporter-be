@@ -32,7 +32,7 @@ import {
 } from "../../../queries/items"
 import { ReportStatus } from "../../../queries/items.model"
 import { getScenarioSettings } from "../../../queries/scenario"
-import {sendDegradationNotifications, sendReportNotifications} from "../../../utils/notifications/send-notification"
+import { sendDegradationNotifications, sendReportNotifications } from "../../../utils/notifications/send-notification"
 import { scenarioThresholdsCalc } from "../utils/scenario-thresholds-calc"
 import { extraIntervalMilliseconds } from "./extra-intervals-mapping"
 import { AnalyticsEvent } from "../../../utils/analytics/anyltics-event"
