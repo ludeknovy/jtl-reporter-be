@@ -169,14 +169,14 @@ export const scenarioNotificationsByType = (projectName, scenarioName, type) => 
     }
 }
 
-export const createScenarioNotification = (projectName, scenarioName, type, url, name) => {
+export const createScenarioNotification = (projectName, scenarioName, channel, url, name, type) => {
     return {
-        text: `INSERT INTO jtl.notifications(scenario_id, type, url, name) VALUES((
+        text: `INSERT INTO jtl.notifications(scenario_id, channel, url, name, notification_type) VALUES((
       SELECT s.id FROM jtl.scenario as s
       LEFT JOIN jtl.projects as p ON p.id = s.project_id
       WHERE s.name = $2 AND p.project_name = $1 
-    ), $3, $4, $5)`,
-        values: [projectName, scenarioName, type, url, name],
+    ), $3, $4, $5, $6)`,
+        values: [projectName, scenarioName, channel, url, name, type],
     }
 }
 
