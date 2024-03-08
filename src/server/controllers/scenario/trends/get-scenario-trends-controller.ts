@@ -8,12 +8,14 @@ import {
 import { StatusCode } from "../../../utils/status-code"
 import { IGetUserAuthInfoRequest } from "../../../middleware/request.model"
 
+const DEFAULT_LIMIT = 15
 export const getScenarioTrendsController = async (req: IGetUserAuthInfoRequest, res: Response) => {
     const { projectName, scenarioName } = req.params
-    const { environment } = req.query
+    const { environment, limit } = req.query
     const envChecked = environment === "" ? null : environment
-    const aggregatedData = await db.any(scenarioAggregatedTrends(projectName, scenarioName, envChecked))
-    const labelData = await db.manyOrNone(scenarioLabelTrends(projectName, scenarioName, envChecked))
+    const limitChecked = limit && typeof limit === "string" ? parseInt(limit as string, 10) : DEFAULT_LIMIT
+    const aggregatedData = await db.any(scenarioAggregatedTrends(projectName, scenarioName, envChecked, limitChecked))
+    const labelData = await db.manyOrNone(scenarioLabelTrends(projectName, scenarioName, envChecked, limitChecked))
     const scenarioSettings = await db.oneOrNone(getUserScenarioSettings(projectName, scenarioName, req.user.userId))
     const responseTimeDegradationCurve = await db.manyOrNone(
         searchResponseTimeDegradation(projectName, scenarioName, envChecked))
