@@ -20,7 +20,7 @@ export const scenarioShareTokenParamsSchema = {
 export const environmentQuerySchema = {
   environment: Joi.string().max(ENVIRONMENT_MAX_LENGTH).allow(""),
   token: Joi.string(),
-  limit: Joi.number().valid([2, 15, 30, 50, 100]),
+  limit: Joi.number().valid([15, 30, 50]),
 }
 
 export const paramSchemaNotification = {
