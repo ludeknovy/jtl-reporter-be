@@ -15,6 +15,7 @@ import { NextFunction, Request, Response } from "express"
 import { PgError } from "./server/errors/pgError"
 import { bree } from "./server/utils/scheduled-tasks/scheduler"
 import helmet from "helmet"
+import { AnalyticsEvent } from "./server/utils/analytics/anyltics-event"
 
 const DEFAULT_PORT = 5000
 const PORT = process.env.PORT || DEFAULT_PORT
@@ -63,6 +64,7 @@ export class App {
       }
       const errorId = uuidv4()
       logger.error(`Unexpected error: ${error}, errorId: ${errorId}`)
+      AnalyticsEvent.reportUnexpectedError(error)
       return res.status(StatusCode.InternalError).json({ message: `Unexpected error occurred: ${errorId}` })
 
     })
