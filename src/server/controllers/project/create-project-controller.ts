@@ -30,8 +30,8 @@ export const createProjectController = async (req: IGetUserAuthInfoRequest, res:
             const usersWithRoles = await db.manyOrNone(
                 "SELECT users.role, users.id FROM jtl.users users WHERE users.id IN ($1:list)",
                 [projectMembers])
-            if (usersWithRoles && usersWithRoles.length > 0) {
-                const nonAdminUsers = usersWithRoles.filter(user => user.role !== AllowedRoles.Admin)
+            const nonAdminUsers = usersWithRoles.filter(user => user.role !== AllowedRoles.Admin)
+            if (nonAdminUsers && nonAdminUsers.length > 0) {
                 const columnSet = new pg.helpers.ColumnSet([
                         { name: "project_id", prop: "projectId" },
                         { name: "user_id", prop: "userId" }],
