@@ -55,11 +55,13 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         const responseFailures = await db.manyOrNone(responseMessageFailures(itemId))
         const scenarioSettings = await db.one(getScenarioSettings(projectName, scenarioName))
 
-        const rawData = await db.manyOrNone(findRawData(itemId))
-        const rawDataArray = rawData?.map(row => [moment(row.timestamp).valueOf(), row.elapsed])
+        let rawData = await db.manyOrNone(findRawData(itemId))
+        let rawDataArray = rawData?.map(row => [moment(row.timestamp).valueOf(), row.elapsed])
         const rawDataDownSampled = downsampleData(rawDataArray, MAX_SCATTER_CHART_POINTS)
         const groupedErrors = await db.manyOrNone(findGroupedErrors(itemId))
         const top5ErrorsByLabel = await db.manyOrNone(findTop5ErrorsByLabel(itemId))
+        rawData = null
+        rawDataArray = null
 
         if (aggOverview.number_of_sut_hostnames > 1) {
             sutMetrics = await db.many(sutOverviewQuery(itemId))
@@ -75,7 +77,6 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
                 toleratingThreshold,
             }))
         }
-
 
         const {
             overview,
