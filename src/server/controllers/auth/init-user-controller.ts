@@ -25,5 +25,4 @@ export const initUserController = async (req: Request, res: Response, next: Next
         }
         return next(error)
     }
-
 }
