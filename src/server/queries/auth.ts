@@ -32,3 +32,10 @@ export const updatePassword = (id, password) => {
     values: [id, password],
   }
 }
+
+export const getRoleMigration = () => {
+  return {
+    text: "SELECT * FROM pgmigrations WHERE name = $1",
+    values: ["1643273224321_role"],
+  }
+}
