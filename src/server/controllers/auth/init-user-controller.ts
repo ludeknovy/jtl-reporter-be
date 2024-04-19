@@ -9,9 +9,8 @@ import { MigrationNotFinishedException } from "../../errors/migration-not-finish
 export const initUserController = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const roleMigration = await db.oneOrNone(getRoleMigration())
-        console.log(roleMigration)
         if (!roleMigration) {
-            throw MigrationNotFinishedException
+            throw new MigrationNotFinishedException("role migration has not finished")
         }
         const users = await db.manyOrNone(getUsers())
         if (users && users.length > 0) {
