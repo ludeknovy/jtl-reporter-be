@@ -35,7 +35,6 @@ import { sendDegradationNotifications, sendReportNotifications } from "../../../
 import { scenarioThresholdsCalc } from "../utils/scenario-thresholds-calc"
 import { extraIntervalMilliseconds } from "./extra-intervals-mapping"
 import { AnalyticsEvent } from "../../../utils/analytics/anyltics-event"
-import moment = require("moment");
 import { DataProcessingException } from "../../../errors/data-processing-exceptions"
 
 export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) => {
