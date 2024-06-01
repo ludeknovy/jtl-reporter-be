@@ -14,7 +14,9 @@ export const updateProjectSchema = {
   topMetricsSettings: Joi.object({
     virtualUsers: Joi.boolean().required(),
     errorRate: Joi.boolean().required(),
-    percentile: Joi.boolean().required(),
+    percentile90: Joi.boolean().required(),
+    percentile95: Joi.boolean().required(),
+    percentile99: Joi.boolean().required(),
     throughput: Joi.boolean().required(),
     network: Joi.boolean().required(),
     avgLatency: Joi.boolean().required(),

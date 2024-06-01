@@ -14,7 +14,7 @@ export const gchatTemplate = (scenarioName: string, url, overview: Overview) => 
                     {
                         keyValue: {
                             topLabel: "90% percentile",
-                            content: `${overview.percentil} ms`,
+                            content: `${overview.percentile90} ms`,
                         },
                     },
                     { keyValue: { topLabel: "Throughput", content: `${overview.throughput} reqs/s` } },

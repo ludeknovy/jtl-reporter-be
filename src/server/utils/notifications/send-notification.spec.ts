@@ -11,7 +11,9 @@ jest.mock("./templates/report/ms-teams-template")
 jest.mock("../../../db/db")
 
 const OVERVIEW = {
-  percentil: 10,
+  percentile90: 10,
+  percentile95: 14,
+  percentile99: 18,
   avgConnect: 1,
   avgLatency: 1,
   avgResponseTime: 1,
