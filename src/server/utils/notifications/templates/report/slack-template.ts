@@ -8,7 +8,7 @@ export const slackTemplate = (scenarioName: string, url, overview: Overview) => 
         }, { type: "divider" }, {
             type: "section",
             fields: [{ type: "mrkdwn", text: `*Error Rate*\n${overview.errorRate}%` }],
-        }, { type: "section", fields: [{ type: "mrkdwn", text: `*90% percentile*\n${overview.percentil} ms` }] }, {
+        }, { type: "section", fields: [{ type: "mrkdwn", text: `*90% percentile*\n${overview.percentile90} ms` }] }, {
             type: "section",
             fields: [{ type: "mrkdwn", text: `*Throughput*\n${overview.throughput} reqs/s` }],
         }, { type: "section", fields: [{ type: "mrkdwn", text: `*Duration*\n${overview.duration} min` }] }],

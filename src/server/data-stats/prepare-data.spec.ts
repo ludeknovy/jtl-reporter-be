@@ -224,6 +224,8 @@ describe("prepare data", () => {
                 bytes_sent_total: 69848465,
                 total: 46596,
                 n90: 271,
+                n95: 272,
+                n99: 273,
                 number_of_failed: 3,
             }
             const labelsData = [
@@ -303,7 +305,9 @@ describe("prepare data", () => {
             const { overview, labelStats } = prepareDataForSavingToDb(overviewData, labelsData, [],
                 statusCodes, responseFailures, apdex, groupedErrors, labelErrors)
             expect(overview).toEqual({
-                percentil: 271,
+                percentile90: 271,
+                percentile95: 272,
+                percentile99: 273,
                 maxVu: undefined,
                 avgResponseTime: 106,
                 errorRate: 0.01,

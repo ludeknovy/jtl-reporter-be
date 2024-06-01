@@ -25,7 +25,7 @@ export const msTeamsTemplate = (scenarioName: string, url, overview: Overview) =
                 },
                 {
                   title: "90% percentile",
-                  value: overview.percentil + " ms",
+                  value: overview.percentile90 + " ms",
                 },
                 {
                   title: "Throughput",

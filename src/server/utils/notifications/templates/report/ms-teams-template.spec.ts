@@ -2,7 +2,9 @@ import { msTeamsTemplate } from "./ms-teams-template"
 
 describe("MS Teams template", () => {
   const OVERVIEW = {
-    percentil: 10,
+    percentile90: 10,
+    percentile95: 14,
+    percentile99: 18,
     avgConnect: 1,
     avgLatency: 1,
     avgResponseTime: 1,
