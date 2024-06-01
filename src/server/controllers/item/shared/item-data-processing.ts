@@ -24,11 +24,10 @@ import {
     updateItemApdexSettings,
     chartOverviewStatusCodesQuery,
     responseTimePerLabelHistogram,
-    findRawData,
     getBaselineItemWithStats,
     findGroupedErrors,
     findTop5ErrorsByLabel,
-    threadsPerThreadGroup,
+    threadsPerThreadGroup, getDownsampledRawData,
 } from "../../../queries/items"
 import { ReportStatus } from "../../../queries/items.model"
 import { getScenarioSettings } from "../../../queries/scenario"
@@ -36,8 +35,6 @@ import { sendDegradationNotifications, sendReportNotifications } from "../../../
 import { scenarioThresholdsCalc } from "../utils/scenario-thresholds-calc"
 import { extraIntervalMilliseconds } from "./extra-intervals-mapping"
 import { AnalyticsEvent } from "../../../utils/analytics/anyltics-event"
-import { downsampleData } from "../../../utils/lttb"
-import moment = require("moment");
 import { DataProcessingException } from "../../../errors/data-processing-exceptions"
 
 export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) => {
@@ -46,6 +43,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
     let distributedThreads = null
     let sutMetrics = []
     let apdex = []
+    let rawDataArray = null
 
     try {
         const aggOverview = await db.one(aggOverviewQuery(itemId))
@@ -55,13 +53,12 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         const responseFailures = await db.manyOrNone(responseMessageFailures(itemId))
         const scenarioSettings = await db.one(getScenarioSettings(projectName, scenarioName))
 
-        let rawData = await db.manyOrNone(findRawData(itemId))
-        let rawDataArray = rawData?.map(row => [moment(row.timestamp).valueOf(), row.elapsed])
-        const rawDataDownSampled = downsampleData(rawDataArray, MAX_SCATTER_CHART_POINTS)
+        let rawDownsampledData = await db.manyOrNone(getDownsampledRawData(itemId, MAX_SCATTER_CHART_POINTS))
+        rawDataArray = rawDownsampledData?.map(row => [row.timestamp, row.value])
+        rawDownsampledData = null
+
         const groupedErrors = await db.manyOrNone(findGroupedErrors(itemId))
         const top5ErrorsByLabel = await db.manyOrNone(findTop5ErrorsByLabel(itemId))
-        rawData = null
-        rawDataArray = null
 
         if (aggOverview.number_of_sut_hostnames > 1) {
             sutMetrics = await db.many(sutOverviewQuery(itemId))
@@ -153,7 +150,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
             await t.none(saveItemStats(itemId, JSON.stringify(labelStats),
                 overview, JSON.stringify(sutOverview), JSON.stringify(errors)))
             await t.none(savePlotData(itemId, JSON.stringify(chartData), JSON.stringify(extraChartData),
-                JSON.stringify(responseTimeHistogram), JSON.stringify(rawDataDownSampled)))
+                JSON.stringify(responseTimeHistogram), JSON.stringify(rawDataArray)))
             await t.none(updateItem(itemId, ReportStatus.Ready, overview.startDate))
         })
 
@@ -170,5 +167,7 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
     } catch(error) {
         throw new DataProcessingException(
             `Error while processing dataId: ${itemId} for item: ${itemId}, error: ${error}`)
+    } finally {
+        rawDataArray = []
     }
 }
