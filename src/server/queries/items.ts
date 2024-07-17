@@ -59,11 +59,13 @@ export const findItemStats = (testItem) => {
     }
 }
 
-export const findRawData = (itemId) => {
+export const getDownsampledRawData = (itemId: string, threshold: number) => {
     return {
-        text: `SELECT timestamp, elapsed
-            FROM jtl.samples WHERE item_id = $1`,
-        values: [itemId],
+        text: `SELECT (EXTRACT(epoch FROM time) * 1000)::bigint as timestamp, value
+                FROM unnest((
+                    SELECT lttb(timestamp, elapsed, $2)
+                    FROM jtl.samples WHERE item_id = $1));`,
+        values: [itemId, threshold],
     }
 }
 
