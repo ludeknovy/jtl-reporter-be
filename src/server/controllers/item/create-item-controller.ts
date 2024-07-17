@@ -31,12 +31,13 @@ import { DataParsingException } from "../../errors/data-parsing-exception"
 import { itemErrorHandler } from "./shared/item-error-handler"
 
 const pg = pgp()
+// eslint-disable-next-line @typescript-eslint/no-magic-numbers
+const FILE_LIMIT = 5120 * 1024 * 1024
 
 const upload = multer(
     {
         dest: "./uploads",
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        limits: { fieldSize: 2048 * 1024 * 1024 },
+        limits: { fieldSize: FILE_LIMIT },
     }).fields([
     { name: "kpi", maxCount: 1 },
     { name: "monitoring", maxCount: 1 },
