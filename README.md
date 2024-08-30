@@ -1,8 +1,8 @@
 # jtl-reporter-be
-JtlReporter backend service. The main repository with all instruction can be found [here](https://github.com/ludeknovy/jtl-reporter).
+JtlReporter backend service. The main repository with all instructions can be found [here](https://github.com/ludeknovy/jtl-reporter).
 
 # Prerequisites
-* Nodejs v16
+* Nodejs v18
 
 # Development
 

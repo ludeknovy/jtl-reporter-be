@@ -36,7 +36,7 @@ describe("AnalyticEvents", () => {
             expect(trackMock).not.toHaveBeenCalled()
 
         })
-        it("should track the even only when analytics enabled", function () {
+        it("should track the event only when analytics enabled", function () {
             process.env.OPT_OUT_ANALYTICS = "false"
             const trackMock = (analytics.track as any).mockResolvedValueOnce(undefined)
             AnalyticsEvent.reportProcessingFinished()
@@ -52,7 +52,7 @@ describe("AnalyticEvents", () => {
             expect(trackMock).not.toHaveBeenCalled()
 
         })
-        it("should track the even only when analytics enabled", function () {
+        it("should track the event only when analytics enabled", function () {
             process.env.OPT_OUT_ANALYTICS = "false"
             const trackMock = (analytics.track as any).mockResolvedValueOnce(undefined)
             AnalyticsEvent.reportDetails(1, 1)
@@ -68,10 +68,25 @@ describe("AnalyticEvents", () => {
             expect(trackMock).not.toHaveBeenCalled()
 
         })
-        it("should track the even only when analytics enabled", function () {
+        it("should track the event only when analytics enabled", function () {
             process.env.OPT_OUT_ANALYTICS = "false"
             const trackMock = (analytics.track as any).mockResolvedValueOnce(undefined)
             AnalyticsEvent.reportProcessingStarted()
+            expect(trackMock).toHaveBeenCalled()
+        })
+    })
+    describe("unexpectedError", () => {
+        it("should not track the event when analytics disabled", function () {
+            process.env.OPT_OUT_ANALYTICS = "true"
+            const trackMock = (analytics.track as any).mockResolvedValueOnce(undefined)
+            AnalyticsEvent.reportUnexpectedError(Error("test"))
+            expect(trackMock).not.toHaveBeenCalled()
+
+        })
+        it("should track the event only when analytics enabled", function () {
+            process.env.OPT_OUT_ANALYTICS = "false"
+            const trackMock = (analytics.track as any).mockResolvedValueOnce(undefined)
+            AnalyticsEvent.reportUnexpectedError(Error("test"))
             expect(trackMock).toHaveBeenCalled()
         })
     })

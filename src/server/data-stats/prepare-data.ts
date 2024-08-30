@@ -19,7 +19,9 @@ export const prepareDataForSavingToDb = (overviewData, labelData, sutStats, stat
         const endDate = new Date(overviewData.end)
         return {
             overview: {
-                percentil: roundNumberTwoDecimals(overviewData.n90),
+                percentile90: roundNumberTwoDecimals(overviewData.n90),
+                percentile95: roundNumberTwoDecimals(overviewData.n95),
+                percentile99: roundNumberTwoDecimals(overviewData.n99),
                 maxVu: undefined,
                 avgResponseTime: Math.round(overviewData.avg_response),
                 errorRate: roundNumberTwoDecimals((overviewData.number_of_failed / overviewData.total) * 100),
@@ -441,7 +443,9 @@ interface ChartLabelData {
 }
 
 export interface Overview {
-    percentil: number
+    percentile90: number
+    percentile95: number
+    percentile99: number
     errorRate: number
     errorCount: number
     throughput: number

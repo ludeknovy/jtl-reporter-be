@@ -1,6 +1,9 @@
 /* eslint-disable max-lines */
 // eslint-disable-next-line max-len
 
+import * as pgp from "pg-promise"
+const pg = pgp()
+
 // eslint-disable-next-line max-len
 export const createNewItem = (scenarioName, startTime, environment, note, status, projectName, hostname, reportStatus, name, resourcesLink) => {
     return {
@@ -27,9 +30,10 @@ export const findItem = (itemId, projectName, scenarioName) => {
     return {
         // eslint-disable-next-line max-len
         text: `SELECT charts.plot_data, charts.extra_plot_data, charts.histogram_plot_data, charts.scatter_plot_data, note, environment, status, hostname, s.analysis_enabled as "analysisEnabled",
-            s.zero_error_tolerance_enabled as "zeroErrorToleranceEnabled", threshold_result as "thresholds", 
+            s.zero_error_tolerance_enabled as "zeroErrorToleranceEnabled", threshold_result as "thresholds",
             report_status as "reportStatus", p.item_top_statistics_settings as "topMetricsSettings", items.name,
             items.apdex_settings as "apdexSettings", items.resources_link as "resourcesLink",
+            s.min_test_duration as "minTestDuration",
            (SELECT items.id FROM jtl.items as items
       LEFT JOIN jtl.charts as charts ON charts.item_id = items.id
       LEFT JOIN jtl.scenario as s ON s.id = items.scenario_id
@@ -78,15 +82,15 @@ export const saveItemStats = (itemId, stats, overview, sutOverview, errors) => {
 }
 
 export const updateTestItemInfo = (itemId, scenarioName, projectName, note,
-                                   environment, hostname, name, resourcesLink) => {
+                                   environment, hostname, name, resourcesLink, status) => {
     return {
         text: `UPDATE jtl.items as it
-    SET note = $3, environment = $4, hostname = $6, name = $7, resources_link = $8
+    SET note = $3, environment = $4, hostname = $6, name = $7, resources_link = $8, status = COALESCE($9, it.status)
     FROM jtl.scenario as s
     WHERE it.id = $1
     AND s.project_id = (SELECT id FROM jtl.projects WHERE project_name = $2)
     AND s.name = $5`,
-        values: [itemId, projectName, note, environment, scenarioName, hostname, name, resourcesLink],
+        values: [itemId, projectName, note, environment, scenarioName, hostname, name, resourcesLink, status],
     }
 }
 
@@ -237,6 +241,8 @@ export const aggOverviewQuery = (itemId) => {
         text: `
     SELECT
     percentile_cont(0.90) within group (order by (samples.elapsed))::real as n90,
+    percentile_cont(0.95) within group (order by (samples.elapsed))::real as n95,
+    percentile_cont(0.99) within group (order by (samples.elapsed))::real as n99,
     COUNT(DISTINCT samples.hostname)::int number_of_hostnames,
     COUNT(DISTINCT samples.sut_hostname)::int number_of_sut_hostnames,
     MAX(samples.timestamp) as end,
@@ -644,3 +650,61 @@ WHERE row_n <= 5;`,
         values: [itemId],
     }
 }
+
+
+export const samplesColumnSet = new pg.helpers.ColumnSet([
+    "elapsed", "success", "bytes", "label",
+    {
+        name: "timestamp",
+        prop: "timeStamp",
+    },
+    {
+        name: "sent_bytes",
+        prop: "sentBytes",
+    },
+    {
+        name: "connect",
+        prop: "Connect",
+    }, {
+        name: "hostname",
+        prop: "Hostname",
+        def: null,
+    }, {
+        name: "status_code",
+        prop: "responseCode",
+    },
+    {
+        name: "all_threads",
+        prop: "allThreads",
+    },
+    {
+        name: "grp_threads",
+        prop: "grpThreads",
+    }, {
+        name: "latency",
+        prop: "Latency",
+    },
+    {
+        name: "response_message",
+        prop: "responseMessage",
+    },
+    {
+        name: "item_id",
+        prop: "itemId",
+    },
+    {
+        name: "sut_hostname",
+        prop: "sutHostname",
+        def: null,
+    },
+    {
+        name: "failure_message",
+        prop: "failureMessage",
+        def: null,
+    },
+    {
+        name: "thread_name",
+        prop: "threadName",
+        def: null,
+    },
+], { table: new pg.helpers.TableName({ table: "samples", schema: "jtl" }) })

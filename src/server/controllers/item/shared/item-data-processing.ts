@@ -32,12 +32,13 @@ import {
 } from "../../../queries/items"
 import { ReportStatus } from "../../../queries/items.model"
 import { getScenarioSettings } from "../../../queries/scenario"
-import { sendNotifications } from "../../../utils/notifications/send-notification"
+import { sendDegradationNotifications, sendReportNotifications } from "../../../utils/notifications/send-notification"
 import { scenarioThresholdsCalc } from "../utils/scenario-thresholds-calc"
 import { extraIntervalMilliseconds } from "./extra-intervals-mapping"
 import { AnalyticsEvent } from "../../../utils/analytics/anyltics-event"
 import { downsampleData } from "../../../utils/lttb"
 import moment = require("moment");
+import { DataProcessingException } from "../../../errors/data-processing-exceptions"
 
 export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) => {
     const MAX_LABEL_CHART_LENGTH = 100000
@@ -54,11 +55,13 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         const responseFailures = await db.manyOrNone(responseMessageFailures(itemId))
         const scenarioSettings = await db.one(getScenarioSettings(projectName, scenarioName))
 
-        const rawData = await db.manyOrNone(findRawData(itemId))
-        const rawDataArray = rawData?.map(row => [moment(row.timestamp).valueOf(), row.elapsed])
+        let rawData = await db.manyOrNone(findRawData(itemId))
+        let rawDataArray = rawData?.map(row => [moment(row.timestamp).valueOf(), row.elapsed])
         const rawDataDownSampled = downsampleData(rawDataArray, MAX_SCATTER_CHART_POINTS)
         const groupedErrors = await db.manyOrNone(findGroupedErrors(itemId))
         const top5ErrorsByLabel = await db.manyOrNone(findTop5ErrorsByLabel(itemId))
+        rawData = null
+        rawDataArray = null
 
         if (aggOverview.number_of_sut_hostnames > 1) {
             sutMetrics = await db.many(sutOverviewQuery(itemId))
@@ -74,7 +77,6 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
                 toleratingThreshold,
             }))
         }
-
 
         const {
             overview,
@@ -138,11 +140,14 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
                 const thresholdResult = scenarioThresholdsCalc(labelStats, baselineReport.stats, scenarioSettings)
                 if (thresholdResult) {
                     await db.none(saveThresholdsResult(projectName, scenarioName, itemId, thresholdResult))
+                    if (!thresholdResult.passed) {
+                        await sendDegradationNotifications(projectName, scenarioName, itemId)
+                    }
                 }
             }
         }
 
-        await sendNotifications(projectName, scenarioName, itemId, overview)
+        await sendReportNotifications(projectName, scenarioName, itemId, overview)
 
         await db.tx(async t => {
             await t.none(saveItemStats(itemId, JSON.stringify(labelStats),
@@ -157,14 +162,13 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         AnalyticsEvent.reportDetails(labelStats.length, overview.duration)
 
         if (scenarioSettings.deleteSamples) {
-            logger.info(`Item: ${itemId} deleting samples data`)
+            logger.info(`Purging samples data, item_id: ${itemId}`)
             await db.none(deleteSamples(itemId))
-            await db.none("VACUUM FULL jtl.samples")
-            logger.info(`Item: ${itemId} samples data deletion done`)
+            logger.info(`Samples purge completed, item_id: ${itemId} `)
         }
 
     } catch(error) {
-        console.log(error)
-        throw new Error(`Error while processing dataId: ${itemId} for item: ${itemId}, error: ${error}`)
+        throw new DataProcessingException(
+            `Error while processing dataId: ${itemId} for item: ${itemId}, error: ${error}`)
     }
 }

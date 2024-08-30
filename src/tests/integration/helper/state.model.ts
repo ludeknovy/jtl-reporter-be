@@ -5,5 +5,6 @@ export enum States {
     EmptyDb = "EMPTY_DB",
     ExistingLogin = "EXISTING_LOGIN",
     ExistingApiKey = "EXISTING_API_KEY",
-    NoUsers = "NO_USERS"
+    NoUsers = "NO_USERS",
+    ExistingScenarioShareToken = "EXISTING_SCENARIO_SHARE_TOKEN",
 }

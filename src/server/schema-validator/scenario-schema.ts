@@ -4,14 +4,22 @@ import { ENVIRONMENT_MAX_LENGTH } from "../controllers/item/create-item-const"
 
 const MAX_NUMBER = 100
 const URL_MAX_LENGTH = 400
+const MAX_NOTE_LENGTH = 200
+const MAX_MIN_TEST_DURATION = 1000
 
 export const paramsSchema = {
   projectName: Joi.string().required(),
   scenarioName: Joi.string().required(),
 }
 
+export const scenarioShareTokenParamsSchema = {
+  ...paramsSchema,
+  shareTokenId: Joi.string().required(),
+}
+
 export const environmentQuerySchema = {
   environment: Joi.string().max(ENVIRONMENT_MAX_LENGTH).allow(""),
+  token: Joi.string(),
 }
 
 export const paramSchemaNotification = {
@@ -27,8 +35,9 @@ export const querySchema = {
 
 export const scenarioNotificationBodySchema = {
   url: Joi.string().max(URL_MAX_LENGTH).required(),
-  type: Joi.string().valid(["ms-teams", "gchat", "slack"]).required(),
+  channel: Joi.string().valid(["ms-teams", "gchat", "slack"]).required(),
   name: Joi.string().min(1).max(MAX_NUMBER).required(),
+  type: Joi.string().valid("report_detail", "degradation").required(),
 }
 
 
@@ -36,6 +45,7 @@ export const updateScenarioSchema = {
   ...scenarioSchema,
   analysisEnabled: Joi.boolean().required(),
   zeroErrorToleranceEnabled: Joi.boolean().required(),
+  minTestDuration: Joi.number().min(0).max(MAX_MIN_TEST_DURATION).required(),
   deleteSamples: Joi.boolean().required(),
   keepTestRunsPeriod: Joi.number().required(),
   generateShareToken: Joi.boolean().required(),
@@ -96,4 +106,8 @@ export const scenarioTrendsSettings = Joi.object({
     throughput: Joi.boolean().required(),
     percentile90: Joi.boolean().required(),
   }),
+})
+
+export const scenarioShareToken = Joi.object({
+  note: Joi.string().max(MAX_NOTE_LENGTH),
 })
