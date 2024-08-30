@@ -14,7 +14,7 @@ jobs:
       - name: Install modules
         run: npm install
       - name: Build the docker-compose stack
-        run: docker-compose -f docker-compose.testing.yaml up -d
+        run: docker compose -f docker-compose.testing.yaml up -d
       # - name: Run contract tests
       #   run: npm run test:contract
       #   env:
