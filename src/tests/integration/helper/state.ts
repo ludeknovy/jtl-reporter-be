@@ -1,5 +1,4 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
-import { Agent } from "http"
 
 const PROVIDER_URL = "http://localhost:5000"
 
@@ -14,8 +13,8 @@ const options = (state, consumer): AxiosRequestConfig => {
     },
     headers: {
       "Content-Type": "application/json",
+      "Keep-Alive": false,
     },
-    httpAgent: new Agent({ keepAlive: false }),
   }
 }
 
