@@ -1,4 +1,4 @@
-import { Overview } from "../../../data-stats/prepare-data"
+import { Overview } from "../../../../data-stats/prepare-data"
 
 export const gchatTemplate = (scenarioName: string, url, overview: Overview) => {
     const cardPayload = {
@@ -14,7 +14,7 @@ export const gchatTemplate = (scenarioName: string, url, overview: Overview) => 
                     {
                         keyValue: {
                             topLabel: "90% percentile",
-                            content: `${overview.percentil} ms`,
+                            content: `${overview.percentile90} ms`,
                         },
                     },
                     { keyValue: { topLabel: "Throughput", content: `${overview.throughput} reqs/s` } },

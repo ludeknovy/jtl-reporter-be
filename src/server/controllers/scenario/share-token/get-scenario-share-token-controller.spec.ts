@@ -30,7 +30,7 @@ describe("getScenarioShareTokenController", () => {
         expect(querySpy).toHaveBeenCalledTimes(1)
         expect(querySpy)
             .toHaveBeenLastCalledWith(request.params.projectName, request.params.scenarioName, request.user.userId)
-        expect(response.send).toHaveBeenCalledTimes(1)
+        expect(response.status).toHaveBeenCalledTimes(1)
         expect(response.json).toHaveBeenNthCalledWith(1, mockData)
     })
     it("should return all tokens when user role is admin", async () => {

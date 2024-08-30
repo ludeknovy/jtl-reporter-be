@@ -241,6 +241,8 @@ export const aggOverviewQuery = (itemId) => {
         text: `
     SELECT
     percentile_cont(0.90) within group (order by (samples.elapsed))::real as n90,
+    percentile_cont(0.95) within group (order by (samples.elapsed))::real as n95,
+    percentile_cont(0.99) within group (order by (samples.elapsed))::real as n99,
     COUNT(DISTINCT samples.hostname)::int number_of_hostnames,
     COUNT(DISTINCT samples.sut_hostname)::int number_of_sut_hostnames,
     MAX(samples.timestamp) as end,

@@ -34,4 +34,13 @@ export class AnalyticsEvent {
             })
         }
     }
+
+    static reportUnexpectedError(error) {
+        if (this.isAnalyticEnabled()) {
+            analytics.track("unexpectedError", {
+                distinct_id: process.env.ANALYTICS_IDENTIFIER,
+                error,
+            })
+        }
+    }
 }

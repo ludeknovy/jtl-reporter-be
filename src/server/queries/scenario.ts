@@ -151,7 +151,7 @@ export const getProcessingItems = (projectName, scenarioName, environment) => {
 
 export const scenarioNotifications = (projectName, scenarioName) => {
     return {
-        text: `SELECT notif.id, url, type, notif.name FROM jtl.notifications as notif
+        text: `SELECT notif.id, url, channel, notification_type as "type", notif.name FROM jtl.notifications as notif
     LEFT JOIN jtl.scenario as s ON s.id = notif.scenario_id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
     WHERE s.name = $2 AND p.project_name = $1`,
@@ -159,14 +159,24 @@ export const scenarioNotifications = (projectName, scenarioName) => {
     }
 }
 
-export const createScenarioNotification = (projectName, scenarioName, type, url, name) => {
+export const scenarioNotificationsByType = (projectName, scenarioName, type) => {
     return {
-        text: `INSERT INTO jtl.notifications(scenario_id, type, url, name) VALUES((
+        text: `SELECT notif.id, url, channel, notif.name FROM jtl.notifications as notif
+    LEFT JOIN jtl.scenario as s ON s.id = notif.scenario_id
+    LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE s.name = $2 AND p.project_name = $1 AND notification_type = $3`,
+        values: [projectName, scenarioName, type],
+    }
+}
+
+export const createScenarioNotification = (projectName, scenarioName, channel, url, name, type) => {
+    return {
+        text: `INSERT INTO jtl.notifications(scenario_id, channel, url, name, notification_type) VALUES((
       SELECT s.id FROM jtl.scenario as s
       LEFT JOIN jtl.projects as p ON p.id = s.project_id
       WHERE s.name = $2 AND p.project_name = $1 
-    ), $3, $4, $5)`,
-        values: [projectName, scenarioName, type, url, name],
+    ), $3, $4, $5, $6)`,
+        values: [projectName, scenarioName, channel, url, name, type],
     }
 }
 
@@ -283,16 +293,28 @@ export const findScenarioShareToken = (projectName: string, scenarioName: string
     }
 }
 
-export const findMyScenarioShareToken = (projectName: string, scenarioName: string, token: string, userId: string) => {
+export const findScenarioShareTokenById = (projectName: string, scenarioName: string, id: string) => {
     return {
         text: `SELECT t.token FROM jtl.scenario_share_tokens as t
     LEFT JOIN jtl.scenario as s ON s.id = t.scenario_id
     LEFT JOIN jtl.projects as p ON p.id = s.project_id
     WHERE p.project_name = $1
     AND s.name = $2
-    AND t.token = $3
+    AND t.id = $3;`,
+        values: [projectName, scenarioName, id],
+    }
+}
+
+export const findMyScenarioShareToken = (projectName: string, scenarioName: string, tokenId: string, userId: string) => {
+    return {
+        text: `SELECT t.token FROM jtl.scenario_share_tokens as t
+    LEFT JOIN jtl.scenario as s ON s.id = t.scenario_id
+    LEFT JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE p.project_name = $1
+    AND s.name = $2
+    AND t.id = $3
     AND t.created_by = $4;`,
-        values: [projectName, scenarioName, token, userId],
+        values: [projectName, scenarioName, tokenId, userId],
     }
 }
 
@@ -349,7 +371,7 @@ export const deleteMyScenarioShareToken = (projectName, scenarioName, id, userId
         text: `DELETE FROM jtl.scenario_share_tokens as sst
     USING jtl.scenario as sc
     WHERE sst.id = $3
-    AND sst.created_by = $3
+    AND sst.created_by = $4
     AND sst.scenario_id = sc.id
     AND sc.name = $2
     AND sc.project_id = (SELECT id FROM jtl.projects WHERE project_name = $1)`,
