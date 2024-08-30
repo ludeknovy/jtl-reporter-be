@@ -13,6 +13,7 @@ const options = (state, consumer): AxiosRequestConfig => {
     },
     headers: {
       "Content-Type": "application/json",
+      "Keep-Alive": false,
     },
   }
 }
