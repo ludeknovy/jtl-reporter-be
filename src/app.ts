@@ -16,6 +16,7 @@ import { PgError } from "./server/errors/pgError"
 import { bree } from "./server/utils/scheduled-tasks/scheduler"
 import helmet from "helmet"
 import { AnalyticsEvent } from "./server/utils/analytics/anyltics-event"
+import { setInstanceId } from "./server/utils/analytics/set-instance-id"
 
 const DEFAULT_PORT = 5000
 const PORT = process.env.PORT || DEFAULT_PORT
@@ -93,7 +94,7 @@ export class App {
         () => {
           logger.info("Express server listening on port " + PORT)
           bree.start().then(() => {
-            process.env.ANALYTICS_IDENTIFIER = uuidv4()
+            setInstanceId()
             logger.info("Bree scheduler was started")
             if (process.env.OPT_OUT_ANALYTICS === "true") {
               bree.stop("analytics-report").then(() => {
