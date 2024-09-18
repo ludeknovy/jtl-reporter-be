@@ -1,8 +1,10 @@
 import { analytics } from "../analytics"
 import { db } from "../../../db/db"
 import { logger } from "../../../logger"
+import { v4 as uuidv4 } from "uuid"
 
 let INSTANCE_ID = null
+const FALLBACK_ID = uuidv4()
 
 export class AnalyticsEvent {
 
@@ -11,14 +13,16 @@ export class AnalyticsEvent {
             return INSTANCE_ID
         }
         try {
-            console.info("AnalyticsEvent.getInstanceId() called")
             const result = await db.oneOrNone("SELECT instance FROM jtl.global")
             if (result && result.instance) {
                 INSTANCE_ID = result.instance
+                return INSTANCE_ID
             }
-            return INSTANCE_ID
+                return FALLBACK_ID
+
         } catch(error) {
             logger.info("Instance id could not be loaded " + error)
+            return FALLBACK_ID
         }
 
     }
