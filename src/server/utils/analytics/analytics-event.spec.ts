@@ -3,7 +3,6 @@ import { analytics } from "../analytics"
 
 jest.mock("../analytics")
 
-
 describe("AnalyticEvents", () => {
 
     beforeEach(() => {
@@ -38,7 +37,7 @@ describe("AnalyticEvents", () => {
         })
         it("should track the event only when analytics enabled", async function () {
             process.env.OPT_OUT_ANALYTICS = "false"
-            jest.spyOn(AnalyticsEvent as any, "getInstanceId").mockResolvedValueOnce("mocked-id");
+            jest.spyOn(AnalyticsEvent as any, "getInstanceId").mockResolvedValueOnce("mocked-id")
             const trackMock = (analytics.track as any).mockResolvedValueOnce(undefined)
             await AnalyticsEvent.reportProcessingFinished()
             expect(trackMock).toHaveBeenCalled()
@@ -48,7 +47,7 @@ describe("AnalyticEvents", () => {
     describe("reportLabelCount", () => {
         it("should not track the event when analytics disabled", async function () {
             process.env.OPT_OUT_ANALYTICS = "true"
-            jest.spyOn(AnalyticsEvent as any, "getInstanceId").mockResolvedValueOnce("mocked-id");
+            jest.spyOn(AnalyticsEvent as any, "getInstanceId").mockResolvedValueOnce("mocked-id")
             const trackMock = (analytics.track as any).mockResolvedValueOnce(undefined)
             await AnalyticsEvent.reportDetails(1, 1)
             expect(trackMock).not.toHaveBeenCalled()
@@ -56,7 +55,7 @@ describe("AnalyticEvents", () => {
         })
         it("should track the event only when analytics enabled", async function () {
             process.env.OPT_OUT_ANALYTICS = "false"
-            jest.spyOn(AnalyticsEvent as any, "getInstanceId").mockResolvedValueOnce("mocked-id");
+            jest.spyOn(AnalyticsEvent as any, "getInstanceId").mockResolvedValueOnce("mocked-id")
             const trackMock = (analytics.track as any).mockResolvedValueOnce(undefined)
             await AnalyticsEvent.reportDetails(1, 1)
             expect(trackMock).toHaveBeenCalled()
@@ -66,7 +65,7 @@ describe("AnalyticEvents", () => {
     describe("reportProcessingStarted", () => {
         it("should not track the event when analytics disabled", async function () {
             process.env.OPT_OUT_ANALYTICS = "true"
-            jest.spyOn(AnalyticsEvent as any, "getInstanceId").mockResolvedValueOnce("mocked-id");
+            jest.spyOn(AnalyticsEvent as any, "getInstanceId").mockResolvedValueOnce("mocked-id")
             const trackMock = (analytics.track as any).mockResolvedValueOnce(undefined)
             await AnalyticsEvent.reportProcessingStarted()
             expect(trackMock).not.toHaveBeenCalled()
@@ -74,7 +73,7 @@ describe("AnalyticEvents", () => {
         })
         it("should track the event only when analytics enabled", async function () {
             process.env.OPT_OUT_ANALYTICS = "false"
-            jest.spyOn(AnalyticsEvent as any, "getInstanceId").mockResolvedValueOnce("mocked-id");
+            jest.spyOn(AnalyticsEvent as any, "getInstanceId").mockResolvedValueOnce("mocked-id")
             const trackMock = (analytics.track as any).mockResolvedValueOnce(undefined)
             await AnalyticsEvent.reportProcessingStarted()
             expect(trackMock).toHaveBeenCalled()
@@ -83,7 +82,7 @@ describe("AnalyticEvents", () => {
     describe("unexpectedError", () => {
         it("should not track the event when analytics disabled", async function () {
             process.env.OPT_OUT_ANALYTICS = "true"
-            jest.spyOn(AnalyticsEvent as any, "getInstanceId").mockResolvedValueOnce("mocked-id");
+            jest.spyOn(AnalyticsEvent as any, "getInstanceId").mockResolvedValueOnce("mocked-id")
             const trackMock = (analytics.track as any).mockResolvedValueOnce(undefined)
             await AnalyticsEvent.reportUnexpectedError(Error("test"))
             expect(trackMock).not.toHaveBeenCalled()
@@ -91,11 +90,10 @@ describe("AnalyticEvents", () => {
         })
         it("should track the event only when analytics enabled", async function () {
             process.env.OPT_OUT_ANALYTICS = "false"
-            jest.spyOn(AnalyticsEvent as any, "getInstanceId").mockResolvedValueOnce("mocked-id");
+            jest.spyOn(AnalyticsEvent as any, "getInstanceId").mockResolvedValueOnce("mocked-id")
             const trackMock = (analytics.track as any).mockResolvedValueOnce(undefined)
             await AnalyticsEvent.reportUnexpectedError(Error("test"))
             expect(trackMock).toHaveBeenCalled()
         })
     })
-
 })
