@@ -157,8 +157,8 @@ export const dashboardStats = () => {
     return {
         text: `
     SELECT round(AVG((overview -> 'maxVu')::int)) as "avgVu",
-    round(AVG((overview -> 'duration')::int)) as "avgDuration",
-    round(SUM((overview -> 'duration')::int)) as "totalDuration",
+    round(AVG((overview -> 'duration')::bigInt)) as "avgDuration",
+    round(SUM((overview -> 'duration')::bigInt)) as "totalDuration",
     count(*) as "totalCount" from jtl.item_stat as stat
     LEFT JOIN jtl.items as items ON items.id = stat.item_id
     WHERE items.report_status = 'ready';`,
