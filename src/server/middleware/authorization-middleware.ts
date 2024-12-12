@@ -6,14 +6,14 @@ import { isUserAuthorizedForProject } from "../queries/user-project-access"
 export const authorizationMiddleware = (allowedRoles: AllowedRoles[]) => {
   return async (request, response, next) => {
     const user = request.user
-    logger.info(`User ${user.userId} with role ${user.role} accessing a resource with allowed roles: ${allowedRoles}`)
+    logger.debug(`User ${user.userId} with role ${user.role} accessing a resource with allowed roles: ${allowedRoles}`)
     // check project authorization
     const { projectName } = request.params
     if (projectName && user?.userId && user?.role !== AllowedRoles.Admin) {
-      logger.info(`User ${user.userId} with role ${user.role} accessing a resource within ${projectName} project`)
+      logger.debug(`User ${user.userId} with role ${user.role} accessing a resource within ${projectName} project`)
       const userAuthorizedForProject = await db.oneOrNone(isUserAuthorizedForProject(projectName, user.userId))
       if (!userAuthorizedForProject && user.role) {
-        logger.info(`User ${user.userId} has no access to project ${projectName}`)
+        logger.debug(`User ${user.userId} has no access to project ${projectName}`)
         return next(boom.forbidden(`You dont have permission to access`))
       }
       // user is authorized, we can proceed

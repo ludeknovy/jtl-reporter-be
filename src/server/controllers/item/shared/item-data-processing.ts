@@ -46,29 +46,40 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
     let rawDataArray = null
 
     try {
+        logger.debug("Loading overview aggregation")
         const aggOverview = await db.one(aggOverviewQuery(itemId))
+        logger.debug("Loading label aggregation")
         const aggLabel = await db.many(aggLabelQuery(itemId))
+        logger.debug("Loading status code distribution")
         const statusCodeDistribution = await db.manyOrNone(responseCodeDistribution(itemId))
+        logger.debug("Loading response time per label distribution")
         const responseTimePerLabelDistribution = await db.manyOrNone(responseTimePerLabelHistogram(itemId))
+        logger.debug("Loading response failures")
         const responseFailures = await db.manyOrNone(responseMessageFailures(itemId))
+        logger.debug("Loading scenario settings")
         const scenarioSettings = await db.one(getScenarioSettings(projectName, scenarioName))
-
+        logger.debug("Loading raw downsampled data")
         let rawDownsampledData = await db.manyOrNone(getDownsampledRawData(itemId, MAX_SCATTER_CHART_POINTS))
         rawDataArray = rawDownsampledData?.map(row => [row.timestamp, row.value])
         rawDownsampledData = null
 
+        logger.debug("Loading grouped errors")
         const groupedErrors = await db.manyOrNone(findGroupedErrors(itemId))
+        logger.debug("Loading top 5 errors by label")
         const top5ErrorsByLabel = await db.manyOrNone(findTop5ErrorsByLabel(itemId))
 
         if (aggOverview.number_of_sut_hostnames > 1) {
+            logger.debug("Loading SUT overview")
             sutMetrics = await db.many(sutOverviewQuery(itemId))
         }
 
         if (scenarioSettings.apdexSettings.enabled) {
             const { satisfyingThreshold, toleratingThreshold } = scenarioSettings.apdexSettings
+            logger.debug("Calculating apdex")
             apdex = await db.many(calculateApdexValues(itemId,
                 satisfyingThreshold,
                 toleratingThreshold))
+            logger.debug("Updating apdex settings")
             await db.none(updateItemApdexSettings(itemId, {
                 satisfyingThreshold,
                 toleratingThreshold,
@@ -92,13 +103,18 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
 
             // distributed mode
             if (aggOverview?.number_of_hostnames > 1) {
+                logger.debug("Loading distributed threads")
                 distributedThreads = await db.manyOrNone(distributedThreadsQuery(interval, itemId))
             }
 
 
+            logger.debug("Loading label chart")
             const labelChart = await db.many(charLabelQuery(interval, itemId))
+            logger.debug("Loading overview chart")
             const overviewChart = await db.many(chartOverviewQuery(interval, itemId))
+            logger.debug("Loading status code chart")
             const statusCodeChart = await db.many(chartOverviewStatusCodesQuery(interval, itemId))
+            logger.debug("Loading threads per group")
             const threadsPerGroup = await db.manyOrNone(threadsPerThreadGroup(interval, itemId))
             if (parseInt(index, 10) === 0) { // default interval
                 chartData = prepareChartDataForSaving(
