@@ -25,7 +25,7 @@
     "boom": "^7.2.0",
     "bree": "^9.2.4",
     "compression": "^1.7.4",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-winston": "^4.2.0",
     "fast-csv": "^4.3.6",
