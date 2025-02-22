@@ -97,12 +97,10 @@ describe("AnalyticEvents", () => {
         })
         it("should ignore specific error numbers", async function () {
             process.env.OPT_OUT_ANALYTICS = "false"
-            await AnalyticsEvent.reportUnexpectedError(Error("test"))
             jest.spyOn(AnalyticsEvent as any, "getInstanceId").mockResolvedValueOnce("mocked-id")
             const trackMock = (analytics.track as any).mockResolvedValueOnce(undefined)
             await AnalyticsEvent.reportUnexpectedError({ errno: -3008 })
             expect(trackMock).not.toHaveBeenCalled()
-
         })
     })
 })
