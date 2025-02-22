@@ -143,7 +143,7 @@ export class ScenarioRoutes {
         app.route("/api/projects/:projectName/scenarios/:scenarioName/share-token")
             .get(
                 authenticationMiddleware,
-                authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
+                authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin, AllowedRoles.Readonly]),
                 paramsSchemaValidator(paramsSchema),
                 projectExistsMiddleware,
                 wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => getScenarioShareTokenController(req, res)))
