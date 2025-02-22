@@ -62,6 +62,9 @@ export class AnalyticsEvent {
 
     static async reportUnexpectedError(error) {
         if (this.isAnalyticEnabled()) {
+            if (error?.errno === -3008) {
+                return
+            }
             analytics.track("unexpectedError", {
                 distinct_id: await this.getInstanceId(),
                 error,
