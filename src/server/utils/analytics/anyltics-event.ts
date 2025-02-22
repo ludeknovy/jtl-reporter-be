@@ -6,6 +6,9 @@ import { v4 as uuidv4 } from "uuid"
 let INSTANCE_ID = null
 const FALLBACK_ID = uuidv4()
 
+// eslint-disable-next-line @typescript-eslint/no-magic-numbers
+const errorNumberToBeIgnored = [-3008]
+
 export class AnalyticsEvent {
 
     private static async getInstanceId(): Promise<string> {
@@ -62,7 +65,7 @@ export class AnalyticsEvent {
 
     static async reportUnexpectedError(error) {
         if (this.isAnalyticEnabled()) {
-            if (error?.errno === -3008) {
+            if (errorNumberToBeIgnored.includes(error?.errno)) {
                 return
             }
             analytics.track("unexpectedError", {
