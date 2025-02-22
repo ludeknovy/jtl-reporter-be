@@ -102,5 +102,12 @@ describe("AnalyticEvents", () => {
             await AnalyticsEvent.reportUnexpectedError({ errno: -3008 })
             expect(trackMock).not.toHaveBeenCalled()
         })
+        it("should log non-ignored error numbers", async function () {
+            process.env.OPT_OUT_ANALYTICS = "false"
+            jest.spyOn(AnalyticsEvent as any, "getInstanceId").mockResolvedValueOnce("mocked-id")
+            const trackMock = (analytics.track as any).mockResolvedValueOnce(undefined)
+            await AnalyticsEvent.reportUnexpectedError({ errno: -3010 })
+            expect(trackMock).toHaveBeenCalled()
+        })
     })
 })
