@@ -1,13 +1,12 @@
 import { Response } from "express"
 import { db } from "../../../db/db"
-import { updateScenario, updateUserScenarioSettings } from "../../queries/scenario"
+import { updateScenario } from "../../queries/scenario"
 import { StatusCode } from "../../utils/status-code"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 
 
 export const updateScenarioController = async (req: IGetUserAuthInfoRequest, res: Response) => {
     const { projectName, scenarioName } = req.params
-    const { userId } = req.user
     const {
         thresholds,
         analysisEnabled,
@@ -19,7 +18,6 @@ export const updateScenarioController = async (req: IGetUserAuthInfoRequest, res
         labelFilterSettings,
         labelTrendChartSettings,
         extraAggregations,
-        userSettings,
         apdexSettings,
         minTestDuration,
     } = req.body
@@ -28,9 +26,6 @@ export const updateScenarioController = async (req: IGetUserAuthInfoRequest, res
         thresholds, deleteSamples, zeroErrorToleranceEnabled, keepTestRunsPeriod,
         generateShareToken, JSON.stringify(labelFilterSettings), JSON.stringify(labelTrendChartSettings),
         extraAggregations, apdexSettings, minTestDuration))
-
-    await db.none(updateUserScenarioSettings(projectName, scenarioName, userId,
-        JSON.stringify(userSettings.requestStats)))
 
     res.status(StatusCode.NoContent).send()
 }

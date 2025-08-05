@@ -1,46 +1,55 @@
-import { Request, Response, NextFunction } from "express"
 import * as express from "express"
-import { wrapAsync } from "../errors/error-handler"
+import {NextFunction, Request, Response} from "express"
+import {wrapAsync} from "../errors/error-handler"
 import {
-    paramsSchemaValidator,
     bodySchemaValidator,
-    queryParamsValidator,
+    paramsSchemaValidator,
+    queryParamsValidator
 } from "../schema-validator/schema-validator-middleware"
 import {
     environmentQuerySchema,
     paramSchemaNotification,
     paramsSchema,
-    scenarioNotificationBodySchema,
     scenarioShareToken,
     scenarioShareTokenParamsSchema,
     scenarioTrendsSettings,
     updateScenarioSchema,
+    updateScenarioUserSettingsSchema
 } from "../schema-validator/scenario-schema"
-import { projectNameParam, scenarioSchema } from "../schema-validator/project-schema"
-import { getScenariosController } from "../controllers/scenario/get-scenarios-controller"
-import { createScenarioController } from "../controllers/scenario/create-scenario-controller"
-import { deleteScenarioController } from "../controllers/scenario/delete-scenario-controller"
-import { getScenarioTrendsController } from "../controllers/scenario/trends/get-scenario-trends-controller"
-import { getScenarioNotificationsController } from "../controllers/scenario/notifications/get-notifications-controllers"
-import { createScenarioNotificationController }
-    from "../controllers/scenario/notifications/create-notification-controller"
-import { deleteScenarioNotificationController }
-    from "../controllers/scenario/notifications/delete-scenario-notification-controller"
-import { updateScenarioController } from "../controllers/scenario/update-scenario-controller"
-import { getScenarioController } from "../controllers/scenario/get-scenario-controller"
-import { authenticationMiddleware } from "../middleware/authentication-middleware"
-import { AllowedRoles, authorizationMiddleware } from "../middleware/authorization-middleware"
-import { IGetUserAuthInfoRequest } from "../middleware/request.model"
-import { postScenarioTrendsSettings } from "../controllers/scenario/trends/update-scenario-trends-settings-controller"
-import { getScenarioEnvironmentController } from "../controllers/scenario/get-scenario-environment-controller"
-import { projectExistsMiddleware } from "../middleware/project-exists-middleware"
-import { allowScenarioQueryTokenAuth } from "../middleware/allow-scenario-query-token-auth"
-import { getScenarioShareTokenController }
-    from "../controllers/scenario/share-token/get-scenario-share-token-controller"
-import { createScenarioShareTokenController }
-    from "../controllers/scenario/share-token/create-scenario-share-token-controller"
-import { deleteScenarioShareTokenController }
-    from "../controllers/scenario/share-token/delete-scenario-share-token-controller"
+import {projectNameParam, scenarioSchema} from "../schema-validator/project-schema"
+import {getScenariosController} from "../controllers/scenario/get-scenarios-controller"
+import {createScenarioController} from "../controllers/scenario/create-scenario-controller"
+import {deleteScenarioController} from "../controllers/scenario/delete-scenario-controller"
+import {getScenarioTrendsController} from "../controllers/scenario/trends/get-scenario-trends-controller"
+import {getScenarioNotificationsController} from "../controllers/scenario/notifications/get-notifications-controllers"
+import {
+    createScenarioNotificationController
+} from "../controllers/scenario/notifications/create-notification-controller"
+import {
+    deleteScenarioNotificationController
+} from "../controllers/scenario/notifications/delete-scenario-notification-controller"
+import {updateScenarioController} from "../controllers/scenario/update-scenario-controller"
+import {getScenarioController} from "../controllers/scenario/get-scenario-controller"
+import {authenticationMiddleware} from "../middleware/authentication-middleware"
+import {AllowedRoles, authorizationMiddleware} from "../middleware/authorization-middleware"
+import {IGetUserAuthInfoRequest} from "../middleware/request.model"
+import {postScenarioTrendsSettings} from "../controllers/scenario/trends/update-scenario-trends-settings-controller"
+import {getScenarioEnvironmentController} from "../controllers/scenario/get-scenario-environment-controller"
+import {projectExistsMiddleware} from "../middleware/project-exists-middleware"
+import {allowScenarioQueryTokenAuth} from "../middleware/allow-scenario-query-token-auth"
+import {getScenarioShareTokenController} from "../controllers/scenario/share-token/get-scenario-share-token-controller"
+import {
+    createScenarioShareTokenController
+} from "../controllers/scenario/share-token/create-scenario-share-token-controller"
+import {
+    deleteScenarioShareTokenController
+} from "../controllers/scenario/share-token/delete-scenario-share-token-controller"
+import {
+    getScenariosUserSettingsController
+} from "../controllers/scenario/user-settings/get-scenario-user-settings-controller";
+import {
+    updateScenariosUserSettingsController
+} from "../controllers/scenario/user-settings/update-scenario-user-settings-controller";
 
 export class ScenarioRoutes {
 
@@ -87,6 +96,25 @@ export class ScenarioRoutes {
                 projectExistsMiddleware,
                 wrapAsync((req: Request, res: Response) => deleteScenarioController(req, res)))
 
+        app.route("/api/projects/:projectName/scenarios/:scenarioName/user-settings")
+            .get(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(paramsSchema),
+                projectExistsMiddleware,
+                wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => getScenariosUserSettingsController(req, res))
+            )
+
+            .put(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(paramsSchema),
+                bodySchemaValidator(updateScenarioSchema),
+                projectExistsMiddleware,
+                // eslint-disable-next-line max-len
+                wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => updateScenariosUserSettingsController(req, res))
+            )
+
         app.route("/api/projects/:projectName/scenarios/:scenarioName/notifications")
             .get(
                 authenticationMiddleware,
@@ -97,9 +125,9 @@ export class ScenarioRoutes {
 
             .post(
                 authenticationMiddleware,
-                authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
+                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(paramsSchema),
-                bodySchemaValidator(scenarioNotificationBodySchema),
+                bodySchemaValidator(updateScenarioUserSettingsSchema),
                 projectExistsMiddleware,
                 wrapAsync((req: Request, res: Response) => createScenarioNotificationController(req, res)))
 
