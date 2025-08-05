@@ -80,7 +80,7 @@ export const updateScenarioSchema = {
     }),
 }
 
-export const updateScenarioUserSettingsSchema = Joi.object({
+export const updateScenarioUserSettingsBodySchema = Joi.object({
     requestStats: Joi.object({
         samples: Joi.boolean().required(),
         avg: Joi.boolean().required(),

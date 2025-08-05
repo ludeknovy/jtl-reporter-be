@@ -9,12 +9,11 @@ import {
 import {
     environmentQuerySchema,
     paramSchemaNotification,
-    paramsSchema,
+    paramsSchema, scenarioNotificationBodySchema,
     scenarioShareToken,
     scenarioShareTokenParamsSchema,
     scenarioTrendsSettings,
-    updateScenarioSchema,
-    updateScenarioUserSettingsSchema,
+    updateScenarioSchema, updateScenarioUserSettingsBodySchema,
 } from "../schema-validator/scenario-schema"
 import { projectNameParam, scenarioSchema } from "../schema-validator/project-schema"
 import { getScenariosController } from "../controllers/scenario/get-scenarios-controller"
@@ -104,7 +103,7 @@ export class ScenarioRoutes {
                 authenticationMiddleware,
                 authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(paramsSchema),
-                bodySchemaValidator(updateScenarioSchema),
+                bodySchemaValidator(updateScenarioUserSettingsBodySchema),
                 projectExistsMiddleware,
                 // eslint-disable-next-line max-len
                 wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => updateScenariosUserSettingsController(req, res))
@@ -122,7 +121,7 @@ export class ScenarioRoutes {
                 authenticationMiddleware,
                 authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(paramsSchema),
-                bodySchemaValidator(updateScenarioUserSettingsSchema),
+                bodySchemaValidator(scenarioNotificationBodySchema),
                 projectExistsMiddleware,
                 wrapAsync((req: Request, res: Response) => createScenarioNotificationController(req, res)))
 
