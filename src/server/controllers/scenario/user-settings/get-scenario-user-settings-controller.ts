@@ -23,5 +23,7 @@ export const getScenariosUserSettingsController = async (req: IGetUserAuthInfoRe
     const { projectName, scenarioName } = req.params
     const userScenarioSettings = await db.oneOrNone(getUserScenarioSettings(projectName, scenarioName, userId))
 
-    res.status(StatusCode.Ok).json(userScenarioSettings?.request_stats_settings || defaultRequestStatsSettings )
+    res.status(StatusCode.Ok).json({
+        requestStats: userScenarioSettings?.request_stats_settings || defaultRequestStatsSettings,
+    })
 }
