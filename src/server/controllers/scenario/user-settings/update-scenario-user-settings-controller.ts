@@ -9,7 +9,7 @@ export const updateScenariosUserSettingsController = async (req: IGetUserAuthInf
     const { userId } = req.user
 
     await db.none(updateUserScenarioSettings(projectName, scenarioName, userId,
-        JSON.stringify(req.body)))
+        JSON.stringify(req.body.requestStats)))
 
     res.status(StatusCode.NoContent).send()
 }

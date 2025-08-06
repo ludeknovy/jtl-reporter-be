@@ -5,18 +5,16 @@ import { IGetUserAuthInfoRequest } from "../../../middleware/request.model"
 import { StatusCode } from "../../../utils/status-code"
 
 const defaultRequestStatsSettings = {
-    requestStats: {
-        samples: true,
-        avg: true,
-        min: true,
-        max: true,
-        p90: true,
-        p95: true,
-        p99: true,
-        throughput: true,
-        network: true,
-        errorRate: true,
-    },
+    samples: true,
+    avg: true,
+    min: true,
+    max: true,
+    p90: true,
+    p95: true,
+    p99: true,
+    throughput: true,
+    network: true,
+    errorRate: true,
 }
 
 
