@@ -79,24 +79,6 @@ describe("Scenario", () => {
                         throughput: false,
                         virtualUsers: true,
                     },
-                    userSettings: {
-                        requestStats: {
-                            samples: true,
-                            avg: true,
-                            min: true,
-                            max: true,
-                            p50: true,
-                            p90: true,
-                            p95: true,
-                            p99: true,
-                            throughput: true,
-                            network: true,
-                            errorRate: true,
-                            failures: true,
-                            apdex: true,
-                            standardDeviation: true,
-                        },
-                    },
                     apdexSettings: {
                         toleratingThreshold: 200,
                         satisfyingThreshold: 50,
@@ -137,24 +119,6 @@ describe("Scenario", () => {
                         throughput: false,
                         virtualUsers: true,
                     },
-                    userSettings: {
-                        requestStats: {
-                            samples: true,
-                            avg: true,
-                            min: true,
-                            max: true,
-                            p50: true,
-                            p90: true,
-                            p95: true,
-                            p99: true,
-                            throughput: true,
-                            network: true,
-                            errorRate: true,
-                            failures: true,
-                            apdex: true,
-                            standardDeviation: true,
-                        },
-                    },
                     apdexSettings: {
                         toleratingThreshold: 200,
                         satisfyingThreshold: 50,
@@ -163,6 +127,34 @@ describe("Scenario", () => {
                 })
                 .set("Accept", "application/json")
                 .expect(StatusCode.NotFound)
+        })
+    })
+    describe("PUT /projects/{projectName}/scenarios/{scenarioName}/user-settings", () => {
+        it("should be able to update scenario user settings", async () => {
+            await stateSetup(States.ExistingScenario)
+            await request(__server__)
+                .put("/api/projects/test-project/scenarios/test-scenario/user-settings")
+                .set(__tokenHeaderKey__, credentials.token)
+                .send({
+                    requestStats: {
+                        samples: true,
+                        avg: true,
+                        min: true,
+                        max: true,
+                        p50: true,
+                        p90: true,
+                        p95: true,
+                        p99: true,
+                        throughput: true,
+                        network: true,
+                        errorRate: true,
+                        failures: true,
+                        apdex: true,
+                        standardDeviation: true,
+                    },
+                })
+                .set("Accept", "application/json")
+                .expect(StatusCode.NoContent)
         })
     })
     describe("POST /projects/{projectName}/scenarios/{scenarioName}/trends/settings", () => {

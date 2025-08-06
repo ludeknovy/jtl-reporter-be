@@ -1,20 +1,19 @@
-import { Request, Response, NextFunction } from "express"
 import * as express from "express"
+import { NextFunction, Request, Response } from "express"
 import { wrapAsync } from "../errors/error-handler"
 import {
-    paramsSchemaValidator,
     bodySchemaValidator,
+    paramsSchemaValidator,
     queryParamsValidator,
 } from "../schema-validator/schema-validator-middleware"
 import {
     environmentQuerySchema,
     paramSchemaNotification,
-    paramsSchema,
-    scenarioNotificationBodySchema,
+    paramsSchema, scenarioNotificationBodySchema,
     scenarioShareToken,
     scenarioShareTokenParamsSchema,
     scenarioTrendsSettings,
-    updateScenarioSchema,
+    updateScenarioSchema, updateScenarioUserSettingsBodySchema,
 } from "../schema-validator/scenario-schema"
 import { projectNameParam, scenarioSchema } from "../schema-validator/project-schema"
 import { getScenariosController } from "../controllers/scenario/get-scenarios-controller"
@@ -41,6 +40,10 @@ import { createScenarioShareTokenController }
     from "../controllers/scenario/share-token/create-scenario-share-token-controller"
 import { deleteScenarioShareTokenController }
     from "../controllers/scenario/share-token/delete-scenario-share-token-controller"
+import { getScenariosUserSettingsController }
+    from "../controllers/scenario/user-settings/get-scenario-user-settings-controller"
+import { updateScenariosUserSettingsController }
+    from "../controllers/scenario/user-settings/update-scenario-user-settings-controller"
 
 export class ScenarioRoutes {
 
@@ -87,6 +90,25 @@ export class ScenarioRoutes {
                 projectExistsMiddleware,
                 wrapAsync((req: Request, res: Response) => deleteScenarioController(req, res)))
 
+        app.route("/api/projects/:projectName/scenarios/:scenarioName/user-settings")
+            .get(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(paramsSchema),
+                projectExistsMiddleware,
+                wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => getScenariosUserSettingsController(req, res))
+            )
+
+            .put(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(paramsSchema),
+                bodySchemaValidator(updateScenarioUserSettingsBodySchema),
+                projectExistsMiddleware,
+                // eslint-disable-next-line max-len
+                wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => updateScenariosUserSettingsController(req, res))
+            )
+
         app.route("/api/projects/:projectName/scenarios/:scenarioName/notifications")
             .get(
                 authenticationMiddleware,
@@ -97,7 +119,7 @@ export class ScenarioRoutes {
 
             .post(
                 authenticationMiddleware,
-                authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
+                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(paramsSchema),
                 bodySchemaValidator(scenarioNotificationBodySchema),
                 projectExistsMiddleware,
