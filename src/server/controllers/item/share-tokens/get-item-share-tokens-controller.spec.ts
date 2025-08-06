@@ -20,6 +20,7 @@ describe("getItemLinksController", () => {
 
         const response = mockResponse()
         const querySpy = jest.spyOn(require("../../../queries/items"), "selectOnlyMyShareTokens")
+        const allTokensQuerySpy = jest.spyOn(require("../../../queries/items"), "selectShareTokens")
         const request = {
             params: { projectName: "project", scenarioName: "scenario", itemId: "id" },
             user: { userId: "userId", role: AllowedRoles.Operator },
@@ -32,8 +33,33 @@ describe("getItemLinksController", () => {
             request.params.itemId,
             request.user.userId
         )
-        expect(response.send).toHaveBeenNthCalledWith(1, StatusCode.Ok)
+        expect(response.status).toHaveBeenNthCalledWith(1, StatusCode.Ok)
         expect(response.json).toHaveBeenNthCalledWith(1, tokenData)
+        expect(allTokensQuerySpy).not.toHaveBeenCalled()
+    })
+
+    it("should only my tokens when user role is readonly", async () => {
+        const tokenData = [{ id: "1", token: "tokenId", name: "test token" }]
+
+        const response = mockResponse()
+        const querySpy = jest.spyOn(require("../../../queries/items"), "selectOnlyMyShareTokens")
+        const allTokensQuerySpy = jest.spyOn(require("../../../queries/items"), "selectShareTokens")
+
+        const request = {
+            params: { projectName: "project", scenarioName: "scenario", itemId: "id" },
+            user: { userId: "userId", role: AllowedRoles.Readonly },
+        };
+        (db.manyOrNone as any).mockResolvedValueOnce(tokenData)
+        await getItemLinksController(request as unknown as IGetUserAuthInfoRequest, response as unknown as Response)
+        expect(querySpy).toHaveBeenNthCalledWith(1,
+            request.params.projectName,
+            request.params.scenarioName,
+            request.params.itemId,
+            request.user.userId
+        )
+        expect(response.status).toHaveBeenNthCalledWith(1, StatusCode.Ok)
+        expect(response.json).toHaveBeenNthCalledWith(1, tokenData)
+        expect(allTokensQuerySpy).not.toHaveBeenCalled()
     })
 
     it("should return all tokens when user role is admin", async () => {
