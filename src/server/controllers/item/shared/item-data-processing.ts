@@ -51,9 +51,6 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         logger.debug("Loading scenario settings")
         const scenarioSettings = await db.one(getScenarioSettings(projectName, scenarioName))
 
-        logger.debug("Loading overview aggregation")
-        let aggOverviewPromise = db.one(aggOverviewQuery(itemId))
-
         logger.debug("Loading label aggregation")
         logger.debug("Loading status code distribution")
         logger.debug("Loading response time per label distribution")
@@ -72,14 +69,16 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
             db.manyOrNone(findTop5ErrorsByLabel(itemId))
         ]
 
-        let conditionalIndex = dbPromises.length
-        
+        // Handle apdex conditionally and independently
+        let apdexPromise = null
         if (scenarioSettings.apdexSettings.enabled) {
             const { satisfyingThreshold, toleratingThreshold } = scenarioSettings.apdexSettings
-            dbPromises.push(db.many(calculateApdexValues(itemId, satisfyingThreshold, toleratingThreshold)))
+            logger.debug("Calculating apdex")
+            apdexPromise = db.many(calculateApdexValues(itemId, satisfyingThreshold, toleratingThreshold))
         }
         
-        const aggOverview = await aggOverviewPromise
+        logger.debug("Loading overview aggregation")
+        const aggOverview = await db.one(aggOverviewQuery(itemId))
 
         if (aggOverview.number_of_sut_hostnames > 1) {
             logger.debug("Loading SUT overview")
@@ -92,9 +91,11 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
             sutMetrics = await sutMetricsPromise
         }
 
-        if (scenarioSettings.apdexSettings.enabled) {
-            apdex = dbResults[conditionalIndex++]
+        // Resolve apdex promise if it exists
+        if (apdexPromise) {
+            apdex = await apdexPromise
             const { satisfyingThreshold, toleratingThreshold } = scenarioSettings.apdexSettings
+            logger.debug("Updating apdex settings")
             await db.none(updateItemApdexSettings(itemId, {
                 satisfyingThreshold,
                 toleratingThreshold,
