@@ -40,9 +40,7 @@ import { DataProcessingException } from "../../../errors/data-processing-excepti
 export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) => {
     const MAX_LABEL_CHART_LENGTH = 100000
     const MAX_SCATTER_CHART_POINTS = 10000
-    let distributedThreads = null
     let sutMetrics = []
-    let sutMetricsPromise = null
     let apdex = []
     let rawDataArray = null
 
@@ -50,6 +48,9 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
 
         logger.debug("Loading scenario settings")
         const scenarioSettings = await db.one(getScenarioSettings(projectName, scenarioName))
+
+        logger.debug("Loading overview aggregation")
+        const aggOverview = await db.one(aggOverviewQuery(itemId))
 
         logger.debug("Loading label aggregation")
         logger.debug("Loading status code distribution")
@@ -59,48 +60,32 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         logger.debug("Loading grouped errors")
         logger.debug("Loading top 5 errors by label")
 
-        let dbPromises = [
+        const dbPromises = [
             db.many(aggLabelQuery(itemId)),
             db.manyOrNone(responseCodeDistribution(itemId)),
             db.manyOrNone(responseTimePerLabelHistogram(itemId)),
             db.manyOrNone(responseMessageFailures(itemId)),
             db.manyOrNone(getDownsampledRawData(itemId, MAX_SCATTER_CHART_POINTS)),
             db.manyOrNone(findGroupedErrors(itemId)),
-            db.manyOrNone(findTop5ErrorsByLabel(itemId))
+            db.manyOrNone(findTop5ErrorsByLabel(itemId)),
         ]
 
-        // Handle apdex conditionally and independently
-        let apdexPromise = null
+        let apdexIndex = -1
         if (scenarioSettings.apdexSettings.enabled) {
             const { satisfyingThreshold, toleratingThreshold } = scenarioSettings.apdexSettings
             logger.debug("Calculating apdex")
-            apdexPromise = db.many(calculateApdexValues(itemId, satisfyingThreshold, toleratingThreshold))
+            apdexIndex = dbPromises.length
+            dbPromises.push(db.many(calculateApdexValues(itemId, satisfyingThreshold, toleratingThreshold)))
         }
-        
-        logger.debug("Loading overview aggregation")
-        const aggOverview = await db.one(aggOverviewQuery(itemId))
 
+        let sutMetricsIndex = -1
         if (aggOverview.number_of_sut_hostnames > 1) {
             logger.debug("Loading SUT overview")
-            sutMetricsPromise = db.many(sutOverviewQuery(itemId))
+            sutMetricsIndex = dbPromises.length
+            dbPromises.push(db.many(sutOverviewQuery(itemId)))
         }
 
-        let dbResults = await Promise.all(dbPromises)
-
-        if (aggOverview.number_of_sut_hostnames > 1) {
-            sutMetrics = await sutMetricsPromise
-        }
-
-        // Resolve apdex promise if it exists
-        if (apdexPromise) {
-            apdex = await apdexPromise
-            const { satisfyingThreshold, toleratingThreshold } = scenarioSettings.apdexSettings
-            logger.debug("Updating apdex settings")
-            await db.none(updateItemApdexSettings(itemId, {
-                satisfyingThreshold,
-                toleratingThreshold,
-            }))
-        }
+        const dbResults = await Promise.all(dbPromises)
 
         const [
             aggLabel,
@@ -109,8 +94,22 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
             responseFailures,
             rawDownsampledData,
             groupedErrors,
-            top5ErrorsByLabel
-        ] = dbResults;
+            top5ErrorsByLabel,
+        ] = dbResults
+
+        if (sutMetricsIndex !== -1) {
+            sutMetrics = dbResults[sutMetricsIndex]
+        }
+
+        if (apdexIndex !== -1) {
+            apdex = dbResults[apdexIndex]
+            const { satisfyingThreshold, toleratingThreshold } = scenarioSettings.apdexSettings
+            logger.debug("Updating apdex settings")
+            await db.none(updateItemApdexSettings(itemId, {
+                satisfyingThreshold,
+                toleratingThreshold,
+            }))
+        }
 
         rawDataArray = rawDownsampledData?.map(row => [row.timestamp, row.value])
 
@@ -129,12 +128,12 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
             "1 minute", "5 minute", "10 minutes", "30 minutes", "1 hour"]
 
         // First loop: Only DB queries, group promises into arrays
-        let charts = []
-        let distributedThreadsPromises = []
+        const charts = []
+        const distributedThreadsPromises = []
 
-        for (const [index, interval] of Object.entries(intervals)) {
+        for (const interval of intervals) {
             logger.debug(`Preparing queries for interval: ${interval}`)
-            
+
             // distributed mode - conditional query
             let distributedThreadsPromise = null
             if (aggOverview?.number_of_hostnames > 1) {
@@ -145,14 +144,14 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
 
             // The 4 main queries for each interval
             const intervalPromises = [
-                db.many(charLabelQuery(interval, itemId)),           // 0: labelChart
-                db.many(chartOverviewQuery(interval, itemId)),       // 1: overviewChart  
+                db.many(charLabelQuery(interval, itemId)), // 0: labelChart
+                db.many(chartOverviewQuery(interval, itemId)), // 1: overviewChart
                 db.many(chartOverviewStatusCodesQuery(interval, itemId)), // 2: statusCodeChart
-                db.manyOrNone(threadsPerThreadGroup(interval, itemId))    // 3: threadsPerGroup
+                db.manyOrNone(threadsPerThreadGroup(interval, itemId)), // 3: threadsPerGroup
             ]
-            
+
             charts.push(intervalPromises)
-            
+
             if (!scenarioSettings.extraAggregations) {
                 break
             }
@@ -166,18 +165,18 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         let distributedThreadsIndex = 0
         for (const [index, interval] of Object.entries(intervals)) {
             const intervalIndex = parseInt(index, 10)
-            
+
             // Get query results for this range
             const [labelChart, overviewChart, statusCodeChart, threadsPerGroup] = allChartResults[intervalIndex]
-            
+
             // Get distributedThreads if applicable
             let distributedThreads = null
             if (aggOverview?.number_of_hostnames > 1) {
                 distributedThreads = allDistributedThreadsResults[distributedThreadsIndex++]
             }
-            
+
             logger.debug(`Processing data for interval: ${interval}`)
-            
+
             if (intervalIndex === 0) { // default interval
                 chartData = prepareChartDataForSaving({
                     overviewData: overviewChart,

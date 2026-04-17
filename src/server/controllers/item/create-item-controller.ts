@@ -9,6 +9,7 @@ import * as fs from "fs"
 import * as csv from "fast-csv"
 import { logger } from "../../../logger"
 import { itemDataProcessing } from "./shared/item-data-processing"
+import { queueItemProcessing } from "./shared/item-processing-queue"
 import * as pgp from "pg-promise"
 import { processMonitoringCsv } from "./utils/process-monitoring-csv"
 import { StatusCode } from "../../utils/status-code"
@@ -160,10 +161,10 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
                         // eslint-disable-next-line max-len
                         logger.info(`Parsed ${rowCount} records in ${(Date.now() - parsingStart) / SECONDS_DIVISOR} seconds`)
                         tempBuffer = null
-                        await itemDataProcessing({
+                        await queueItemProcessing(() => itemDataProcessing({
                             itemId,
                             projectName, scenarioName,
-                        })
+                        }))
                         logger.info(`Done ${rowCount} in ${(Date.now() - parsingStart) / SECONDS_DIVISOR} seconds`)
 
                     } catch(onEndError) {
