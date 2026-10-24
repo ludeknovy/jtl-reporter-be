@@ -4,7 +4,17 @@ import { deleteItems } from "../../queries/items"
 import { logger } from "../../../logger"
 import { StatusCode } from "../../utils/status-code"
 
-export const deleteItemsController = async (req: Request, res: Response) => {
+interface DeleteItemsParams {
+  projectName: string
+  scenarioName: string
+}
+
+interface DeleteItemsBody {
+  itemIds: string[]
+}
+
+export const deleteItemsController = async (
+  req: Request<DeleteItemsParams, unknown, DeleteItemsBody>, res: Response) => {
   const { projectName, scenarioName } = req.params
   const { itemIds } = req.body
 
