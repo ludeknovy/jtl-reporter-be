@@ -1,6 +1,6 @@
 import { NextFunction } from "express"
 import { AllowedRoles, authorizationMiddleware } from "./authorization-middleware"
-import * as boom from "boom"
+import * as boom from "@hapi/boom"
 import { db } from "../../db/db"
 jest.mock("../../db/db")
 

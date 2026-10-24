@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express"
 import { db } from "../../../db/db"
 import { isExistingScenario, createNewScenario } from "../../queries/scenario"
-import * as boom from "boom"
+import * as boom from "@hapi/boom"
 import { StatusCode } from "../../utils/status-code"
 
 export const createScenarioController = async (req: Request, res: Response, next: NextFunction) => {

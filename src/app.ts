@@ -1,7 +1,7 @@
 import * as express from "express"
 import * as bodyParser from "body-parser"
 import * as pgp from "pg-promise"
-import * as boom from "boom"
+import * as boom from "@hapi/boom"
 import * as winston from "winston"
 import * as compression from "compression"
 import * as expressWinston from "express-winston"

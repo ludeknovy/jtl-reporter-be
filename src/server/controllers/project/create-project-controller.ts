@@ -1,7 +1,7 @@
 import { NextFunction, Response } from "express"
 import { db } from "../../../db/db"
 import { createNewProject, isExistingProject } from "../../queries/projects"
-import * as boom from "boom"
+import * as boom from "@hapi/boom"
 import { StatusCode } from "../../utils/status-code"
 import { assignAllAdminsAsProjectMembers, addProjectMember } from "../../queries/user-project-access"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
