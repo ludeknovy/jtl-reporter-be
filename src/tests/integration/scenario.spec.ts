@@ -9,6 +9,68 @@ describe("Scenario", () => {
     beforeAll(async () => {
         ({ data: credentials } = await userSetup())
     })
+    describe("GET /projects/{projectName}/scenarios/{scenarioName}", () => {
+        it("should return the scenario configuration", async () => {
+            await stateSetup(States.ExistingScenario)
+            const response = await request(__server__)
+                .get("/api/projects/test-project/scenarios/test-scenario")
+                .set(__tokenHeaderKey__, credentials.token)
+                .set("Accept", "application/json")
+                .expect(StatusCode.Ok)
+
+            expect(response.body).toEqual(expect.objectContaining({ name: "test-scenario" }))
+        })
+    })
+    describe("scenario notification lifecycle", () => {
+        const notification = {
+            channel: "slack",
+            name: "Release updates",
+            type: "report_detail",
+            url: "https://example.com/notifications",
+        }
+
+        it("creates, retrieves, and deletes a scenario notification", async () => {
+            await stateSetup(States.ExistingScenario)
+            const endpoint = "/api/projects/test-project/scenarios/test-scenario/notifications"
+
+            await request(__server__)
+                .post(endpoint)
+                .set(__tokenHeaderKey__, credentials.token)
+                .set("Accept", "application/json")
+                .send(notification)
+                .expect(StatusCode.Created)
+
+            const listResponse = await request(__server__)
+                .get(endpoint)
+                .set(__tokenHeaderKey__, credentials.token)
+                .set("Accept", "application/json")
+                .expect(StatusCode.Ok)
+            const createdNotification = listResponse.body.find(item => item.name === notification.name)
+
+            expect(createdNotification).toEqual(expect.objectContaining({
+                channel: notification.channel,
+                id: expect.any(String),
+                type: notification.type,
+                url: notification.url,
+            }))
+
+            await request(__server__)
+                .delete(`${endpoint}/${createdNotification.id}`)
+                .set(__tokenHeaderKey__, credentials.token)
+                .set("Accept", "application/json")
+                .expect(StatusCode.NoContent)
+        })
+
+        it("rejects incomplete notification data", async () => {
+            await stateSetup(States.ExistingScenario)
+            await request(__server__)
+                .post("/api/projects/test-project/scenarios/test-scenario/notifications")
+                .set(__tokenHeaderKey__, credentials.token)
+                .set("Accept", "application/json")
+                .send({ name: notification.name })
+                .expect(StatusCode.BadRequest)
+        })
+    })
     describe("POST /projects/{projectName}/scenarios", () => {
         it("should be able to create new scenario", async () => {
             await stateSetup(States.ExistingProject)

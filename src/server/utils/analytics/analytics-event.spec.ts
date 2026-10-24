@@ -4,9 +4,19 @@ import { analytics } from "../analytics"
 jest.mock("../analytics")
 
 describe("AnalyticEvents", () => {
+    const originalOptOutAnalytics = process.env.OPT_OUT_ANALYTICS
 
     beforeEach(() => {
         jest.clearAllMocks()
+        delete process.env.OPT_OUT_ANALYTICS
+    })
+
+    afterAll(() => {
+        if (originalOptOutAnalytics === undefined) {
+            delete process.env.OPT_OUT_ANALYTICS
+            return
+        }
+        process.env.OPT_OUT_ANALYTICS = originalOptOutAnalytics
     })
 
 

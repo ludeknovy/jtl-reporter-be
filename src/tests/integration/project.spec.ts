@@ -9,6 +9,45 @@ describe("Projects", () => {
     beforeAll(async () => {
         ({ data: credentials } = await userSetup())
     })
+    describe("GET /projects", () => {
+        it("should return projects available to the authenticated user", async () => {
+            await stateSetup(States.ExistingProject)
+            const response = await request(__server__)
+                .get("/api/projects")
+                .set(__tokenHeaderKey__, credentials.token)
+                .set("Accept", "application/json")
+                .expect(StatusCode.Ok)
+
+            expect(Array.isArray(response.body)).toEqual(true)
+        })
+    })
+    describe("GET /projects/{projectName}", () => {
+        it("should return project settings", async () => {
+            await stateSetup(States.ExistingProject)
+            await request(__server__)
+                .get("/api/projects/test-project")
+                .set(__tokenHeaderKey__, credentials.token)
+                .set("Accept", "application/json")
+                .expect(StatusCode.Ok)
+        })
+    })
+    describe("GET /projects/overall-stats", () => {
+        it("should return dashboard statistics", async () => {
+            await stateSetup(States.ExistingProject)
+            const response = await request(__server__)
+                .get("/api/projects/overall-stats")
+                .set(__tokenHeaderKey__, credentials.token)
+                .set("Accept", "application/json")
+                .expect(StatusCode.Ok)
+
+            expect(response.body).toEqual(expect.objectContaining({
+                avgDuration: expect.any(Number),
+                avgVu: expect.any(Number),
+                totalDuration: expect.any(Number),
+                totalRunCount: expect.any(Number),
+            }))
+        })
+    })
     describe("POST /projects", () => {
         it("should be able to create new project", async () => {
             await stateSetup(States.EmptyDb)

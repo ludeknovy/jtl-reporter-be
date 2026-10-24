@@ -4,6 +4,9 @@ import {
     prepareDataForSavingToDb,
     prepareHistogramDataForSaving,
 } from "../../../data-stats/prepare-data"
+import { AnalyticsEvent } from "../../../utils/analytics/anyltics-event"
+import { sendDegradationNotifications, sendReportNotifications } from "../../../utils/notifications/send-notification"
+import { scenarioThresholdsCalc } from "../utils/scenario-thresholds-calc"
 import { itemDataProcessing } from "./item-data-processing"
 
 jest.mock("../../../../db/db")
@@ -22,11 +25,17 @@ jest.mock("../../../utils/notifications/send-notification", () => ({
     sendDegradationNotifications: jest.fn(),
     sendReportNotifications: jest.fn(),
 }))
+jest.mock("../utils/scenario-thresholds-calc")
 
 const ITEM_ID = "item-id"
 const DEFAULT_INTERVAL = "300 milliseconds"
 const QUERIES_PER_INTERVAL = 5
 const EXTRA_AGGREGATION_INTERVALS = 9
+const CHART_MAX_VU = 12
+const PROCESSED_OVERVIEW = { duration: 1000, startDate: "2024-01-01T00:00:00.000Z" }
+const PROCESSED_LABEL_STATS = [{ label: "GET /health" }]
+const PROCESSED_CHART = { threads: [[0, CHART_MAX_VU]] }
+const TRANSACTION_QUERY_COUNT = 3
 
 interface Deferred<T> {
     promise: Promise<T>
@@ -92,6 +101,33 @@ describe("itemDataProcessing", () => {
         ;(db.tx as any).mockImplementation(callback => callback({ none: jest.fn().mockResolvedValue(undefined) }))
     }
 
+    const configureSuccessfulProcessing = (scenarioSettings = {}) => {
+        const transaction = { none: jest.fn().mockResolvedValue(undefined) }
+        ;(db.one as any)
+            .mockResolvedValueOnce({
+                apdexSettings: { enabled: false },
+                deleteSamples: false,
+                extraAggregations: false,
+                thresholdEnabled: false,
+                ...scenarioSettings,
+            })
+            .mockResolvedValueOnce({ number_of_hostnames: 1, number_of_sut_hostnames: 1 })
+        ;(db.many as any).mockResolvedValue([])
+        ;(db.manyOrNone as any).mockResolvedValue([])
+        ;(db.none as any).mockResolvedValue(undefined)
+        ;(db.tx as any).mockImplementation(callback => callback(transaction))
+        ;(prepareDataForSavingToDb as any).mockReturnValue({
+            errors: [],
+            labelStats: PROCESSED_LABEL_STATS,
+            overview: { ...PROCESSED_OVERVIEW },
+            sutOverview: [],
+        })
+        ;(prepareHistogramDataForSaving as any).mockReturnValue([])
+        ;(prepareChartDataForSaving as any).mockReturnValue(PROCESSED_CHART)
+
+        return transaction
+    }
+
     beforeEach(() => {
         jest.resetAllMocks()
         ;(prepareDataForSavingToDb as any).mockReturnValue({
@@ -125,5 +161,52 @@ describe("itemDataProcessing", () => {
         await itemDataProcessing({ itemId: ITEM_ID, projectName: "project", scenarioName: "scenario" })
 
         expect(chartIntervals).toEqual(Array(QUERIES_PER_INTERVAL).fill(DEFAULT_INTERVAL))
+    })
+
+    it("saves processed report data, notifies subscribers, and marks the item ready", async () => {
+        const transaction = configureSuccessfulProcessing()
+        const saveItemStatsSpy = jest.spyOn(require("../../../queries/items"), "saveItemStats")
+        const savePlotDataSpy = jest.spyOn(require("../../../queries/items"), "savePlotData")
+        const updateItemSpy = jest.spyOn(require("../../../queries/items"), "updateItem")
+
+        await itemDataProcessing({ itemId: ITEM_ID, projectName: "project", scenarioName: "scenario" })
+
+        expect(sendReportNotifications).toHaveBeenCalledWith(
+            "project", "scenario", ITEM_ID, { ...PROCESSED_OVERVIEW, maxVu: CHART_MAX_VU })
+        expect(transaction.none).toHaveBeenCalledTimes(TRANSACTION_QUERY_COUNT)
+        expect(saveItemStatsSpy).toHaveBeenCalledWith(
+            ITEM_ID, JSON.stringify(PROCESSED_LABEL_STATS),
+            { ...PROCESSED_OVERVIEW, maxVu: CHART_MAX_VU }, "[]", "[]")
+        expect(savePlotDataSpy).toHaveBeenCalledWith(
+            ITEM_ID, JSON.stringify(PROCESSED_CHART), "[]", "[]", "[]")
+        expect(updateItemSpy).toHaveBeenCalledWith(ITEM_ID, "ready", PROCESSED_OVERVIEW.startDate)
+        expect(AnalyticsEvent.reportProcessingFinished).toHaveBeenCalledTimes(1)
+        expect(AnalyticsEvent.reportDetails).toHaveBeenCalledWith(1, PROCESSED_OVERVIEW.duration)
+        expect(db.none).not.toHaveBeenCalled()
+    })
+
+    it("persists apdex and threshold results, sends degradation notifications, and purges samples", async () => {
+        configureSuccessfulProcessing({
+            apdexSettings: { enabled: true, satisfyingThreshold: 100, toleratingThreshold: 500 },
+            deleteSamples: true,
+            thresholdEnabled: true,
+        })
+        ;(db.oneOrNone as any).mockResolvedValue({ stats: [{ label: "GET /health" }] })
+        ;(scenarioThresholdsCalc as any).mockReturnValue({ passed: false })
+        const updateApdexSettingsSpy = jest.spyOn(require("../../../queries/items"), "updateItemApdexSettings")
+        const saveThresholdsResultSpy = jest.spyOn(require("../../../queries/items"), "saveThresholdsResult")
+        const deleteSamplesSpy = jest.spyOn(require("../../../queries/items"), "deleteSamples")
+
+        await itemDataProcessing({ itemId: ITEM_ID, projectName: "project", scenarioName: "scenario" })
+
+        expect(updateApdexSettingsSpy).toHaveBeenCalledWith(ITEM_ID, {
+            satisfyingThreshold: 100,
+            toleratingThreshold: 500,
+        })
+        expect(saveThresholdsResultSpy).toHaveBeenCalledWith(
+            "project", "scenario", ITEM_ID, { passed: false })
+        expect(sendDegradationNotifications).toHaveBeenCalledWith("project", "scenario", ITEM_ID)
+        expect(deleteSamplesSpy).toHaveBeenCalledWith(ITEM_ID)
+        expect(db.none).toHaveBeenCalledTimes(TRANSACTION_QUERY_COUNT)
     })
 })
