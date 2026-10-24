@@ -26,7 +26,7 @@ describe("loginWithTokenController", () => {
     await loginWithTokenController(
       request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response, nextFunction)
-    expect(response.json).toBeCalledWith(
+    expect(response.json).toHaveBeenCalledWith(
       expect.objectContaining({
         jwtToken: expect.any(String),
       }))

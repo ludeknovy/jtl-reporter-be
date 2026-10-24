@@ -36,7 +36,7 @@ export const authenticationMiddleware = async (req: IGetUserAuthInfoRequest, res
             }
             return next(boom.unauthorized(UNAUTHORIZED_MSG))
 
-        } catch(error) {
+        } catch{
             return next(boom.unauthorized(UNAUTHORIZED_MSG))
         }
     }
@@ -49,7 +49,7 @@ export const authenticationMiddleware = async (req: IGetUserAuthInfoRequest, res
         }
         req.user = { userId, role: userData.role }
         next()
-    } catch(error) {
+    } catch{
         return next(boom.unauthorized(UNAUTHORIZED_MSG))
     }
 }

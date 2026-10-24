@@ -163,6 +163,7 @@
     "no-sequences": "error",
     "no-shadow": "off",
     "@typescript-eslint/no-shadow": "error",
+    "@typescript-eslint/no-require-imports": "off",
     "no-throw-literal": "error",
     "no-trailing-spaces": "error",
     "no-undef-init": "error",
@@ -217,28 +218,12 @@
       }
     ],
     "@typescript-eslint/ban-ts-comment": "error",
-    "@typescript-eslint/ban-types": [
-      "error"
-    ],
     "@typescript-eslint/consistent-type-assertions": "error",
     "@typescript-eslint/consistent-type-definitions": "error",
     "@typescript-eslint/explicit-member-accessibility": [
       "error",
       {
         "accessibility": "no-public"
-      }
-    ],
-    "@typescript-eslint/member-delimiter-style": [
-      "error",
-      {
-        "multiline": {
-          "delimiter": "none",
-          "requireLast": true
-        },
-        "singleline": {
-          "delimiter": "semi",
-          "requireLast": false
-        }
       }
     ],
     "@typescript-eslint/naming-convention": [

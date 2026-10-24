@@ -51,7 +51,7 @@ describe("updateScenariosController", () => {
     await updateScenarioController(request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response)
     expect(response.send).toHaveBeenCalledTimes(1)
-    expect(querySpy).toBeCalledWith("project", "test-scenario", "test-scenario",
+    expect(querySpy).toHaveBeenCalledWith("project", "test-scenario", "test-scenario",
       body.analysisEnabled, body.thresholds, body.deleteSamples, body.zeroErrorToleranceEnabled,
       body.keepTestRunsPeriod, body.generateShareToken, JSON.stringify(body.labelFilterSettings),
       JSON.stringify(body.labelTrendChartSettings), body.extraAggregations, body.apdexSettings, body.minTestDuration)

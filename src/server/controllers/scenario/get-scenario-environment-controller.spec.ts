@@ -34,8 +34,8 @@ describe("getScenarioEnvironmentController", () => {
             response as unknown as Response
         )
 
-        expect(response.json).toBeCalledWith(["environment-name"])
-        expect(response.status).toBeCalledWith(StatusCode.Ok)
+        expect(response.json).toHaveBeenCalledWith(["environment-name"])
+        expect(response.status).toHaveBeenCalledWith(StatusCode.Ok)
         expect(querySpy).toHaveBeenCalledWith(projectName, scenarioName)
     })
 

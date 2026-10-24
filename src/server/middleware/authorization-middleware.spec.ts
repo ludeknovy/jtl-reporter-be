@@ -19,7 +19,7 @@ describe("AuthorizationMiddleware", () => {
             params: { },
         }
         authorizationMiddleware([AllowedRoles.Operator])(req, mockResponse, nextFunction)
-        expect(nextFunction).toBeCalledWith(boom.forbidden(`Not enough permission to do this`))
+        expect(nextFunction).toHaveBeenCalledWith(boom.forbidden(`Not enough permission to do this`))
     })
 
     it("should call next when role is allowed", () => {
@@ -34,8 +34,8 @@ describe("AuthorizationMiddleware", () => {
 
         }
         authorizationMiddleware([AllowedRoles.Readonly])(req, mockResponse, nextFunction)
-        expect(nextFunction).toBeCalledTimes(1)
-        expect(nextFunction).toBeCalledWith()
+        expect(nextFunction).toHaveBeenCalledTimes(1)
+        expect(nextFunction).toHaveBeenCalledWith()
     })
     it("should check if user has access when project related resource accessed", function () {
         const nextFunction: NextFunction = jest.fn()
@@ -55,7 +55,7 @@ describe("AuthorizationMiddleware", () => {
 
         authorizationMiddleware([AllowedRoles.Readonly])(req, mockResponse, nextFunction)
         expect(querySpy).toHaveBeenNthCalledWith(1, "projectName", "123")
-        expect(nextFunction).not.toBeCalledWith(boom.forbidden(`You dont have permission to access`))
+        expect(nextFunction).not.toHaveBeenCalledWith(boom.forbidden(`You dont have permission to access`))
     })
     it.skip("should return forbidden error if user has no access to project related resource", () => {
         const nextFunction: NextFunction = jest.fn()
