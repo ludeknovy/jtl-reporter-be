@@ -10,9 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '24.22.1'
       - name: Install modules
         run: npm install
       - name: Run unit tests
@@ -20,10 +20,11 @@ jobs:
         env:
           JWT_TOKEN_LOGIN: ploki
           JWT_TOKEN: abcdef
+
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v5
         with:
-          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
-          flags: unittests # optional
-          fail_ci_if_error: true # optional (default = false)
-          directory: coverage
+          files: ./coverage/lcov.info
+          flags: unittests
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}

@@ -1,4 +1,4 @@
-FROM node:20.19.0-alpine3.20 as builder
+FROM node:24.22.1-alpine3.24 as builder
 
 RUN apk --update add git build-base
 
@@ -16,7 +16,7 @@ COPY /src ./src/
 
 RUN npm run build
 
-FROM node:20.19.0-alpine3.20
+FROM node:24.22.1-alpine3.24
 
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.7.2/wait /wait
 RUN chmod +x /wait
@@ -26,4 +26,3 @@ WORKDIR /src/be
 COPY --from=builder /src/be/ ./
 
 CMD [ "npm", "run", "start" ]
-
