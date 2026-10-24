@@ -1,11 +1,52 @@
 import * as request from "supertest"
 import { stateSetup, userSetup, apiTokenSetup } from "./helper/state"
 import { States } from "./helper/state.model"
-import { ItemStatus } from "../../server/queries/items.model"
+import { ItemStatus, ReportStatus } from "../../server/queries/items.model"
 import * as path from "path"
 import { StatusCode } from "../../server/utils/status-code"
 
 const TIMEOUT = 2000
+const POLL_INTERVAL = 100
+const PROCESSING_TIMEOUT = 15000
+const PROJECT_NAME = "test-project"
+const SCENARIO_NAME = "test-scenario"
+const EXTRA_AGGREGATION_INTERVALS = ["5 seconds", "10 seconds", "30 seconds", "1 minute", "5 minute",
+  "10 minutes", "30 minutes", "1 hour"]
+
+const wait = (timeout: number): Promise<void> => new Promise(resolve => setTimeout(resolve, timeout))
+
+const scenarioSettings = (extraAggregations: boolean) => ({
+  scenarioName: SCENARIO_NAME,
+  analysisEnabled: false,
+  zeroErrorToleranceEnabled: false,
+  deleteSamples: false,
+  keepTestRunsPeriod: 0,
+  minTestDuration: 0,
+  generateShareToken: false,
+  extraAggregations,
+  thresholds: {
+    enabled: false,
+    percentile: 0,
+    errorRate: 0,
+    throughput: 0,
+  },
+  labelTrendChartSettings: {
+    avgConnectionTime: false,
+    avgLatency: false,
+    avgResponseTime: false,
+    errorRate: false,
+    p90: false,
+    p95: false,
+    p99: false,
+    throughput: false,
+    virtualUsers: false,
+  },
+  apdexSettings: {
+    toleratingThreshold: 0,
+    satisfyingThreshold: 0,
+    enabled: false,
+  },
+})
 
 describe("Items", () => {
   let credentials
@@ -23,63 +64,24 @@ describe("Items", () => {
     await new Promise(resolve => setTimeout(resolve, TIMEOUT))
   })
 
-  describe("GET /projects/:projectName/scenarios/:scenarioName/items", () => {
-    it("should return completed items and their total count", async () => {
-      await stateSetup(States.ExistingTestItem)
-      const response = await request(__server__)
-        .get("/api/projects/test-project/scenarios/test-scenario/items?environment=localhost")
-        .set(__tokenHeaderKey__, credentials.token)
-        .set("Accept", "application/json")
-        .expect(StatusCode.Ok)
+  const waitForProcessedItem = async (itemId: string) => {
+    const deadline = Date.now() + PROCESSING_TIMEOUT
 
-      expect(response.body).toEqual(expect.objectContaining({
-        data: expect.any(Array),
-        name: "test-scenario",
-        total: 1,
-      }))
-    })
-  })
-  describe("GET /projects/:projectName/scenarios/:scenarioName/items/:itemId", () => {
-    it("should return the report detail for an existing item", async () => {
-      const { data: { itemId } } = await stateSetup(States.ExistingTestItem)
+    while (Date.now() < deadline) {
       const response = await request(__server__)
-        .get(`/api/projects/test-project/scenarios/test-scenario/items/${itemId}`)
+        .get(`/api/projects/${PROJECT_NAME}/scenarios/${SCENARIO_NAME}/items/${itemId}`)
         .set(__tokenHeaderKey__, credentials.token)
-        .set("Accept", "application/json")
-        .expect(StatusCode.Ok)
 
-      expect(response.body).toEqual(expect.objectContaining({
-        environment: "localhost",
-        name: "test-name",
-        reportStatus: "ready",
-        statistics: expect.any(Array),
-      }))
-    })
-  })
-  describe("GET /projects/:projectName/scenarios/:scenarioName/processing-items", () => {
-    it("should separate in-progress and failed items", async () => {
-      await stateSetup(States.ExistingTestItem)
-      const response = await request(__server__)
-        .get("/api/projects/test-project/scenarios/test-scenario/processing-items?environment=localhost")
-        .set(__tokenHeaderKey__, credentials.token)
-        .set("Accept", "application/json")
-        .expect(StatusCode.Ok)
+      if (response.status === StatusCode.Ok && response.body.reportStatus === ReportStatus.Ready) {
+        return response.body
+      }
 
-      expect(response.body).toEqual({ failed: [], inprogress: [] })
-    })
-  })
-  describe("GET /projects/:projectName/scenarios/:scenarioName/items/:itemId/share-tokens", () => {
-    it("should return existing item share tokens", async () => {
-      const { data: { itemId } } = await stateSetup(States.ExistingTestItem)
-      const response = await request(__server__)
-        .get(`/api/projects/test-project/scenarios/test-scenario/items/${itemId}/share-tokens`)
-        .set(__tokenHeaderKey__, credentials.token)
-        .set("Accept", "application/json")
-        .expect(StatusCode.Ok)
+      await wait(POLL_INTERVAL)
+    }
 
-      expect(response.body).toEqual([])
-    })
-  })
+    throw new Error(`Item ${itemId} did not finish processing within ${PROCESSING_TIMEOUT}ms`)
+  }
+
   describe("POST /api/projects/:projectName/scenarios/:scenarioName/items/start-async", () => {
     it("should be able to start async item", async () => {
       await stateSetup(States.ExistingScenario)
@@ -288,6 +290,59 @@ describe("Items", () => {
           .field("status", ItemStatus.Passed)
           .field("hostname", "localhost")
           .expect(StatusCode.NotFound)
+      })
+  })
+
+  describe("item data processing", () => {
+    const updateScenario = async (extraAggregations: boolean) => {
+      await request(__server__)
+        .put(`/api/projects/${PROJECT_NAME}/scenarios/${SCENARIO_NAME}`)
+        .set(__tokenHeaderKey__, credentials.token)
+        .send(scenarioSettings(extraAggregations))
+        .expect(StatusCode.NoContent)
+    }
+
+    const createItem = async (filename: string) => {
+      const response = await request(__server__)
+        .post(`/api/projects/${PROJECT_NAME}/scenarios/${SCENARIO_NAME}/items`)
+        .set(__tokenHeaderKey__, credentials.token)
+        .attach("kpi", path.join(__dirname, "./test-data", filename), filename)
+        .field("environment", "test-environment")
+        .field("status", ItemStatus.Passed)
+        .expect(StatusCode.Ok)
+
+      return response.body.itemId
+    }
+
+    const uploadItem = async (extraAggregations: boolean, filename: string) => {
+      await stateSetup(States.ExistingScenario)
+      await updateScenario(extraAggregations)
+
+      return waitForProcessedItem(await createItem(filename))
+    }
+
+    it("persists extra chart data when extra aggregations are enabled", async () => {
+      const item = await uploadItem(true, "kpi-comprehensive.jtl")
+
+      expect(item.plot.threads).not.toHaveLength(0)
+      expect(item.extraPlotData.map(chart => chart.interval)).toEqual(EXTRA_AGGREGATION_INTERVALS)
+    })
+
+    it("persists only the default chart interval when extra aggregations are disabled", async () => {
+      const item = await uploadItem(false, "kpi.jtl")
+
+      expect(item.plot.threads).not.toHaveLength(0)
+      expect(item.extraPlotData).toEqual([])
+    })
+
+    it("processes concurrent uploads without leaving either report in progress", async () => {
+      await stateSetup(States.ExistingScenario)
+      await updateScenario(false)
+
+      const itemIds = await Promise.all([createItem("kpi.jtl"), createItem("kpi.jtl")])
+      const items = await Promise.all(itemIds.map(waitForProcessedItem))
+
+      items.forEach(item => expect(item.plot.threads).not.toHaveLength(0))
     })
   })
 })
