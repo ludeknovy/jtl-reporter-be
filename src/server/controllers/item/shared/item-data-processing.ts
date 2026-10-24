@@ -127,57 +127,20 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         const intervals = [`${defaultInterval} milliseconds`, "5 seconds", "10 seconds", "30 seconds",
             "1 minute", "5 minute", "10 minutes", "30 minutes", "1 hour"]
 
-        // First loop: Only DB queries, group promises into arrays
-        const charts = []
-        const distributedThreadsPromises = []
-
-        for (const interval of intervals) {
-            logger.debug(`Preparing queries for interval: ${interval}`)
-
-            // distributed mode - conditional query
-            let distributedThreadsPromise = null
-            if (aggOverview?.number_of_hostnames > 1) {
-                logger.debug("Preparing distributed threads query")
-                distributedThreadsPromise = db.manyOrNone(distributedThreadsQuery(interval, itemId))
-            }
-            distributedThreadsPromises.push(distributedThreadsPromise)
-
-            // The 4 main queries for each interval
-            const intervalPromises = [
-                db.many(charLabelQuery(interval, itemId)), // 0: labelChart
-                db.many(chartOverviewQuery(interval, itemId)), // 1: overviewChart
-                db.many(chartOverviewStatusCodesQuery(interval, itemId)), // 2: statusCodeChart
-                db.manyOrNone(threadsPerThreadGroup(interval, itemId)), // 3: threadsPerGroup
-            ]
-
-            charts.push(intervalPromises)
-
-            if (!scenarioSettings.extraAggregations) {
-                break
-            }
-        }
-
-        logger.debug("Executing all chart queries in parallel")
-        const chartResultsPromise = Promise.all(charts.map(promises => Promise.all(promises)))
-        const distributedThreadsResultsPromise = Promise.all(distributedThreadsPromises.filter(p => p !== null))
-        const [allChartResults, allDistributedThreadsResults] = await Promise.all([
-            chartResultsPromise,
-            distributedThreadsResultsPromise,
-        ])
-
-        // Second loop: Only data processing
-        let distributedThreadsIndex = 0
         for (const [index, interval] of Object.entries(intervals)) {
             const intervalIndex = parseInt(index, 10)
 
-            // Get query results for this range
-            const [labelChart, overviewChart, statusCodeChart, threadsPerGroup] = allChartResults[intervalIndex]
-
-            // Get distributedThreads if applicable
-            let distributedThreads = null
-            if (aggOverview?.number_of_hostnames > 1) {
-                distributedThreads = allDistributedThreadsResults[distributedThreadsIndex++]
-            }
+            logger.debug(`Loading chart data for interval: ${interval}`)
+            const [labelChart, overviewChart, statusCodeChart, threadsPerGroup, distributedThreads] =
+                await Promise.all([
+                    db.many(charLabelQuery(interval, itemId)),
+                    db.many(chartOverviewQuery(interval, itemId)),
+                    db.many(chartOverviewStatusCodesQuery(interval, itemId)),
+                    db.manyOrNone(threadsPerThreadGroup(interval, itemId)),
+                    aggOverview?.number_of_hostnames > 1
+                        ? db.manyOrNone(distributedThreadsQuery(interval, itemId))
+                        : Promise.resolve(null),
+                ])
 
             logger.debug(`Processing data for interval: ${interval}`)
 
