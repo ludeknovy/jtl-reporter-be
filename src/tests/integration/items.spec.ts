@@ -23,6 +23,63 @@ describe("Items", () => {
     await new Promise(resolve => setTimeout(resolve, TIMEOUT))
   })
 
+  describe("GET /projects/:projectName/scenarios/:scenarioName/items", () => {
+    it("should return completed items and their total count", async () => {
+      await stateSetup(States.ExistingTestItem)
+      const response = await request(__server__)
+        .get("/api/projects/test-project/scenarios/test-scenario/items?environment=localhost")
+        .set(__tokenHeaderKey__, credentials.token)
+        .set("Accept", "application/json")
+        .expect(StatusCode.Ok)
+
+      expect(response.body).toEqual(expect.objectContaining({
+        data: expect.any(Array),
+        name: "test-scenario",
+        total: 1,
+      }))
+    })
+  })
+  describe("GET /projects/:projectName/scenarios/:scenarioName/items/:itemId", () => {
+    it("should return the report detail for an existing item", async () => {
+      const { data: { itemId } } = await stateSetup(States.ExistingTestItem)
+      const response = await request(__server__)
+        .get(`/api/projects/test-project/scenarios/test-scenario/items/${itemId}`)
+        .set(__tokenHeaderKey__, credentials.token)
+        .set("Accept", "application/json")
+        .expect(StatusCode.Ok)
+
+      expect(response.body).toEqual(expect.objectContaining({
+        environment: "localhost",
+        name: "test-name",
+        reportStatus: "ready",
+        statistics: expect.any(Array),
+      }))
+    })
+  })
+  describe("GET /projects/:projectName/scenarios/:scenarioName/processing-items", () => {
+    it("should separate in-progress and failed items", async () => {
+      await stateSetup(States.ExistingTestItem)
+      const response = await request(__server__)
+        .get("/api/projects/test-project/scenarios/test-scenario/processing-items?environment=localhost")
+        .set(__tokenHeaderKey__, credentials.token)
+        .set("Accept", "application/json")
+        .expect(StatusCode.Ok)
+
+      expect(response.body).toEqual({ failed: [], inprogress: [] })
+    })
+  })
+  describe("GET /projects/:projectName/scenarios/:scenarioName/items/:itemId/share-tokens", () => {
+    it("should return existing item share tokens", async () => {
+      const { data: { itemId } } = await stateSetup(States.ExistingTestItem)
+      const response = await request(__server__)
+        .get(`/api/projects/test-project/scenarios/test-scenario/items/${itemId}/share-tokens`)
+        .set(__tokenHeaderKey__, credentials.token)
+        .set("Accept", "application/json")
+        .expect(StatusCode.Ok)
+
+      expect(response.body).toEqual([])
+    })
+  })
   describe("POST /api/projects/:projectName/scenarios/:scenarioName/items/start-async", () => {
     it("should be able to start async item", async () => {
       await stateSetup(States.ExistingScenario)
