@@ -158,8 +158,12 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         }
 
         logger.debug("Executing all chart queries in parallel")
-        const allChartResults = await Promise.all(charts.map(promises => Promise.all(promises)))
-        const allDistributedThreadsResults = await Promise.all(distributedThreadsPromises.filter(p => p !== null))
+        const chartResultsPromise = Promise.all(charts.map(promises => Promise.all(promises)))
+        const distributedThreadsResultsPromise = Promise.all(distributedThreadsPromises.filter(p => p !== null))
+        const [allChartResults, allDistributedThreadsResults] = await Promise.all([
+            chartResultsPromise,
+            distributedThreadsResultsPromise,
+        ])
 
         // Second loop: Only data processing
         let distributedThreadsIndex = 0
