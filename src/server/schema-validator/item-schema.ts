@@ -70,6 +70,16 @@ export const upsertUserItemChartSettings = Joi.array().items(Joi.object().keys({
     metric: Joi.string().required(),
 })).required()
 
+export const MAX_DELETE_ITEMS = 100
+
 export const stopItemAsyncBodySchema = Joi.object().keys({
     status,
+})
+
+export const deleteItemsBodySchema = Joi.object({
+  itemIds: Joi.array()
+    .items(Joi.string().uuid())
+    .min(1)
+    .max(MAX_DELETE_ITEMS)
+    .required(),
 })

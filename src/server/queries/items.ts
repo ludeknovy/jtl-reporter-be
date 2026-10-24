@@ -107,6 +107,17 @@ export const deleteItem = (projectName, scenarioName, itemId) => {
     }
 }
 
+export const deleteItems = (projectName: string, scenarioName: string, itemIds: string[]) => ({
+    text: `DELETE FROM jtl.items
+    WHERE id = ANY($1::uuid[])
+    AND scenario_id = (
+      SELECT s.id FROM jtl.scenario as s
+      JOIN jtl.projects as p ON p.id = s.project_id
+      WHERE s.name = $2 AND p.project_name = $3
+    )`,
+    values: [itemIds, scenarioName, projectName],
+})
+
 export const saveData = (itemId, data, dataType) => {
     return {
         text: "INSERT INTO jtl.data(item_id, item_data, data_type) VALUES($1, $2, $3)",

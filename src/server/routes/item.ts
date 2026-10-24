@@ -9,6 +9,7 @@ import {
     paramsSchema, updateItemBodySchema,
     newItemParamSchema,
     newAsyncItemStartBodySchema, shareTokenSchema, upsertUserItemChartSettings, stopItemAsyncBodySchema,
+    deleteItemsBodySchema,
 } from "../schema-validator/item-schema"
 import {
     environmentQuerySchema,
@@ -19,6 +20,7 @@ import { getItemsController } from "../controllers/item/get-items-controller"
 import { getItemController } from "../controllers/item/get-item-controller"
 import { updateItemController } from "../controllers/item/update-item-controller"
 import { deleteItemController } from "../controllers/item/delete-item-controller"
+import { deleteItemsController } from "../controllers/item/delete-items-controller"
 import { createItemController } from "../controllers/item/create-item-controller"
 import { getProcessingItemsController } from "../controllers/item/get-processing-items-controller"
 import { createItemAsyncController } from "../controllers/item/create-item-async-controller"
@@ -40,6 +42,14 @@ export class ItemsRoutes {
     routes(app: express.Application): void {
 
         app.route("/api/projects/:projectName/scenarios/:scenarioName/items")
+            .delete(
+                authenticationMiddleware,
+                authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
+                paramsSchemaValidator(newItemParamSchema),
+                bodySchemaValidator(deleteItemsBodySchema),
+                projectExistsMiddleware,
+                wrapAsync(deleteItemsController))
+
             .get(
                 authenticationMiddleware,
                 authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),

@@ -2,6 +2,9 @@ import * as request from "supertest"
 import { stateSetup, userSetup, apiTokenSetup } from "./helper/state"
 import { States } from "./helper/state.model"
 import { ItemStatus, ReportStatus } from "../../server/queries/items.model"
+import { createNewItem } from "../../server/queries/items"
+import { db } from "../../db/db"
+import { MAX_DELETE_ITEMS } from "../../server/schema-validator/item-schema"
 import * as path from "path"
 import { StatusCode } from "../../server/utils/status-code"
 
@@ -178,6 +181,50 @@ describe("Items", () => {
             base: true,
           })
           .expect(StatusCode.NotFound)
+    })
+  })
+  describe("DELETE /projects/{projectName}/scenarios/{scenarioName}/items", () => {
+    it("should delete multiple items and be idempotent", async () => {
+      const { data: { itemId } } = await stateSetup(States.ExistingTestItem)
+      const [secondItem] = await db.any(createNewItem(
+        "test-scenario", "2019-09-22 20:21:23.265", "localhost", "second test note",
+        "1", "test-project", "localhost", ReportStatus.Ready, "second-test-name", "resourcesLink"))
+
+      const endpoint = "/api/projects/test-project/scenarios/test-scenario/items"
+      await request(__server__)
+        .delete(endpoint)
+        .set(__tokenHeaderKey__, credentials.token)
+        .set("Accept", "application/json")
+        .send({ itemIds: [itemId, secondItem.id] })
+        .expect(StatusCode.NoContent)
+
+      const items = await request(__server__)
+        .get(endpoint)
+        .set(__tokenHeaderKey__, credentials.token)
+        .set("Accept", "application/json")
+        .expect(StatusCode.Ok)
+      expect(items.body).toMatchObject({ data: [], total: 0 })
+
+      await request(__server__)
+        .delete(endpoint)
+        .set(__tokenHeaderKey__, credentials.token)
+        .set("Accept", "application/json")
+        .send({ itemIds: [itemId, secondItem.id] })
+        .expect(StatusCode.NoContent)
+    })
+
+    it("should reject invalid, empty, and oversized batches", async () => {
+      const { data: { itemId } } = await stateSetup(States.ExistingTestItem)
+      const endpoint = "/api/projects/test-project/scenarios/test-scenario/items"
+
+      for (const itemIds of [["invalid"], [], Array(MAX_DELETE_ITEMS + 1).fill(itemId)]) {
+        await request(__server__)
+          .delete(endpoint)
+          .set(__tokenHeaderKey__, credentials.token)
+          .set("Accept", "application/json")
+          .send({ itemIds })
+          .expect(StatusCode.BadRequest)
+      }
     })
   })
   describe("POST /projects/{projectName}/scenarios/{scenarioName}/items/{itemId}/share-tokens", () => {
