@@ -21,7 +21,7 @@ describe("getInitController", () => {
     await getInitController(
       request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response, nextFunction)
-    expect(response.json).toBeCalledWith({ initialized: true })
+    expect(response.json).toHaveBeenCalledWith({ initialized: true })
   })
   it("should return false if no user exists", async function () {
     (db.manyOrNone as any).mockResolvedValue([])
@@ -31,6 +31,6 @@ describe("getInitController", () => {
     await getInitController(
       request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response, nextFunction)
-    expect(response.json).toBeCalledWith({ initialized: false })
+    expect(response.json).toHaveBeenCalledWith({ initialized: false })
   })
 })

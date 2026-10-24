@@ -45,7 +45,7 @@ describe("getScenarioTrendsController", function () {
             request as unknown as IGetUserAuthInfoRequest,
             response as unknown as Response)
 
-        expect(response.json).toBeCalledWith({
+        expect(response.json).toHaveBeenCalledWith({
             aggregatedTrends: [{
                 id: "id1",
                 overview: {
@@ -100,7 +100,7 @@ describe("getScenarioTrendsController", function () {
             request as unknown as IGetUserAuthInfoRequest,
             response as unknown as Response)
 
-        expect(response.json).toBeCalledWith({
+        expect(response.json).toHaveBeenCalledWith({
             aggregatedTrends: [{
                 id: "id1",
                 overview: {
@@ -177,7 +177,7 @@ describe("getScenarioTrendsController", function () {
             request as unknown as IGetUserAuthInfoRequest,
             response as unknown as Response)
 
-        expect(response.json).toBeCalledWith({
+        expect(response.json).toHaveBeenCalledWith({
             aggregatedTrends: [{
                 id: "id1",
                 overview: {

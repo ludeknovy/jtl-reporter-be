@@ -52,7 +52,7 @@ describe("deleteTokenController", () => {
     await deleteTokenController(
       request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response, nextFunction)
-    expect(nextFunction).toBeCalledWith(boom.forbidden())
+    expect(nextFunction).toHaveBeenCalledWith(boom.forbidden())
   })
 
   it("should call deleteToken query for api key the user created as operator role", async () => {

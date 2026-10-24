@@ -56,7 +56,8 @@ export class App {
     }
 
     private errorHandler() {
-        // eslint-disable-next-line no-unused-vars
+        // Express identifies error middleware by its four-argument signature.
+        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
         this.app.use(function (error: Error, req: Request, res: Response, next: NextFunction) {
             if (boom.isBoom(error)) {
                 const { payload: { message } } = error.output

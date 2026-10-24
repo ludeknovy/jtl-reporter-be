@@ -206,8 +206,7 @@ export const checkKeepTestRunsPeriod = (keepTestRunsPeriod): boom => {
         if (!allowedValue) {
             return boom.badRequest(`invalid value, allowed values are: ${ALLOWED_PERIOD}`)
         }
-        return
-    } catch(e) {
+    } catch{
         return boom.badRequest("keepTestRunsPeriod - only numbers are allowed")
     }
 }
@@ -235,8 +234,7 @@ const handleError = async (itemId: string, kpiFilename: string, processingError:
     await itemErrorHandler(itemId, processingError)
     try {
         removeUploadedFile(kpiFilename)
-    } catch(e) {
+    } catch{
         logger.error(`File ${kpiFilename} does not exist anymore`)
     }
 }
-

@@ -6,7 +6,7 @@ WORKDIR /src/be
 
 COPY package.json package-lock.json  ./
 
-RUN npm install
+RUN npm ci
 
 COPY tsconfig.json custom-typings.d.ts ./
 

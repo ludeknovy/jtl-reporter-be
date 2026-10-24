@@ -36,7 +36,7 @@ describe("updateScenarioTrendsSettings", function () {
         const querySpy = jest.spyOn(require("../../../queries/scenario"), "updateUserScenarioTrendsSettings")
 
         await postScenarioTrendsSettings(request as unknown as IGetUserAuthInfoRequest, response as unknown as Response)
-        expect(response.status).toBeCalledWith(StatusCode.NoContent)
+        expect(response.status).toHaveBeenCalledWith(StatusCode.NoContent)
         expect(querySpy).toHaveBeenCalledWith(request.params.projectName,
             request.params.scenarioName, "userId", JSON.stringify(request.body))
     })
@@ -59,7 +59,7 @@ describe("updateScenarioTrendsSettings", function () {
         }
 
         await postScenarioTrendsSettings(request as unknown as IGetUserAuthInfoRequest, response as unknown as Response)
-        expect(response.status).toBeCalledWith(StatusCode.BadRequest)
+        expect(response.status).toHaveBeenCalledWith(StatusCode.BadRequest)
         expect(response.send).toHaveBeenCalledWith("Max 2 metrics allowed")
     })
 })
