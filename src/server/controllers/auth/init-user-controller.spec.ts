@@ -27,7 +27,7 @@ describe("initUserController", () => {
         expect(request.body).toEqual({ username: "test", password: "123", role: AllowedRoles.Admin })
     })
     it("should return an error if user already exists", async function () {
-        const querySpy = jest.spyOn(require("boom"), "forbidden");
+        const querySpy = jest.spyOn(require("@hapi/boom"), "forbidden");
         (db.oneOrNone as any).mockResolvedValueOnce({}); // migration has finished
         (db.manyOrNone as any).mockResolvedValue(["test"])
         const nextFunction: NextFunction = jest.fn()
@@ -41,7 +41,7 @@ describe("initUserController", () => {
         expect(querySpy).toHaveBeenCalledWith("User was already initialized")
     })
     it("should throw exception when migrations have not finished", async () => {
-        const spy = jest.spyOn(require("boom"), "preconditionRequired")
+        const spy = jest.spyOn(require("@hapi/boom"), "preconditionRequired")
         const nextFunction: NextFunction = jest.fn()
         const response = mockResponse()
         const request = {}

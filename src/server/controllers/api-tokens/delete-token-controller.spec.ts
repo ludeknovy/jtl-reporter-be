@@ -3,7 +3,7 @@ import { AllowedRoles } from "../../middleware/authorization-middleware"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 import { deleteTokenController } from "./delete-token-controller"
 import { db } from "../../../db/db"
-import * as boom from "boom"
+import * as boom from "@hapi/boom"
 
 jest.mock("../../../db/db")
 const mockResponse = () => {

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express"
 import { createUser } from "../../queries/auth"
 import { db } from "../../../db/db"
-import * as boom from "boom"
+import * as boom from "@hapi/boom"
 import { hashPassword } from "../auth/helper/passwords"
 import { StatusCode } from "../../utils/status-code"
 import { asignAdminAsProjectMember } from "../../queries/user-project-access"

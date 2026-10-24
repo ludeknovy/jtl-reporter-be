@@ -2,7 +2,7 @@ import { IGetUserAuthInfoRequest } from "./request.model"
 import { Response, NextFunction } from "express"
 import { projectAutoProvisioningMiddleware, projectExistsMiddleware } from "./project-exists-middleware"
 import { db } from "../../db/db"
-import Boom = require("boom")
+import Boom = require("@hapi/boom")
 
 jest.mock("../../db/db")
 

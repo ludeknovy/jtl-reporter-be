@@ -4,7 +4,7 @@ import { transformDataForDb } from "../../data-stats/prepare-data"
 import { db } from "../../../db/db"
 import { createNewItem, createShareToken, samplesColumnSet } from "../../queries/items"
 import * as multer from "multer"
-import * as boom from "boom"
+import * as boom from "@hapi/boom"
 import * as fs from "fs"
 import * as csv from "fast-csv"
 import { logger } from "../../../logger"
@@ -196,7 +196,7 @@ const checkFieldsLength = (properties: Array<{ name: string; value: any; maxLeng
     return failedValidations
 }
 
-export const checkKeepTestRunsPeriod = (keepTestRunsPeriod): boom => {
+export const checkKeepTestRunsPeriod = (keepTestRunsPeriod): boom.Boom => {
     try {
         const keepTestRunsPeriodNumber = parseInt(keepTestRunsPeriod, 10)
         if (isNaN(keepTestRunsPeriodNumber)) {

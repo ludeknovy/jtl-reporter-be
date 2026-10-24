@@ -2,7 +2,7 @@ import { db } from "../../../db/db"
 import { Response } from "express"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 import { createProjectController } from "./create-project-controller"
-import * as boom from "boom"
+import * as boom from "@hapi/boom"
 import { AllowedRoles } from "../../middleware/authorization-middleware"
 
 jest.mock("../../../db/db")

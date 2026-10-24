@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express"
 import { db } from "../../../db/db"
 import { getUser } from "../../queries/auth"
-import * as boom from "boom"
+import * as boom from "@hapi/boom"
 import { passwordMatch } from "./helper/passwords"
 import { generateToken } from "./helper/token-generator"
 import { StatusCode } from "../../utils/status-code"
