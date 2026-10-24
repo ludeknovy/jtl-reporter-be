@@ -1,0 +1,15 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,success,bytes,sentBytes,grpThreads,allThreads,Latency,Hostname,Connect,URL
+1700000000000,120,GET /health,200,OK,Load Group A 1-1,true,1024,128,1,2,20,agent-a,5,https://service-a.example.test/health
+1700000010000,180,GET /health,200,OK,Load Group B 1-1,true,1100,140,1,2,25,agent-b,6,https://service-b.example.test/health
+1700000300000,450,GET /orders,500,Internal server error,Load Group A 1-2,false,2048,256,2,4,80,agent-a,12,https://service-a.example.test/orders
+1700000310000,300,GET /orders,200,OK,Load Group B 1-2,true,1800,220,2,4,45,agent-b,9,https://service-b.example.test/orders
+1700000600000,900,GET /health,200,OK,Load Group A 1-3,true,1300,150,3,6,30,agent-a,7,https://service-a.example.test/health
+1700000610000,750,GET /health,Non HTTP response code: java.net.SocketException,Connection refused,Load Group B 1-3,false,0,0,3,6,0,agent-b,0,https://service-b.example.test/health
+1700001800000,220,GET /orders,200,OK,Load Group A 1-4,true,1500,180,4,8,35,agent-a,8,https://service-a.example.test/orders
+1700001810000,650,GET /orders,503,Service unavailable,Load Group B 1-4,false,0,0,4,8,60,agent-b,11,https://service-b.example.test/orders
+1700003600000,140,GET /health,200,OK,Load Group A 1-5,true,1150,145,5,10,22,agent-a,5,https://service-a.example.test/health
+1700003610000,480,GET /health,200,OK,Load Group B 1-5,true,1250,155,5,10,40,agent-b,8,https://service-b.example.test/health
+1700005400000,330,GET /orders,200,OK,Load Group A 1-6,true,1700,210,6,12,50,agent-a,10,https://service-a.example.test/orders
+1700005410000,820,GET /orders,500,Internal server error,Load Group B 1-6,false,0,0,6,12,75,agent-b,14,https://service-b.example.test/orders
+1700007200000,160,GET /health,200,OK,Load Group A 1-7,true,1180,148,7,14,24,agent-a,5,https://service-a.example.test/health
+1700007210000,510,GET /health,200,OK,Load Group B 1-7,true,1320,160,7,14,42,agent-b,9,https://service-b.example.test/health

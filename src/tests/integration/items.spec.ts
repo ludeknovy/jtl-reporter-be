@@ -10,6 +10,8 @@ const POLL_INTERVAL = 100
 const PROCESSING_TIMEOUT = 15000
 const PROJECT_NAME = "test-project"
 const SCENARIO_NAME = "test-scenario"
+const EXTRA_AGGREGATION_INTERVALS = ["5 seconds", "10 seconds", "30 seconds", "1 minute", "5 minute",
+  "10 minutes", "30 minutes", "1 hour"]
 
 const wait = (timeout: number): Promise<void> => new Promise(resolve => setTimeout(resolve, timeout))
 
@@ -320,10 +322,10 @@ describe("Items", () => {
     }
 
     it("persists extra chart data when extra aggregations are enabled", async () => {
-      const item = await uploadItem(true, "kpi1.jtl")
+      const item = await uploadItem(true, "kpi-comprehensive.jtl")
 
       expect(item.plot.threads).not.toHaveLength(0)
-      expect(item.extraPlotData.length).toBeGreaterThan(0)
+      expect(item.extraPlotData.map(chart => chart.interval)).toEqual(EXTRA_AGGREGATION_INTERVALS)
     })
 
     it("persists only the default chart interval when extra aggregations are disabled", async () => {
