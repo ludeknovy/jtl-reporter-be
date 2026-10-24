@@ -1,7 +1,7 @@
 import { IGetUserAuthInfoRequest } from "./request.model"
 import { NextFunction, Response } from "express"
 import { db } from "../../db/db"
-import * as boom from "boom"
+import * as boom from "@hapi/boom"
 import { createNewProject, findProjectId } from "../queries/projects"
 import { getGlobalSettings } from "../queries/global-settings"
 import { logger } from "../../logger"

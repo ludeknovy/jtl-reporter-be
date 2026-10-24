@@ -1,4 +1,4 @@
-import * as boom from "boom"
+import * as boom from "@hapi/boom"
 import { logger } from "../../logger"
 import { db } from "../../db/db"
 import { isUserAuthorizedForProject } from "../queries/user-project-access"

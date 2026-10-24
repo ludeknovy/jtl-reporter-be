@@ -1,4 +1,4 @@
-import boom = require("boom")
+import boom = require("@hapi/boom")
 import { Request, Response, NextFunction } from "express"
 import { db } from "../../../db/db"
 import { AllowedRoles } from "../../middleware/authorization-middleware"

@@ -1,5 +1,5 @@
 import * as Joi from "joi"
-import * as boom from "boom"
+import * as boom from "@hapi/boom"
 
 export const bodySchemaValidator = (schema) => {
   return schemaValidator(schema, Property.Body)
