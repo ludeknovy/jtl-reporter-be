@@ -13,8 +13,10 @@ jobs:
           node-version: '24.22.1'
       - name: Install modules
         run: npm install
-      - name: Build the docker-compose stack
-        run: docker compose -f docker-compose.testing.yaml up -d
+      - name: Start integration database
+        run: docker compose -f docker-compose.testing.yaml up -d db
+      - name: Apply database migrations
+        run: docker compose -f docker-compose.testing.yaml run --rm --build migration
       - name: Run integration tests
         run: npm run test:integration
         env:
