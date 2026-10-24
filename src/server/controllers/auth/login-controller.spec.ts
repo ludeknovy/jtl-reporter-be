@@ -73,7 +73,7 @@ describe("loginController", () => {
       request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response, nextFunction)
     expect(response.json).toHaveBeenCalledTimes(1)
-    expect(response.json).toBeCalledWith(
+    expect(response.json).toHaveBeenCalledWith(
       expect.objectContaining({
         token: expect.any(String),
         username: "test",

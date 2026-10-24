@@ -1,13 +1,15 @@
-import { Request, Response } from "express"
+import { Response } from "express"
 import { db } from "../../../db/db"
 import { logger } from "../../../logger"
 import { updateItemStatus } from "../../queries/items"
 import { ReportStatus } from "../../queries/items.model"
 import { itemDataProcessing } from "./shared/item-data-processing"
+import { queueItemProcessing } from "./shared/item-processing-queue"
 import { StatusCode } from "../../utils/status-code"
 import { itemErrorHandler } from "./shared/item-error-handler"
+import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 
-export const stopItemAsyncController = async (req: Request, res: Response) => {
+export const stopItemAsyncController = async (req: IGetUserAuthInfoRequest, res: Response) => {
   const { projectName, scenarioName, itemId } = req.params
   const { status } = req.body
   res.status(StatusCode.Ok).send()
@@ -21,7 +23,7 @@ export const stopItemAsyncController = async (req: Request, res: Response) => {
       logger.info(`Item: ${itemId} was already processed`)
       return
     }
-    await itemDataProcessing({ itemId, projectName, scenarioName })
+    await queueItemProcessing(() => itemDataProcessing({ itemId, projectName, scenarioName }))
     if (status) {
       await db.none(updateItemStatus(itemId, status))
     }

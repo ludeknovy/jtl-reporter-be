@@ -57,7 +57,7 @@ export const newAsyncItemStartBodySchema = Joi.object().keys({
     hostname,
     note,
     resourcesLink,
-    keepTestRunsPeriod: Joi.number().valid(ALLOWED_PERIOD),
+    keepTestRunsPeriod: Joi.number().valid(...ALLOWED_PERIOD),
 })
 
 export const newItemParamSchema = Joi.object().keys({

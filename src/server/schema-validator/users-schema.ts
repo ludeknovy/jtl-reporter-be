@@ -9,7 +9,7 @@ import * as Joi from "joi"
 export const newUserSchema = {
   username,
   password,
-  role: Joi.string().valid(Object.values(AllowedRoles)).required(),
+  role: Joi.string().valid(...Object.values(AllowedRoles)).required(),
 }
 
 export const initUserScheam = {

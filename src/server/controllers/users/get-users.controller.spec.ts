@@ -20,7 +20,7 @@ describe("getUsersController", () => {
     await getUsersController(
       request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response)
-    expect(response.json).toBeCalledTimes(1)
-    expect(response.json).toBeCalledWith(users)
+    expect(response.json).toHaveBeenCalledTimes(1)
+    expect(response.json).toHaveBeenCalledWith(users)
   })
 })

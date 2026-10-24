@@ -295,7 +295,7 @@ export const getHostnameFromUrl = (url) => {
         if (hostname && hostname.length > 0) {
             return hostname
         }
-    } catch(error) {
+    } catch{
 
     }
 }

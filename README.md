@@ -2,7 +2,7 @@
 JtlReporter backend service. The main repository with all instructions can be found [here](https://github.com/ludeknovy/jtl-reporter).
 
 # Prerequisites
-* Nodejs v18
+* Node.js v24.22.1
 
 # Development
 

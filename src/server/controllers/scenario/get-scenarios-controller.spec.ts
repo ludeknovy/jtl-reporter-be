@@ -26,7 +26,7 @@ describe("getScenariosController", () => {
     await getScenariosController(
       request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response)
-    expect(response.json).toBeCalledWith([
+    expect(response.json).toHaveBeenCalledWith([
       { name: "scenario1", id: "id1", data: [{ test: 1 }, { test: 2 }] },
       { name: "scenario2", id: "id2", data: [{ test: 2 }] },
     ])
@@ -43,7 +43,7 @@ describe("getScenariosController", () => {
     await getScenariosController(
       request as unknown as IGetUserAuthInfoRequest,
       response as unknown as Response)
-    expect(response.json).toBeCalledWith([
+    expect(response.json).toHaveBeenCalledWith([
       { name: "scenario1", id: "id1", data: [{ test: 1 }] },
       { name: "scenario2", id: "id2", data: [] },
     ])

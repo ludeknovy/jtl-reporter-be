@@ -8,6 +8,8 @@ import {
 import { StatusCode } from "../../../utils/status-code"
 import { IGetUserAuthInfoRequest } from "../../../middleware/request.model"
 
+// The controller assembles the endpoint's several independent response series.
+// eslint-disable-next-line complexity
 export const getScenarioTrendsController = async (req: IGetUserAuthInfoRequest, res: Response) => {
     const { projectName, scenarioName } = req.params
     const { environment } = req.query
@@ -92,4 +94,3 @@ const sortByDateAsc = (a, b): number => {
     return new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
 
 }
-

@@ -35,7 +35,7 @@ export const querySchema = {
 
 export const scenarioNotificationBodySchema = {
     url: Joi.string().max(URL_MAX_LENGTH).required(),
-    channel: Joi.string().valid(["ms-teams", "gchat", "slack"]).required(),
+    channel: Joi.string().valid("ms-teams", "gchat", "slack").required(),
     name: Joi.string().min(1).max(MAX_NUMBER).required(),
     type: Joi.string().valid("report_detail", "degradation").required(),
 }

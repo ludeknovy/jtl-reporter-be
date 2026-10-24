@@ -15,7 +15,8 @@ export const queryParamsValidator = (schema) => {
 
 const schemaValidator = (schema, property) => {
   return (req, res, next) => {
-    const { error } = Joi.validate(req[property], schema)
+    const validator = typeof schema.validate === "function" ? schema : Joi.object(schema)
+    const { error } = validator.validate(req[property])
     // eslint-disable-next-line no-eq-null,eqeqeq
     const valid = error == null
     if (valid) {
@@ -33,4 +34,3 @@ export const enum Property {
   Params = "params",
   Query = "query"
 }
-
