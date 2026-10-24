@@ -32,7 +32,7 @@ describe("loginWithTokenController", () => {
       }))
   })
   it("should return unauthorized error if invalid token provided", async function () {
-    const boomSpy = jest.spyOn(require("boom"), "unauthorized");
+    const boomSpy = jest.spyOn(require("@hapi/boom"), "unauthorized");
     (db.query as any).mockResolvedValue([])
     const nextFunction: NextFunction = jest.fn()
     const response = mockResponse()

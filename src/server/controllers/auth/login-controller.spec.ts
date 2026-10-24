@@ -19,7 +19,7 @@ describe("loginController", () => {
   })
 
   it("should return unauthorized in case user does not exist", async function () {
-    const boomSpy = jest.spyOn(require("boom"), "unauthorized");
+    const boomSpy = jest.spyOn(require("@hapi/boom"), "unauthorized");
     (db.query as any).mockResolvedValue([])
     const nextFunction: NextFunction = jest.fn()
     const response = mockResponse()
@@ -38,7 +38,7 @@ describe("loginController", () => {
   })
 
   it("should return unauthorized in case password is not correct", async function () {
-    const boomSpy = jest.spyOn(require("boom"), "unauthorized");
+    const boomSpy = jest.spyOn(require("@hapi/boom"), "unauthorized");
     (db.query as any).mockResolvedValue([{ password: "test-password" }]);
     (passwordMatch as any).mockReturnValue(false)
     const nextFunction: NextFunction = jest.fn()

@@ -1,5 +1,5 @@
 import { Response, NextFunction } from "express"
-import * as boom from "boom"
+import * as boom from "@hapi/boom"
 import * as jwt from "jsonwebtoken"
 import { db } from "../../db/db"
 import { getUserById } from "../queries/auth"

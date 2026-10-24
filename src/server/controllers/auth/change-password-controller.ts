@@ -2,7 +2,7 @@ import { Response, NextFunction } from "express"
 import { db } from "../../../db/db"
 import { getUserById, updatePassword } from "../../queries/auth"
 import { passwordMatch, hashPassword } from "./helper/passwords"
-import * as boom from "boom"
+import * as boom from "@hapi/boom"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 import { StatusCode } from "../../utils/status-code"
 

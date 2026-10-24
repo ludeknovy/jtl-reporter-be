@@ -1,6 +1,6 @@
 import { Response, NextFunction } from "express"
 import { IGetUserAuthInfoRequest } from "./request.model"
-import Boom = require("boom")
+import Boom = require("@hapi/boom")
 import { db } from "../../db/db"
 import * as jwt from "jsonwebtoken"
 import { authenticationMiddleware } from "./authentication-middleware"

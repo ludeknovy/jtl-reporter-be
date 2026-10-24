@@ -16,7 +16,7 @@ const mockResponse = () => {
 
 describe("changePasswordController", () => {
   it("should return an error if password do not match", async function () {
-    const querySpy = jest.spyOn(require("boom"), "unauthorized");
+    const querySpy = jest.spyOn(require("@hapi/boom"), "unauthorized");
     (passwordMatch as any).mockReturnValue(false);
     (db.query as any).mockResolvedValue([{ password: "12345" }])
 

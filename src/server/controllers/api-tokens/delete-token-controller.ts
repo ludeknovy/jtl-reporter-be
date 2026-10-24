@@ -3,7 +3,7 @@ import { db } from "../../../db/db"
 import { isMyToken, deleteToken } from "../../queries/api-tokens"
 import { IGetUserAuthInfoRequest } from "../../middleware/request.model"
 import { AllowedRoles } from "../../middleware/authorization-middleware"
-import * as boom from "boom"
+import * as boom from "@hapi/boom"
 import { StatusCode } from "../../utils/status-code"
 
 export const deleteTokenController = async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
