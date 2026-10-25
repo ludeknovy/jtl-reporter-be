@@ -9,7 +9,29 @@ const FALLBACK_ID = uuidv4()
 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
 const errorNumberToBeIgnored = [-3008]
 
+export type UiAnalyticsEvent = "reportViewed" | "comparisonOpened"
+export type ComparisonType = "manual" | "baseline"
+
+export interface UiAnalyticsProperties {
+    comparisonType?: ComparisonType
+}
+
 export class AnalyticsEvent {
+
+    static async trackUiEvent(event: UiAnalyticsEvent, properties: UiAnalyticsProperties = {}): Promise<void> {
+        if (!this.isAnalyticEnabled()) {
+            return
+        }
+        try {
+            analytics.track(event, {
+                // eslint-disable-next-line camelcase
+                distinct_id: await this.getInstanceId(),
+                ...properties,
+            })
+        } catch(error) {
+            logger.info("UI analytics event could not be sent " + error)
+        }
+    }
 
     private static async getInstanceId(): Promise<string> {
         if (INSTANCE_ID !== null) {
