@@ -7,6 +7,7 @@ import * as multer from "multer"
 import * as boom from "@hapi/boom"
 import * as fs from "fs"
 import * as csv from "fast-csv"
+import { getUploadedFilePath, UPLOAD_DIRECTORY } from "./utils/uploaded-file-path"
 import { logger } from "../../../logger"
 import { itemDataProcessing } from "./shared/item-data-processing"
 import { queueItemProcessing } from "./shared/item-processing-queue"
@@ -37,7 +38,7 @@ const FILE_LIMIT = 5120 * 1024 * 1024
 
 const upload = multer(
     {
-        dest: "./uploads",
+        dest: UPLOAD_DIRECTORY,
         limits: { fieldSize: FILE_LIMIT },
     }).fields([
     { name: "kpi", maxCount: 1 },
@@ -96,8 +97,11 @@ export const createItemController = (req: IGetUserAuthInfoRequest, res: Response
         logger.info(`Starting new item processing for scenario: ${scenarioName}`)
         try {
 
-            const kpiFilename = kpi[0]?.path
-            const monitoringFileName = monitoring?.[0]?.path
+            const kpiFilename = getUploadedFilePath(kpi[0]?.path)
+            const monitoringFileName = getUploadedFilePath(monitoring?.[0]?.path)
+            if (!kpiFilename || (monitoring?.[0]?.path && !monitoringFileName)) {
+                return next(boom.badRequest("invalid uploaded file path"))
+            }
             let tempBuffer = []
 
             await upsertScenario(projectName, scenarioName, keepTestRunsPeriod)
@@ -212,9 +216,14 @@ export const checkKeepTestRunsPeriod = (keepTestRunsPeriod): boom.Boom => {
 }
 
 const removeUploadedFile = (filename: string) => {
+    const safeFilename = getUploadedFilePath(filename)
+    if (!safeFilename) {
+        throw new UnlinkingFileException(new Error("invalid uploaded file path"))
+    }
+
     try {
         logger.info(`Deleting file: ${filename}`)
-        fs.unlinkSync(filename)
+        fs.unlinkSync(safeFilename)
     } catch(e) {
         throw new UnlinkingFileException(e)
     }
