@@ -17,7 +17,8 @@ export const getUploadedFilePath = (filename?: string): string | undefined => {
     const resolvedFilename = path.resolve(filename)
     const relativeFilename = path.relative(UPLOAD_DIRECTORY, resolvedFilename)
 
-    if (!relativeFilename || relativeFilename.startsWith("..") || path.isAbsolute(relativeFilename)) {
+    if (!relativeFilename || relativeFilename === ".." ||
+        relativeFilename.startsWith(".." + path.sep) || path.isAbsolute(relativeFilename)) {
         return undefined
     }
 
