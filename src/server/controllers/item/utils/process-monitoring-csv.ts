@@ -4,13 +4,15 @@ import * as pgp from "pg-promise"
 import { logger } from "../../../../logger"
 import { transformMonitoringDataForDb } from "../../../data-stats/prepare-data"
 import { db } from "../../../../db/db"
+import { getUploadedFilePath } from "./uploaded-file-path"
 
 const pg = pgp()
 const BUFFER_SIZE = 1000
 
 
 export const processMonitoringCsv = (filename: string, itemId: string) => {
-  if (!filename) {
+  const safeFilename = getUploadedFilePath(filename)
+  if (!safeFilename) {
     return
   }
   let tempBuffer = []
@@ -21,7 +23,7 @@ export const processMonitoringCsv = (filename: string, itemId: string) => {
       prop: "itemId",
     },
   ], { table: new pg.helpers.TableName({ table: "monitor", schema: "jtl" }) })
-  const csvStream = fs.createReadStream(filename)
+  const csvStream = fs.createReadStream(safeFilename)
     .pipe(csv.parse({ headers: true }))
     .on("data", async row => {
       if (tempBuffer.length === (BUFFER_SIZE)) {
@@ -43,7 +45,7 @@ export const processMonitoringCsv = (filename: string, itemId: string) => {
         await db.none(pg.helpers.insert(tempBuffer, columnSet))
         tempBuffer = null
 
-        fs.unlinkSync(filename)
+        fs.unlinkSync(safeFilename)
 
         logger.info(`Parsed ${rowCount} monitoring records`)
       } catch(error) {
