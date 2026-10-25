@@ -196,6 +196,20 @@ describe("scenarioThresholdsCalc", () => {
         const output = scenarioThresholdsCalc(labelData, BASELINE_REPORT_STATS, {})
         expect(output).not.toBeDefined()
     })
+
+    it("should not report a regression when both baseline and current zero-valued metrics are zero", () => {
+        const output = scenarioThresholdsCalc([
+            { label: "zero", n0: 0, throughput: 0, errorRate: 0 },
+        ] as LabelStats[], [
+            { label: "zero", n0: 0, throughput: 0, errorRate: 0 },
+        ] as LabelStats[], {
+            errorRate: "5", percentile: "5", throughput: "5",
+        })
+
+        expect(output.passed).toBe(true)
+        expect(output.results[0].passed).toBe(true)
+    })
+
     it("should return default values when label not found it baseline report", function () {
         const labelData: LabelStats[] = [{
             label: "labelNotFound",
