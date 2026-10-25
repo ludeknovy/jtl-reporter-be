@@ -13,8 +13,8 @@ export const scenarioThresholdsCalc = (labelStats: LabelStats[], baselineReportS
     labelStats.forEach(value => {
         const baselineLabelStats = baselineReportStats.find(baselineValue => baselineValue.label === value.label)
         if (baselineLabelStats) {
-            const percentileDiff = (value.n0 / baselineLabelStats.n0) * PERC
-            const throughputDiff = (value.throughput / baselineLabelStats.throughput) * PERC
+            const percentileDiff = relativeMetric(value.n0, baselineLabelStats.n0)
+            const throughputDiff = relativeMetric(value.throughput, baselineLabelStats.throughput)
             const errorRateDiff = baselineLabelStats.errorRate === 0
                 ? PERC + value.errorRate
                 : divide(value.errorRate, baselineLabelStats.errorRate as unknown as number) * PERC
@@ -69,6 +69,13 @@ export const scenarioThresholdsCalc = (labelStats: LabelStats[], baselineReportS
             percentile: scenarioSettings.percentile,
         },
     }
+}
+
+const relativeMetric = (current: number, baseline: number): number => {
+    if (baseline === 0) {
+        return current === 0 ? PERC : Infinity
+    }
+    return (current / baseline) * PERC
 }
 
 export interface ThresholdValidation {
