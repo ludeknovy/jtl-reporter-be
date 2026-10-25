@@ -110,11 +110,12 @@ describe("createItemController uploaded file paths", () => {
         ["with monitoring", validMonitoringPath],
     ])("processes a valid KPI upload %s", async (_description, monitoringPath) => {
         mockKpiStream()
+        const expectedStatusCode = 200
 
         const { response, next } = await startValidUpload(monitoringPath)
 
         expect(next).not.toHaveBeenCalled()
-        expect(response.status).toHaveBeenCalledWith(200)
+        expect(response.status).toHaveBeenCalledWith(expectedStatusCode)
         expect(response.json).toHaveBeenCalledWith({ itemId: "new-item", shareToken: undefined })
         expect(fs.createReadStream).toHaveBeenCalledWith(validKpiPath)
         expect(processMonitoringCsv).toHaveBeenCalledWith(monitoringPath, "new-item")
