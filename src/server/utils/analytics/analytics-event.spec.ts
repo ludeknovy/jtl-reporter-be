@@ -54,6 +54,38 @@ describe("AnalyticEvents", () => {
         })
     })
 
+    describe("trackUiEvent", () => {
+        it("tracks a supported UI event with the server instance id", async () => {
+            process.env.OPT_OUT_ANALYTICS = "false"
+            jest.spyOn(AnalyticsEvent as any, "getInstanceId").mockResolvedValueOnce("server-instance")
+
+            await AnalyticsEvent.trackUiEvent("comparisonOpened", { comparisonType: "baseline" })
+
+            expect(analytics.track).toHaveBeenCalledWith("comparisonOpened", {
+                distinct_id: "server-instance",
+                comparisonType: "baseline",
+            })
+        })
+
+        it("does not track when analytics is disabled", async () => {
+            process.env.OPT_OUT_ANALYTICS = "true"
+
+            await AnalyticsEvent.trackUiEvent("reportViewed")
+
+            expect(analytics.track).not.toHaveBeenCalled()
+        })
+
+        it("swallows analytics failures", async () => {
+            process.env.OPT_OUT_ANALYTICS = "false"
+            jest.spyOn(AnalyticsEvent as any, "getInstanceId").mockResolvedValueOnce("server-instance")
+            ;(analytics.track as jest.Mock).mockImplementationOnce(() => {
+                throw new Error("analytics unavailable")
+            })
+
+            await expect(AnalyticsEvent.trackUiEvent("reportViewed")).resolves.toBeUndefined()
+        })
+    })
+
     describe("reportLabelCount", () => {
         it("should not track the event when analytics disabled", async function () {
             process.env.OPT_OUT_ANALYTICS = "true"
