@@ -21,7 +21,9 @@ jest.mock("pg-promise", () => jest.fn(() => ({
         insert: jest.fn(() => "INSERT"),
     },
 })))
-jest.mock("../../../db/db")
+jest.mock("../../../db/db", () => ({
+    db: { one: jest.fn(), none: jest.fn() },
+}))
 jest.mock("../../../logger")
 jest.mock("../../utils/analytics/anyltics-event")
 jest.mock("../../data-stats/prepare-data")
