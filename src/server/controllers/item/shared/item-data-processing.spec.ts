@@ -36,6 +36,8 @@ const PROCESSED_OVERVIEW = { duration: 1000, startDate: "2024-01-01T00:00:00.000
 const PROCESSED_LABEL_STATS = [{ label: "GET /health" }]
 const PROCESSED_CHART = { threads: [[0, CHART_MAX_VU]] }
 const TRANSACTION_QUERY_COUNT = 3
+// label, status codes, histogram, failures, raw data, grouped errors, top 5 errors, apdex, sut
+const NON_CHART_SAMPLES_QUERIES = 9
 
 interface Deferred<T> {
     promise: Promise<T>
@@ -101,7 +103,7 @@ describe("itemDataProcessing", () => {
         ;(db.tx as any).mockImplementation(callback => callback({ none: jest.fn().mockResolvedValue(undefined) }))
     }
 
-    const configureSuccessfulProcessing = (scenarioSettings = {}) => {
+    const configureSuccessfulProcessing = (scenarioSettings = {}, aggOverview = {}) => {
         const transaction = { none: jest.fn().mockResolvedValue(undefined) }
         ;(db.one as any)
             .mockResolvedValueOnce({
@@ -111,7 +113,7 @@ describe("itemDataProcessing", () => {
                 thresholdEnabled: false,
                 ...scenarioSettings,
             })
-            .mockResolvedValueOnce({ number_of_hostnames: 1, number_of_sut_hostnames: 1 })
+            .mockResolvedValueOnce({ number_of_hostnames: 1, number_of_sut_hostnames: 1, ...aggOverview })
         ;(db.many as any).mockResolvedValue([])
         ;(db.manyOrNone as any).mockResolvedValue([])
         ;(db.none as any).mockResolvedValue(undefined)
@@ -161,6 +163,33 @@ describe("itemDataProcessing", () => {
         await itemDataProcessing({ itemId: ITEM_ID, projectName: "project", scenarioName: "scenario" })
 
         expect(chartIntervals).toEqual(Array(QUERIES_PER_INTERVAL).fill(DEFAULT_INTERVAL))
+    })
+
+    it("bounds every samples query by the item's samples time range", async () => {
+        const samplesFrom = "2024-01-01 10:00:00.123456"
+        const samplesTo = "2024-01-01 10:05:00.654321"
+        configureSuccessfulProcessing({
+            apdexSettings: { enabled: true, satisfyingThreshold: 100, toleratingThreshold: 500 },
+            extraAggregations: true,
+        }, {
+            number_of_hostnames: 2,
+            number_of_sut_hostnames: 2,
+            samples_from: samplesFrom,
+            samples_to: samplesTo,
+        })
+
+        await itemDataProcessing({ itemId: ITEM_ID, projectName: "project", scenarioName: "scenario" })
+
+        const samplesQueries = [...(db.many as any).mock.calls, ...(db.manyOrNone as any).mock.calls]
+            .map(([query]) => query)
+            .filter(query => query.text.includes("jtl.samples"))
+
+        expect(samplesQueries).toHaveLength(
+            NON_CHART_SAMPLES_QUERIES + QUERIES_PER_INTERVAL * EXTRA_AGGREGATION_INTERVALS)
+        samplesQueries.forEach(query => {
+            expect(query.text).toMatch(/timestamp BETWEEN \$\d+::timestamp AND \$\d+::timestamp/)
+            expect(query.values).toEqual(expect.arrayContaining([samplesFrom, samplesTo]))
+        })
     })
 
     it("saves processed report data, notifies subscribers, and marks the item ready", async () => {

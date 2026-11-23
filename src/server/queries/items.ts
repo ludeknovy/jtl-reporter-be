@@ -59,13 +59,25 @@ export const findItemStats = (testItem) => {
     }
 }
 
-export const getDownsampledRawData = (itemId: string, threshold: number) => {
+/**
+ * Time range (inclusive) of an item's samples, as returned by aggOverviewQuery.
+ * The bounds are kept as text so they round-trip without losing precision.
+ * Filtering jtl.samples by this range lets TimescaleDB exclude chunks outside
+ * the test run instead of scanning (and decompressing) the whole hypertable.
+ */
+export interface SamplesTimeRange {
+    from: string
+    to: string
+}
+
+export const getDownsampledRawData = (itemId: string, threshold: number, timeRange: SamplesTimeRange) => {
     return {
         text: `SELECT (EXTRACT(epoch FROM time) * 1000)::bigint as timestamp, value
                 FROM unnest((
                     SELECT lttb(timestamp, elapsed, $2)
-                    FROM jtl.samples WHERE item_id = $1));`,
-        values: [itemId, threshold],
+                    FROM jtl.samples WHERE item_id = $1
+                    AND timestamp BETWEEN $3::timestamp AND $4::timestamp));`,
+        values: [itemId, threshold, timeRange.from, timeRange.to],
     }
 }
 
@@ -260,6 +272,8 @@ export const aggOverviewQuery = (itemId) => {
     COUNT(DISTINCT samples.sut_hostname)::int number_of_sut_hostnames,
     MAX(samples.timestamp) as end,
     MIN(samples.timestamp) as start,
+    MIN(samples.timestamp)::text as samples_from,
+    MAX(samples.timestamp)::text as samples_to,
     AVG(samples.latency)::real as avg_latency,
     AVG(samples.connect)::real as avg_connect,
     count(*) filter (where samples.success = false)::int as number_of_failed,
@@ -273,7 +287,7 @@ export const aggOverviewQuery = (itemId) => {
     }
 }
 
-export const aggLabelQuery = (item_id) => {
+export const aggLabelQuery = (item_id, timeRange: SamplesTimeRange) => {
     return {
         text: `
     SELECT 
@@ -296,12 +310,13 @@ export const aggLabelQuery = (item_id) => {
       SUM(samples.bytes)::bigint as bytes_received_total
     FROM jtl.samples as samples
     WHERE item_id = $1
+    AND samples.timestamp BETWEEN $2::timestamp AND $3::timestamp
     GROUP BY samples.label;`,
-        values: [item_id],
+        values: [item_id, timeRange.from, timeRange.to],
     }
 }
 
-export const sutOverviewQuery = (item_id) => {
+export const sutOverviewQuery = (item_id, timeRange: SamplesTimeRange) => {
     return {
         text: `
     SELECT 
@@ -318,12 +333,13 @@ export const sutOverviewQuery = (item_id) => {
       count(*) as total
     FROM jtl.samples as samples
     WHERE item_id = $1
+    AND samples.timestamp BETWEEN $2::timestamp AND $3::timestamp
     GROUP BY samples.sut_hostname;`,
-        values: [item_id],
+        values: [item_id, timeRange.from, timeRange.to],
     }
 }
 
-export const chartOverviewQuery = (interval, item_id) => {
+export const chartOverviewQuery = (interval, item_id, timeRange: SamplesTimeRange) => {
     return {
         text: `
     SELECT
@@ -338,12 +354,13 @@ export const chartOverviewQuery = (interval, item_id) => {
       COUNT(*)::bigint as total
     FROM jtl.samples as samples
     WHERE item_id = $2
+    AND samples.timestamp BETWEEN $3::timestamp AND $4::timestamp
     GROUP BY time;`,
-        values: [interval, item_id],
+        values: [interval, item_id, timeRange.from, timeRange.to],
     }
 }
 
-export const chartOverviewStatusCodesQuery = (interval, itemId) => {
+export const chartOverviewStatusCodesQuery = (interval, itemId, timeRange: SamplesTimeRange) => {
     return {
         text: `SELECT
       time_bucket($1, timestamp) as time,
@@ -351,15 +368,16 @@ export const chartOverviewStatusCodesQuery = (interval, itemId) => {
       count(samples.status_code)::int
     FROM jtl.samples as samples
     WHERE item_id = $2
+    AND samples.timestamp BETWEEN $3::timestamp AND $4::timestamp
     AND status_code != '0'
     AND status_code != ''
     GROUP BY time, samples.status_code
     ORDER BY time`,
-        values: [interval, itemId],
+        values: [interval, itemId, timeRange.from, timeRange.to],
     }
 }
 
-export const charLabelQuery = (interval, item_id) => {
+export const charLabelQuery = (interval, item_id, timeRange: SamplesTimeRange) => {
     return {
         text: `
     SELECT
@@ -380,37 +398,40 @@ export const charLabelQuery = (interval, item_id) => {
       COUNT(*)::bigint as total
     FROM jtl.samples as samples
     WHERE item_id = $2
+    AND samples.timestamp BETWEEN $3::timestamp AND $4::timestamp
     GROUP BY time, samples.label;`,
-        values: [interval, item_id],
+        values: [interval, item_id, timeRange.from, timeRange.to],
     }
 }
 
-export const distributedThreadsQuery = (interval, item_id) => {
+export const distributedThreadsQuery = (interval, item_id, timeRange: SamplesTimeRange) => {
     return {
         text: `
-    SELECT 
+    SELECT
       time_bucket($1, timestamp) as time,
       samples.hostname,
-      AVG(samples.all_threads)::int as threads  
-    FROM jtl.samples samples WHERE item_id = $2 
+      AVG(samples.all_threads)::int as threads
+    FROM jtl.samples samples WHERE item_id = $2
+    AND samples.timestamp BETWEEN $3::timestamp AND $4::timestamp
     AND samples.response_message not like 'Number of samples in transaction%'
     GROUP BY time, samples.hostname
     ORDER BY time ASC;`,
-        values: [interval, item_id],
+        values: [interval, item_id, timeRange.from, timeRange.to],
     }
 }
 
-export const threadsPerThreadGroup = (interval, itemId) => {
+export const threadsPerThreadGroup = (interval, itemId, timeRange: SamplesTimeRange) => {
     return {
         text: `SELECT
           time_bucket($1, timestamp) as time,
           samples.thread_name,
           AVG(samples.grp_threads)::int as threads
         FROM jtl.samples samples WHERE item_id = $2
+        AND samples.timestamp BETWEEN $3::timestamp AND $4::timestamp
         AND samples.response_message not like 'Number of samples in transaction%'
         GROUP BY time, samples.thread_name
         ORDER BY time ASC;`,
-        values: [interval, itemId],
+        values: [interval, itemId, timeRange.from, timeRange.to],
     }
 }
 
@@ -537,22 +558,25 @@ export const getItemChartSettings = (itemId, userId) => {
     }
 }
 
-export const responseCodeDistribution = (itemId) => {
+export const responseCodeDistribution = (itemId, timeRange: SamplesTimeRange) => {
     return {
-        // eslint-disable-next-line max-len
-        text: "SELECT samples.label, samples.status_code, count(samples.status_code)::int FROM jtl.samples samples WHERE samples.item_id = $1 GROUP BY samples.label, samples.status_code;",
-        values: [itemId],
+        text: `SELECT samples.label, samples.status_code, count(samples.status_code)::int FROM jtl.samples samples
+    WHERE samples.item_id = $1
+    AND samples.timestamp BETWEEN $2::timestamp AND $3::timestamp
+    GROUP BY samples.label, samples.status_code;`,
+        values: [itemId, timeRange.from, timeRange.to],
     }
 }
 
-export const responseMessageFailures = (itemId) => {
+export const responseMessageFailures = (itemId, timeRange: SamplesTimeRange) => {
     return {
         // eslint-disable-next-line max-len
         text: `SELECT samples.label, samples.status_code, samples.response_message, samples.failure_message, count(samples.response_message)::int FROM jtl.samples samples
     WHERE samples.item_id = $1 AND success is false
+    AND samples.timestamp BETWEEN $2::timestamp AND $3::timestamp
     GROUP BY samples.label, samples.response_message, samples.status_code, samples.failure_message
     ORDER BY count DESC`,
-        values: [itemId],
+        values: [itemId, timeRange.from, timeRange.to],
     }
 }
 
@@ -564,19 +588,20 @@ export const deleteSamples = (itemId) => {
     }
 }
 
-export const calculateApdexValues = (itemId, satisfyingThreshold, toleratingThreshold) => {
+export const calculateApdexValues = (itemId, satisfyingThreshold, toleratingThreshold, timeRange: SamplesTimeRange) => {
     return {
-        text: `SELECT 
+        text: `SELECT
        count(*) FILTER (WHERE elapsed > 0 AND elapsed <= $2) AS satisfaction
      , count(*) FILTER (WHERE elapsed > $2 AND elapsed <= $3) AS toleration
      , label
         FROM jtl.samples where item_id = $1
+        AND timestamp BETWEEN $4::timestamp AND $5::timestamp
         GROUP BY label`,
-        values: [itemId, satisfyingThreshold, toleratingThreshold],
+        values: [itemId, satisfyingThreshold, toleratingThreshold, timeRange.from, timeRange.to],
     }
 }
 
-export const responseTimePerLabelHistogram = (itemId) => {
+export const responseTimePerLabelHistogram = (itemId, timeRange: SamplesTimeRange) => {
     return {
         text: `
         SELECT label, histogram(t_elapsed, 0, (x.buckets * 100) + 1, COALESCE(NULLIF(x.buckets,0), 1))
@@ -586,10 +611,11 @@ export const responseTimePerLabelHistogram = (itemId) => {
                      max(elapsed)                      as max
               FROM jtl.samples
               WHERE item_id = $1
+              AND timestamp BETWEEN $2::timestamp AND $3::timestamp
               GROUP BY label) x,
              LATERAL unnest(x.elapsed) as t_elapsed
         GROUP BY x.label;`,
-        values: [itemId],
+        values: [itemId, timeRange.from, timeRange.to],
     }
 }
 
@@ -637,30 +663,32 @@ export const findItemsWithThresholds = (projectName, scenarioName) => {
     }
 }
 
-export const findGroupedErrors = (itemId) => {
+export const findGroupedErrors = (itemId, timeRange: SamplesTimeRange) => {
     return {
         // eslint-disable-next-line max-len
         text: `SELECT status_code as "statusCode", response_message as "responseMessage", failure_message as "failureMessage", count(*) FROM jtl.samples
          WHERE item_id = $1
+         AND timestamp BETWEEN $2::timestamp AND $3::timestamp
          AND success is false
          AND (nullif(trim(status_code),'') is not null OR nullif(trim(failure_message),'')  is not null)
         GROUP BY failure_message, response_message, status_code
         ORDER BY count DESC;`,
-        values: [itemId],
+        values: [itemId, timeRange.from, timeRange.to],
     }
 }
 
-export const findTop5ErrorsByLabel = (itemId) => {
+export const findTop5ErrorsByLabel = (itemId, timeRange: SamplesTimeRange) => {
     return {
         // eslint-disable-next-line max-len
         text: `SELECT * FROM(SELECT *, row_number () OVER (partition by label ORDER BY e.cnt DESC) as row_n FROM (SELECT label, status_code, response_message, failure_message, count(*) as cnt
 FROM jtl.samples s
 WHERE item_id = $1
+  AND timestamp BETWEEN $2::timestamp AND $3::timestamp
   AND success is false
   AND (nullif(trim(status_code),'')  is not null OR nullif(trim(failure_message),'')  is not null)
 GROUP BY label, status_code, response_message, failure_message) e) ae
 WHERE row_n <= 5;`,
-        values: [itemId],
+        values: [itemId, timeRange.from, timeRange.to],
     }
 }
 

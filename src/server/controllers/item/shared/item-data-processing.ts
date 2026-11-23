@@ -28,6 +28,7 @@ import {
     findGroupedErrors,
     findTop5ErrorsByLabel,
     threadsPerThreadGroup, getDownsampledRawData,
+    SamplesTimeRange,
 } from "../../../queries/items"
 import { ReportStatus } from "../../../queries/items.model"
 import { getScenarioSettings } from "../../../queries/scenario"
@@ -51,6 +52,9 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
 
         logger.debug("Loading overview aggregation")
         const aggOverview = await db.one(aggOverviewQuery(itemId))
+        // Bounding the remaining samples queries by the item's time range lets TimescaleDB
+        // exclude chunks outside the test run instead of scanning the whole hypertable.
+        const timeRange: SamplesTimeRange = { from: aggOverview.samples_from, to: aggOverview.samples_to }
 
         logger.debug("Loading label aggregation")
         logger.debug("Loading status code distribution")
@@ -61,13 +65,13 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
         logger.debug("Loading top 5 errors by label")
 
         const dbPromises = [
-            db.many(aggLabelQuery(itemId)),
-            db.manyOrNone(responseCodeDistribution(itemId)),
-            db.manyOrNone(responseTimePerLabelHistogram(itemId)),
-            db.manyOrNone(responseMessageFailures(itemId)),
-            db.manyOrNone(getDownsampledRawData(itemId, MAX_SCATTER_CHART_POINTS)),
-            db.manyOrNone(findGroupedErrors(itemId)),
-            db.manyOrNone(findTop5ErrorsByLabel(itemId)),
+            db.many(aggLabelQuery(itemId, timeRange)),
+            db.manyOrNone(responseCodeDistribution(itemId, timeRange)),
+            db.manyOrNone(responseTimePerLabelHistogram(itemId, timeRange)),
+            db.manyOrNone(responseMessageFailures(itemId, timeRange)),
+            db.manyOrNone(getDownsampledRawData(itemId, MAX_SCATTER_CHART_POINTS, timeRange)),
+            db.manyOrNone(findGroupedErrors(itemId, timeRange)),
+            db.manyOrNone(findTop5ErrorsByLabel(itemId, timeRange)),
         ]
 
         let apdexIndex = -1
@@ -75,14 +79,14 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
             const { satisfyingThreshold, toleratingThreshold } = scenarioSettings.apdexSettings
             logger.debug("Calculating apdex")
             apdexIndex = dbPromises.length
-            dbPromises.push(db.many(calculateApdexValues(itemId, satisfyingThreshold, toleratingThreshold)))
+            dbPromises.push(db.many(calculateApdexValues(itemId, satisfyingThreshold, toleratingThreshold, timeRange)))
         }
 
         let sutMetricsIndex = -1
         if (aggOverview.number_of_sut_hostnames > 1) {
             logger.debug("Loading SUT overview")
             sutMetricsIndex = dbPromises.length
-            dbPromises.push(db.many(sutOverviewQuery(itemId)))
+            dbPromises.push(db.many(sutOverviewQuery(itemId, timeRange)))
         }
 
         const dbResults = await Promise.all(dbPromises)
@@ -133,12 +137,12 @@ export const itemDataProcessing = async ({ projectName, scenarioName, itemId }) 
             logger.debug(`Loading chart data for interval: ${interval}`)
             const [labelChart, overviewChart, statusCodeChart, threadsPerGroup, distributedThreads] =
                 await Promise.all([
-                    db.many(charLabelQuery(interval, itemId)),
-                    db.many(chartOverviewQuery(interval, itemId)),
-                    db.many(chartOverviewStatusCodesQuery(interval, itemId)),
-                    db.manyOrNone(threadsPerThreadGroup(interval, itemId)),
+                    db.many(charLabelQuery(interval, itemId, timeRange)),
+                    db.many(chartOverviewQuery(interval, itemId, timeRange)),
+                    db.many(chartOverviewStatusCodesQuery(interval, itemId, timeRange)),
+                    db.manyOrNone(threadsPerThreadGroup(interval, itemId, timeRange)),
                     aggOverview?.number_of_hostnames > 1
-                        ? db.manyOrNone(distributedThreadsQuery(interval, itemId))
+                        ? db.manyOrNone(distributedThreadsQuery(interval, itemId, timeRange))
                         : Promise.resolve(null),
                 ])
 
