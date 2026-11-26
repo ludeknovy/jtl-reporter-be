@@ -178,15 +178,19 @@ export const setBaseFlag = (itemId, scenarioName, projectName) => {
     }
 }
 
-export const dashboardStats = () => {
+export const dashboardStats = (userId: string) => {
     return {
         text: `
     SELECT round(AVG((overview -> 'maxVu')::int)) as "avgVu",
     round(AVG((overview -> 'duration')::bigInt)) as "avgDuration",
     round(SUM((overview -> 'duration')::bigInt)) as "totalDuration",
     count(*) as "totalCount" from jtl.item_stat as stat
-    LEFT JOIN jtl.items as items ON items.id = stat.item_id
-    WHERE items.report_status = 'ready';`,
+    INNER JOIN jtl.items as items ON items.id = stat.item_id
+    INNER JOIN jtl.scenario as s ON s.id = items.scenario_id
+    INNER JOIN jtl.user_project_access as upa ON upa.project_id = s.project_id
+    WHERE items.report_status = 'ready'
+    AND upa.user_id = $1;`,
+        values: [userId],
     }
 }
 

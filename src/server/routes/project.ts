@@ -41,7 +41,7 @@ export class ProjectRoutes {
             .get(
                 authenticationMiddleware,
                 authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
-                wrapAsync((req: Request, res: Response) => getProjectStatsController(req, res)))
+                wrapAsync((req: IGetUserAuthInfoRequest, res: Response) => getProjectStatsController(req, res)))
 
         app.route("/api/projects/:projectName")
             .delete(
