@@ -26,6 +26,18 @@ export const savePlotData = (itemId, data, extraPlotData, histogramData, scatter
     }
 }
 
+export const findItemIdInScenario = (itemId: string, projectName: string, scenarioName: string) => {
+    return {
+        text: `SELECT it.id FROM jtl.items as it
+    INNER JOIN jtl.scenario as s ON s.id = it.scenario_id
+    INNER JOIN jtl.projects as p ON p.id = s.project_id
+    WHERE it.id = $1
+    AND p.project_name = $2
+    AND s.name = $3;`,
+        values: [itemId, projectName, scenarioName],
+    }
+}
+
 export const findItem = (itemId, projectName, scenarioName) => {
     return {
         // eslint-disable-next-line max-len
@@ -90,6 +102,7 @@ export const updateTestItemInfo = (itemId, scenarioName, projectName, note,
     SET note = $3, environment = $4, hostname = $6, name = $7, resources_link = $8, status = COALESCE($9, it.status)
     FROM jtl.scenario as s
     WHERE it.id = $1
+    AND it.scenario_id = s.id
     AND s.project_id = (SELECT id FROM jtl.projects WHERE project_name = $2)
     AND s.name = $5`,
         values: [itemId, projectName, note, environment, scenarioName, hostname, name, resourcesLink, status],
@@ -101,6 +114,7 @@ export const deleteItem = (projectName, scenarioName, itemId) => {
         text: `DELETE FROM jtl.items as it
     USING jtl.scenario as s
     WHERE it.id = $1
+    AND it.scenario_id = s.id
     AND s.name = $2
     AND s.project_id = (SELECT id FROM jtl.projects WHERE project_name = $3)`,
         values: [itemId, scenarioName, projectName],
@@ -485,9 +499,11 @@ export const createShareToken = (projectName, scenarioName, itemId, token, userI
 export const deleteShareToken = (projectName, scenarioName, itemId, id) => {
     return {
         text: `DELETE FROM jtl.share_tokens as st
-    USING jtl.scenario as sc
+    USING jtl.items as it, jtl.scenario as sc
     WHERE st.id = $4
     AND st.item_id = $3
+    AND it.id = st.item_id
+    AND it.scenario_id = sc.id
     AND sc.name = $2
     AND sc.project_id = (SELECT id FROM jtl.projects WHERE project_name = $1)`,
         values: [projectName, scenarioName, itemId, id],
@@ -497,10 +513,12 @@ export const deleteShareToken = (projectName, scenarioName, itemId, id) => {
 export const deleteMyShareToken = (projectName, scenarioName, itemId, id, userId) => {
     return {
         text: `DELETE FROM jtl.share_tokens as st
-    USING jtl.scenario as sc
+    USING jtl.items as it, jtl.scenario as sc
     WHERE st.id = $4
     AND st.created_by = $5
     AND st.item_id = $3
+    AND it.id = st.item_id
+    AND it.scenario_id = sc.id
     AND sc.name = $2
     AND sc.project_id = (SELECT id FROM jtl.projects WHERE project_name = $1);`,
         values: [projectName, scenarioName, itemId, id, userId],
@@ -513,6 +531,7 @@ export const saveThresholdsResult = (projectName, scenarioName, itemId, threshol
     SET threshold_result = $4
     FROM jtl.scenario as s
     WHERE it.id = $1
+    AND it.scenario_id = s.id
     AND s.project_id = (SELECT id FROM jtl.projects WHERE project_name = $2)
     AND s.name = $3`,
         values: [itemId, projectName, scenarioName, threshold],

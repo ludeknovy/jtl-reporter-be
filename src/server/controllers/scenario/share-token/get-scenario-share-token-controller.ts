@@ -8,7 +8,7 @@ import { searchScenarioShareTokens, selectOnlyMyScenarioShareTokens } from "../.
 export const getScenarioShareTokenController = async (req: IGetUserAuthInfoRequest, res: Response) => {
     const { role, userId } = req.user
     const { projectName, scenarioName } = req.params
-    if ([AllowedRoles.Operator].includes(role)) {
+    if ([AllowedRoles.Operator, AllowedRoles.Readonly].includes(role)) {
         const myApiKeys = await db.manyOrNone(selectOnlyMyScenarioShareTokens(projectName, scenarioName, userId))
         res.status(StatusCode.Ok).json(myApiKeys)
     } else {
