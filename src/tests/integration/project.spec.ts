@@ -2,6 +2,17 @@ import * as request from "supertest"
 import { States } from "./helper/state.model"
 import { stateSetup, userSetup } from "./helper/state"
 import { StatusCode } from "../../server/utils/status-code"
+import { db } from "../../db/db"
+import { createNewProject } from "../../server/queries/projects"
+import { createNewScenario } from "../../server/queries/scenario"
+import { createNewItem, saveItemStats } from "../../server/queries/items"
+import { ReportStatus } from "../../server/queries/items.model"
+import { addProjectMember, assignAllAdminsAsProjectMembers } from "../../server/queries/user-project-access"
+import { createUserInDB } from "../../server/controllers/users/create-new-user-controller"
+import { AllowedRoles } from "../../server/middleware/authorization-middleware"
+import { getUser } from "../../server/queries/auth"
+import { generateToken } from "../../server/controllers/auth/helper/token-generator"
+import { testStats } from "../../test-data/test-stats"
 
 
 describe("Projects", () => {
@@ -46,6 +57,67 @@ describe("Projects", () => {
                 totalDuration: expect.any(Number),
                 totalRunCount: expect.any(Number),
             }))
+        })
+
+        it("should scope dashboard statistics only to projects the user has access to", async () => {
+            const RESTRICTED_MAX_VU = 40
+            const RESTRICTED_DURATION = 20
+            const EXPECTED_ADMIN_RUN_COUNT = 2
+
+            await stateSetup(States.ExistingTestItem)
+
+            const restrictedProject = await db.one(createNewProject("restricted-project"))
+            await db.any(assignAllAdminsAsProjectMembers(restrictedProject.id))
+            await db.none(createNewScenario("restricted-project", "restricted-scenario"))
+            const restrictedItem = await db.one(createNewItem(
+                "restricted-scenario", "2020-01-01 10:00:00.000", "localhost", "restricted note",
+                "1", "restricted-project", "localhost", ReportStatus.Ready, "restricted-run", "resourcesLink"))
+            await db.none(saveItemStats(
+                restrictedItem.id,
+                JSON.stringify(testStats),
+                JSON.stringify({ maxVu: RESTRICTED_MAX_VU, duration: RESTRICTED_DURATION }),
+                JSON.stringify([]),
+                JSON.stringify([])))
+
+            await createUserInDB("readonly-scoped", "Password123!", AllowedRoles.Readonly)
+            const scopedUser = await db.one(getUser("readonly-scoped"))
+            await db.none(addProjectMember(restrictedProject.id, scopedUser.id))
+            const scopedToken = generateToken(scopedUser.id)
+
+            await createUserInDB("readonly-no-access", "Password123!", AllowedRoles.Readonly)
+            const noAccessUser = await db.one(getUser("readonly-no-access"))
+            const noAccessToken = generateToken(noAccessUser.id)
+
+            const scopedResponse = await request(__server__)
+                .get("/api/projects/overall-stats")
+                .set(__tokenHeaderKey__, scopedToken)
+                .set("Accept", "application/json")
+                .expect(StatusCode.Ok)
+            expect(scopedResponse.body).toEqual({
+                avgVu: RESTRICTED_MAX_VU,
+                avgDuration: RESTRICTED_DURATION,
+                totalDuration: RESTRICTED_DURATION,
+                totalRunCount: 1,
+            })
+
+            const noAccessResponse = await request(__server__)
+                .get("/api/projects/overall-stats")
+                .set(__tokenHeaderKey__, noAccessToken)
+                .set("Accept", "application/json")
+                .expect(StatusCode.Ok)
+            expect(noAccessResponse.body).toEqual({
+                avgVu: 0,
+                avgDuration: 0,
+                totalDuration: 0,
+                totalRunCount: 0,
+            })
+
+            const adminResponse = await request(__server__)
+                .get("/api/projects/overall-stats")
+                .set(__tokenHeaderKey__, credentials.token)
+                .set("Accept", "application/json")
+                .expect(StatusCode.Ok)
+            expect(adminResponse.body.totalRunCount).toBe(EXPECTED_ADMIN_RUN_COUNT)
         })
     })
     describe("POST /projects", () => {

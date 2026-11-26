@@ -9,6 +9,7 @@ import { getLabelErrorsController } from "../controllers/label/get-label-errors-
 import { AllowedRoles, authorizationMiddleware } from "../middleware/authorization-middleware"
 import { authenticationMiddleware } from "../middleware/authentication-middleware"
 import { projectExistsMiddleware } from "../middleware/project-exists-middleware"
+import { itemExistsMiddleware } from "../middleware/item-exists-middleware"
 
 export class LabelRoutes {
 
@@ -21,6 +22,7 @@ export class LabelRoutes {
                 paramsSchemaValidator(labelParamSchema),
                 queryParamsValidator(labelQuerySchema),
                 projectExistsMiddleware,
+                itemExistsMiddleware,
                 wrapAsync((req: Request, res: Response) => getLabelTrendController(req, res)))
 
         app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/label/:label/virtual-users")
@@ -30,6 +32,7 @@ export class LabelRoutes {
                 paramsSchemaValidator(labelParamSchema),
                 queryParamsValidator(labelQuerySchema),
                 projectExistsMiddleware,
+                itemExistsMiddleware,
                 wrapAsync((req: Request, res: Response, next: NextFunction) =>
                     getLabelVirtualUsersController(req, res, next)))
 
@@ -39,6 +42,7 @@ export class LabelRoutes {
                 authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(labelParamSchema),
                 projectExistsMiddleware,
+                itemExistsMiddleware,
                 wrapAsync((req: Request, res: Response) => getLabelErrorsController(req, res)))
     }
 }
