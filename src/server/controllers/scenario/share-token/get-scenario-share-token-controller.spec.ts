@@ -33,22 +33,6 @@ describe("getScenarioShareTokenController", () => {
         expect(response.status).toHaveBeenCalledTimes(1)
         expect(response.json).toHaveBeenNthCalledWith(1, mockData)
     })
-    it("should load only my keys when user role is readonly", async () => {
-        const mockData = [{ id: "1", note: "my note", token: "my token" }]
-        const response = mockResponse()
-        const querySpy = jest.spyOn(require("../../../queries/scenario"), "selectOnlyMyScenarioShareTokens")
-        const request = {
-            params: { projectName: "project", scenarioName: "scenario" },
-            user: { role: AllowedRoles.Readonly, userId: uuidv4() },
-        };
-        (db.manyOrNone as any).mockResolvedValueOnce(mockData)
-        await getScenarioShareTokenController(request as unknown as IGetUserAuthInfoRequest,
-            response as unknown as Response)
-        expect(querySpy)
-            .toHaveBeenLastCalledWith(request.params.projectName, request.params.scenarioName, request.user.userId)
-        expect(response.status).toHaveBeenCalledTimes(1)
-        expect(response.json).toHaveBeenNthCalledWith(1, mockData)
-    })
     it("should return all tokens when user role is admin", async () => {
         const mockData = [
             { id: "1", note: "my note", token: "my token" },

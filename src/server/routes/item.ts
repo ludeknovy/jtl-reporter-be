@@ -126,7 +126,7 @@ export class ItemsRoutes {
         app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/share-tokens")
             .get(
                 authenticationMiddleware,
-                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+                authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(paramsSchema),
                 projectExistsMiddleware,
                 itemExistsMiddleware,
