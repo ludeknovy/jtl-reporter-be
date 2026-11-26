@@ -119,7 +119,7 @@ export class ScenarioRoutes {
 
             .post(
                 authenticationMiddleware,
-                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+                authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(paramsSchema),
                 bodySchemaValidator(scenarioNotificationBodySchema),
                 projectExistsMiddleware,

@@ -134,7 +134,7 @@ export class ItemsRoutes {
 
             .post(
                 authenticationMiddleware,
-                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+                authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(paramsSchema),
                 projectExistsMiddleware,
                 itemExistsMiddleware,
@@ -143,7 +143,7 @@ export class ItemsRoutes {
         app.route("/api/projects/:projectName/scenarios/:scenarioName/items/:itemId/share-tokens/:tokenId")
             .delete(
                 authenticationMiddleware,
-                authorizationMiddleware([AllowedRoles.Readonly, AllowedRoles.Operator, AllowedRoles.Admin]),
+                authorizationMiddleware([AllowedRoles.Operator, AllowedRoles.Admin]),
                 paramsSchemaValidator(shareTokenSchema),
                 projectExistsMiddleware,
                 itemExistsMiddleware,
